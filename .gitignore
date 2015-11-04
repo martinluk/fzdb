@@ -29,10 +29,7 @@
 bin
 
 # Biicode
-bii/build
-bii/cmake
-bii/deps
-bii/lib
+bii
 
 #Sublime
 *.sublime-workspace
