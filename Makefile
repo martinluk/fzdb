@@ -42,3 +42,5 @@ $(OBJECTS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cpp
 
 clean:
 	rm -f $(BUILDDIR)/*o $(BUILDDIR)/$(EXECUTABLE)
+
+test:;
