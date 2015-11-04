@@ -11,6 +11,7 @@ install:
   - cd biicode/opt/biicode
   - BIIPATH=$(pwd)
   - export PATH="$BIIPATH:$PATH"
+  - cd /home/travis/build/matann/fuzzy-database
 script:
   - pwd
   - bii init -L
