@@ -26,3 +26,13 @@
 *.exe
 *.out
 *.app
+bin
+
+# Biicode
+bii/build
+bii/cmake
+bii/deps
+bii/lib
+
+#Sublime
+*.sublime-workspace

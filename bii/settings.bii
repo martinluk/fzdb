@@ -1,0 +1,2 @@
+cmake: {generator: Visual Studio 14}
+os: {arch: 64bit, family: Windows, subfamily: '8', version: 6.2.9200}
