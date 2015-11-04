@@ -14,10 +14,7 @@ install:
   - cd /home/travis/build/matann/fuzzy-database
 script:
   - pwd
-  - bii init -L
-  - bii find
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++" && bii build; fi
-  - if [ "$CXX" == "g++" ];     then export CXX="g++"     && bii build; fi
+  - bii buzz
 ##################### CHANGE WITH YOUR CUSTOM CHECKS OR TEST EXECUTION ##################
 ########################################################################################
 env:
