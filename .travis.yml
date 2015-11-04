@@ -1,21 +1,16 @@
 language: cpp
-sudo: required
+#sudo: required
+addons:
+  apt:
+    sources:
+    - george-edison55/precise-backports
+    packages:
+    - gcc-4.8
+    - g++-4.8
+    - biicode
 compiler:
   - clang
   - gcc
-install:
-  - if [ "$CXX" == "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
-  - wget http://www.biicode.com/downloads/latest/ubuntu64
-  - mv ubuntu64 bii-ubuntu64.deb
-  - sudo dpkg -i bii-ubuntu64.deb && sudo apt-get -f install
-  - rm bii-ubuntu64.deb
-  - wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz
-  - tar -xzf cmake-3.0.2-Linux-64.tar.gz
-  - sudo cp -fR cmake-3.0.2-Linux-64/* /usr
-  - rm -rf cmake-3.0.2-Linux-64
-  - rm cmake-3.0.2-Linux-64.tar.gz
-  - export TRAVIS_CXX=$CXX
 script:
   - pwd
   - bii buzz
