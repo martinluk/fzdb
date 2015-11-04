@@ -1,0 +1,12 @@
+language: cpp
+
+install: biicode configure
+
+script: biicode build
+
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
