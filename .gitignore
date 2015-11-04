@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# Don't include the build directory - this is platform-specific and
+# generated at compilation anyway.
+build/*
