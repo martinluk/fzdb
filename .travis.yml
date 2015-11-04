@@ -8,9 +8,9 @@ install:
   - BIIPATH=$(pwd)
   - export PATH="$BIIPATH:$PATH"
   - bii setup:cpp
-  - biicode configure
+  - bii configure
 
-script: biicode build
+script: bii build
 
 compiler:
   - gcc
