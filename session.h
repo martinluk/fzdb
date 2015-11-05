@@ -1,3 +1,5 @@
+#ifndef FUZZYDB_SESSION
+#define FUZZYDB_SESSION
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -7,6 +9,7 @@ using boost::asio::ip::tcp;
 class TCPSession
 {
 public:
+
 	TCPSession(boost::asio::io_service& io_service)
 		: socket_(io_service) { }
 
@@ -14,15 +17,16 @@ public:
 
 	void start();
 
-	void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
-
-	void handle_write(const boost::system::error_code& error);
-
 	void respond(const std::string response);
 
 private:
+
+	void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
+	void handle_write(const boost::system::error_code& error);	
+
 	tcp::socket socket_;
 	enum { max_length = 1024 };
 	char data_[max_length];
-	std::string _command;
 };
+
+#endif
