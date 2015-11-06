@@ -17,7 +17,9 @@ install:
   - export TRAVIS_CXX=$CXX
 script:
   - pwd
-  - bii buzz
+  - bii find
+  - bii configure -DBII_BOOST_BUILD_J=16
+  - bii build
 ##################### CHANGE WITH YOUR CUSTOM CHECKS OR TEST EXECUTION ##################
 ########################################################################################
 env:

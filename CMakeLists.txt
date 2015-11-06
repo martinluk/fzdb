@@ -3,7 +3,8 @@ include(biicode/boost/setup)
 ADD_BII_TARGETS()
 
 set(Boost_USE_STATIC_LIBS ON)
-bii_find_boost(COMPONENTS system coroutine context thread filesystem REQUIRED)
+
+bii_find_boost(COMPONENTS thread date_time filesystem system REQUIRED)
 target_include_directories(${BII_BLOCK_TARGET} INTERFACE ${Boost_INCLUDE_DIRS})
 target_link_libraries(${BII_BLOCK_TARGET} INTERFACE ${Boost_LIBRARIES})
 

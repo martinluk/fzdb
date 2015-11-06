@@ -3,6 +3,8 @@
 #include <iostream>
 #include "./server.h"
 
+#include "./Logger.h"
+
 /**
  * @brief Entry point for the application
  * @details [long description]
@@ -13,6 +15,10 @@
  * @return error code
  */
 int main(int argc, char* argv[]) {
+
+	Logger::Init();
+	Logger::Log(Logger::Level::Info, "Hello World");
+
   try {
     std::cout << "Fuzzy Database v0.1" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
