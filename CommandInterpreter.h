@@ -1,7 +1,7 @@
 /*
 *	Parses commands, establishes which jobs need doing and then adds jobs to the jobs queue
 */
-#include "./session.h";
+#include "./session.h"
 
 class CommandInterpreter
 {
