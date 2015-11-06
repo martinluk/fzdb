@@ -17,6 +17,7 @@ install:
   - export TRAVIS_CXX=$CXX
 script:
   - pwd
+  - bii init -L
   - bii find
   - bii configure -DBII_BOOST_BUILD_J=16
   - bii build
