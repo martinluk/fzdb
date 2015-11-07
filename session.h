@@ -20,6 +20,7 @@ public:
 	tcp::socket& socket();
 	void start();
 	void respond(const std::string response);
+	void terminate();
 
 private:
 

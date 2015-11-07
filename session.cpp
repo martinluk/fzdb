@@ -48,6 +48,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   // Check whether the socket disconnected.
   if ( _socketDisconnected(error) )
   {
+  	// No need to call terminate() since we're already disconnected.
   	parent_->signalSessionTerminated(this);
   	return;
   }
@@ -62,7 +63,10 @@ void TCPSession::handle_read(const boost::system::error_code& error,
         boost::asio::placeholders::error,
         boost::asio::placeholders::bytes_transferred));
   } else {
-    // TODO: Handle other errors
+    // TODO: Handle other errors.
+  	// For now, just quit the session.
+  	terminate();
+  	parent_->signalSessionTerminated(this);
   }
 }
 
@@ -75,7 +79,10 @@ void TCPSession::handle_read(const boost::system::error_code& error,
 void TCPSession::handle_write(const boost::system::error_code& error) {
   if (!error) {
   } else {
-    // TODO: Handle errors
+    // TODO: Handle errors.
+    // For now, just terminate.
+    terminate();
+    parent_->signalSessionTerminated(this);
   }
 }
 
@@ -90,4 +97,10 @@ void TCPSession::respond(const std::string response) {
     boost::asio::buffer(response.c_str(), response.length()),
     boost::bind(&TCPSession::handle_write, this,
       boost::asio::placeholders::error));
+}
+
+void TCPSession::terminate()
+{
+	socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+	socket_.close();
 }

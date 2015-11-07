@@ -10,6 +10,7 @@ CMD_QUIT = "quit"
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
+print "Connected - type 'quit' to disconnect."
 while True:
 	line = sys.stdin.readline().rstrip();
 	if line != "quit":

@@ -21,7 +21,9 @@ TCPServer::~TCPServer()
 	// Delete all live sessions.
 	while ( liveSessions_.size() > 0 )
 	{
-		delete liveSessions_.back();
+		TCPSession* s = liveSessions_.back();
+		s->terminate();
+		delete s;
 		liveSessions_.pop_back();
 	}
 }
@@ -34,6 +36,9 @@ TCPServer::~TCPServer()
 void TCPServer::handle_accept(TCPSession* session, const boost::system::error_code& error) {
 	// If no errors in the setup:
   if (!error) {
+
+  	// TODO: How do we get the client's IP to display here?
+  	Logger::Log() << "Session initiated." << std::endl;
 
 		// Start the session. It will sit in our vector until we decide to remove it.
     session->start();
@@ -74,7 +79,7 @@ void TCPServer::signalSessionTerminated(TCPSession* session)
 
 	if ( it != liveSessions_.end() )
 	{
-		Logger::Log(Logger::Level::Info, "Deleting session");
+		Logger::Log() << "Session " << (*it) << " deleted." << std::endl;
 		delete *it;
 		liveSessions_.erase(it);
 	}
