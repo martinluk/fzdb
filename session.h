@@ -6,6 +6,9 @@
 
 using boost::asio::ip::tcp;
 
+// TODO: How to we handle when the connection to this session is ended?
+// We'll want to do this in order to inform the TCPServer that we are no
+// longer live and can be cleaned up.
 class TCPSession
 {
 public:

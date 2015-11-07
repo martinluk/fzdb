@@ -1,6 +1,7 @@
 #ifndef FUZZYDB_SERVER
 #define FUZZYDB_SERVER
 
+#include <vector>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
@@ -12,12 +13,17 @@ class TCPServer
 {
 public:
 	TCPServer(boost::asio::io_service& io_service, unsigned short port);
+	~TCPServer();
 
-	void handle_accept(TCPSession* new_session, const boost::system::error_code& error);
+	void handle_accept(TCPSession* session, const boost::system::error_code& error);
 
 private:
+	void listenForNewConnection();
+
+	unsigned short port_;
 	boost::asio::io_service& io_service_;
 	tcp::acceptor acceptor_;
+	std::vector<TCPSession*> liveSessions_;
 };
 
 #endif

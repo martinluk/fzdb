@@ -37,3 +37,6 @@ bii
 
 # Mac cache files
 .DS_Store
+
+# Vim locks
+*.swp

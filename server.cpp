@@ -1,23 +1,57 @@
 #include "./server.h"
 
 TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
-    : io_service_(io_service),
-    acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) {
-  TCPSession* new_session = new TCPSession(io_service_);
-  acceptor_.async_accept(new_session->socket(),
-    boost::bind(&TCPServer::handle_accept, this, new_session,
-      boost::asio::placeholders::error));
+		: port_(port),
+    io_service_(io_service),
+		// The acceptor is connected to the IO service here.
+		// The acceptor listens on the given port to see whether
+		// there are any clients who want to establish a
+		// connection.
+    acceptor_(io_service, tcp::endpoint(tcp::v4(), port_)) {
+	
+		// Start listening for the first connection request.
+		listenForNewConnection();
 }
 
-void TCPServer::handle_accept(TCPSession* new_session,
-  const boost::system::error_code& error) {
+TCPServer::~TCPServer()
+{
+	// Delete all live sessions.
+	while ( liveSessions_.size() > 0 )
+	{
+		delete liveSessions_.back();
+		liveSessions_.pop_back();
+	}
+}
+
+// Called when the acceptor receives a connection request.
+// No actual data about the request is read in here -
+// this function just sets up a TCP session which then
+// handles reading and acting upon the actual data from the
+// client.
+void TCPServer::handle_accept(TCPSession* session, const boost::system::error_code& error) {
+	// If no errors in the setup:
   if (!error) {
-    new_session->start();
-    new_session = new TCPSession(io_service_);
-    acceptor_.async_accept(new_session->socket(),
-      boost::bind(&TCPServer::handle_accept, this, new_session,
-      boost::asio::placeholders::error));
+
+		// Start the session. It will sit in our vector until we decide to remove it.
+    session->start();
+
+		// Listen for the next connection attempt.
+		listenForNewConnection();
   } else {
-    delete new_session;
+		// Nothing to do here now.
   }
+}
+
+void TCPServer::listenForNewConnection()
+{
+	// Create a new TCP session.
+	// This is kept in the live sessions list.
+	TCPSession* s = new TCPSession(io_service_);
+	liveSessions_.push_back(s);
+
+	// Set up the server's acceptor to call the function
+	// below whenever a client tries to connect.
+  acceptor_.async_accept(s->socket(),
+    boost::bind(&TCPServer::handle_accept, this, s,
+      boost::asio::placeholders::error));
 }
