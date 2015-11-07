@@ -5,6 +5,7 @@ compiler:
   - clang
   - gcc
 install:
+  - sudo apt-get install libpthread-stubs0-dev
   - wget http://www.biicode.com/downloads/latest/ubuntu64
   - mv ubuntu64 bii-ubuntu64.deb
   - sudo dpkg -i bii-ubuntu64.deb && sudo apt-get -f install
