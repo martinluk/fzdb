@@ -33,3 +33,6 @@ bii
 
 #Sublime
 *.sublime-workspace
+
+# Mac cache files
+.DS_Store
