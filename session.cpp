@@ -5,8 +5,20 @@
 #include "Logger.h"
 
 #include "./CommandInterpreter.h"
+#include "./server.h"
 
 using boost::asio::ip::tcp;
+
+// As per http://stackoverflow.com/questions/19887537/how-to-detect-when-a-boost-tcp-socket-disconnects
+bool _socketDisconnected(const boost::system::error_code& error)
+{
+	return error == boost::asio::error::eof || error == boost::asio::error::connection_reset;
+}
+
+TCPSession::TCPSession(boost::asio::io_service& io_service, TCPServer* parent)
+	: socket_(io_service), parent_(parent)
+{
+}
 
 tcp::socket& TCPSession::socket() {
   return socket_;
@@ -32,6 +44,14 @@ void TCPSession::start() {
  */
 void TCPSession::handle_read(const boost::system::error_code& error,
   size_t bytes_transferred) {
+
+  // Check whether the socket disconnected.
+  if ( _socketDisconnected(error) )
+  {
+  	parent_->signalSessionTerminated(this);
+  	return;
+  }
+  
   if (!error) {
     std::string _command = std::string(data_).substr(0, bytes_transferred);
 	  Logger::Log(Logger::Info, "Recieved command: " + _command);
@@ -42,7 +62,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
         boost::asio::placeholders::error,
         boost::asio::placeholders::bytes_transferred));
   } else {
-    delete this;
+    // TODO: Handle other errors
   }
 }
 
@@ -55,7 +75,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
 void TCPSession::handle_write(const boost::system::error_code& error) {
   if (!error) {
   } else {
-    delete this;
+    // TODO: Handle errors
   }
 }
 

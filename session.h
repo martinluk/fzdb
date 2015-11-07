@@ -6,6 +6,8 @@
 
 using boost::asio::ip::tcp;
 
+class TCPServer;
+
 // TODO: How to we handle when the connection to this session is ended?
 // We'll want to do this in order to inform the TCPServer that we are no
 // longer live and can be cleaned up.
@@ -13,13 +15,10 @@ class TCPSession
 {
 public:
 
-	TCPSession(boost::asio::io_service& io_service)
-		: socket_(io_service) { }
+	TCPSession(boost::asio::io_service& io_service, TCPServer* parent);
 
 	tcp::socket& socket();
-
 	void start();
-
 	void respond(const std::string response);
 
 private:
@@ -30,6 +29,7 @@ private:
 	tcp::socket socket_;
 	enum { max_length = 1024 };
 	char data_[max_length];
+	TCPServer*	parent_;
 };
 
 #endif

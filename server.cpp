@@ -1,4 +1,7 @@
 #include "./server.h"
+#include "./Logger.h"
+
+typedef std::vector<TCPSession*> SessionVector;
 
 TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
 		: port_(port),
@@ -46,7 +49,7 @@ void TCPServer::listenForNewConnection()
 {
 	// Create a new TCP session.
 	// This is kept in the live sessions list.
-	TCPSession* s = new TCPSession(io_service_);
+	TCPSession* s = new TCPSession(io_service_, this);
 	liveSessions_.push_back(s);
 
 	// Set up the server's acceptor to call the function
@@ -54,4 +57,25 @@ void TCPServer::listenForNewConnection()
   acceptor_.async_accept(s->socket(),
     boost::bind(&TCPServer::handle_accept, this, s,
       boost::asio::placeholders::error));
+}
+
+void TCPServer::signalSessionTerminated(TCPSession* session)
+{
+	// Delete the session and remove it fromt the list.
+	SessionVector::iterator it = liveSessions_.end();
+	for ( SessionVector::iterator i = liveSessions_.begin(); i != liveSessions_.end(); ++i )
+	{
+		if ( *i == session )
+		{
+			it = i;
+			break;
+		}
+	}
+
+	if ( it != liveSessions_.end() )
+	{
+		Logger::Log(Logger::Level::Info, "Deleting session");
+		delete *it;
+		liveSessions_.erase(it);
+	}
 }

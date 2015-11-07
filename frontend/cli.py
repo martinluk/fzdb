@@ -6,12 +6,13 @@ import sys
 
 TCP_IP = 'localhost'
 TCP_PORT = 1407 
+CMD_QUIT = "quit"
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
 while True:
-	line = sys.stdin.readline()
-	if line:
+	line = sys.stdin.readline().rstrip();
+	if line != "quit":
 		s.send(line)
 	else:
 		break

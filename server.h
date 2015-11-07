@@ -11,6 +11,7 @@ using boost::asio::ip::tcp;
 
 class TCPServer
 {
+	friend class TCPSession;
 public:
 	TCPServer(boost::asio::io_service& io_service, unsigned short port);
 	~TCPServer();
@@ -19,6 +20,7 @@ public:
 
 private:
 	void listenForNewConnection();
+	void signalSessionTerminated(TCPSession* session);
 
 	unsigned short port_;
 	boost::asio::io_service& io_service_;
