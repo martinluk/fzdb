@@ -1,6 +1,14 @@
 include(biicode/boost/setup)
 
+if(UNIX)
+	FIND_PACKAGE ( Threads REQUIRED )
+endif()
+
 ADD_BII_TARGETS()
+
+if(UNIX)
+	TARGET_LINK_LIBRARIES ( ${BII_BLOCK_TARGET} INTERFACE ${CMAKE_THREAD_LIBS_INIT} )
+endif()
 
 set(Boost_USE_STATIC_LIBS ON)
 
