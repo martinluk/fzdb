@@ -6,6 +6,7 @@ boost::thread_group JobQueue::_threads;
 
 void JobQueue::ExecuteJob(Job * job) {
 	job->execute();
+	delete job;
 }
 
 void JobQueue::Init(boost::asio::io_service* service) {
