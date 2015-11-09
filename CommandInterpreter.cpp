@@ -39,7 +39,7 @@ namespace client
 			using qi::lexeme;
 			using ascii::char_;
 
-			string %= lexeme[+(boost::spirit::qi::alpha) | ('"' >> +(char_ - '"') >> '"')];
+			string %= lexeme[+(boost::spirit::qi::alnum) | ('"' >> +(char_ - '"') >> '"')];
 
 			start %=
 				string
