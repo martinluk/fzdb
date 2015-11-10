@@ -11,6 +11,8 @@ public:
 		_session = session;
 	}
 
+	virtual ~Job() {}
+
 	virtual void execute() = 0;
 protected:
 	TCPSession* _session;
