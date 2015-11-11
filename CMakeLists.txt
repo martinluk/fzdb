@@ -1,6 +1,6 @@
 project(fuzzy-database)
-cmake_minimum_required(VERSION 2.8.8)
-cmake_policy(VERSION 2.8.8)
+cmake_minimum_required(VERSION 2.8.7)
+cmake_policy(VERSION 2.8.7)
 
 #Default is DEBUG build
 IF(NOT DEFINED CMAKE_BUILD_TYPE)
