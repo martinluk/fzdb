@@ -1,23 +1,33 @@
-include(biicode/boost/setup)
+project(fuzzy-database)
+cmake_minimum_required(VERSION 2.8.8)
+cmake_policy(VERSION 2.8.8)
 
-if(UNIX)
-	FIND_PACKAGE ( Threads REQUIRED )
-endif()
+#Default is DEBUG build
+IF(NOT DEFINED CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE "DEBUG")
+ENDIF(NOT DEFINED CMAKE_BUILD_TYPE)
 
-ADD_BII_TARGETS()
-
-if(UNIX)
-	TARGET_LINK_LIBRARIES ( ${BII_BLOCK_TARGET} INTERFACE ${CMAKE_THREAD_LIBS_INIT} )
-endif()
-
-set(Boost_USE_STATIC_LIBS ON)
-
-bii_find_boost(COMPONENTS thread date_time filesystem system REQUIRED)
-target_include_directories(${BII_BLOCK_TARGET} INTERFACE ${Boost_INCLUDE_DIRS})
-target_link_libraries(${BII_BLOCK_TARGET} INTERFACE ${Boost_LIBRARIES})
-
-if(MSVC)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+if(${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
+  message("Starting DEBUG configuration..")
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
+  message("Starting RELEASE configuration..")
 else()
-    target_compile_options(${BII_BLOCK_TARGET} INTERFACE -std=c++11)
+  message( FATAL_ERROR "CMAKE_BUILD_TYPE must be DEBUG or RELEASE" )
 endif()
+
+message("Using generator ${CMAKE_GENERATOR}")
+
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost.cmake)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${Boost_INCLUDE_DIRS}) 
+
+FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp)
+FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h)
+
+add_executable(fuzzy-database ${SOURCES} ${HEADERS})
+
+target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
+
+message(${Boost_LIBRARIES})
