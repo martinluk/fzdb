@@ -12,7 +12,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
   message("Starting RELEASE configuration..")
 else()
-  message( FATAL_ERROR "CMAKE_BUILD_TYPE must be DEBUG or RELEASE" )
+  message( FATAL_ERROR "CMAKE_BUILD_TYPE must be DEBUG or RELEASE - it's currently ${CMAKE_BUILD_TYPE}" )
 endif()
 
 message("Using generator ${CMAKE_GENERATOR}")
