@@ -9,6 +9,7 @@ addons:
     packages:
       - cmake
 install:
+  - cmake --version
   - mkdir build
   - cd build
   - cmake ..
