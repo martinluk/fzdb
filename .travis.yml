@@ -3,7 +3,7 @@ compiler:
   - clang
   - gcc
 install:
-  - mdkir build
+  - mkdir build
   - cd build
   - cmake ..
 script:
