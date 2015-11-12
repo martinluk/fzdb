@@ -4,6 +4,7 @@ cmake_policy(VERSION 2.8.11)
 
 #Default is DEBUG build
 IF(NOT DEFINED CMAKE_BUILD_TYPE)
+  message("No build type set - assuming debug build")
   SET(CMAKE_BUILD_TYPE "DEBUG")
 ENDIF(NOT DEFINED CMAKE_BUILD_TYPE)
 
