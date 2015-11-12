@@ -12,7 +12,7 @@ install:
   - cmake --version
   - mkdir build
   - cd build
-  - cmake .. --DCMAKE_BUILD_TYPE=DEBUG
+  - cmake .. -DCMAKE_BUILD_TYPE=DEBUG
 script:
   - cmake --build .
 ##################### CHANGE WITH YOUR CUSTOM CHECKS OR TEST EXECUTION ##################
