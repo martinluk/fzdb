@@ -6,8 +6,11 @@ addons:
   apt:
     sources:
       - kalakris-cmake
+      - ubuntu-toolchain-r-test
     packages:
       - cmake
+      - gcc-4.8
+      - g++-4.8
 install:
   - cmake --version
   - mkdir build
@@ -17,6 +20,3 @@ script:
   - cmake --build .
 ##################### CHANGE WITH YOUR CUSTOM CHECKS OR TEST EXECUTION ##################
 ########################################################################################
-env:
-  global:
-    - GCC_VERSION="4.9"
