@@ -33,3 +33,6 @@ add_executable(fuzzy-database ${SOURCES} ${HEADERS})
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
+if(UNIX AND NOT APPLE)
+   target_link_libraries(fuzzy-database rt)
+endif()
