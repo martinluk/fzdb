@@ -2,6 +2,8 @@ project(fuzzy-database)
 cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(VERSION 2.8.11)
 
+set (CMAKE_CXX_STANDARD 11)
+
 #Default is DEBUG build
 IF(NOT DEFINED CMAKE_BUILD_TYPE)
   message("No build type set - assuming debug build")
@@ -18,7 +20,7 @@ endif()
 
 message("Using generator ${CMAKE_GENERATOR}")
 
-
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/pthreads.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -30,5 +32,4 @@ FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR
 add_executable(fuzzy-database ${SOURCES} ${HEADERS})
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
-
-message(${Boost_LIBRARIES})
+target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})

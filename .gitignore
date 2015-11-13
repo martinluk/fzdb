@@ -39,3 +39,4 @@ build
 
 # Vim locks
 *.swp
+*~
