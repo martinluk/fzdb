@@ -1,4 +1,5 @@
 language: cpp
+sudo: false
 compiler:
   - clang
   - gcc
@@ -9,9 +10,11 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - cmake
+      - clang
       - gcc-4.8
       - g++-4.8
 install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - cmake --version
   - mkdir build
   - cd build
