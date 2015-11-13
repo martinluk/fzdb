@@ -4,15 +4,18 @@
 A graph-based fuzzy data store.
 
 ## Building
-Initialise biicode with `bii init -L`.
 
-Run `bii find` to find dependencies, `bii configure` to download/install dependencies 
-and `bii build` to actually build the solution. The final executable is put in the 'bin' folder. 
+It is best to do 'out of source builds'.
 
-Alternatively running `bii buzz` on a clean clone of this branch will do EVERYTHING for you and you'll
- get a binary at the end. 
+Create a directory called build `mkdir build` and set the working directory to that directory.
+Then call `cmake ..`, this will download and build dependencies as well as configuring a build
+system for the project. Note: call `cmake .. -G "Visual Studio 14"` to build a VS2015 community edition 
+project. 
 
-If you want to generate visual studio files put `-G "Visual Studio 14"` on the `bii buzz` or `bii build` commands.
+If the command complains that it must be set to DEBUG or release add the option `-DCMAKE_BUILD_TYPE=DEBUG`.
+
+Once the configuration is complete you can either build the project using the generated build files or use the
+command `cmake --build .` to get cmake to do that for you.
 
 ## Running
 The program starts a TCP server on port 1407. Use CTRL-C to kill the running server.
