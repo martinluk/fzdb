@@ -1,5 +1,8 @@
 language: cpp
 sudo: false
+cache:
+  directories:
+    - build/external
 compiler:
   - clang
   - gcc
