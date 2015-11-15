@@ -16,4 +16,9 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(nowide install_dir)
 set(Boost_Nowide_INCLUDES "${install_dir}/src/nowide")
-set(Boost_Nowide_LIBRARIES "${install_dir}/src/nowide-build/Debug/libnowide.lib")
+
+if(MSVC)
+	set(Boost_Nowide_LIBRARIES "${install_dir}/src/nowide-build/Debug/libnowide.lib")
+elseif(GCC)
+	set(Boost_Nowide_LIBRARIES "${install_dir}/src/nowide-build/libnowide.a")
+endif()
