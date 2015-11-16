@@ -6,6 +6,7 @@ INCLUDE(ExternalProject)
 
 if(UNIX)
   set (CMAKE_CXX_FLAGS -std=c++11)
+  set (CMAKE_VERBOSE_MAKEFILE true )
 endif()
 
 #Default is DEBUG build
@@ -44,9 +45,5 @@ target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
 add_dependencies(fuzzy-database nowide)
 
 if(UNIX AND NOT APPLE)
-   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-      target_link_libraries(fuzzy-database rt)
-   else()
-      SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt" )
-   endif()   
+   target_link_libraries(fuzzy-database -lrt) 
 endif()
