@@ -1,23 +1,25 @@
 language: cpp
-sudo: false
+sudo: required
+dist: trusty
 cache:
   directories:
     - build/external
 compiler:
   - clang
   - gcc
-addons:
-  apt:
-    sources:
-      - kalakris-cmake
-      - ubuntu-toolchain-r-test
-    packages:
-      - cmake
-      - clang
-      - gcc-4.8
-      - g++-4.8
+#addons:
+#  apt:
+#    sources:
+#      - kalakris-cmake
+#      - ubuntu-toolchain-r-test
+#    packages:
+#      - cmake
+#      - clang
+#      - gcc-4.8
+#      - g++-4.8
 install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - sudo apt-get install gcc-4.9
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   - gcc --version
   - cmake --version
   - mkdir -p build
