@@ -55,8 +55,14 @@ else()
   set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
   set(Boost_LIBRARY_DIRS "${BOOST_ROOT}/stage/lib")
   if(UNIX)
-     file(GLOB Boost_LIBRARIES "${Boost_LIBRARY_DIRS}/*.a")
+     #the ordering is important in gcc4.8 (used by travis)
+     set(Boost_LIBRARIES "${Boost_LIBRARY_DIRS}/libboost_thread.a"
+                         "${Boost_LIBRARY_DIRS}/libboost_system.a"
+                         "${Boost_LIBRARY_DIRS}/libboost_date_time.a"
+                         "${Boost_LIBRARY_DIRS}/libboost_filesystem.a"
+                         "${Boost_LIBRARY_DIRS}/libboost_regex.a")
   elseif(WIN32)
+     #msvc is clever enough to work out the ordering itself, and has more annoying filenames
      if(${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
         file(GLOB Boost_LIBRARIES "${Boost_LIBRARY_DIRS}/*-mt-gd-1_59.lib")
      elseif(${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
