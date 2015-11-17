@@ -40,3 +40,4 @@ bii
 
 # Vim locks
 *.swp
+.vagrant
