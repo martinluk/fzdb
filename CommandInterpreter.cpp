@@ -1,5 +1,7 @@
-#include <boost/config/warning_disable.hpp>
+#define BOOST_SPIRIT_UNICODE
+
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -25,11 +27,9 @@ BOOST_FUSION_ADAPT_STRUCT(
 namespace client
 {
 	namespace qi = boost::spirit::qi;
-	namespace ascii = boost::spirit::ascii;
-
 
 	template <typename Iterator>
-	struct command_parser : qi::grammar<Iterator, command_struct(), ascii::space_type>
+	struct command_parser : qi::grammar<Iterator, command_struct(), boost::spirit::unicode::space_type>
 	{
 		command_parser() : command_parser::base_type(start)
 		{
@@ -37,9 +37,9 @@ namespace client
 			using qi::lit;
 			using qi::double_;
 			using qi::lexeme;
-			using ascii::char_;
+			using boost::spirit::unicode::char_;
 
-			string %= lexeme[+(boost::spirit::qi::alnum) | ('"' >> +(char_ - '"') >> '"')];
+			string %= lexeme[+(char_ - ' ') | ('"' >> +(char_ - '"') >> '"')];
 
 			start %=
 				string
@@ -47,18 +47,16 @@ namespace client
 				;
 		}
 
-		qi::rule<Iterator, std::string(), ascii::space_type> string;
-		qi::rule<Iterator, command_struct(), ascii::space_type> start;
+		qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> string;
+		qi::rule<Iterator, command_struct(), boost::spirit::unicode::space_type> start;
 	};
 }
-
-
 
 void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command) {
 
 	client::command_parser<std::string::iterator> g;
 	command_struct cmd;
-	bool r = boost::spirit::qi::phrase_parse(command.begin(), command.end(), g, boost::spirit::ascii::space, cmd);
+	bool r = boost::spirit::qi::phrase_parse(command.begin(), command.end(), g, boost::spirit::unicode::space, cmd);
 	Job* job;
 	if (r) {
 		if (cmd.arg1.length() == 0) {
