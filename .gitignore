@@ -26,3 +26,18 @@
 *.exe
 *.out
 *.app
+
+bin
+
+# Biicode
+bii
+
+#Sublime
+*.sublime-workspace
+
+# Mac cache files
+.DS_Store
+
+# Vim locks
+*.swp
+.vagrant
