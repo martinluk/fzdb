@@ -7,16 +7,12 @@ cache:
 compiler:
   - clang
   - gcc
-#addons:
-#  apt:
-#    sources:
-#      - kalakris-cmake
-#      - ubuntu-toolchain-r-test
-#    packages:
-#      - cmake
-#      - clang
-#      - gcc-4.8
-#      - g++-4.8
+webhooks:
+  urls:
+    - https://webhooks.gitter.im/e/64463f491a9781e3b19b
+      on_success: always  # options: [always|never|change] default: always
+      on_failure: always  # options: [always|never|change] default: always
+      on_start: false     # default: false
 install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -y
