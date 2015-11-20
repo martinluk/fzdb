@@ -27,12 +27,10 @@
 *.out
 *.app
 
-bin
+# Build file
+build
 
-# Biicode
-bii
-
-#Sublime
+# Sublime
 *.sublime-workspace
 
 # Mac cache files
@@ -40,4 +38,6 @@ bii
 
 # Vim locks
 *.swp
+
 .vagrant
+*~
