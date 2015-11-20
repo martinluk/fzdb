@@ -3,15 +3,10 @@
 PropertyValue::PropertyValue(const Variant &value, float confidence) :
 	value_(value)
 {
-	setConfidence(f);
+	setConfidenceClamp(f);
 }
 
-bool PropertyValue::isConcrete() const
-{
-	return confidence_ == 1.0f;
-}
-
-void PropertyValue::clampConfidence(float f)
+void PropertyValue::setConfidenceClamp(float f)
 {
 	// Clamp to make sure it's between 0 and 1.
 	if ( f < 0.0f ) f = 0.0f;

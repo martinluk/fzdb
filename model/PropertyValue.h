@@ -10,18 +10,12 @@ class PropertyValue
 		// Constructs a concrete value. The confidence is 1 by default.
 		PropertyValue(const Variant &value, float confidence = 1.0f);
 		
-		// Returns whether this value is concrete.
-		// Concrete values have a confidence quantifier of 1.
-		bool isConcrete() const;
-
 		// Getters
 		Variant value() const;
 		float confidence() const;
 
-		// TODO: Setters?
-
 	private:
-		void clampConfidence(float c);
+		void setConfidenceClamp(float c);
 
 		Variant	value_;
 		float confidence_;
