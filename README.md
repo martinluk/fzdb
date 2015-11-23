@@ -1,4 +1,6 @@
 [![Build Status](https://magnum.travis-ci.com/matann/fuzzy-database.svg?token=9y2FhEje8Gso8srsgnQj&branch=develop)](https://magnum.travis-ci.com/matann/fuzzy-database)
+[![Gitter](https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg)](https://gitter.im/matann/fuzzy-database)
+[![Waffle](https://badge.waffle.io/matann/fuzzy-database.png)](https://waffle.io/matann/fuzzy-database)
 
 # fuzzy-database
 A graph-based fuzzy data store.
