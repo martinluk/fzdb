@@ -14,6 +14,7 @@ apt-get -y install screen
 
 #Installing application independencies
 set -x #Output progress
+apt-get -y install build-essential
 apt-get -y install libpthread-stubs0-dev
 wget --quiet http://www.biicode.com/downloads/latest/ubuntu64
 mv ubuntu64 bii-ubuntu64.deb
