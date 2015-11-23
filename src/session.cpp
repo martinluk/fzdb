@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include <boost/uuid/uuid.hpp>
+
 #include "./session.h"
 #include "Logger.h"
 
@@ -15,9 +17,10 @@ bool _socketDisconnected(const boost::system::error_code& error)
 	return error == boost::asio::error::eof || error == boost::asio::error::connection_reset;
 }
 
-TCPSession::TCPSession(boost::asio::io_service& io_service, TCPServer* parent)
+TCPSession::TCPSession(boost::asio::io_service& io_service, TCPServer* parent, boost::uuids::uuid identifier)
 	: socket_(io_service), parent_(parent)
 {
+	_uuid = identifier;
 }
 
 tcp::socket& TCPSession::socket() {
@@ -55,7 +58,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   
   if (!error) {
     std::string _command = std::string(data_).substr(0, bytes_transferred);
-	  Logger::Log(Logger::Info, "Recieved command: " + _command);
+	  Logger::Log() << std::setw(37) << _uuid << "Recieved command: " << _command << std::endl;
     CommandInterpreter::ProcessCommand(this, _command);
     
     socket_.async_read_some(boost::asio::buffer(data_, max_length),
@@ -103,4 +106,9 @@ void TCPSession::terminate()
 {
 	socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 	socket_.close();
+}
+
+boost::uuids::uuid TCPSession::uuid()
+{
+	return _uuid;
 }

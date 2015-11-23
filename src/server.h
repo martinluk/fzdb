@@ -5,6 +5,10 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 #include "./session.h"
 
 using boost::asio::ip::tcp;
@@ -26,6 +30,7 @@ private:
 	boost::asio::io_service& io_service_;
 	tcp::acceptor acceptor_;
 	std::vector<TCPSession*> liveSessions_;
+	boost::uuids::random_generator _uuidGenerator;
 };
 
 #endif
