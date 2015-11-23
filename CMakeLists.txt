@@ -10,10 +10,10 @@ if(UNIX)
 endif()
 
 #Default is DEBUG build
-IF(NOT DEFINED CMAKE_BUILD_TYPE)
-  message("No build type set - assuming debug build")
+IF(NOT CMAKE_BUILD_TYPE MATCHES "RELEASE")
+  message("Assuming debug build, use -DCMAKE_BUILD_TYPE=RELEASE for release build")
   SET(CMAKE_BUILD_TYPE "DEBUG")
-ENDIF(NOT DEFINED CMAKE_BUILD_TYPE)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   message("Starting DEBUG configuration..")
