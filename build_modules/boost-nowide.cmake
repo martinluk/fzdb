@@ -1,6 +1,8 @@
 ExternalProject_Add(
     nowide
     URL http://cppcms.com/files/nowide/nowide_standalone.zip
+    DOWNLOAD_DIR external
+    DOWNLOAD_NAME nowide.zip
     # TIMEOUT 10
     # # Force separate output paths for debug and release builds to allow easy
     # # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
