@@ -11,7 +11,7 @@ ExternalProject_Add(googletest
     #BUILD_COMMAND cmake --build "${GTEST_DIR}/googletest-build"
 )
 
-set(GTEST_INCLUDE_DIRS "${GTEST_DIR}/googletest/googletest/include")
+set(GTEST_INCLUDE_DIRS "${GTEST_DIR}/googletest/include")
 
 if(WIN32)
     if(CMAKE_BUILD_TYPE MATCHES "DEBUG")

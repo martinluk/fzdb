@@ -35,6 +35,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
 include_directories(${Boost_INCLUDE_DIRS}) 
+include_directories(${GTEST_INCLUDE_DIRS}) 
 
 FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp)
 FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h)
