@@ -4,6 +4,8 @@ cmake_policy(VERSION 2.8.11)
 
 INCLUDE(ExternalProject)
 
+enable_testing()
+
 if(UNIX)
   set (CMAKE_CXX_FLAGS -std=c++11)
   set (CMAKE_VERBOSE_MAKEFILE true )
@@ -28,6 +30,7 @@ message("Using generator ${CMAKE_GENERATOR}")
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/pthreads.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost-nowide.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
