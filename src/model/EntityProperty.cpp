@@ -71,3 +71,8 @@ PropertyValue EntityProperty::value(int index) const
 {
 	return values_[index];
 }
+
+const std::string& EntityProperty::keyRef() const
+{
+	return key_;
+}

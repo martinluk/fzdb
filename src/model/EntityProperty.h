@@ -14,6 +14,9 @@
 // concrete property.
 // Property keys cannot be changed once the property has been instanciated,
 // as this simplifies property management within entities.
+
+// TODO: We may want this class to be implicitly shared, so that we can return
+// properties without having to perform deep copies.
 class EntityProperty
 {
 	public:
@@ -36,6 +39,7 @@ class EntityProperty
 
 		// Getters
 		std::string key() const;
+		const std::string& keyRef() const;
 		std::vector<PropertyValue> values() const;
 		PropertyValue value(int index) const;
 		int count() const;

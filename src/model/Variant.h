@@ -9,6 +9,9 @@
 // value is stored by blindly casting the pointer to that type. If this is not the
 // case, an object of the correct type is allocated on the heap and the data pointer
 // records its address.
+
+// TODO: We may want this class to be implicitly shared, so that we can return
+// variants without having to perform deep copies.
 class Variant
 {
 	friend class Variant;
