@@ -28,6 +28,7 @@ message("Using generator ${CMAKE_GENERATOR}")
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/pthreads.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost-nowide.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
@@ -47,3 +48,6 @@ add_dependencies(fuzzy-database nowide)
 if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
 endif()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
