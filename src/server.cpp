@@ -1,6 +1,9 @@
 #include "./server.h"
 #include "./Logger.h"
 
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 typedef std::vector<TCPSession*> SessionVector;
 
 TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
@@ -14,6 +17,8 @@ TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
 	
 		// Start listening for the first connection request.
 		listenForNewConnection();
+
+		_uuidGenerator = boost::uuids::random_generator();
 }
 
 TCPServer::~TCPServer()
@@ -38,7 +43,7 @@ void TCPServer::handle_accept(TCPSession* session, const boost::system::error_co
   if (!error) {
 
   	// TODO: How do we get the client's IP to display here?
-  	Logger::Log() << "Session initiated." << std::endl;
+  	Logger::Log() << std::setw(37) << session->uuid() << "Session initiated." << std::endl;
 
 		// Start the session. It will sit in our vector until we decide to remove it.
     session->start();
@@ -54,7 +59,7 @@ void TCPServer::listenForNewConnection()
 {
 	// Create a new TCP session.
 	// This is kept in the live sessions list.
-	TCPSession* s = new TCPSession(io_service_, this);
+	TCPSession* s = new TCPSession(io_service_, this, _uuidGenerator());
 	liveSessions_.push_back(s);
 
 	// Set up the server's acceptor to call the function
@@ -79,7 +84,7 @@ void TCPServer::signalSessionTerminated(TCPSession* session)
 
 	if ( it != liveSessions_.end() )
 	{
-		Logger::Log() << "Session " << (*it) << " deleted." << std::endl;
+		Logger::Log() << std::setw(37) << (*it)->uuid() << "Session deleted." << std::endl;
 		delete *it;
 		liveSessions_.erase(it);
 	}

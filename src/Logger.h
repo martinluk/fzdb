@@ -76,11 +76,11 @@ private:
 
 	static void LogBegin(Level level)
 	{
-		std::cout << std::left << std::setw(20) << ("[" + boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time()) + "]");
-		std::cout << std::left << std::setw(8);
+		std::cout << std::left << std::setw(18) << ("[" + boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time()) + "]");
+		std::cout << std::left << std::setw(5);
 		switch (level) {
 			case Verbose: {
-				std::cout << "Verbose";
+				std::cout << "Verb";
 				break;
 			}
 			case Info: {
@@ -88,15 +88,15 @@ private:
 				break;
 			}
 			case Warning: {
-				std::cout << "Warning";
+				std::cout << "Warn";
 				break;
 			}
 			case Error: {
-				std::cout << "Error";
+				std::cout << "Err";
 				break;
 			}
 			case Debug: {
-				std::cout << "Debug";
+				std::cout << "Dbug";
 				break;
 			}
 		}
