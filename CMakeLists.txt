@@ -2,6 +2,8 @@ project(fuzzy-database)
 cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(VERSION 2.8.11)
 
+enable_testing()
+
 INCLUDE(ExternalProject)
 
 if(UNIX)
@@ -38,16 +40,14 @@ FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_D
 FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h)
 
 add_executable(fuzzy-database ${SOURCES} ${HEADERS})
+add_dependencies(fuzzy-database nowide)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
 target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
-
-add_dependencies(fuzzy-database nowide)
 
 if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-

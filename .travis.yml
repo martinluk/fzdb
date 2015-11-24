@@ -25,5 +25,4 @@ install:
   - cmake .. -DCMAKE_BUILD_TYPE=DEBUG
 script:
   - cmake --build .
-##################### CHANGE WITH YOUR CUSTOM CHECKS OR TEST EXECUTION ##################
-########################################################################################
+  - ctest -C debug

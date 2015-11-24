@@ -13,7 +13,23 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
 include_directories(${GTEST_INCLUDE_DIRS}) 
 
-add_executable(fuzzy-database-test ${TEST_SOURCES} ${TEST_HEADERS})
+set(PD "${CMAKE_CURRENT_SOURCE_DIR}/../src/")
+
+# FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp)
+# SET(SOURCES_NO_MAIN ${SOURCES})
+# LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")
+# message("BOO: ${SOURCES}")
+# message("WOO: ${SOURCES_NO_MAIN}")
+
+add_executable(fuzzy-database-test ${TEST_SOURCES} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest>)
+add_dependencies(fuzzy-database-test nowide)
+add_dependencies(fuzzy-database-test gtest)
+
+#remove main otherwise there are 2 main functions!
 
 target_link_libraries(fuzzy-database-test ${GTEST_LIBRARIES})
 target_link_libraries(fuzzy-database-test ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(fuzzy-database-test ${Boost_LIBRARIES})
+target_link_libraries(fuzzy-database-test ${Boost_Nowide_LIBRARIES})
+
+add_test(NAME test COMMAND fuzzy-database-test)

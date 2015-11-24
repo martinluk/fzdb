@@ -1,24 +1,23 @@
- set(GTEST_DIR ${CMAKE_CURRENT_BINARY_DIR}/googletest-prefix/src)
+message("Attempting to download GTest")
+set(MY_URL "https://github.com/google/googletest/archive/release-1.7.0.zip")
+set(MY_DOWNLOAD_PATH "${CMAKE_BINARY_DIR}/external/gtest.zip")
+set(GTEST_ROOT "${CMAKE_BINARY_DIR}/googletest-release-1.7.0")
 
-ExternalProject_Add(googletest
-    URL https://github.com/google/googletest/archive/release-1.7.0.zip
-    DOWNLOAD_DIR external
-    DOWNLOAD_NAME gtest.zip
-    URL_MD5 EF5E700C8A0F3EE123E2E0209B8B4961
-# Disable install step
-    INSTALL_COMMAND ""
-    #CONFIGURE_COMMAND cmake "${GTEST_DIR}/googletest/googletest"
-    #BUILD_COMMAND cmake --build "${GTEST_DIR}/googletest-build"
-)
+if (NOT EXISTS "${MY_DOWNLOAD_PATH}")
+  file(DOWNLOAD "${MY_URL}" "${MY_DOWNLOAD_PATH}" SHOW_PROGRESS)      
+else()
+message("Google test appears to already be downloaded")
+endif()  
 
-set(GTEST_INCLUDE_DIRS "${GTEST_DIR}/googletest/include")
-
-if(WIN32)
-    if(CMAKE_BUILD_TYPE MATCHES "DEBUG")
-        set(GTEST_LIBRARIES "${GTEST_DIR}/googletest-build/Debug/gtest.lib" "${GTEST_DIR}/googletest-build/Debug/gtest_main.lib")
-    elseif(CMAKE_BUILD_TYPE MATCHES "RELEASE")
-        set(GTEST_LIBRARIES "${GTEST_DIR}/googletest-build/Release/gtest.lib" "${GTEST_DIR}/googletest-build/Release/gtest_main.lib")
-    endif()
-elseif(UNIX)
-    set(GTEST_LIBRARIES "${GTEST_DIR}/googletest-build/libgtest.a" "${GTEST_DIR}/googletest-build/libgtest_main.a")
+if (NOT EXISTS "${GTEST_ROOT}")
+message("Extracting GTest")
+execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${MY_DOWNLOAD_PATH}")
 endif()
+
+add_library(gtest OBJECT "${GTEST_ROOT}/src/gtest-all.cc")
+
+set_property(TARGET gtest PROPERTY INCLUDE_DIRECTORIES
+    "${GTEST_ROOT}"
+    "${GTEST_ROOT}/include")
+
+set(GTEST_INCLUDE_DIRS "${GTEST_ROOT}/include")
