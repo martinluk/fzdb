@@ -15,13 +15,13 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 set(PD "${CMAKE_CURRENT_SOURCE_DIR}/../src/")
 
-# FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp)
-# SET(SOURCES_NO_MAIN ${SOURCES})
-# LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")
-# message("BOO: ${SOURCES}")
-# message("WOO: ${SOURCES_NO_MAIN}")
+FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp)
+SET(SOURCES_NO_MAIN ${SOURCES})
+LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")
+message("BOO: ${SOURCES}")
+message("WOO: ${SOURCES_NO_MAIN}")
 
-add_executable(fuzzy-database-test ${TEST_SOURCES} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest>)
+add_executable(fuzzy-database-test ${TEST_SOURCES} ${SOURCES_NO_MAIN} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest>)
 add_dependencies(fuzzy-database-test nowide)
 add_dependencies(fuzzy-database-test gtest)
 
