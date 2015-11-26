@@ -50,4 +50,6 @@ if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+if(UNIX)
+   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+endif()
