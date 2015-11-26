@@ -31,6 +31,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/pthreads.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost-nowide.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gmock.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
