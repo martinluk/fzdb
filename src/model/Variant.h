@@ -62,7 +62,7 @@ class Variant : public ISerialisable
 		std::string getString(bool* ok = NULL) const;
 
 		// Implementation of ISerialisable.
-		std::size_t serialise(char* buffer, std::size_t maxSize) const override;
+		std::pair<std::size_t,bool> serialise(char* buffer, std::size_t maxSize) const override;
 
 	private:
 		void cleanData();

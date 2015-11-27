@@ -210,20 +210,24 @@ std::size_t Variant::internalDataSize() const
 	}
 }
 
-std::size_t Variant::serialise(char* buffer, std::size_t maxSize) const
+std::pair<std::size_t,bool> Variant::serialise(char* buffer, std::size_t maxSize) const
 {
+	std::size_t bytesRequired = internalDataSize();
+
 	// If the buffer is null, return the amount of bytes occupied by our data.
 	if ( !buffer )
 	{
-		return internalDataSize();
+		return std::pair<std::size_t,bool>(bytesRequired, false);
 	}
 	
 	// Record how much we need to write.
-	std::size_t bytesToWrite = std::min(internalDataSize(), maxSize);
+	std::size_t bytesToWrite = std::min(bytesRequired, maxSize);
+	bool canWriteAll = true;
+	if ( bytesToWrite < bytesRequired ) canWriteAll = false;
 
 	// If there's nothing to write, return 0.
 	if ( bytesToWrite < 1 )
-		return 0;
+		return std::pair<std::size_t,bool>(0, canWriteAll);
 
 	// Write however many bytes required.
 	const void* src = NULL;
@@ -245,4 +249,6 @@ std::size_t Variant::serialise(char* buffer, std::size_t maxSize) const
 	}
 
 	std::memcpy(buffer, src, bytesToWrite);
+
+	return std::pair<std::size_t,bool>(bytesToWrite, canWriteAll);
 }
