@@ -22,4 +22,4 @@ set_property(TARGET gmock PROPERTY INCLUDE_DIRECTORIES
     "${GTEST_ROOT}"
     "${GTEST_ROOT}/include")
 
-set(GMOCK_INCLUDE_DIRS "${GTEST_ROOT}/include")
+set(GMOCK_INCLUDE_DIRS "${GMOCK_ROOT}/include")
