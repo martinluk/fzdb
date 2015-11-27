@@ -45,11 +45,11 @@ void TCPServer::handle_accept(TCPSession* session, const boost::system::error_co
   	// TODO: How do we get the client's IP to display here?
   	Logger::Log() << std::setw(37) << session->uuid() << "Session initiated." << std::endl;
 
-		// Start the session. It will sit in our vector until we decide to remove it.
+	// Start the session. It will sit in our vector until we decide to remove it.
     session->start();
 
-		// Listen for the next connection attempt.
-		listenForNewConnection();
+	// Listen for the next connection attempt.
+	listenForNewConnection();
   } else {
 		// Nothing to do here now.
   }

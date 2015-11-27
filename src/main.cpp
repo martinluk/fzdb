@@ -4,7 +4,8 @@
 #include "./server.h"
 
 #include "./Logger.h"
-#include "JobQueue.h"
+#include "./JobQueue.h"
+#include "./singletons.h"
 
 /**
  * @brief Entry point for the application
@@ -19,6 +20,8 @@ int main(int argc, char* argv[]) {
 
   Logger::Init();
   //Logger::Log(Logger::Level::Info, "Hello World");
+
+  Singletons::initialise();
 
   try {
     std::cout << "Fuzzy Database v0.1" << std::endl;
@@ -50,6 +53,7 @@ int main(int argc, char* argv[]) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
 
-  JobQueue::Shutdown();  
+  JobQueue::Shutdown();
+  Singletons::shutdown();
   return 0;
 }
