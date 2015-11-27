@@ -43,8 +43,14 @@ include_directories(${GTEST_INCLUDE_DIRS})
 FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp)
 FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h)
 
-add_executable(fuzzy-database ${SOURCES} ${HEADERS})
-add_dependencies(fuzzy-database nowide)
+SET(SOURCES_NO_MAIN ${SOURCES})
+LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+
+add_library(fuzzy-database-lib OBJECT ${SOURCES_NO_MAIN} ${HEADERS})
+add_executable(fuzzy-database ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp $<TARGET_OBJECTS:fuzzy-database-lib>)
+
+add_dependencies(fuzzy-database-lib nowide)
+add_dependencies(fuzzy-database fuzzy-database-lib)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
@@ -54,6 +60,4 @@ if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
 endif()
 
-if(UNIX)
-   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-endif()
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
