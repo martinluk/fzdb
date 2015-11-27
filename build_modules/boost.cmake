@@ -50,7 +50,7 @@ else()
   else()
     message(FATAL_ERROR "Configuration for your target does not exist - on windows please use msvc12 or msvc14 compilers!")
   endif()
-  execute_process(COMMAND ./b2 toolset=${Boost_BUILD_TOOLSET} --with-system --with-thread --with-date_time --with-filesystem --with-regex WORKING_DIRECTORY ${BOOST_ROOT})
+  execute_process(COMMAND ./b2 -j4 toolset=${Boost_BUILD_TOOLSET} --with-system --with-thread --with-date_time --with-filesystem --with-regex WORKING_DIRECTORY ${BOOST_ROOT})
 
   set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
   set(Boost_LIBRARY_DIRS "${BOOST_ROOT}/stage/lib")
