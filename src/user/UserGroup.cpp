@@ -1,19 +1,20 @@
 #include "./UserGroup.h"
 
-UserGroup::UserGroup(bool viewDBPermission, bool modifyDbPermission, bool userOpPermission) {
-	viewDbPerm = viewDBPermission;
-	modifyDbPerm = modifyDbPermission;
-	userOpPerm = userOpPermission;
+User::User(bool viewDBPermission, bool modifyDbPermission, bool userOpPermission) {
+	permMatrix.viewDbPerm = viewDBPermission;
+	permMatrix.modifyDbPerm = modifyDbPermission;
+	permMatrix.userOpPerm = userOpPermission;
 }
 
-bool UserGroup::hasViewDBPerm() {
-	return viewDbPerm;
+bool User::hasViewDBPerm() {
+	return permMatrix.viewDbPerm;
 }
 
-bool UserGroup::hasModifyDBPerm() {
-	return modifyDbPerm;
+bool User::hasModifyDBPerm() {
+	return permMatrix.modifyDbPerm;
 }
 
-bool UserGroup::hasUserOpPerm() {
-	return userOpPerm;
+bool User::hasUserOpPerm() {
+	return permMatrix.userOpPerm;
 }
+
