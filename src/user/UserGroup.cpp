@@ -5,3 +5,15 @@ UserGroup::UserGroup(bool viewDBPermission, bool modifyDbPermission, bool userOp
 	modifyDbPerm = modifyDbPermission;
 	userOpPerm = userOpPermission;
 }
+
+bool UserGroup::hasViewDBPerm() {
+	return viewDbPerm;
+}
+
+bool UserGroup::hasModifyDBPerm() {
+	return modifyDbPerm;
+}
+
+bool UserGroup::hasUserOpPerm() {
+	return userOpPerm;
+}
