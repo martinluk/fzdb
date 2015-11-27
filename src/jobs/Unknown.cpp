@@ -1,6 +1,6 @@
 #include "Unknown.h"
 
-UnknownJob::UnknownJob(TCPSession* session, std::string name) : Job(session)
+UnknownJob::UnknownJob(ISession* session, std::string name) : Job(session)
 {
   _name = name;
 }

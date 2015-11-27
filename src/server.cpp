@@ -1,7 +1,7 @@
 #include "./server.h"
 #include "./Logger.h"
 
-typedef std::vector<TCPSession*> SessionVector;
+typedef std::vector<ISession*> SessionVector;
 
 TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
 		: port_(port),
@@ -21,7 +21,7 @@ TCPServer::~TCPServer()
 	// Delete all live sessions.
 	while ( liveSessions_.size() > 0 )
 	{
-		TCPSession* s = liveSessions_.back();
+		ISession* s = liveSessions_.back();
 		s->terminate();
 		delete s;
 		liveSessions_.pop_back();
@@ -33,7 +33,7 @@ TCPServer::~TCPServer()
 // this function just sets up a TCP session which then
 // handles reading and acting upon the actual data from the
 // client.
-void TCPServer::handle_accept(TCPSession* session, const boost::system::error_code& error) {
+void TCPServer::handle_accept(ISession* session, const boost::system::error_code& error) {
 	// If no errors in the setup:
   if (!error) {
 
@@ -54,7 +54,7 @@ void TCPServer::listenForNewConnection()
 {
 	// Create a new TCP session.
 	// This is kept in the live sessions list.
-	TCPSession* s = new TCPSession(io_service_, this);
+	ISession* s = new TCPSession(io_service_, this);
 	liveSessions_.push_back(s);
 
 	// Set up the server's acceptor to call the function
@@ -64,7 +64,7 @@ void TCPServer::listenForNewConnection()
       boost::asio::placeholders::error));
 }
 
-void TCPServer::signalSessionTerminated(TCPSession* session)
+void TCPServer::signalSessionTerminated(ISession* session)
 {
 	// Delete the session and remove it fromt the list.
 	SessionVector::iterator it = liveSessions_.end();
