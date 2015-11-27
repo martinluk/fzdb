@@ -5,6 +5,9 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
+#include "./ISession.h"
+
+
 using boost::asio::ip::tcp;
 
 class TCPServer;
@@ -12,7 +15,7 @@ class TCPServer;
 // TODO: How to we handle when the connection to this session is ended?
 // We'll want to do this in order to inform the TCPServer that we are no
 // longer live and can be cleaned up.
-class TCPSession
+class TCPSession : public ISession
 {
 public:
 

@@ -10,7 +10,7 @@ private:
 
 public:
   
-	UnknownJob(TCPSession* session, std::string name);
+	UnknownJob(ISession* session, std::string name);
 	// Inherited via Job
 	virtual void execute() override;
 

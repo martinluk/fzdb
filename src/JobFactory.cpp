@@ -10,16 +10,16 @@ void JobFactory::Init() {
  
 }
 
-Job* JobFactory::createJob(TCPSession* session, std::string const& name) {
+Job* JobFactory::createJob(ISession* session, std::string const& name) {
   if(name == "PING") return new PingJob(session);
   return new UnknownJob(session, name);
 }
 
-Job* JobFactory::createJob(TCPSession* session, std::string const& name, std::string const& arg1) {
+Job* JobFactory::createJob(ISession* session, std::string const& name, std::string const& arg1) {
 	if (name == "ECHO") return new EchoJob(session, arg1);
 	return new UnknownJob(session, name);
 }
 
-Job* JobFactory::createUnknownJob(TCPSession* session, std::string const& name) {
+Job* JobFactory::createUnknownJob(ISession* session, std::string const& name) {
 	return new UnknownJob(session, name);
 }

@@ -1,12 +1,12 @@
 #ifndef FUZZYDB_JOB
 #define FUZZYDB_JOB
 
-#include "session.h"
+#include "ISession.h"
 
 class Job 
 {
 public:
-	Job(TCPSession* session) 
+	Job(ISession* session) 
 	{
 		_session = session;
 	}
@@ -15,7 +15,7 @@ public:
 
 	virtual void execute() = 0;
 protected:
-	TCPSession* _session;
+	ISession* _session;
 };
 
 #endif
