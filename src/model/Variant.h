@@ -2,6 +2,7 @@
 #define MODEL_VARIANT_H
 
 #include <string>
+#include "./ISerialisable.h"
 
 // Class that can store one of multiple different value types. Used within properties.
 // Arbitrary data is stored within the data_ void pointer. If the physical value fits
@@ -12,9 +13,8 @@
 
 // TODO: We may want this class to be implicitly shared, so that we can return
 // variants without having to perform deep copies.
-class Variant
+class Variant : public ISerialisable
 {
-	friend class Variant;
 	public:
 		enum Type
 		{
@@ -61,9 +61,13 @@ class Variant
 		int getInteger(bool* ok = NULL) const;
 		std::string getString(bool* ok = NULL) const;
 
+		// Implementation of ISerialisable.
+		std::size_t serialise(char* buffer, std::size_t maxSize) const override;
+
 	private:
 		void cleanData();
 		void setSafeDefaults();
+		std::size_t internalDataSize() const;
 
 		// Here we assume the types between the two check objects are equal.
 		

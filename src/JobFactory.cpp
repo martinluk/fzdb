@@ -5,6 +5,7 @@
 #include "jobs/Ping.h"
 #include "jobs/Unknown.h"
 #include "jobs/Echo.h"
+#include "jobs/CreateEntityJob.h"
 
 void JobFactory::Init() {
  
@@ -12,6 +13,7 @@ void JobFactory::Init() {
 
 Job* JobFactory::createJob(TCPSession* session, std::string const& name) {
   if(name == "PING") return new PingJob(session);
+	else if (name == "CREATE") return new CreateEntityJob(session);
   return new UnknownJob(session, name);
 }
 

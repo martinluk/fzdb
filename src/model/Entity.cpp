@@ -44,3 +44,8 @@ void Entity::clearProperties()
 {
 	propertyTable_.clear();
 }
+
+Entity::EHandle_t Entity::getHandle() const
+{
+	return handle_;
+}

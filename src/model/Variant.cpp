@@ -1,5 +1,7 @@
 #include "./Variant.h"
 #include <cassert>
+#include <algorithm>
+#include <cstring>
 #include "../platform.h"
 
 Variant::Variant()
@@ -186,4 +188,61 @@ template <typename T>
 bool Variant::dataDereferenceEqual(const Variant &other) const
 {
 	return *(reinterpret_cast<const T*>(data_)) == *(reinterpret_cast<const T*>(other.data_));
+}
+
+std::size_t Variant::internalDataSize() const
+{
+	switch (type_)
+	{
+		case UNDEFINED:
+			return 0;
+
+		case INTEGER:
+			return sizeof(int);
+
+		case STRING:
+			return static_cast<std::string*>(data_)->size();
+
+		default:
+			// Someone's added a new type and not updated this!
+			assert(false);
+			return 0;
+	}
+}
+
+std::size_t Variant::serialise(char* buffer, std::size_t maxSize) const
+{
+	// If the buffer is null, return the amount of bytes occupied by our data.
+	if ( !buffer )
+	{
+		return internalDataSize();
+	}
+	
+	// Record how much we need to write.
+	std::size_t bytesToWrite = std::min(internalDataSize(), maxSize);
+
+	// If there's nothing to write, return 0.
+	if ( bytesToWrite < 1 )
+		return 0;
+
+	// Write however many bytes required.
+	const void* src = NULL;
+	switch (type_)
+	{
+	// Cases where we're just writing the contents of the pointer itself:
+	case INTEGER:
+		src = &data_;
+		break;
+
+	// Cases where we must dereference the pointer first (different for each item):
+	case STRING:
+		src = static_cast<std::string*>(data_)->c_str();
+		break;
+
+	default:
+		// Someone's added a new type and not updated this!
+		assert(false);
+	}
+
+	std::memcpy(buffer, src, bytesToWrite);
 }

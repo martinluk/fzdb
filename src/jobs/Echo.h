@@ -1,4 +1,5 @@
-
+#ifndef JOBS_ECHOJOB_H
+#define JOBS_ECHOJOB_H
 #include "../session.h"
 
 #include "../Job.h"
@@ -19,3 +20,5 @@ private:
 	std::string _message;
 
 };
+
+#endif	// JOBS_ECHOJOB_H

@@ -32,6 +32,9 @@ public:
 	// to be implicitly shared, as a copy of the property has to be made.
 	EntityProperty getProperty(const std::string &key) const;
 
+	// Returns this entity's handle.
+	EHandle_t getHandle() const;
+
 	// Setters:
 
 	// Inserts the given property into this entity.
