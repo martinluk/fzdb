@@ -9,7 +9,7 @@ if(Boost_FOUND)
   message("Found a Boost system install!") 
 else()
   message("Attempting to download Boost")
-  set(MY_URL "http://freefr.dl.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.zip")
+  set(MY_URL "http://www.dcs.warwick.ac.uk/~csulak/boost_1_59_0.zip")
   set(MY_DOWNLOAD_PATH "./external/boost_1_59_0.zip")
   set(BOOST_ROOT "${CMAKE_BINARY_DIR}/boost_1_59_0")
 
