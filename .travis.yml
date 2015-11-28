@@ -6,6 +6,7 @@ addons:
     sources:
       - kalakris-cmake
       - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.5
     packages:
       - cmake
       - g++-4.9
