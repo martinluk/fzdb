@@ -8,7 +8,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - cmake
-      - gcc4.9
+      - gcc-4.9
 cache:
   directories:
     - build/external
