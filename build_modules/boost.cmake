@@ -43,9 +43,8 @@ else()
 
   if(UNIX)
     set(Boost_BUILD_TOOLSET gcc)  
-    message("COMPILER IS ${CMAKE_CXX_COMPILER}")  
-    if(CMAKE_CXX_COMPILER STREQUAL "/usr/bin/g++-4.9" OR CMAKE_CXX_COMPILER STREQUAL "/usr/local/clang-3.4/bin/clang++")
-      message("IS 4.9! :D")
+    #to make travis do things correctly
+    if(CMAKE_CXX_COMPILER STREQUAL "/usr/bin/g++-4.9" OR CMAKE_CXX_COMPILER STREQUAL "/usr/bin/clang++-3.5")
       set(Boost_BUILD_TOOLSET "gcc-4.9")
     endif()
   elseif(MSVC14)
