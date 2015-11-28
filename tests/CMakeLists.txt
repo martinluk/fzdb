@@ -23,4 +23,8 @@ target_link_libraries(fuzzy-database-test ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(fuzzy-database-test ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database-test ${Boost_Nowide_LIBRARIES})
 
+if(UNIX AND NOT APPLE)
+   target_link_libraries(fuzzy-database-test -lrt) 
+endif()
+
 add_test(NAME test COMMAND fuzzy-database-test)

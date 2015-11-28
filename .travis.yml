@@ -11,8 +11,9 @@ cache:
   directories:
     - build/external
 compiler:
-  - clang
-  - gcc
+  matrix:
+    - clang
+    - gcc
 notifications:
   webhooks:
     urls:
