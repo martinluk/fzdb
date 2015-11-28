@@ -1,6 +1,12 @@
 language: cpp
 #sudo: required
 #dist: trusty
+addons:
+  apt:
+    sources:
+      - kalakris-cmake
+    packages:
+      - cmake
 cache:
   directories:
     - build/external
