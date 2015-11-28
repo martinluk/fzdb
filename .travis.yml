@@ -11,9 +11,10 @@ addons:
       - cmake
       - g++-4.9
       - clang-3.5
-cache:
+cache: 
   directories:
     - build/external
+  apt: true
 compiler:
   - clang
   - gcc
@@ -28,8 +29,13 @@ install:
 #  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
  # - sudo apt-get update -y
  # - sudo apt-get install -y g++-4.9
+  - 
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   - if [ "$CXX" = "clang++"]; then export CXX="clang++-3.5"; fi
+  - alias g++="g++-4.9"
+  - alias gcc="gcc-4.9"
+  - alias clang++="clang++-3.5"
+  - alias clang="clang-3.5"
   - gcc --version
   - cmake --version
   - mkdir -p build
