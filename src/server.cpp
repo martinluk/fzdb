@@ -59,7 +59,6 @@ void TCPServer::handle_accept(ISession* session, const boost::system::error_code
 
 void TCPServer::listenForNewConnection()
 {
-	std::unique_ptr<ISession> su = std::make_unique<TCPSession>(_io_service, this, _uuidGenerator());
 	ISession* s = new TCPSession(_io_service, this, _uuidGenerator());
 	_liveSessions.push_back(s);
 
