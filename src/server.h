@@ -12,6 +12,8 @@
 #include "./ISession.h"
 #include "./session.h"
 
+using SessionVector = std::vector<ISession*>;
+
 using boost::asio::ip::tcp;
 
 class TCPServer
@@ -27,12 +29,12 @@ private:
 	void listenForNewConnection();
 	void signalSessionTerminated(ISession* session);
 
-	unsigned short port_;
-	boost::asio::io_service& io_service_;
-	tcp::acceptor acceptor_;
+	unsigned short _port;
+	boost::asio::io_service& _io_service;
+	tcp::acceptor _acceptor;
 
 	boost::uuids::random_generator _uuidGenerator;
-	std::vector<ISession*> liveSessions_;
+	SessionVector _liveSessions;
 };
 
 #endif

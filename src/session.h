@@ -33,10 +33,10 @@ private:
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 	void handle_write(const boost::system::error_code& error);	
 
-	tcp::socket socket_;
+	tcp::socket _socket;
 	enum { max_length = 1024 };
-	char data_[max_length];
-	TCPServer*	parent_;
+	char _data[max_length];
+	TCPServer*	_parent;
 	boost::uuids::uuid _uuid;
 };
 

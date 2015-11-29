@@ -18,13 +18,13 @@ bool _socketDisconnected(const boost::system::error_code& error)
 }
 
 TCPSession::TCPSession(boost::asio::io_service& io_service, TCPServer* parent, boost::uuids::uuid identifier)
-	: socket_(io_service), parent_(parent)
+	: _socket(io_service), _parent(parent)
 {
 	_uuid = identifier;
 }
 
 tcp::socket& TCPSession::socket() {
-  return socket_;
+  return _socket;
 }
 
 /**
@@ -32,7 +32,7 @@ tcp::socket& TCPSession::socket() {
  * @details Starts the session listening for input from the client
  */
 void TCPSession::start() {
-  socket_.async_read_some(boost::asio::buffer(data_, max_length),
+  _socket.async_read_some(boost::asio::buffer(_data, max_length),
     boost::bind(&TCPSession::handle_read, this,
       boost::asio::placeholders::error,
       boost::asio::placeholders::bytes_transferred));
@@ -52,16 +52,16 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   if ( _socketDisconnected(error) )
   {
   	// No need to call terminate() since we're already disconnected.
-  	parent_->signalSessionTerminated(this);
+  	_parent->signalSessionTerminated(this);
   	return;
   }
   
   if (!error) {
-    std::string _command = std::string(data_).substr(0, bytes_transferred);
+    std::string _command = std::string(_data).substr(0, bytes_transferred);
 	  Logger::Log() << std::setw(37) << _uuid << "Recieved command: " << _command << std::endl;
     CommandInterpreter::ProcessCommand(this, _command);
     
-    socket_.async_read_some(boost::asio::buffer(data_, max_length),
+    _socket.async_read_some(boost::asio::buffer(_data, max_length),
       boost::bind(&TCPSession::handle_read, this,
         boost::asio::placeholders::error,
         boost::asio::placeholders::bytes_transferred));
@@ -69,7 +69,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
     // TODO: Handle other errors.
   	// For now, just quit the session.
   	terminate();
-  	parent_->signalSessionTerminated(this);
+  	_parent->signalSessionTerminated(this);
   }
 }
 
@@ -85,7 +85,7 @@ void TCPSession::handle_write(const boost::system::error_code& error) {
     // TODO: Handle errors.
     // For now, just terminate.
     terminate();
-    parent_->signalSessionTerminated(this);
+    _parent->signalSessionTerminated(this);
   }
 }
 
@@ -96,7 +96,7 @@ void TCPSession::handle_write(const boost::system::error_code& error) {
  * @param response A string to send to the client
  */
 void TCPSession::respond(const std::string response) {
-  boost::asio::async_write(socket_,
+  boost::asio::async_write(_socket,
     boost::asio::buffer(response.c_str(), response.length()),
     boost::bind(&TCPSession::handle_write, this,
       boost::asio::placeholders::error));
@@ -104,8 +104,8 @@ void TCPSession::respond(const std::string response) {
 
 void TCPSession::terminate()
 {
-	socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-	socket_.close();
+	_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+	_socket.close();
 }
 
 boost::uuids::uuid TCPSession::uuid()
