@@ -8,7 +8,7 @@ class JobFactory
 {
 public:  
   static void Init();
-  static Job* createUnknownJob(TCPSession* session, std::string const& name);
-  static Job* createJob(TCPSession* session, std::string const& name);
-  static Job* createJob(TCPSession* session, std::string const& name, std::string const& arg1);
+  static Job* createUnknownJob(ISession* session, std::string const& name);
+  static Job* createJob(ISession* session, std::string const& name);
+  static Job* createJob(ISession* session, std::string const& name, std::string const& arg1);
 };

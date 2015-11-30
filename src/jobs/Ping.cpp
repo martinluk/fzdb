@@ -1,6 +1,6 @@
 #include "Ping.h"
 
-PingJob::PingJob(TCPSession* session) : Job(session)
+PingJob::PingJob(ISession* session) : Job(session)
 {
 
 }

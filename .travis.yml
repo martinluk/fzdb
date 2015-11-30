@@ -26,4 +26,4 @@ install:
   - cmake .. -DCMAKE_BUILD_TYPE=DEBUG
 script:
   - cmake --build .
-  - ctest
+  - ctest -V -C debug
