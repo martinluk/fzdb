@@ -10,6 +10,11 @@ struct PermissionMatrix {
 		bool userOpPerm;
 };
 
+struct HashedCredentials {
+	int uid;
+	std::string hashed_salted_password;
+};
+
 class User{
 	public: 
 		//Instantiation with permission
@@ -31,29 +36,24 @@ class Guest: public User{
 class LoggedOnUser: public User{
 	//User with a username and password
 	public:
-		LoggedOnUser(bool viewDBPermission, bool modifyDbPermission, bool userOpPermission, std::string userName, std::string password) :
+		LoggedOnUser(bool viewDBPermission, bool modifyDbPermission, bool userOpPermission, HashedCredentials cred) :
 			User(viewDBPermission, modifyDbPermission, userOpPermission)	{
-				//TODO If verification fails then throw an exception
-				//TODO Hash and salted password
 	};
 	protected:
-		int userID;
-		std::string hashed_salted_password;
-
-	private: 
-		void verifyLogin(std::string userName, std::string password);
+		HashedCredentials credentials;
+		void verifyLogin();
 };
 
 class Editor: public LoggedOnUser{
 	//Editor can edit and view DB
 	public: 
-		Editor(std::string userName, std::string password) : LoggedOnUser(true, true, false, userName, password){};
+		Editor(HashedCredentials cred) : LoggedOnUser(true, true, false, cred){};
 };
 
 class UserAdmin: public LoggedOnUser{
 	//User admin can only do user operations, without ability to view and edit DB
 	public: 
-		UserAdmin(std::string userName, std::string password) : LoggedOnUser(false, false, true,userName, password){};
+		UserAdmin(HashedCredentials cred) : LoggedOnUser(false, false, true, cred){};
 };
 
 
