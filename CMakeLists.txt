@@ -7,7 +7,7 @@ INCLUDE(ExternalProject)
 enable_testing()
 
 if(UNIX)
-  set (CMAKE_CXX_FLAGS -std=c++11)
+  set (CMAKE_CXX_FLAGS "-std=c++11 -Wfatal-errors")
   set (CMAKE_VERBOSE_MAKEFILE true )
 endif()
 

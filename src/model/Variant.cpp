@@ -212,9 +212,15 @@ std::size_t Variant::internalDataSize() const
 
 std::pair<std::size_t,bool> Variant::serialise(char* buffer, std::size_t maxSize) const
 {
-	std::size_t bytesRequired = internalDataSize();
+	// Serialisation format:
+	// + SerialHeader
+	// - Type
+	// - Data
+	
+	std::size_t dataSize = internalDataSize();
+	std::size_t bytesRequired = sizeof(Variant::SerialHeader) + sizeof(Variant::Type) + dataSize;
 
-	// If the buffer is null, return the amount of bytes occupied by our data.
+	// If the buffer is null, return the amount of bytes we need.
 	if ( !buffer )
 	{
 		return std::pair<std::size_t,bool>(bytesRequired, false);
@@ -229,6 +235,34 @@ std::pair<std::size_t,bool> Variant::serialise(char* buffer, std::size_t maxSize
 	if ( bytesToWrite < 1 )
 		return std::pair<std::size_t,bool>(0, canWriteAll);
 
+	SerialHeader header;
+	header.dataSize = dataSize;
+
+	// Write the header.
+	std::size_t idealWrite = sizeof(Variant::SerialHeader);
+	std::size_t written = 0;
+	std::size_t canWrite = std::min(idealWrite, bytesToWrite);
+	memcpy(buffer, &header, canWrite);
+	bytesToWrite -= canWrite;
+	written += canWrite;
+
+	if ( bytesToWrite < 1 )
+	{
+		return std::pair<std::size_t,bool>(written, canWriteAll);
+	}
+
+	// Write the type information.
+	idealWrite = sizeof(Variant::Type);
+	canWrite = std::min(idealWrite, bytesToWrite);
+	memcpy(buffer, &type_, canWrite);
+	bytesToWrite -= canWrite;
+	written += canWrite;
+
+	if ( bytesToWrite < 1 )
+	{
+		return std::pair<std::size_t,bool>(written, canWriteAll);
+	}
+	
 	// Write however many bytes required.
 	const void* src = NULL;
 	switch (type_)
@@ -248,7 +282,8 @@ std::pair<std::size_t,bool> Variant::serialise(char* buffer, std::size_t maxSize
 		assert(false);
 	}
 
-	std::memcpy(buffer, src, bytesToWrite);
+	std::memcpy(buffer + written, src, bytesToWrite);
+	written += bytesToWrite;
 
-	return std::pair<std::size_t,bool>(bytesToWrite, canWriteAll);
+	return std::pair<std::size_t,bool>(written, canWriteAll);
 }

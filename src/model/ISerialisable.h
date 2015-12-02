@@ -4,6 +4,14 @@
 #include <cstddef>
 #include <utility>
 
+// TODO: Perhaps there's a better way of doing this.
+// Right now the implementation of serialisation is left to each class.
+// This generates a lot of boilerplate code and tiptoeing around the max
+// buffer size is complicated and annoying.
+// What we need ideally is some helper class that each serialisable class
+// can give a list of pointer/size pairs to. The helper class then serialises
+// this data, keeps track of headers, etc.
+
 // Implemented by classes that need to be serialised to a stream of bytes.
 class ISerialisable
 {

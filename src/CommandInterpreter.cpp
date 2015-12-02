@@ -6,6 +6,8 @@
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
+#include <vector>
+
 #include "./CommandInterpreter.h"
 
 #include "Job.h"
@@ -58,6 +60,9 @@ void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command
 	command_struct cmd;
 	bool r = boost::spirit::qi::phrase_parse(command.begin(), command.end(), g, boost::spirit::unicode::space, cmd);
 	Job* job;
+
+	// Made this a bit more generic.
+	/*
 	if (r) {
 		if (cmd.arg1.length() == 0) {
 			job = JobFactory::createJob(session, cmd.command);
@@ -69,7 +74,17 @@ void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command
 	else {
 		job = JobFactory::createUnknownJob(session, cmd.command);
 	}
+	*/
   //simple commands
-   
+  
+	std::vector<std::string> args;
+	args.push_back(cmd.command);
+	if ( r )
+	{
+		if ( cmd.arg1.length() > 0 )
+			args.push_back(cmd.arg1);
+	}
+	job = JobFactory::createJob(session, args);
+
   JobQueue::AddJob(job);
 }

@@ -65,6 +65,11 @@ class Variant : public ISerialisable
 		std::pair<std::size_t,bool> serialise(char* buffer, std::size_t maxSize) const override;
 
 	private:
+		struct SerialHeader
+		{
+			std::size_t dataSize;
+		};
+
 		void cleanData();
 		void setSafeDefaults();
 		std::size_t internalDataSize() const;
