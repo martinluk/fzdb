@@ -4,7 +4,7 @@
 #include <boost/uuid/uuid.hpp>
 
 #include "./session.h"
-#include "Logger.h"
+#include "spdlog/spdlog.h"
 
 #include "./CommandInterpreter.h"
 #include "./server.h"
@@ -58,7 +58,8 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   
   if (!error) {
     std::string _command = std::string(_data).substr(0, bytes_transferred);
-	  Logger::Log() << std::setw(37) << _uuid << "Recieved command: " << _command << std::endl;
+	  //Logger::Instance()->Log() << std::setw(37) << _uuid << "Recieved command: " << _command << std::endl;
+    spdlog::get("main")->info("[{:<}] {} {}", _uuid, "Recieved command:", _command);
     CommandInterpreter::ProcessCommand(this, _command);
     
     _socket.async_read_some(boost::asio::buffer(_data, max_length),

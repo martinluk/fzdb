@@ -1,8 +1,9 @@
 #include "./server.h"
-#include "./Logger.h"
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+
+#include "spdlog/spdlog.h"
 
 using SessionVector = std::vector<ISession*>;
 
@@ -45,8 +46,8 @@ void TCPServer::handle_accept(ISession* session, const boost::system::error_code
 	  // This is kept in the live sessions list.	 
 
   	// TODO: How do we get the client's IP to display here?
-  	Logger::Log() << std::setw(37) << session->uuid() << "Session initiated." << std::endl;
-
+  	spdlog::get("main")->info("[{:<}] {:<30}", session->uuid(), "Session initiated.");// << std::setw(37) << session->uuid() << "Session initiated." << std::endl;
+    //spdlog::get("console")->info("loggers can be retrieved from a global registry using the spdlog::get(logger_name) function");
 		// Start the session. It will sit in our vector until we decide to remove it.
     session->start();
 
@@ -83,8 +84,8 @@ void TCPServer::signalSessionTerminated(ISession* session)
 	}
 
 	if ( it != _liveSessions.end() )
-	{
-		Logger::Log() << std::setw(37) << (*it)->uuid() << "Session deleted." << std::endl;
+	{		
+		spdlog::get("main")->info("[{:<}] {:<30}", session->uuid(), "Session deleted.");
 		delete *it;
 		_liveSessions.erase(it);
 	}
