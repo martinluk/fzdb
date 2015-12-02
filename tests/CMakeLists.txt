@@ -25,6 +25,7 @@ LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")
 add_executable(fuzzy-database-test ${TEST_SOURCES} ${SOURCES_NO_MAIN} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest> $<TARGET_OBJECTS:gmock>)
 add_dependencies(fuzzy-database-test nowide)
 add_dependencies(fuzzy-database-test gtest)
+add_dependencies(fuzzy-database-test spdlog)
 
 #remove main otherwise there are 2 main functions!
 

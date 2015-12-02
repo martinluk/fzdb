@@ -47,6 +47,7 @@ FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR
 
 add_executable(fuzzy-database ${SOURCES} ${HEADERS})
 add_dependencies(fuzzy-database nowide)
+add_dependencies(fuzzy-database spdlog)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
