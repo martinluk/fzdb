@@ -1,3 +1,5 @@
+#ifndef JOBS_UNKNOWNJOB_H
+#define JOBS_UNKNOWNJOB_H
 
 #include "../session.h"
 
@@ -15,3 +17,5 @@ public:
 	virtual void execute() override;
 
 };
+
+#endif	// JOBS_UNKNOWNJOB_H

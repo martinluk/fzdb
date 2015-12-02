@@ -7,5 +7,5 @@ UnknownJob::UnknownJob(TCPSession* session, std::string name) : Job(session)
 
 void UnknownJob::execute()
 {
-	_session->respond("Unknown command: " + _name + "\n");
+	_session->respond("Unknown command: \"" + _name + "\"\n");
 }

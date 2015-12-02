@@ -7,5 +7,5 @@ EchoJob::EchoJob(TCPSession* session, std::string message) : Job(session)
 
 void EchoJob::execute()
 {
-	_session->respond(_message);
+	_session->respond(_message + std::string("\n"));
 }

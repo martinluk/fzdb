@@ -6,6 +6,7 @@
 #include "./Logger.h"
 #include "./JobQueue.h"
 #include "./singletons.h"
+#include "./JobFactory.h"
 
 /**
  * @brief Entry point for the application
@@ -38,6 +39,7 @@ int main(int argc, char* argv[]) {
     // we need to do for the connected client.
     // This creates the desired number of threads that will handle the jobs.
     JobQueue::Init(&io_service);
+		JobFactory::Init();
 
     // Next we create a TCP server. The server listens for information on
     // the specified port and creates sessions when data is received.

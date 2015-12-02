@@ -2,11 +2,13 @@
 #include <unordered_map>
 
 #include "session.h"
+#include "Logger.h"
 
 #include "jobs/Ping.h"
 #include "jobs/Unknown.h"
 #include "jobs/Echo.h"
 #include "jobs/CreateEntityJob.h"
+#include "jobs/DebugSerialiseJob.h"
 
 // Generalisation: keep a hash table that maps command names to factory functions.
 // When a new job is required, call the function that matches the name string.
@@ -35,25 +37,42 @@ Job* factoryCreateEntityJob(TCPSession* session, const std::vector<std::string> 
 	return new CreateEntityJob(session);
 }
 
+Job* factoryDebugSerialiseJob(TCPSession* session, const std::vector<std::string> &args)
+{
+	return new DebugSerialiseJob(session);
+}
+
 typedef std::unordered_map<std::string,JobFactoryFunction> FactoryMap;
 FactoryMap factoryMap_;
 
-void JobFactory::Init() {
-	 // TODO: Make the name attribute a static property on each Job subclass?
-	 factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
-	 	std::string("PING"), &factoryPingJob));
+void JobFactory::Init()
+{
+	// TODO: Make the name attribute a static property on each Job subclass?
+	factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
+		std::string("PING"), &factoryPingJob));
 
-	 factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
+	factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
 	 	std::string("ECHO"), &factoryEchoJob));
 	
-	 factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
+	factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
 	 	std::string("CREATE"), &factoryCreateEntityJob));
+
+	factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
+	 	std::string("DBG_SERIALISE"), &factoryDebugSerialiseJob));
+
+	Logger::Log() << "Job factory table has " << factoryMap_.size() << " entries." << std::endl;
 }
 
 Job* JobFactory::createJob(TCPSession* session, const std::vector<std::string> &args)
 {
+	Logger::Log() << "Args: " << args.size() << std::endl;
+	for (int i = 0; i < args.size(); i++)
+	{
+		Logger::Log() << "Arg " << i << ": " << args[i] << std::endl;
+	}
+	
 	// Argument 0 should always be the command name.
-	assert(args.size() < 1);
+	assert(args.size() >= 1);
 	if ( args.size() < 1 )
 	{
 		return new UnknownJob(session, std::string("ERROR_UNNAMED_JOB"));

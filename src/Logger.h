@@ -60,16 +60,10 @@ public:
 	    }
 	};
 
-	static Helper Log(Level l)
+	static Helper Log(Level l = Info)
 	{
 		LogBegin(l);
 		return Helper(l);
-	}
-
-	// Convenience
-	static Helper Log()
-	{
-		return Log(Info);
 	}
 
 private:

@@ -1,4 +1,5 @@
-
+#ifndef JOB_PINGJOB_H
+#define JOB_PINGJOB_H
 #include "../session.h"
 
 #include "../Job.h"
@@ -14,3 +15,5 @@ public:
 	virtual void execute() override;
 
 };
+
+#endif	// JOB_PINGJOB_H
