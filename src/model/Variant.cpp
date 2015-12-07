@@ -210,80 +210,44 @@ std::size_t Variant::internalDataSize() const
 	}
 }
 
-std::pair<std::size_t,bool> Variant::serialise(char* buffer, std::size_t maxSize) const
+void Variant::serialise(Serialiser &serialiser) const
 {
 	// Serialisation format:
 	// + SerialHeader
 	// - Type
 	// - Data
 	
-	std::size_t dataSize = internalDataSize();
-	std::size_t bytesRequired = sizeof(Variant::SerialHeader) + sizeof(Variant::Type) + dataSize;
+	std::vector<Serialiser::SerialProperty> propList;
 
-	// If the buffer is null, return the amount of bytes we need.
-	if ( !buffer )
-	{
-		return std::pair<std::size_t,bool>(bytesRequired, false);
-	}
-	
-	// Record how much we need to write.
-	std::size_t bytesToWrite = std::min(bytesRequired, maxSize);
-	bool canWriteAll = true;
-	if ( bytesToWrite < bytesRequired ) canWriteAll = false;
-
-	// If there's nothing to write, return 0.
-	if ( bytesToWrite < 1 )
-		return std::pair<std::size_t,bool>(0, canWriteAll);
-
+	// Create a header.
 	SerialHeader header;
-	header.dataSize = dataSize;
+	header.dataSize = internalDataSize();
 
-	// Write the header.
-	std::size_t idealWrite = sizeof(Variant::SerialHeader);
-	std::size_t written = 0;
-	std::size_t canWrite = std::min(idealWrite, bytesToWrite);
-	memcpy(buffer, &header, canWrite);
-	bytesToWrite -= canWrite;
-	written += canWrite;
+	// Add header and type informaion to list.
+	propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+	propList.push_back(Serialiser::SerialProperty(&type_, sizeof(Type)));
 
-	if ( bytesToWrite < 1 )
-	{
-		return std::pair<std::size_t,bool>(written, canWriteAll);
-	}
-
-	// Write the type information.
-	idealWrite = sizeof(Variant::Type);
-	canWrite = std::min(idealWrite, bytesToWrite);
-	memcpy(buffer, &type_, canWrite);
-	bytesToWrite -= canWrite;
-	written += canWrite;
-
-	if ( bytesToWrite < 1 )
-	{
-		return std::pair<std::size_t,bool>(written, canWriteAll);
-	}
-	
-	// Write however many bytes required.
-	const void* src = NULL;
+	// Add our actual data, depending on what it is.
 	switch (type_)
 	{
-	// Cases where we're just writing the contents of the pointer itself:
+	// Non-dereference types: pass a pointer to our pointer.
+	case UNDEFINED:
 	case INTEGER:
-		src = &data_;
+		propList.push_back(Serialiser::SerialProperty(reinterpret_cast<const void*>(&data_),
+			sizeof(const void*)));
 		break;
 
-	// Cases where we must dereference the pointer first (different for each item):
+	// Dereference types: pass the pointer itself.
 	case STRING:
-		src = static_cast<std::string*>(data_)->c_str();
+		propList.push_back(Serialiser::SerialProperty(data_, header.dataSize));
 		break;
 
 	default:
 		// Someone's added a new type and not updated this!
 		assert(false);
+		break;
 	}
 
-	std::memcpy(buffer + written, src, bytesToWrite);
-	written += bytesToWrite;
-
-	return std::pair<std::size_t,bool>(written, canWriteAll);
+	// Pass all the properties to the serialiser.
+	serialiser.serialise(propList);
 }

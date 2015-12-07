@@ -9,17 +9,16 @@
 std::string testSerialise(const ISerialisable* ser)
 {
 	std::stringstream log;
+	
+	Serialiser serialiser;
+	ser->serialise(serialiser);
 
-	std::size_t length = ser->serialise(NULL, 0).first;
-	log << "Variant has serialised length " << length << "\n";
+	const char* buffer = serialiser.cdata();
+	std::size_t length = serialiser.size();
 
-	char* buffer = new char[length];
-	auto result = ser->serialise(buffer, length);
-
-	log << "Variant serialisation success: " << (result.second ? "TRUE" : "FALSE") << "\n";
-	log << "Variant serialisation wrote " << result.first << " bytes.\nBytes written:\n";
-
+	log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
 	log << std::hex << std::setfill ('0') << std::setw(2);
+	
 	// i progresses in multiples of 8.
 	for (int i = 0; i < length; i += 8)
 	{
@@ -45,7 +44,6 @@ std::string testSerialise(const ISerialisable* ser)
 		log << "\n";
 	}
 
-	delete[] buffer;
 	return log.str();
 }
 

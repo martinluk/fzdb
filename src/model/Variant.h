@@ -62,7 +62,7 @@ class Variant : public ISerialisable
 		std::string getString(bool* ok = NULL) const;
 
 		// Implementation of ISerialisable.
-		std::pair<std::size_t,bool> serialise(char* buffer, std::size_t maxSize) const override;
+		virtual void serialise(Serialiser &serialiser) const override;
 
 	private:
 		struct SerialHeader

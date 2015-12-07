@@ -27,62 +27,43 @@ float PropertyValue::confidence() const
 	return confidence_;
 }
 
-std::pair<std::size_t,bool> PropertyValue::serialise(char* buffer, std::size_t maxSize) const
+void PropertyValue::serialise(Serialiser &serialiser) const
 {
 	// The serialised structure is as follows:
 	// + SerialHeader struct
 	// - Confidence
 	// - Value
+	
+	std::vector<Serialiser::SerialProperty> propList;
 
-	// If buffer is zero, just return how large we need to be.
-	std::size_t valueSize = value_.serialise(NULL, 0).first;
-	std::size_t bytesRequired = sizeof(SerialHeader) + valueSize + sizeof(float);
-	if ( !buffer )
-	{
-		return std::pair<std::size_t,bool>(bytesRequired, false);
-	}
-
-	// Work out how much we're allowed to write.
-	std::size_t bytesToWrite = std::min(bytesRequired, maxSize);
-	bool canWriteAll = true;
-	if ( bytesToWrite < bytesRequired ) canWriteAll = false;
-
-	// If zero, return.
-	if ( bytesToWrite < 1 )
-		return std::pair<std::size_t,bool>(0, canWriteAll);
-
-	// Create a struct for serialisation.
+	// Create a header.
 	SerialHeader header;
-	header.valueSize = valueSize;
 
-	// Write as much of the struct as we can.
-	std::size_t leftToWrite = bytesToWrite;
-	std::size_t written = 0;
-	std::size_t toWriteNow = std::min(sizeof(SerialHeader), leftToWrite);
-	memcpy(buffer, &header, toWriteNow);
-	leftToWrite -= toWriteNow;
-	written += toWriteNow;
-	
-	// If we can't write any more, exit.
-	if ( leftToWrite < 1 )
-	{
-		return std::pair<std::size_t,bool>(written, canWriteAll);
-	}
+	// We don't know the size yet, so set to zero.
+	header.valueSize = 0;
 
-	toWriteNow = std::min(sizeof(float), leftToWrite);
-	memcpy(buffer + written, &confidence_, toWriteNow);
-	leftToWrite -= toWriteNow;
-	written += toWriteNow;
+	// Keep the size that the serialiser was before we added anything to it.
+	std::size_t origSize = serialiser.size();
 
-	// If we can't write any more, exit.
-	if ( leftToWrite < 1 )
-	{
-		return std::pair<std::size_t,bool>(written, canWriteAll);
-	}
+	// Prepare our properties.
+	propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+	propList.push_back(Serialiser::SerialProperty(&confidence_, sizeof(float)));
 
-	// Have the variant write its own data and get the result.
-	std::pair<size_t,bool> result = value_.serialise(buffer + written, leftToWrite);
-	
-	written += result.first;
-	return std::pair<std::size_t,bool>(written, canWriteAll);
+	// Serialise these.
+	serialiser.serialise(propList);
+
+	// Record the current size.
+	std::size_t prevSize = serialiser.size();
+
+	// Serialise the variant.
+	value_.serialise(serialiser);
+
+	// Calculate how large it was.
+	header.valueSize = serialiser.size() - prevSize;
+
+	// Write this back into the serialiser.
+	// We calculate where the header would have been written.
+	char* headerLoc = serialiser.data() + origSize;
+	SerialHeader* pHeader = reinterpret_cast<SerialHeader*>(headerLoc);
+	*pHeader = header;
 }

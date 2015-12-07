@@ -16,7 +16,7 @@ class PropertyValue : public ISerialisable
 		float confidence() const;
 
 		// Implementation of ISerialisable.
-		std::pair<std::size_t,bool> serialise(char* buffer, std::size_t maxSize) const override;
+		virtual void serialise(Serialiser &serialiser) const override;
 
 	private:
 		struct SerialHeader
