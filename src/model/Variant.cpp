@@ -239,7 +239,7 @@ void Variant::serialise(Serialiser &serialiser) const
 
 	// Dereference types: pass the pointer itself.
 	case STRING:
-		propList.push_back(Serialiser::SerialProperty(data_, header.dataSize));
+		propList.push_back(Serialiser::SerialProperty(static_cast<std::string*>(data_)->c_str(), header.dataSize));
 		break;
 
 	default:
