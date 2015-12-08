@@ -58,7 +58,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   
   if (!error) {
     std::string _command = std::string(data_).substr(0, bytes_transferred);
-	  Logger::Log() << std::setw(37) << _uuid << "Recieved command: " << _command << std::endl;
+	  Logger::Log() << std::setw(37) << _uuid << "Received command: " << _command << std::endl;
     CommandInterpreter::ProcessCommand(this, _command);
     
     socket_.async_read_some(boost::asio::buffer(data_, max_length),
