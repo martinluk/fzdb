@@ -1,29 +1,29 @@
 language: cpp
 sudo: required
 dist: trusty
+cache:
+  directories:
+    - build/external
 compiler:
   - clang
   - gcc
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/64463f491a9781e3b19b
+    on_success: always # default: always
+    on_failure: always # default: always
+    on_start: never # default: always
 install:
-  - sudo apt-get install libpthread-stubs0-dev
-  - wget http://www.biicode.com/downloads/latest/ubuntu64
-  - mv ubuntu64 bii-ubuntu64.deb
-  - sudo dpkg -i bii-ubuntu64.deb && sudo apt-get -f install
-  - rm bii-ubuntu64.deb
-  - wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz
-  - tar -xzf cmake-3.0.2-Linux-64.tar.gz
-  - sudo cp -fR cmake-3.0.2-Linux-64/* /usr
-  - rm -rf cmake-3.0.2-Linux-64
-  - rm cmake-3.0.2-Linux-64.tar.gz
-  - export TRAVIS_CXX=$CXX
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -y
+  - sudo apt-get install -y g++-4.9
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - gcc --version
+  - cmake --version
+  - mkdir -p build
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=DEBUG
 script:
-  - pwd
-  - bii init -L
-  - bii find
-  - bii configure -DBII_BOOST_BUILD_J=16
-  - bii build
-##################### CHANGE WITH YOUR CUSTOM CHECKS OR TEST EXECUTION ##################
-########################################################################################
-env:
-  global:
-    - GCC_VERSION="4.9"
+  - cmake --build .
+  - ctest -V -C debug
