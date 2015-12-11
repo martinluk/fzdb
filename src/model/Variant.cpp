@@ -228,6 +228,7 @@ void Variant::serialise(Serialiser &serialiser) const
 	propList.push_back(Serialiser::SerialProperty(&type_, sizeof(Type)));
 
 	// Add our actual data, depending on what it is.
+	char* buffer = NULL;
 	switch (type_)
 	{
 	// Non-dereference types: pass a pointer to our pointer.
@@ -239,8 +240,19 @@ void Variant::serialise(Serialiser &serialiser) const
 
 	// Dereference types: pass the pointer itself.
 	case STRING:
-		propList.push_back(Serialiser::SerialProperty(static_cast<std::string*>(data_)->c_str(), header.dataSize));
+	{
+		// Optimisation: for the string, we copy in the null terminator
+		// as well. This means it's more efficient to read back a variant
+		// once it's been serialised, as we can just create a string out of
+		// the char pointer pointing to the serialised data.
+		header.dataSize++;	// Increment for the terminator.
+		buffer = new char[header.dataSize];
+		std::string* dataString = static_cast<std::string*>(data_);
+		memcpy(buffer, dataString->c_str(), header.dataSize);
+		buffer[header.dataSize-1] = '\0';	// Terminate!
+		propList.push_back(Serialiser::SerialProperty(buffer, header.dataSize));
 		break;
+	}
 
 	default:
 		// Someone's added a new type and not updated this!
@@ -250,6 +262,8 @@ void Variant::serialise(Serialiser &serialiser) const
 
 	// Pass all the properties to the serialiser.
 	serialiser.serialise(propList);
+
+	delete[] buffer;
 }
 
 Variant Variant::unserialise(const char* data)
@@ -288,22 +302,11 @@ Variant Variant::unserialise(const char* data)
 
 		case STRING:
 		{
-			// Create a buffer to copy into.
-			// TODO: Perhaps a more efficient way would be to store the
-			// null terminator of the string when serialising?
-			// Then we wouldn't have to copy anything back, we'd just be
-			// able to pass the pointer to the raw data and std::string
-			// would interpret it correctly.
-			char* buffer = new char[pHeader->dataSize+1];
-
+			// This is a pointer to the null-terminated char data.
 			const char* sData =
 				reinterpret_cast<const char*>(data + sizeof(Variant::SerialHeader)
 				+ sizeof(Variant::Type));
-			memcpy(buffer, sData, pHeader->dataSize);
-			buffer[pHeader->dataSize] = '\0';
-			std::string str(buffer);
-			delete[] buffer;
-			return Variant(str);
+			return Variant(std::string(sData));
 		}	
 
 		default:
