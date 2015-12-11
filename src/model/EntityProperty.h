@@ -1,6 +1,7 @@
 #ifndef MODEL_ENTITYPROPERTY_H
 #define MODEL_ENTITYPROPERTY_H
 
+#include "./ISerialisable.h"
 #include <string>
 #include <vector>
 #include "./PropertyValue.h"
@@ -17,7 +18,7 @@
 
 // TODO: We may want this class to be implicitly shared, so that we can return
 // properties without having to perform deep copies.
-class EntityProperty
+class EntityProperty : public ISerialisable
 {
 	public:
 		// Constructs a null property. This can be used for returning 'null',
@@ -62,7 +63,27 @@ class EntityProperty
 		// Clears this property of any values.
 		void clear();
 
+		// Implementation of ISerislisable
+		virtual void serialise(Serialiser &serialiser) const override;
+
 	private:
+		// Header for serialisation.
+		// This is the first data item, followed by valueCount number of
+		// ValueHeaderItems.
+		struct SerialHeader
+		{
+			std::size_t keySize;		// Length of the key string in bytes.
+			std::size_t valueCount;		// How many ValueHeaderItems to expect after this header.
+			std::size_t totalSize;		// Size of the header and all the data, in bytes.
+		};
+
+		// Represents header information for a PropertyValue.
+		// Here we store the serialised length of the given value.
+		struct ValueHeaderItem
+		{
+			std::size_t size;			// Serialised length of this value.
+		};
+
 		std::string	key_;
 		std::vector<PropertyValue> values_;
 };

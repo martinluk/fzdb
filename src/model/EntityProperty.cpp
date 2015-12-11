@@ -1,4 +1,6 @@
 #include "./EntityProperty.h"
+#include <cstring>
+#include <vector>
 
 EntityProperty::EntityProperty()
 {
@@ -75,4 +77,75 @@ PropertyValue EntityProperty::value(int index) const
 const std::string& EntityProperty::keyRef() const
 {
 	return key_;
+}
+
+void EntityProperty::serialise(Serialiser &serialiser) const
+{
+	// Serialisation format:
+	// + SerialHeader
+	// + ValueHeaderItems
+	// + ...
+	// - Key
+	// - PropertyValues
+	// - ...
+	
+	std::vector<Serialiser::SerialProperty> propList;
+	
+	// Construct a header.
+	SerialHeader header;
+	header.keySize = key_.size();
+	header.valueCount = values_.size();
+	header.totalSize = 0;	// We don't yet know this.
+
+	// Add this to the list.
+	propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+
+	// Make a note of how large the serialiser was - we'll use this to find
+	// the header location later.
+	std::size_t origSize = serialiser.size();
+
+	// We need to add a load of null ValueHeaderItems to the list too.
+	// All these will get updated as we go along.
+	std::size_t numValues = values_.size();
+	ValueHeaderItem vHeader;
+	vHeader.size = 0;
+	for (std::size_t i = 0; i < numValues; i++)
+	{
+		propList.push_back(Serialiser::SerialProperty(&vHeader, sizeof(ValueHeaderItem)));
+	}
+
+	// Also add our key string.
+	propList.push_back(Serialiser::SerialProperty(key_.c_str(), header.keySize));
+
+	// Serialise all the things we have so far.
+	serialiser.serialise(propList);
+
+	// Now get a pointer to our original header.
+	char* serStart = serialiser.data() + origSize;
+	SerialHeader* pHeader = reinterpret_cast<SerialHeader*>(serStart);
+	ValueHeaderItem* pVHeader = reinterpret_cast<ValueHeaderItem*>(serStart + sizeof(SerialHeader));
+	
+	// Initialise the total size to the size of the data so far.
+	pHeader->totalSize = sizeof(SerialHeader) + (numValues * sizeof(ValueHeaderItem))
+		+ pHeader->keySize;
+
+	// For each of our property values:
+	for (int i = 0; i < numValues; i++)
+	{
+		// Record how large the serialiser is at first.
+		std::size_t sizeBefore = serialiser.size();
+
+		// Serialise the PropertyValue.
+		values_[i].serialise(serialiser);
+
+		// See how large the serialiser now is.
+		std::size_t sizeAfter = serialiser.size();
+
+		// Calculate how large the value was.
+		std::size_t valueSize = sizeAfter - sizeBefore;
+
+		// Record this.
+		pVHeader[i].size = valueSize;
+		pHeader->totalSize++;
+	}
 }
