@@ -25,6 +25,9 @@ class EntityProperty : public ISerialisable
 		// for example if no property matches a given search.
 		// isNull() will return true.
 		EntityProperty();
+		EntityProperty(const std::string &key);
+		EntityProperty(const std::string &key,
+			const std::vector<PropertyValue> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
 		// Internally, a property is null if its key is an empty string.
@@ -65,6 +68,7 @@ class EntityProperty : public ISerialisable
 
 		// Implementation of ISerislisable
 		virtual void serialise(Serialiser &serialiser) const override;
+		static EntityProperty unserialise(const char* data);
 
 	private:
 		// Header for serialisation.

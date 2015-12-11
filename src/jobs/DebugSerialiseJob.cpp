@@ -81,5 +81,25 @@ void DebugSerialiseJob::execute()
 	log << "Unserialised variant string:\n"
 	    << vsUnserialised.getString() << "\n";
 
+	s.clear();
+	vi.serialise(s);
+	Variant viUnserialised = Variant::unserialise(s.cdata());
+	log << "Unserialised variant integer:\n"
+	    << viUnserialised.getInteger() << "\n";
+
+	s.clear();
+	val1.serialise(s);
+	PropertyValue val1Uns = PropertyValue::unserialise(s.cdata());
+	log << "Unserialised PropertyValue 1:\n("
+	    << val1Uns.value().getString() << ","
+			<< val1Uns.confidence() << ")\n";
+
+	s.clear();
+	val2.serialise(s);
+	PropertyValue val2Uns = PropertyValue::unserialise(s.cdata());
+	log << "Unserialised PropertyValue 2:\n("
+	    << val2Uns.value().getInteger() << ","
+			<< val2Uns.confidence() << ")\n";
+
 	_session->respond(log.str());
 }

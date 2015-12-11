@@ -7,6 +7,18 @@ EntityProperty::EntityProperty()
 	// Nothing to do - key will automatically be empty.
 }
 
+EntityProperty::EntityProperty(const std::string &key) :
+	key_(key)
+{
+
+}
+
+EntityProperty::EntityProperty(const std::string &key,
+	const std::vector<PropertyValue> &values) : key_(key)
+{
+	append(values);
+}
+
 bool EntityProperty::isNull() const
 {
 	return key_.empty();
@@ -93,7 +105,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 	
 	// Construct a header.
 	SerialHeader header;
-	header.keySize = key_.size();
+	header.keySize = key_.size()+1;
 	header.valueCount = values_.size();
 	header.totalSize = 0;	// We don't yet know this.
 
@@ -115,7 +127,10 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 	}
 
 	// Also add our key string.
-	propList.push_back(Serialiser::SerialProperty(key_.c_str(), header.keySize));
+	std::vector<char> strBuffer(header.keySize, NULL);
+	memcpy(strBuffer.data(), key_.c_str(), header.keySize-1);
+	propList.push_back(Serialiser::SerialProperty(strBuffer.data(),
+		header.keySize));
 
 	// Serialise all the things we have so far.
 	serialiser.serialise(propList);
@@ -148,4 +163,47 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 		pVHeader[i].size = valueSize;
 		pHeader->totalSize++;
 	}
+}
+EntityProperty EntityProperty::unserialise(const char* data)
+{
+	// Serialisation format:
+	// + SerialHeader
+	// + ValueHeaderItems
+	// + ...
+	// - Key
+	// - PropertyValues
+	// - ...
+
+	// Firstly get the header.
+	const SerialHeader* pHeader =
+		reinterpret_cast<const SerialHeader*>(data);
+	
+	// Get a pointer to the first ValueHeaderItem.
+	const ValueHeaderItem* pVHI =
+		reinterpret_cast<const ValueHeaderItem*>(data + sizeof(SerialHeader));
+	
+	// Get a pointer to the key.
+	const char* pKey =
+		reinterpret_cast<const char*>(data + sizeof(SerialHeader) +
+		(pHeader->valueCount * sizeof(ValueHeaderItem)));
+	
+	// Get a pointer to the actual data.
+	const char* pData =
+		reinterpret_cast<const char*>(pKey + pHeader->keySize);
+
+	// Create a vector to fill with values.
+	std::vector<PropertyValue> pvList;
+
+	// Get all the values!
+	for (int i = 0; i < pHeader->valueCount; i++)
+	{
+		// Unserialise with the data pointed to.
+		pvList.push_back(PropertyValue::unserialise(pData));
+
+		// Advance the pointer by the correct number of bytes.
+		pData += pVHI[i].size;
+	}
+
+	// Return the property.
+	return EntityProperty(std::string(pKey), pvList);
 }
