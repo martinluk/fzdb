@@ -14,11 +14,11 @@ commSocket.settimeout(2)
 try:
 	commSocket.connect((TCP_IP, TCP_PORT))
 except:	# We couldn't connect!
-	print "ERROR: Unable to connect to database on %s:%s" % (TCP_IP, TCP_PORT)
+	print("ERROR: Unable to connect to database on %s:%s" % (TCP_IP, TCP_PORT))
 	sys.exit()
 
 # The connection was successful.
-print "Connected to database on %s:%s. Type ':quit' to quit the session." % (TCP_IP, TCP_PORT)
+print("Connected to database on %s:%s. Type ':quit' to quit the session." % (TCP_IP, TCP_PORT))
 
 # We begin in sending mode, to listen for user input.
 sending = True
@@ -60,14 +60,14 @@ while True:
 
 		# If the user wants to quit, do so.
 		if msg == ":quit":
-			print "Quitting session."
+			print("Quitting session.")
 			commSocket.close()
 			sys.exit()
 
 		# Otherwise, send the command.
 		# Later we'll want to do JSON conversion here.
 		else:
-			commSocket.send(msg)
+			commSocket.send(msg.encode('utf-8'))
 
 			# Switch into receiving mode to listen for a response back from the database.
 			sending = False
@@ -80,12 +80,12 @@ while True:
 		# If there wasn't actually any:
 		if not data:
 			# This signals that the connection has been closed.
-			print "Connection to database closed."
+			print("Connection to database closed.")
 			commSocket.close()
 			sys.exit()
 		else:
 			# Write the response to the console.
-			sys.stdout.write(data)
+			sys.stdout.write(data.decode('utf-8'))
 
 			# Switch back into sending mode ready for the next command.
 			sending = True

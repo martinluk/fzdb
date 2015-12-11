@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <cassert>
 
 #include "../model/Variant.h"
 #include "../model/PropertyValue.h"
@@ -72,6 +73,13 @@ void DebugSerialiseJob::execute()
 
 	log << "======== Testing Property Value 2  ========\n";
 	log << testSerialise(&val2) << "\n";
+
+	// Testing unserialising!
+	Serialiser s;
+	vs.serialise(s);
+	Variant vsUnserialised = Variant::unserialise(s.cdata());
+	log << "Unserialised variant string:\n"
+	    << vsUnserialised.getString() << "\n";
 
 	_session->respond(log.str());
 }

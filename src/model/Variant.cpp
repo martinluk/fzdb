@@ -251,3 +251,66 @@ void Variant::serialise(Serialiser &serialiser) const
 	// Pass all the properties to the serialiser.
 	serialiser.serialise(propList);
 }
+
+Variant Variant::unserialise(const char* data)
+{
+	// Serialisation format:
+	// + SerialHeader
+	// - Type
+	// - Data
+
+	// Read back the data as a header.
+	const SerialHeader* pHeader =
+		reinterpret_cast<const SerialHeader*>(data);
+
+	// Get the type.
+	const Type* pType =
+		reinterpret_cast<const Type*>(data
+		+ sizeof(SerialHeader));
+
+	// Switch on the type.
+	switch (*pType)
+	{
+		case UNDEFINED:
+		{
+			// Return a null variant.
+			return Variant();
+		}
+
+		case INTEGER:
+		{
+			// Interpret the rest of the data as a raw integer.
+			const int* pData =
+				reinterpret_cast<const int*>(data + sizeof(Variant::SerialHeader)
+				+ sizeof(Variant::Type));
+			return Variant(*pData);
+		}
+
+		case STRING:
+		{
+			// Create a buffer to copy into.
+			// TODO: Perhaps a more efficient way would be to store the
+			// null terminator of the string when serialising?
+			// Then we wouldn't have to copy anything back, we'd just be
+			// able to pass the pointer to the raw data and std::string
+			// would interpret it correctly.
+			char* buffer = new char[pHeader->dataSize+1];
+
+			const char* sData =
+				reinterpret_cast<const char*>(data + sizeof(Variant::SerialHeader)
+				+ sizeof(Variant::Type));
+			memcpy(buffer, sData, pHeader->dataSize);
+			buffer[pHeader->dataSize] = '\0';
+			std::string str(buffer);
+			delete[] buffer;
+			return Variant(str);
+		}	
+
+		default:
+		{
+			// Someone's added a new type and not updated this!
+			assert(false);
+			return Variant();
+		}
+	}
+}

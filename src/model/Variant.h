@@ -15,6 +15,7 @@
 // variants without having to perform deep copies.
 class Variant : public ISerialisable
 {
+	friend class Variant;
 	public:
 		enum Type
 		{
@@ -63,7 +64,8 @@ class Variant : public ISerialisable
 
 		// Implementation of ISerialisable.
 		virtual void serialise(Serialiser &serialiser) const override;
-
+		static Variant unserialise(const char* data);
+		
 	private:
 		struct SerialHeader
 		{

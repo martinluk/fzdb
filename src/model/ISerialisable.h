@@ -12,4 +12,5 @@ public:
 	// Serialise this object through the given serialiser.
 	virtual void serialise(Serialiser& serialiser) const = 0;
 };
+
 #endif	// MODEL_ISERIALISABLE_H
