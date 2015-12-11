@@ -67,3 +67,25 @@ void PropertyValue::serialise(Serialiser &serialiser) const
 	SerialHeader* pHeader = reinterpret_cast<SerialHeader*>(headerLoc);
 	*pHeader = header;
 }
+
+PropertyValue PropertyValue::unserialise(const char* data)
+{
+	// + SerialHeader struct
+	// - Confidence
+	// - Value
+
+	// Firstly get the header.
+	const SerialHeader* pHeader =
+		reinterpret_cast<const SerialHeader*>(data);
+
+	// Read back the confidence value.
+	const float* pConfidence = reinterpret_cast<const float*>(data +
+		sizeof(SerialHeader));
+
+	// Get a pointer to the variant data.
+	const char* vData = reinterpret_cast<const char*>(data +
+		sizeof(SerialHeader) + sizeof(float));
+
+	// Return everything at once!
+	return PropertyValue(Variant::unserialise(vData), *pConfidence);
+}
