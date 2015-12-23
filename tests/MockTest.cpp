@@ -45,6 +45,7 @@ TEST_F(MockTest, ping_command) {
 }
 
 TEST_F(MockTest, echo_command) {
+
   MockSession mockSession;
   EchoJob* echo = new EchoJob(&mockSession, "Hello World");
   
@@ -59,7 +60,7 @@ TEST_F(MockTest, echo_command_unicode) {
   const std::string testString = "Testing «ταБЬℓσ»: 1<2 & 4+1>3, now 20% off!";
   EchoJob* echo = new EchoJob(&mockSession, testString);
 
-  QueryResult result = echo->execute();
+	QueryResult result = echo->execute();
 
   EXPECT_EQ(result.getValue<std::string>("response"), "Testing «ταБЬℓσ»: 1<2 & 4+1>3, now 20% off!");
 }
