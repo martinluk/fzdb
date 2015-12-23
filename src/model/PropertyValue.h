@@ -9,7 +9,7 @@ class PropertyValue : public ISerialisable
 {
 	public:
 		// Constructs a concrete value. The confidence is 1 by default.
-		PropertyValue(const Variant &value, float confidence = 1.0f);
+		PropertyValue(const Variant &value, signed char confidence = 255);
 		
 		// Getters
 		Variant value() const;
@@ -27,8 +27,8 @@ class PropertyValue : public ISerialisable
 
 		void setConfidenceClamp(float c);
 
-		Variant	value_;
-		float confidence_;
+		Variant	_value;
+		signed char _confidence;
 };
 
 #endif	// MODEL_PROPERTYVALUE_H

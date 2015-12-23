@@ -7,59 +7,59 @@ EntityProperty::EntityProperty()
 	// Nothing to do - key will automatically be empty.
 }
 
-EntityProperty::EntityProperty(const std::string &key) :
-	key_(key)
+EntityProperty::EntityProperty(const unsigned int& key) :
+	_key(key)
 {
 
 }
 
-EntityProperty::EntityProperty(const std::string &key,
-	const std::vector<PropertyValue> &values) : key_(key)
+EntityProperty::EntityProperty(const unsigned int& key,
+	const std::vector<PropertyValue> &values) : _key(key)
 {
 	append(values);
 }
 
 bool EntityProperty::isNull() const
 {
-	return key_.empty();
+	return _key == 0;
 }
 
 bool EntityProperty::isConcrete() const
 {
-	if ( values_.size() != 1 ) return false;
+	if ( _values.size() != 1 ) return false;
 
 	// The confidence must be 1.
-	return values_[0].confidence() == 1.0f;
+	return _values[0].confidence() == 100;
 }
 
 bool EntityProperty::isEmpty() const
 {
-	return values_.size() == 0;
+	return _values.size() == 0;
 }
 
-std::string EntityProperty::key() const
+unsigned int EntityProperty::key() const
 {
-	return key_;
+	return _key;
 }
 
 std::vector<PropertyValue> EntityProperty::values() const
 {
-	return values_;
+	return _values;
 }
 
 int EntityProperty::count() const
 {
-	return values_.size();
+	return _values.size();
 }
 
 Variant EntityProperty::concreteValue() const
 {
-	return isConcrete() ? values_[0].value() : Variant();
+	return isConcrete() ? _values[0].value() : Variant();
 }
 
 void EntityProperty::append(const PropertyValue &value)
 {
-	values_.push_back(value);
+	_values.push_back(value);
 }
 
 void EntityProperty::append(const std::vector<PropertyValue> &list)
@@ -78,17 +78,17 @@ void EntityProperty::setConcrete(const Variant &value)
 
 void EntityProperty::clear()
 {
-	values_.clear();
+	_values.clear();
 }
 
 PropertyValue EntityProperty::value(int index) const
 {
-	return values_[index];
+	return _values[index];
 }
 
-const std::string& EntityProperty::keyRef() const
+const unsigned int& EntityProperty::keyRef() const
 {
-	return key_;
+	return _key;
 }
 
 void EntityProperty::serialise(Serialiser &serialiser) const
@@ -105,8 +105,8 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 	
 	// Construct a header.
 	SerialHeader header;
-	header.keySize = key_.size()+1;
-	header.valueCount = values_.size();
+	header.keySize = sizeof(unsigned int);
+	header.valueCount = _values.size();
 	header.totalSize = 0;	// We don't yet know this.
 
 	// Add this to the list.
@@ -118,7 +118,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 
 	// We need to add a load of null ValueHeaderItems to the list too.
 	// All these will get updated as we go along.
-	std::size_t numValues = values_.size();
+	std::size_t numValues = _values.size();
 	ValueHeaderItem vHeader;
 	vHeader.size = 0;
 	for (std::size_t i = 0; i < numValues; i++)
@@ -128,7 +128,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 
 	// Also add our key string.
 	std::vector<char> strBuffer(header.keySize, NULL);
-	memcpy(strBuffer.data(), key_.c_str(), header.keySize-1);
+	memcpy(strBuffer.data(), (void*)_key, header.keySize);
 	propList.push_back(Serialiser::SerialProperty(strBuffer.data(),
 		header.keySize));
 
@@ -151,7 +151,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 		std::size_t sizeBefore = serialiser.size();
 
 		// Serialise the PropertyValue.
-		values_[i].serialise(serialiser);
+		_values[i].serialise(serialiser);
 
 		// See how large the serialiser now is.
 		std::size_t sizeAfter = serialiser.size();
@@ -205,5 +205,5 @@ EntityProperty EntityProperty::unserialise(const char* data)
 	}
 
 	// Return the property.
-	return EntityProperty(std::string(pKey), pvList);
+	return EntityProperty((unsigned int) pKey, pvList);
 }

@@ -19,8 +19,13 @@ Entity* EntityManager::createEntity()
 	lastHandle_++;
 	assert(lastHandle_ != Entity::INVALID_EHANDLE);
 
-	Entity* e = new Entity(lastHandle_);
+	Entity* e = new Entity(0, lastHandle_);
 	entities_.insert(std::pair<Entity::EHandle_t, Entity*>(lastHandle_, e));
 
 	return e;
+}
+
+QueryResult EntityManager::BGP(std::vector<model::Triple> conditions)
+{
+	return QueryResult();
 }

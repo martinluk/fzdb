@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <cstring>
 
-PropertyValue::PropertyValue(const Variant &value, float confidence) :
-	value_(value)
+PropertyValue::PropertyValue(const Variant &value, signed char confidence) :
+	_value(value)
 {
 	setConfidenceClamp(confidence);
 }
@@ -11,20 +11,20 @@ PropertyValue::PropertyValue(const Variant &value, float confidence) :
 void PropertyValue::setConfidenceClamp(float f)
 {
 	// Clamp to make sure it's between 0 and 1.
-	if ( f < 0.0f ) f = 0.0f;
-	else if ( f > 1.0f ) f = 1.0f;
+	if ( f < 0 ) f = 0;
+	else if ( f > 100 ) f = 100;
 
-	confidence_ = f;
+	_confidence = f;
 }
 
 Variant PropertyValue::value() const
 {
-	return value_;
+	return _value;
 }
 
 float PropertyValue::confidence() const
 {
-	return confidence_;
+	return _confidence;
 }
 
 void PropertyValue::serialise(Serialiser &serialiser) const
@@ -47,7 +47,7 @@ void PropertyValue::serialise(Serialiser &serialiser) const
 
 	// Prepare our properties.
 	propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
-	propList.push_back(Serialiser::SerialProperty(&confidence_, sizeof(float)));
+	propList.push_back(Serialiser::SerialProperty(&_confidence, sizeof(float)));
 
 	// Serialise these.
 	serialiser.serialise(propList);
@@ -56,7 +56,7 @@ void PropertyValue::serialise(Serialiser &serialiser) const
 	std::size_t prevSize = serialiser.size();
 
 	// Serialise the variant.
-	value_.serialise(serialiser);
+	_value.serialise(serialiser);
 
 	// Calculate how large it was.
 	header.valueSize = serialiser.size() - prevSize;

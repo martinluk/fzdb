@@ -25,8 +25,8 @@ class EntityProperty : public ISerialisable
 		// for example if no property matches a given search.
 		// isNull() will return true.
 		EntityProperty();
-		EntityProperty(const std::string &key);
-		EntityProperty(const std::string &key,
+		EntityProperty(const unsigned int &key);
+		EntityProperty(const unsigned int &key,
 			const std::vector<PropertyValue> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
@@ -42,8 +42,8 @@ class EntityProperty : public ISerialisable
 		bool isEmpty() const;
 
 		// Getters
-		std::string key() const;
-		const std::string& keyRef() const;
+		unsigned int key() const;
+		const unsigned int& keyRef() const;
 		std::vector<PropertyValue> values() const;
 		PropertyValue value(int index) const;
 		int count() const;
@@ -88,8 +88,8 @@ class EntityProperty : public ISerialisable
 			std::size_t size;			// Serialised length of this value.
 		};
 
-		std::string	key_;
-		std::vector<PropertyValue> values_;
+		unsigned int _key;
+		std::vector<PropertyValue> _values;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

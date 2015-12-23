@@ -7,9 +7,12 @@
 
 #include "model/Triple.h"
 
+//TODO: this whole file could do with tidying up
+
 using StringIterator = std::vector<std::string>::iterator;
 using StringMap = std::map<std::string, std::string>;
 
+//tokenises str
 std::vector<std::string> Tokenize(std::string str) {
 
 	std::vector<std::string> results;
@@ -87,6 +90,8 @@ std::vector<std::string> Tokenize(std::string str) {
 	return results;
 }
 
+//General exception class for parsing
+//TODO: extend to show line and column
 class ParseException : public std::exception {
 
 private:
@@ -105,7 +110,7 @@ public:
 	}
 };
 
-
+//Represents a block of triples
 struct TriplesBlock {
 public:
 	std::vector<model::Triple> triples;
@@ -124,6 +129,7 @@ public:
 	TriplesBlock() {}
 };
 
+//Types of query
 //ECHO is called DEBUGECHO to avoid a namespace collision on linux
 enum class QueryType {
 	SELECT,
@@ -134,6 +140,7 @@ enum class QueryType {
 	USER
 };
 
+//Aggregate query object - this should contain all info required to do a query
 struct Query {
 public:
 
@@ -152,6 +159,7 @@ public:
 	}
 };
 
+//parses a block of triples
 std::vector<model::Triple> ParseTriples(StringIterator&& iter, StringIterator end) {
 	std::vector<model::Triple> triples;
 	std::string sub;
@@ -197,6 +205,7 @@ std::vector<model::Triple> ParseTriples(StringIterator&& iter, StringIterator en
 	return triples;
 }
 
+//parses a { } block
 TriplesBlock ParseInsert(StringIterator&& iter, StringIterator end) {
 
 	TriplesBlock output;
@@ -213,6 +222,8 @@ TriplesBlock ParseInsert(StringIterator&& iter, StringIterator end) {
 	return output;
 }
 
+
+//parses prolouge
 StringMap ParseSources(StringIterator&& iter, StringIterator end) {
 	
 	StringMap sources;
@@ -238,6 +249,7 @@ StringMap ParseSources(StringIterator&& iter, StringIterator end) {
 	return sources;
 }
 
+//parses a tokenised list of strings to give a query object
 Query ParseAll(std::vector<std::string> tokens) {
 
 	auto iter = tokens.begin();
