@@ -2,7 +2,7 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
-CreateEntityJob::CreateEntityJob(TCPSession* session) : Job(session)
+CreateEntityJob::CreateEntityJob(ISession* session) : Job(session)
 {
 }
 

@@ -10,7 +10,7 @@ class EchoJob : public Job
 {
 public:
 
-	EchoJob(TCPSession* session, std::string message);
+	EchoJob(ISession* session, std::string message);
 
 
 	// Inherited via Job

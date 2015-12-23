@@ -2,7 +2,6 @@
 #include <unordered_map>
 
 #include "session.h"
-#include "Logger.h"
 
 #include "jobs/Ping.h"
 #include "jobs/Unknown.h"
@@ -10,16 +9,18 @@
 #include "jobs/CreateEntityJob.h"
 #include "jobs/DebugSerialiseJob.h"
 
+#include "spdlog/spdlog.h"
+
 // Generalisation: keep a hash table that maps command names to factory functions.
 // When a new job is required, call the function that matches the name string.
-typedef Job* (*JobFactoryFunction) (TCPSession*, const std::vector<std::string>&);
+typedef Job* (*JobFactoryFunction) (ISession*, const std::vector<std::string>&);
 
-Job* factoryPingJob(TCPSession* session, const std::vector<std::string> &args)
+Job* factoryPingJob(ISession* session, const std::vector<std::string> &args)
 {
 	return new PingJob(session);
 }
 
-Job* factoryEchoJob(TCPSession* session, const std::vector<std::string> &args)
+Job* factoryEchoJob(ISession* session, const std::vector<std::string> &args)
 {
 	// TODO: We might want to change echo to give it the raw list,
 	// rather than concatenating here.
@@ -32,12 +33,12 @@ Job* factoryEchoJob(TCPSession* session, const std::vector<std::string> &args)
 	return new EchoJob(session, output);
 }
 
-Job* factoryCreateEntityJob(TCPSession* session, const std::vector<std::string> &args)
+Job* factoryCreateEntityJob(ISession* session, const std::vector<std::string> &args)
 {
 	return new CreateEntityJob(session);
 }
 
-Job* factoryDebugSerialiseJob(TCPSession* session, const std::vector<std::string> &args)
+Job* factoryDebugSerialiseJob(ISession* session, const std::vector<std::string> &args)
 {
 	return new DebugSerialiseJob(session);
 }
@@ -59,16 +60,16 @@ void JobFactory::Init()
 
 	factoryMap_.insert(std::make_pair<std::string,JobFactoryFunction>(
 	 	std::string("DBG_SERIALISE"), &factoryDebugSerialiseJob));
-
-	Logger::Log() << "Job factory table has " << factoryMap_.size() << " entries." << std::endl;
+	
+	spdlog::get("main")->trace("Job factory table has {} entries.", factoryMap_.size());
 }
 
-Job* JobFactory::createJob(TCPSession* session, const std::vector<std::string> &args)
+Job* JobFactory::createJob(ISession* session, const std::vector<std::string> &args)
 {
-	Logger::Log() << "Args: " << args.size() << std::endl;
+	spdlog::get("main")->trace("Args: {}", args.size());
 	for (int i = 0; i < args.size(); i++)
 	{
-		Logger::Log() << "Arg " << i << ": " << args[i] << std::endl;
+		spdlog::get("main")->trace("Arg {}: {}", i, args[i]);
 	}
 	
 	// Argument 0 should always be the command name.
@@ -93,17 +94,17 @@ Job* JobFactory::createJob(TCPSession* session, const std::vector<std::string> &
 }
 
 // TODO: Deprecate these.
-Job* JobFactory::createJob(TCPSession* session, std::string const& name) {
+Job* JobFactory::createJob(ISession* session, std::string const& name) {
   if(name == "PING") return new PingJob(session);
 	else if (name == "CREATE") return new CreateEntityJob(session);
   return new UnknownJob(session, name);
 }
 
-Job* JobFactory::createJob(TCPSession* session, std::string const& name, std::string const& arg1) {
+Job* JobFactory::createJob(ISession* session, std::string const& name, std::string const& arg1) {
 	if (name == "ECHO") return new EchoJob(session, arg1);
 	return new UnknownJob(session, name);
 }
 
-Job* JobFactory::createUnknownJob(TCPSession* session, std::string const& name) {
+Job* JobFactory::createUnknownJob(ISession* session, std::string const& name) {
 	return new UnknownJob(session, name);
 }

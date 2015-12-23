@@ -4,6 +4,7 @@
 */
 #include "Job.h"
 #include <vector>
+#include "./ISession.h"
 
 class JobFactory
 {
@@ -11,11 +12,12 @@ public:
   static void Init();
 
 	// TODO: Deprecate these.
-  static Job* createUnknownJob(TCPSession* session, std::string const& name);
-  static Job* createJob(TCPSession* session, std::string const& name);
-  static Job* createJob(TCPSession* session, std::string const& name, std::string const& arg1);
+  static Job* createUnknownJob(ISession* session, std::string const& name);
+  static Job* createJob(ISession* session, std::string const& name);
+  static Job* createJob(ISession* session, std::string const& name, std::string const& arg1);
 
 	// PROPOSED: Pass a std::vector of string arguments? Then we only need one function.
 	// The name of the job is always arguemnt 0, and arguments 1+ are passed in as required.
-	static Job* createJob(TCPSession* session, const std::vector<std::string> &args);
+	static Job* createJob(ISession* session, const std::vector<std::string> &args);
+
 };

@@ -8,7 +8,7 @@ class PingJob : public Job
 {
 public:
 
-	PingJob(TCPSession* session);
+	PingJob(ISession* session);
 
 
 	// Inherited via Job

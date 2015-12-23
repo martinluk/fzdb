@@ -1,19 +1,20 @@
 #include "./server.h"
-#include "./Logger.h"
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-typedef std::vector<TCPSession*> SessionVector;
+#include "spdlog/spdlog.h"
 
-TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
-		: port_(port),
-    io_service_(io_service),
+using SessionVector = std::vector<ISession*>;
+
+TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port) :
+	_port (port),
+    _io_service(io_service),
 		// The acceptor is connected to the IO service here.
 		// The acceptor listens on the given port to see whether
 		// there are any clients who want to establish a
 		// connection.
-    acceptor_(io_service, tcp::endpoint(tcp::v4(), port_)) {
+    _acceptor(io_service, tcp::endpoint(tcp::v4(), _port)) {
 	
 		// Start listening for the first connection request.
 		listenForNewConnection();
@@ -24,12 +25,12 @@ TCPServer::TCPServer(boost::asio::io_service& io_service, unsigned short port)
 TCPServer::~TCPServer()
 {
 	// Delete all live sessions.
-	while ( liveSessions_.size() > 0 )
+	while ( _liveSessions.size() > 0 )
 	{
-		TCPSession* s = liveSessions_.back();
+		ISession* s = _liveSessions.back();
 		s->terminate();
 		delete s;
-		liveSessions_.pop_back();
+		_liveSessions.pop_back();
 	}
 }
 
@@ -38,14 +39,16 @@ TCPServer::~TCPServer()
 // this function just sets up a TCP session which then
 // handles reading and acting upon the actual data from the
 // client.
-void TCPServer::handle_accept(TCPSession* session, const boost::system::error_code& error) {
+void TCPServer::handle_accept(ISession* session, const boost::system::error_code& error) {
 	// If no errors in the setup:
   if (!error) {
+	  // Create a new TCP session.
+	  // This is kept in the live sessions list.	 
 
   	// TODO: How do we get the client's IP to display here?
-  	Logger::Log() << std::setw(37) << session->uuid() << "Session initiated." << std::endl;
-
-	// Start the session. It will sit in our vector until we decide to remove it.
+  	spdlog::get("main")->info("[{:<}] {:<30}", session->uuid(), "Session initiated.");// << std::setw(37) << session->uuid() << "Session initiated." << std::endl;
+    //spdlog::get("console")->info("loggers can be retrieved from a global registry using the spdlog::get(logger_name) function");
+		// Start the session. It will sit in our vector until we decide to remove it.
     session->start();
 
 	// Listen for the next connection attempt.
@@ -57,23 +60,21 @@ void TCPServer::handle_accept(TCPSession* session, const boost::system::error_co
 
 void TCPServer::listenForNewConnection()
 {
-	// Create a new TCP session.
-	// This is kept in the live sessions list.
-	TCPSession* s = new TCPSession(io_service_, this, _uuidGenerator());
-	liveSessions_.push_back(s);
+	ISession* s = new TCPSession(_io_service, this, _uuidGenerator());
+	_liveSessions.push_back(s);
 
 	// Set up the server's acceptor to call the function
 	// below whenever a client tries to connect.
-  acceptor_.async_accept(s->socket(),
+  _acceptor.async_accept(s->socket(),
     boost::bind(&TCPServer::handle_accept, this, s,
       boost::asio::placeholders::error));
 }
 
-void TCPServer::signalSessionTerminated(TCPSession* session)
+void TCPServer::signalSessionTerminated(ISession* session)
 {
 	// Delete the session and remove it fromt the list.
-	SessionVector::iterator it = liveSessions_.end();
-	for ( SessionVector::iterator i = liveSessions_.begin(); i != liveSessions_.end(); ++i )
+	SessionVector::iterator it = _liveSessions.end();
+	for ( SessionVector::iterator i = _liveSessions.begin(); i != _liveSessions.end(); ++i )
 	{
 		if ( *i == session )
 		{
@@ -82,10 +83,10 @@ void TCPServer::signalSessionTerminated(TCPSession* session)
 		}
 	}
 
-	if ( it != liveSessions_.end() )
-	{
-		Logger::Log() << std::setw(37) << (*it)->uuid() << "Session deleted." << std::endl;
+	if ( it != _liveSessions.end() )
+	{		
+		spdlog::get("main")->info("[{:<}] {:<30}", session->uuid(), "Session deleted.");
 		delete *it;
-		liveSessions_.erase(it);
+		_liveSessions.erase(it);
 	}
 }

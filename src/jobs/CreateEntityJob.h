@@ -6,7 +6,7 @@
 class CreateEntityJob : public Job
 {
 public:
-	CreateEntityJob(TCPSession* session);
+	CreateEntityJob(ISession* session);
 
 	virtual void execute() override;
 };

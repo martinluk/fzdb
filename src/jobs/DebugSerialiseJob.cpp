@@ -48,7 +48,7 @@ std::string testSerialise(const ISerialisable* ser)
 	return log.str();
 }
 
-DebugSerialiseJob::DebugSerialiseJob(TCPSession* session) : Job(session)
+DebugSerialiseJob::DebugSerialiseJob(ISession* session) : Job(session)
 {
 }
 

@@ -2,12 +2,13 @@ project(fuzzy-database)
 cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(VERSION 2.8.11)
 
+enable_testing()
+
 INCLUDE(ExternalProject)
 
 enable_testing()
 
 if(UNIX)
-#  set (CMAKE_CXX_FLAGS "-std=c++11 -Wfatal-errors")
   set (CMAKE_CXX_FLAGS "-std=c++11")
   set (CMAKE_VERBOSE_MAKEFILE true )
 endif()
@@ -32,23 +33,51 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/pthreads.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost-nowide.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gmock.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/spdlog.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
 include_directories(${Boost_INCLUDE_DIRS}) 
 include_directories(${GTEST_INCLUDE_DIRS}) 
+include_directories(${SPDLOG_INCLUDE_DIRS}) 
 
-FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp)
-FILE(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h)
+FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+
+macro(GroupSources curdir)
+  file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
+  foreach(child ${children})
+    if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+      GroupSources(${curdir}/${child})
+    else()
+      string(REPLACE "/" "\\" groupname ${curdir})
+
+      if(${child} MATCHES .*\\.h$)
+        string(REPLACE "src" "Headers" groupname ${groupname})
+        source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+      else()
+        if(${child} MATCHES .*\\.cpp$)
+          string(REPLACE "src" "Source Files" groupname ${groupname})
+          source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+        endif()
+      endif()        
+    endif()
+  endforeach()
+endmacro()
+
+GroupSources(src)
 
 add_executable(fuzzy-database ${SOURCES} ${HEADERS})
+add_dependencies(fuzzy-database nowide)
+add_dependencies(fuzzy-database spdlog)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
 target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
 
-add_dependencies(fuzzy-database nowide)
-
 if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
 endif()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)

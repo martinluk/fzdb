@@ -7,7 +7,7 @@
 class DebugSerialiseJob : public Job
 {
 public:
-	DebugSerialiseJob(TCPSession* session);
+	DebugSerialiseJob(ISession* session);
 
 	// Inherited via Job
 	virtual void execute() override;
