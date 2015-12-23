@@ -21,7 +21,7 @@ void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command
 		case QueryType::PING:
 			JobQueue::AddJob(new PingJob(session));
 			break;
-		case QueryType::ECHO:
+		case QueryType::DEBUGECHO:
 			JobQueue::AddJob(new EchoJob(session, query.data0));
 			break;
 		default:

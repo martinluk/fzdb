@@ -134,12 +134,13 @@ public:
 	TriplesBlock() {}
 };
 
+//ECHO is called DEBUGECHO to avoid a namespace collision on linux
 enum class QueryType {
 	SELECT,
 	INSERT,
 	DEL,
 	PING,
-	ECHO,
+	DEBUGECHO,
 	USER
 };
 
@@ -294,7 +295,7 @@ Query ParseAll(std::vector<std::string> tokens) {
 
 		if (*iter == "ECHO") {
 			*iter++;
-			type = QueryType::ECHO;
+			type = QueryType::DEBUGECHO;
 
 			if (iter != tokens.end()) {
 				data0 = *iter;
