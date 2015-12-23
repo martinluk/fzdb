@@ -10,7 +10,7 @@
 
 #include "Parser.h"
 
-void CommandInterpreter::ProcessCommand(ISession* session, std::string command) {
+void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command) {
 
 	auto tokens = Tokenize(command);
 

@@ -3,6 +3,7 @@
 
 #include "../session.h"
 #include "../Job.h"
+#include "QueryResult.h"
 
 class DebugSerialiseJob : public Job
 {
@@ -10,7 +11,7 @@ public:
 	DebugSerialiseJob(ISession* session);
 
 	// Inherited via Job
-	virtual void execute() override;
+	virtual QueryResult execute() override;
 };
 
 #endif	// JOBS_DEBUGSERIALISEJOB_H

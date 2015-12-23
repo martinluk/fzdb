@@ -6,11 +6,15 @@ CreateEntityJob::CreateEntityJob(ISession* session) : Job(session)
 {
 }
 
-void CreateEntityJob::execute()
+QueryResult CreateEntityJob::execute()
 {
 	EntityManager* m = Singletons::entityManager();
 	Entity* e = m->createEntity();
 
 	std::string id = std::to_string(e->getHandle());
-	_session->respond("Entity created with handle " + id);
+
+  QueryResult result;
+  result.setValue("type", "string");
+  result.setValue(std::string("response"), "Entity created with handle " + id);
+  return result;
 }

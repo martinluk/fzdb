@@ -52,7 +52,7 @@ DebugSerialiseJob::DebugSerialiseJob(ISession* session) : Job(session)
 {
 }
 
-void DebugSerialiseJob::execute()
+QueryResult DebugSerialiseJob::execute()
 {
 	Variant vs("Sample string");
 	Variant vi(5);
@@ -101,5 +101,8 @@ void DebugSerialiseJob::execute()
 	    << val2Uns.value().getInteger() << ","
 			<< val2Uns.confidence() << ")\n";
 
-	_session->respond(log.str());
+	QueryResult result;
+	result.setValue("type", "string");
+	result.setValue(std::string("response"), log.str());
+	return result;
 }
