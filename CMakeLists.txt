@@ -9,7 +9,7 @@ INCLUDE(ExternalProject)
 enable_testing()
 
 if(UNIX)
-  set (CMAKE_CXX_FLAGS -std=c++11)
+  set (CMAKE_CXX_FLAGS "-std=c++11")
   set (CMAKE_VERBOSE_MAKEFILE true )
 endif()
 
@@ -80,6 +80,4 @@ if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
 endif()
 
-if(UNIX)
-   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-endif()
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)

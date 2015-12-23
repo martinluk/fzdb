@@ -51,8 +51,8 @@ void TCPServer::handle_accept(ISession* session, const boost::system::error_code
 		// Start the session. It will sit in our vector until we decide to remove it.
     session->start();
 
-		// Listen for the next connection attempt.
-		listenForNewConnection();
+	// Listen for the next connection attempt.
+	listenForNewConnection();
   } else {
 		// Nothing to do here now.
   }

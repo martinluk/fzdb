@@ -1,6 +1,7 @@
 #ifndef MODEL_ENTITYPROPERTY_H
 #define MODEL_ENTITYPROPERTY_H
 
+#include "./ISerialisable.h"
 #include <string>
 #include <vector>
 #include "./PropertyValue.h"
@@ -14,13 +15,19 @@
 // concrete property.
 // Property keys cannot be changed once the property has been instanciated,
 // as this simplifies property management within entities.
-class EntityProperty
+
+// TODO: We may want this class to be implicitly shared, so that we can return
+// properties without having to perform deep copies.
+class EntityProperty : public ISerialisable
 {
 	public:
 		// Constructs a null property. This can be used for returning 'null',
 		// for example if no property matches a given search.
 		// isNull() will return true.
 		EntityProperty();
+		EntityProperty(const std::string &key);
+		EntityProperty(const std::string &key,
+			const std::vector<PropertyValue> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
 		// Internally, a property is null if its key is an empty string.
@@ -36,6 +43,7 @@ class EntityProperty
 
 		// Getters
 		std::string key() const;
+		const std::string& keyRef() const;
 		std::vector<PropertyValue> values() const;
 		PropertyValue value(int index) const;
 		int count() const;
@@ -58,7 +66,28 @@ class EntityProperty
 		// Clears this property of any values.
 		void clear();
 
+		// Implementation of ISerislisable
+		virtual void serialise(Serialiser &serialiser) const override;
+		static EntityProperty unserialise(const char* data);
+
 	private:
+		// Header for serialisation.
+		// This is the first data item, followed by valueCount number of
+		// ValueHeaderItems.
+		struct SerialHeader
+		{
+			std::size_t keySize;		// Length of the key string in bytes.
+			std::size_t valueCount;		// How many ValueHeaderItems to expect after this header.
+			std::size_t totalSize;		// Size of the header and all the data, in bytes.
+		};
+
+		// Represents header information for a PropertyValue.
+		// Here we store the serialised length of the given value.
+		struct ValueHeaderItem
+		{
+			std::size_t size;			// Serialised length of this value.
+		};
+
 		std::string	key_;
 		std::vector<PropertyValue> values_;
 };

@@ -3,6 +3,8 @@
 #include <iostream>
 #include "./server.h"
 
+#include "./singletons.h"
+#include "./JobFactory.h"
 #include "JobQueue.h"
 #include "spdlog/spdlog.h"
 #include <vector>
@@ -23,6 +25,8 @@ int main(int argc, char* argv[]) {
   */
   unsigned int port = 1407;
   int loggingLevel = 0;
+
+  Singletons::initialise();
 
   /*
   *   HANDLE COMMAND LINE ARGUMENTS
@@ -63,6 +67,7 @@ int main(int argc, char* argv[]) {
   /*
   *   INITIALISE LOGGING
   */
+
   try
   {
       std::vector<spdlog::sink_ptr> sinks;
@@ -70,6 +75,7 @@ int main(int argc, char* argv[]) {
       if(loggingLevel == 1) sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_st>("logfile", "txt", 23, 59, true));
       auto combined_logger = std::make_shared<spdlog::logger>("main", begin(sinks), end(sinks));
       spdlog::register_logger(combined_logger);
+	  combined_logger.get()->set_level(spdlog::level::trace);
   }
   catch (const spdlog::spdlog_ex& ex)
   {
@@ -79,9 +85,12 @@ int main(int argc, char* argv[]) {
   /*
   *   START THE SERVER
   **/
+
   try {
     std::cout << "Fuzzy Database v0.1" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
+	std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
+	std::cout << "CTRL-C to stop" << std::endl;
 
     // Create the IO service.
     // This is essentially a link to the OS' IO system.
@@ -94,13 +103,11 @@ int main(int argc, char* argv[]) {
     // we need to do for the connected client.
     // This creates the desired number of threads that will handle the jobs.
     JobQueue::Init(&io_service);
+	JobFactory::Init();
 
     // Next we create a TCP server. The server listens for information on
     // the specified port and creates sessions when data is received.
     TCPServer s(io_service, port);
-
-    std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
-    std::cout << "CTRL-C to stop" << std::endl;
 
     // Start the IO service running.
     io_service.run(); 
@@ -109,6 +116,7 @@ int main(int argc, char* argv[]) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
 
-  JobQueue::Shutdown();  
+  JobQueue::Shutdown();
+  Singletons::shutdown();
   return 0;
 }

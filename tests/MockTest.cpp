@@ -47,7 +47,7 @@ TEST_F(MockTest, echo_command) {
 	MockSession mockSession;
 	EchoJob* echo = new EchoJob(&mockSession, "Hello World");
 
-	EXPECT_CALL(mockSession, respond("Hello World"))
+	EXPECT_CALL(mockSession, respond("Hello World\n"))
            .Times(AtLeast(1));
 	
 	echo->execute();
@@ -59,7 +59,7 @@ TEST_F(MockTest, echo_command_unicode) {
 	const std::string testString = "Testing «ταБЬℓσ»: 1<2 & 4+1>3, now 20% off!";
 	EchoJob* echo = new EchoJob(&mockSession, testString);
 
-	EXPECT_CALL(mockSession, respond(testString))
+	EXPECT_CALL(mockSession, respond(testString + "\n"))
            .Times(AtLeast(1));
 	
 	echo->execute();
