@@ -3,6 +3,8 @@
 
 #include "../Job.h"
 
+#include "QueryResult.h"
+
 class PingJob : public Job
 {
 public:
@@ -11,6 +13,6 @@ public:
 
 
 	// Inherited via Job
-	virtual void execute() override;
+	virtual QueryResult execute() override;
 
 };

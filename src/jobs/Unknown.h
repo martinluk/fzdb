@@ -3,6 +3,8 @@
 
 #include "../Job.h"
 
+#include "QueryResult.h"
+
 class UnknownJob : public Job
 {
 private:
@@ -12,6 +14,6 @@ public:
   
 	UnknownJob(ISession* session, std::string name);
 	// Inherited via Job
-	virtual void execute() override;
+	virtual QueryResult execute() override;
 
 };

@@ -2,7 +2,7 @@
 #include "../session.h"
 
 #include "../Job.h"
-
+#include "QueryResult.h"
 #include <string>
 
 class EchoJob : public Job
@@ -13,7 +13,7 @@ public:
 
 
 	// Inherited via Job
-	virtual void execute() override;
+	virtual QueryResult execute() override;
 
 private:
 	std::string _message;

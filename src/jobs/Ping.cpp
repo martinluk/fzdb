@@ -5,7 +5,10 @@ PingJob::PingJob(ISession* session) : Job(session)
 
 }
 
-void PingJob::execute()
+QueryResult PingJob::execute()
 {
-	_session->respond("Pong\n");
+  QueryResult result;
+  result.setValue("type", "string");
+  result.setValue("response", std::string("PONG"));
+  return result;
 }

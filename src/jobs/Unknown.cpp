@@ -5,7 +5,10 @@ UnknownJob::UnknownJob(ISession* session, std::string name) : Job(session)
   _name = name;
 }
 
-void UnknownJob::execute()
+QueryResult UnknownJob::execute()
 {
-	_session->respond("Unknown command: " + _name + "\n");
+	QueryResult result;
+	result.setValue("type", "err");
+	result.setValue("response", "Unknown command: " + _name + "\n");
+	return result;
 }
