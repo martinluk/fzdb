@@ -93,6 +93,7 @@ const unsigned int& EntityProperty::keyRef() const
 
 void EntityProperty::serialise(Serialiser &serialiser) const
 {
+	/*
 	// Serialisation format:
 	// + SerialHeader
 	// + ValueHeaderItems
@@ -162,7 +163,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 		// Record this.
 		pVHeader[i].size = valueSize;
 		pHeader->totalSize++;
-	}
+	}*/
 }
 EntityProperty EntityProperty::unserialise(const char* data)
 {
@@ -173,7 +174,7 @@ EntityProperty EntityProperty::unserialise(const char* data)
 	// - Key
 	// - PropertyValues
 	// - ...
-
+	/*
 	// Firstly get the header.
 	const SerialHeader* pHeader =
 		reinterpret_cast<const SerialHeader*>(data);
@@ -183,8 +184,8 @@ EntityProperty EntityProperty::unserialise(const char* data)
 		reinterpret_cast<const ValueHeaderItem*>(data + sizeof(SerialHeader));
 	
 	// Get a pointer to the key.
-	const char* pKey =
-		reinterpret_cast<const char*>(data + sizeof(SerialHeader) +
+	const unsigned int pKey =
+		reinterpret_cast<unsigned int>(data + sizeof(SerialHeader) +
 		(pHeader->valueCount * sizeof(ValueHeaderItem)));
 	
 	// Get a pointer to the actual data.
@@ -205,5 +206,6 @@ EntityProperty EntityProperty::unserialise(const char* data)
 	}
 
 	// Return the property.
-	return EntityProperty((unsigned int) pKey, pvList);
+	return EntityProperty((unsigned int) pKey, pvList);*/
+	return EntityProperty();
 }
