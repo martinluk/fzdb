@@ -5,18 +5,22 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-class QueryResults 
+class QueryResult
 {
 private:
   boost::property_tree::ptree _ptree;
 public:
-  QueryResults();
+  QueryResult();
 
   template<typename T>
-  void setValue(std::string key, T value);
+  void setValue(std::string key, T value) {
+	  _ptree.put<T>(key, value);
+  }
 
   template<typename T>
-  T getValue(std::string key);
+  T getValue(std::string key) {
+	  return _ptree.get_child(key).get_value<T>();
+  }
 
   std::string toJSON();
 };

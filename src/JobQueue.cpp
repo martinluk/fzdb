@@ -1,11 +1,14 @@
 #include "JobQueue.h"
 
+#include "QueryResult.h"
+
 boost::asio::io_service* JobQueue::_service;
 boost::thread_group JobQueue::_threads;
 
 
-void JobQueue::ExecuteJob(Job * job) {
-	job->execute();
+void JobQueue::ExecuteJob(Job* job) {
+	QueryResult result = job->execute();
+  job->Session()->respond(result.toJSON());
 	delete job;
 }
 

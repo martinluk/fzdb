@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include "model/Triple.h"
+
 using StringIterator = std::vector<std::string>::iterator;
 using StringMap = std::map<std::string, std::string>;
 
@@ -103,31 +105,19 @@ public:
 	}
 };
 
-struct Triple {
-public: 
-	std::string subject;
-	std::string predicate;
-	std::string object;
-
-	Triple(std::string sub, std::string pred, std::string obj) {
-		subject = sub;
-		predicate = pred;
-		object = obj;
-	}
-};
 
 struct TriplesBlock {
 public:
-	std::vector<Triple> triples;
+	std::vector<model::Triple> triples;
 	std::string name;
 	std::vector<std::string> filters;
 
-	TriplesBlock(std::vector<Triple> trip, std::string n) {
+	TriplesBlock(std::vector<model::Triple> trip, std::string n) {
 		triples = trip;
 		name = n;
 	}
 
-	TriplesBlock(std::vector<Triple> trip) {
+	TriplesBlock(std::vector<model::Triple> trip) {
 		triples = trip;
 	}
 
@@ -162,8 +152,8 @@ public:
 	}
 };
 
-std::vector<Triple> ParseTriples(StringIterator&& iter, StringIterator end) {
-	std::vector<Triple> triples;
+std::vector<model::Triple> ParseTriples(StringIterator&& iter, StringIterator end) {
+	std::vector<model::Triple> triples;
 	std::string sub;
 	std::string pred;
 	int pos = 0;
@@ -181,7 +171,7 @@ std::vector<Triple> ParseTriples(StringIterator&& iter, StringIterator end) {
 				pos = 2;
 				break;
 			case 2:
-				Triple trip(sub, pred, *iter);
+				model::Triple trip(sub, pred, *iter);
 				triples.push_back(trip);
 				break;
 			}

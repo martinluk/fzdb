@@ -2,6 +2,7 @@
 #define FUZZYDB_JOB
 
 #include "ISession.h"
+#include "QueryResult.h"
 
 class Job 
 {
@@ -13,7 +14,11 @@ public:
 
 	virtual ~Job() {}
 
-	virtual void execute() = 0;
+	virtual QueryResult execute() = 0;
+
+  ISession* Session() {
+    return _session;
+  }
 protected:
 	ISession* _session;
 };
