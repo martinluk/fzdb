@@ -39,7 +39,7 @@ public:
 
 	// Inserts the given property into this entity.
 	// If a property with this key already exists, it is replaced.
-	void insertProperty(const EntityProperty &prop);
+	void insertProperty(EntityProperty &prop);
 
 	// Removes the property with the given key.
 	void removeProperty(const unsigned int &key);
@@ -53,12 +53,11 @@ public:
 private:
 	// Here (if C++ will let us), we use a const string reference as the key.
 	// This avoids us from storing duplicate strings.
-	typedef std::map<unsigned int, EntityProperty> PropertyTable;
 
 	const EHandle_t	handle_;
 	const unsigned int _type;
 
-	PropertyTable	propertyTable_;	
+	std::map<unsigned int, EntityProperty> _propertyTable;
 };
 
 #endif	// MODEL_ENTITY_H

@@ -48,6 +48,12 @@ class EntityProperty : public ISerialisable
 		PropertyValue value(int index) const;
 		int count() const;
 
+		template<typename T>
+		T getValue(unsigned int index);
+
+		template<typename T>
+		bool containsValue(T value);
+
 		// If this property is concrete, returns its value only.
 		// Otherwise, returns a null Variant.
 		Variant concreteValue() const;

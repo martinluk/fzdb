@@ -86,6 +86,31 @@ PropertyValue EntityProperty::value(int index) const
 	return _values[index];
 }
 
+template<>
+std::string EntityProperty::getValue(unsigned int index)
+{
+	if (index >= _values.size()) return std::string();
+	return _values[index].value().getString();
+}
+
+template<>
+int EntityProperty::getValue(unsigned int index)
+{
+	if (index >= _values.size()) return 0;
+	return _values[index].value().getInteger();
+}
+
+template<>
+bool EntityProperty::containsValue(std::string value)
+{
+	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
+		if (iter->value().getString() == value) {
+			return true;
+		}
+	}
+	return false;
+}
+
 const unsigned int& EntityProperty::keyRef() const
 {
 	return _key;

@@ -3,11 +3,14 @@
 #include <iostream>
 #include "./server.h"
 
+#include "model/EntityManager.h"
 #include "./singletons.h"
 #include "./JobFactory.h"
 #include "JobQueue.h"
 #include "spdlog/spdlog.h"
 #include <vector>
+
+#include "model/Triple.h"
 
 /**
  * @brief Entry point for the application
@@ -27,6 +30,37 @@ int main(int argc, char* argv[]) {
   int loggingLevel = 0;
 
   Singletons::initialise();
+
+  Singletons::entityManager()->AddProperty("<forename>", 1);
+  Singletons::entityManager()->AddProperty("<surname>", 2);
+
+  Entity* e1 = Singletons::entityManager()->createEntity();
+  e1->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+	  PropertyValue(Variant("fred"), 80)
+  }));
+  e1->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
+	  PropertyValue(Variant("smith"), 80)
+  }));
+
+  Entity* e2 = Singletons::entityManager()->createEntity();
+  e2->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+	  PropertyValue(Variant("james"), 80)
+  }));
+
+  Entity* e3 = Singletons::entityManager()->createEntity();
+  e3->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+	  PropertyValue(Variant("fred"), 80)
+  }));
+  e3->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
+	  PropertyValue(Variant("smoth"), 80),
+      PropertyValue(Variant("smith"), 40)
+  }));
+
+  std::vector<model::Triple> tripleVector{
+	model::Triple("$a", "<forename>", "fred"),
+	model::Triple("$a", "<surname>", "smith")
+  };
+  Singletons::entityManager()->BGP2(tripleVector);
 
   /*
   *   HANDLE COMMAND LINE ARGUMENTS

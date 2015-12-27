@@ -19,10 +19,17 @@ public:
 	// Creates an entity on the heap and returns a pointer to it.
 	Entity* createEntity();
 
+	void AddProperty(std::string name, unsigned int val) {
+		_propertyNames[name] = val;
+	}
+
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult BGP(std::vector<model::Triple> conditions);
 
-private:
+	void BGP2(std::vector <model::Triple> conditions);
+
+private:	
+
 	// TODO: This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
 	typedef std::map<Entity::EHandle_t, Entity*> EntityMap;

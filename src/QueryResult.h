@@ -22,6 +22,18 @@ public:
 	  return _ptree.get_child(key).get_value<T>();
   }
 
+  boost::property_tree::ptree getElement(std::string key) {
+	  return _ptree.get_child(key);
+  }
+
+  bool hasValue(std::string key) {
+	  return _ptree.find(key) != _ptree.not_found();
+  }
+
+  boost::property_tree::ptree root() {
+	  return _ptree;
+  }
+
   std::string toJSON();
 };
 
