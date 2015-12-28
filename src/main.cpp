@@ -35,26 +35,26 @@ int main(int argc, char* argv[]) {
   Singletons::entityManager()->AddProperty("<surname>", 2);
 
   Entity* e1 = Singletons::entityManager()->createEntity();
-  e1->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+  e1->insertProperty(std::move(EntityProperty(1, std::vector<PropertyValue>{
 	  PropertyValue(Variant("fred"), 80)
-  }));
-  e1->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
-	  PropertyValue(Variant("smith"), 80)
-  }));
+  })));
+  //e1->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
+	 // PropertyValue(Variant("smith"), 80)
+  //}));
 
-  Entity* e2 = Singletons::entityManager()->createEntity();
-  e2->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
-	  PropertyValue(Variant("james"), 80)
-  }));
+  //Entity* e2 = Singletons::entityManager()->createEntity();
+  //e2->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+	 // PropertyValue(Variant("james"), 80)
+  //}));
 
-  Entity* e3 = Singletons::entityManager()->createEntity();
-  e3->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
-	  PropertyValue(Variant("fred"), 80)
-  }));
-  e3->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
-	  PropertyValue(Variant("smoth"), 80),
-      PropertyValue(Variant("smith"), 40)
-  }));
+  //Entity* e3 = Singletons::entityManager()->createEntity();
+  //e3->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+	 // PropertyValue(Variant("fred"), 80)
+  //}));
+  //e3->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
+	 // PropertyValue(Variant("smoth"), 80),
+  //    PropertyValue(Variant("smith"), 40)
+  //}));
 
   std::vector<model::Triple> tripleVector{
 	model::Triple("$a", "<forename>", "fred"),
