@@ -35,9 +35,9 @@ int main(int argc, char* argv[]) {
   Singletons::entityManager()->AddProperty("<surname>", 2);
 
   Entity* e1 = Singletons::entityManager()->createEntity();
-  e1->insertProperty(std::move(EntityProperty(1, std::vector<PropertyValue>{
-	  PropertyValue(Variant("fred"), 80)
-  })));
+  //e1->insertProperty(EntityProperty(1, std::vector<PropertyValue>{
+	 // PropertyValue(Variant("fred"), 80)
+  //}));
   //e1->insertProperty(EntityProperty(2, std::vector<PropertyValue>{
 	 // PropertyValue(Variant("smith"), 80)
   //}));
