@@ -240,4 +240,7 @@ EntityProperty<T> EntityProperty<T>::unserialise(const char* data)
 	return EntityProperty<T>();
 }
 
+//template instantiations - parameters must be listed here in order to link
 template class EntityProperty < model::types::String >;
+template class EntityProperty < model::types::EntityRef >;
+template class EntityProperty < model::types::Int >;

@@ -8,6 +8,8 @@
 #include "./ISerialisable.h"
 
 #include "./types/String.h"
+#include "./types/EntityRef.h"
+#include "./types/Int.h"
 
 class IEntityProperty {
 public:
