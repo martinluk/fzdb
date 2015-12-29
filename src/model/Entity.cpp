@@ -15,22 +15,6 @@ bool Entity::isNull() const
 	return handle_ == INVALID_EHANDLE;
 }
 
-EntityProperty Entity::getProperty(const unsigned int &key) const
-{
-	auto it = _propertyTable.find(key);
-	return it == _propertyTable.cend() ? EntityProperty() : it->second;
-}
-
-void Entity::insertProperty(EntityProperty&& prop)
-{
-	// Erase the property if it exists (If not, this will do nothing).
-	//propertyTable_.erase(prop.key());
-
-	// Insert the new one.
-	auto pair = std::make_pair<unsigned int, EntityProperty>(std::move(prop.key()), std::move(prop));
-	_propertyTable.insert(pair);
-}
-
 int Entity::propertyCount() const
 {
 	return _propertyTable.size();
@@ -39,6 +23,14 @@ int Entity::propertyCount() const
 void Entity::removeProperty(const unsigned int &key)
 {
 	_propertyTable.erase(key);
+}
+
+bool Entity::hasProperty(const unsigned int& key)
+{
+	if (_propertyTable.find(key) == _propertyTable.cend()) {
+		return false;
+	}
+	return true;
 }
 
 void Entity::clearProperties()

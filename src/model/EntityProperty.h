@@ -6,15 +6,15 @@
 #include <queue>
 
 #include "./ISerialisable.h"
-#include "./PropertyValue.h"
-#include "./Variant.h"
 
-class PropertyValueCompare {
+#include "./types/String.h"
+
+class IEntityProperty {
 public:
-	bool operator() (PropertyValue a, PropertyValue b)
-	{
-		return a.confidence > b.confidence;
+	virtual ~IEntityProperty() {
+		bool a = true;
 	}
+	virtual int count() const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -28,7 +28,8 @@ public:
 
 // TODO: We may want this class to be implicitly shared, so that we can return
 // properties without having to perform deep copies.
-class EntityProperty : public ISerialisable
+template <typename T>
+class EntityProperty : public IEntityProperty
 {
 	public:
 		// Constructs a null property. This can be used for returning 'null',
@@ -37,7 +38,7 @@ class EntityProperty : public ISerialisable
 		EntityProperty();
 		EntityProperty(const unsigned int &key);
 		EntityProperty(const unsigned int &key,
-			const std::vector<PropertyValue> &values);
+			const std::vector<T> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
 		// Internally, a property is null if its key is an empty string.
@@ -54,59 +55,57 @@ class EntityProperty : public ISerialisable
 		// Getters
 		unsigned int key() const;
 		const unsigned int& keyRef() const;
-		std::vector<PropertyValue> values() const;
-		PropertyValue value(int index) const;
+		std::vector<T> values() const;
+		T value(int index) const;
 		int count() const;
 
-		template<typename T>
-		T getValue(unsigned int index);
+		//T getValue(unsigned int index);
 
-		template<typename T>
-		bool containsValue(T value);
+		//bool containsValue(T value);
 
 		// If this property is concrete, returns its value only.
 		// Otherwise, returns a null Variant.
-		Variant concreteValue() const;
+		//Variant concreteValue() const;
 
 		// Setters:
 
 		// Appends a value to the value list.
-		void append(const PropertyValue &value);
+		void append(const T &value);
 
 		// Appends a list of values.
-		void append(const std::vector<PropertyValue> &list);
+		void append(const std::vector<T> &list);
 
 		// Makes this property concrete, with the given variant value.
-		void setConcrete(const Variant &value);
+		//void setConcrete(const Variant &value);
 
 		// Clears this property of any values.
 		void clear();
 
 		// Implementation of ISerislisable
-		virtual void serialise(Serialiser &serialiser) const override;
+		virtual void serialise(Serialiser &serialiser) const;// override;
 		static EntityProperty unserialise(const char* data);
 
 	private:
-		// Header for serialisation.
-		// This is the first data item, followed by valueCount number of
-		// ValueHeaderItems.
-		struct SerialHeader
-		{
-			std::size_t keySize;		// Length of the key string in bytes.
-			std::size_t valueCount;		// How many ValueHeaderItems to expect after this header.
-			std::size_t totalSize;		// Size of the header and all the data, in bytes.
-		};
+		//// Header for serialisation.
+		//// This is the first data item, followed by valueCount number of
+		//// ValueHeaderItems.
+		//struct SerialHeader
+		//{
+		//	std::size_t keySize;		// Length of the key string in bytes.
+		//	std::size_t valueCount;		// How many ValueHeaderItems to expect after this header.
+		//	std::size_t totalSize;		// Size of the header and all the data, in bytes.
+		//};
 
-		// Represents header information for a PropertyValue.
-		// Here we store the serialised length of the given value.
-		struct ValueHeaderItem
-		{
-			std::size_t size;			// Serialised length of this value.
-		};
+		//// Represents header information for a PropertyValue.
+		//// Here we store the serialised length of the given value.
+		//struct ValueHeaderItem
+		//{
+		//	std::size_t size;			// Serialised length of this value.
+		//};
 
 		unsigned int _key;
-		std::vector<PropertyValue> _values;
-		std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
+		std::vector<T> _values;
+		//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

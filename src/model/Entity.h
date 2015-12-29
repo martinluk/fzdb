@@ -32,7 +32,23 @@ public:
 	// Returns the property with the given key, or a null property if this is not found.
 	// TODO: This may be slow unless/until properties and their related classes are made
 	// to be implicitly shared, as a copy of the property has to be made.
-	EntityProperty getProperty(const unsigned int &key) const;
+	template<typename T>
+	EntityProperty<T>* getProperty(const unsigned int &key) const {
+		auto it = _propertyTable.find(key);
+		if (it == _propertyTable.cend()) {
+			return new EntityProperty<T>();
+		}
+		
+		////TODO: Add error messages
+		try {
+			EntityProperty<T>* prop = dynamic_cast<EntityProperty<T>*>(it->second);
+			return prop;
+		}
+		catch (std::bad_cast ex) {
+			return new EntityProperty<T>();
+		}
+		return new EntityProperty<T>();
+	}
 
 	// Returns this entity's handle.
 	EHandle_t getHandle() const;
@@ -41,10 +57,21 @@ public:
 
 	// Inserts the given property into this entity.
 	// If a property with this key already exists, it is replaced.
-	void insertProperty(EntityProperty&& prop);
+	template<typename T>
+	void insertProperty(EntityProperty<T>* prop) {
+		// Erase the property if it exists (If not, this will do nothing).
+		//propertyTable_.erase(prop.key());
+
+		// Insert the new one.
+		auto pair = std::make_pair<unsigned int, IEntityProperty*>(std::move(prop->key()), (IEntityProperty*)prop);
+		_propertyTable.insert(pair);
+	}
 
 	// Removes the property with the given key.
 	void removeProperty(const unsigned int &key);
+
+	// Tests if the entity has a property
+	bool hasProperty(const unsigned int &key);
 
 	// Clears all properties on the entity.
 	void clearProperties();
@@ -69,7 +96,7 @@ private:
 	const EHandle_t	handle_;
 	const unsigned int _type;
 
-	std::map<unsigned int, EntityProperty> _propertyTable;
+	std::map<unsigned int, IEntityProperty*> _propertyTable;
 	std::vector<Entity*> _linkedEntities;
 };
 

@@ -2,29 +2,34 @@
 #include <cstring>
 #include <vector>
 
-EntityProperty::EntityProperty()
+template <typename T>
+EntityProperty<T>::EntityProperty()
 {
 	// Nothing to do - key will automatically be empty.
 }
 
-EntityProperty::EntityProperty(const unsigned int& key) :
+template <typename T>
+EntityProperty<T>::EntityProperty(const unsigned int& key) :
 	_key(key)
 {
 
 }
 
-EntityProperty::EntityProperty(const unsigned int& key,
-	const std::vector<PropertyValue> &values) : _key(key)
+template <typename T>
+EntityProperty<T>::EntityProperty(const unsigned int& key,
+	const std::vector<T> &values) : _key(key)
 {
 	append(values);
 }
 
-bool EntityProperty::isNull() const
+template <typename T>
+bool EntityProperty<T>::isNull() const
 {
 	return _key == 0;
 }
 
-bool EntityProperty::isConcrete() const
+template <typename T>
+bool EntityProperty<T>::isConcrete() const 
 {
 	if ( _values.size() != 1 ) return false;
 
@@ -32,37 +37,44 @@ bool EntityProperty::isConcrete() const
 	return _values[0].confidence() == 100;
 }
 
-bool EntityProperty::isEmpty() const
+template <typename T>
+bool EntityProperty<T>::isEmpty() const
 {
 	return _values.size() == 0;
 }
 
-unsigned int EntityProperty::key() const
+template <typename T>
+unsigned int EntityProperty<T>::key() const
 {
 	return _key;
 }
 
-std::vector<PropertyValue> EntityProperty::values() const
+template <typename T>
+std::vector<T> EntityProperty<T>::values() const
 {
 	return _values;
 }
 
-int EntityProperty::count() const
+template <typename T>
+int EntityProperty<T>::count() const
 {
 	return _values.size();
 }
 
-Variant EntityProperty::concreteValue() const
-{
-	return isConcrete() ? _values[0].value() : Variant();
-}
+//template <typename T>
+//Variant EntityProperty<T>::concreteValue() const
+//{
+//	return isConcrete() ? _values[0].value() : Variant();
+//}
 
-void EntityProperty::append(const PropertyValue &value)
+template <typename T>
+void EntityProperty<T>::append(const T &value)
 {
 	_values.push_back(value);
 }
 
-void EntityProperty::append(const std::vector<PropertyValue> &list)
+template <typename T>
+void EntityProperty<T>::append(const std::vector<T> &list)
 {
 	for ( int i = 0; i < list.size(); i++ )
 	{
@@ -70,53 +82,44 @@ void EntityProperty::append(const std::vector<PropertyValue> &list)
 	}
 }
 
-void EntityProperty::setConcrete(const Variant &value)
-{
-	clear();
-	append(PropertyValue(value, 255));
-}
+//template <typename T>
+//void EntityProperty<T>::setConcrete(const Variant &value)
+//{
+//	clear();
+//	append(PropertyValue(value, 255));
+//}
 
-void EntityProperty::clear()
+template <typename T>
+void EntityProperty<T>::clear()
 {
 	_values.clear();
 }
 
-PropertyValue EntityProperty::value(int index) const
+template <typename T>
+T EntityProperty<T>::value(int index) const
 {
 	return _values[index];
 }
 
-template<>
-std::string EntityProperty::getValue(unsigned int index)
-{
-	if (index >= _values.size()) return std::string();
-	return _values[index].value().getString();
-}
+//template <typename T>
+//bool EntityProperty<T>::containsValue(T value)
+//{
+//	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
+//		if (iter->value().getString() == value) {
+//			return true;
+//		}
+//	}
+//	return false;
+//}
 
-template<>
-int EntityProperty::getValue(unsigned int index)
-{
-	if (index >= _values.size()) return 0;
-	return _values[index].value().getInteger();
-}
-
-template<>
-bool EntityProperty::containsValue(std::string value)
-{
-	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
-		if (iter->value().getString() == value) {
-			return true;
-		}
-	}
-	return false;
-}
-
-const unsigned int& EntityProperty::keyRef() const
+template <typename T>
+const unsigned int& EntityProperty<T>::keyRef() const
 {
 	return _key;
 }
 
-void EntityProperty::serialise(Serialiser &serialiser) const
+template <typename T>
+void EntityProperty<T>::serialise(Serialiser &serialiser) const
 {
 	/*
 	// Serialisation format:
@@ -190,7 +193,9 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 		pHeader->totalSize++;
 	}*/
 }
-EntityProperty EntityProperty::unserialise(const char* data)
+
+template <typename T>
+EntityProperty<T> EntityProperty<T>::unserialise(const char* data)
 {
 	// Serialisation format:
 	// + SerialHeader
@@ -232,5 +237,7 @@ EntityProperty EntityProperty::unserialise(const char* data)
 
 	// Return the property.
 	return EntityProperty((unsigned int) pKey, pvList);*/
-	return EntityProperty();
+	return EntityProperty<T>();
 }
+
+template class EntityProperty < model::types::String >;

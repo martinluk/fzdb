@@ -122,24 +122,27 @@ void EntityManager::BGP2(std::vector<model::Triple> conditions)
 			if (conditionsIter->subject.type == model::TripleComponentType::Variable && conditionsIter->object.type == model::TripleComponentType::Value) {
 
 				unsigned int propertyId = _propertyNames[conditionsIter->predicate.value];
-				auto val = currentEntity->getProperty(propertyId).getValue<std::string>(0);
 
-				if (currentEntity->getProperty(propertyId).containsValue<std::string>(conditionsIter->object.value)) {
+				if (currentEntity->hasProperty(propertyId)) {
+					auto val = currentEntity->getProperty<model::types::String>(propertyId)->values();
 
-					if (variableAssignments.find(conditionsIter->subject.value) == variableAssignments.end()) {
-						variableAssignments[conditionsIter->subject.value] = std::to_string(currentEntity->getHandle());
+					if (val[0].value() == conditionsIter->object.value) {
+
+						if (variableAssignments.find(conditionsIter->subject.value) == variableAssignments.end()) {
+							variableAssignments[conditionsIter->subject.value] = std::to_string(currentEntity->getHandle());
+						}
+						else {
+							if (variableAssignments[conditionsIter->subject.value] != std::to_string(currentEntity->getHandle())) {
+								pass = false;
+								break;
+							}
+						}
+
 					}
 					else {
-						if (variableAssignments[conditionsIter->subject.value] != std::to_string(currentEntity->getHandle())) {
-							pass = false;
-							break;
-						}
+						pass = false;
+						break;
 					}
-
-				}
-				else {
-					pass = false;
-					break;
 				}
 			}			
 		}
