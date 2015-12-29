@@ -12,6 +12,8 @@
 
 #include "model/Triple.h"
 
+#include "Parser.h"
+
 /**
  * @brief Entry point for the application
  * @details [long description]
@@ -23,14 +25,30 @@
  */
 int main(int argc, char* argv[]) {
 
-  /*
-  *   DEFAULT SETTINGS
-  */
-  unsigned int port = 1407;
-  int loggingLevel = 0;
+	/*
+	*   DEFAULT SETTINGS
+	*/
+	unsigned int port = 1407;
+	int loggingLevel = 0;
 
-  Singletons::initialise();
+	Singletons::initialise();
 
+	//////////////////////////////////////////////////////////////////////////////
+
+	std::string query = R"(SELECT $forename $a
+WHERE {
+    $a <forename> $forename ;
+    <surname> "Abad" ;
+    <birthplace> "Liverpool"
+})";
+
+	auto tokens = FSparqlParser::Tokenize(query);
+	for (auto i = tokens.begin(); i != tokens.end(); ++i) {
+		std::cout << *i << std::endl;
+	}
+	//return 0;
+
+  /////////////////////////////////////////////////////////////////////////////
   Singletons::entityManager()->AddProperty("<forename>", 1);
   Singletons::entityManager()->AddProperty("<surname>", 2);
 
@@ -61,6 +79,8 @@ int main(int argc, char* argv[]) {
 	model::Triple("$a", "<surname>", "smith")
   };
   Singletons::entityManager()->BGP2(tripleVector);
+  ///////////////////////////////////////////////////////////////
+
 
   /*
   *   HANDLE COMMAND LINE ARGUMENTS

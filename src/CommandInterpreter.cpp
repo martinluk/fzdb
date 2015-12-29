@@ -12,10 +12,10 @@
 
 void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command) {
 
-	auto tokens = Tokenize(command);
+	auto tokens = FSparqlParser::Tokenize(command);
 
 	try {
-		Query query = ParseAll(tokens);
+		Query query = FSparqlParser::ParseAll(tokens);
 
 		switch (query.type) {
 		case QueryType::PING:
