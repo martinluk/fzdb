@@ -21,7 +21,7 @@ EntityProperty Entity::getProperty(const unsigned int &key) const
 	return it == _propertyTable.cend() ? EntityProperty() : it->second;
 }
 
-void Entity::insertProperty(EntityProperty& prop)
+void Entity::insertProperty(EntityProperty&& prop)
 {
 	// Erase the property if it exists (If not, this will do nothing).
 	//propertyTable_.erase(prop.key());

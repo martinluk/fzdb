@@ -39,7 +39,7 @@ public:
 
 	// Inserts the given property into this entity.
 	// If a property with this key already exists, it is replaced.
-	void insertProperty(EntityProperty &prop);
+	void insertProperty(EntityProperty&& prop);
 
 	// Removes the property with the given key.
 	void removeProperty(const unsigned int &key);
