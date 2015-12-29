@@ -1,11 +1,21 @@
 #ifndef MODEL_ENTITYPROPERTY_H
 #define MODEL_ENTITYPROPERTY_H
 
-#include "./ISerialisable.h"
 #include <string>
 #include <vector>
+#include <queue>
+
+#include "./ISerialisable.h"
 #include "./PropertyValue.h"
 #include "./Variant.h"
+
+class PropertyValueCompare {
+public:
+	bool operator() (PropertyValue a, PropertyValue b)
+	{
+		return a.confidence > b.confidence;
+	}
+};
 
 // An entity property is a key-values property that can be aggregated by an entity.
 // Each property has a string key which acts as its identifier.
@@ -96,6 +106,7 @@ class EntityProperty : public ISerialisable
 
 		unsigned int _key;
 		std::vector<PropertyValue> _values;
+		std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

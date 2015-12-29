@@ -13,7 +13,7 @@ class PropertyValue : public ISerialisable
 		
 		// Getters
 		Variant value() const;
-		float confidence() const;
+		signed char confidence() const;
 
 		// Implementation of ISerialisable.
 		virtual void serialise(Serialiser &serialiser) const override;
@@ -25,7 +25,7 @@ class PropertyValue : public ISerialisable
 			std::size_t valueSize;
 		};
 
-		void setConfidenceClamp(float c);
+		void setConfidenceClamp(signed char c);
 
 		Variant	_value;
 		signed char _confidence;

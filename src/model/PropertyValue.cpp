@@ -8,7 +8,7 @@ PropertyValue::PropertyValue(const Variant &value, signed char confidence) :
 	setConfidenceClamp(confidence);
 }
 
-void PropertyValue::setConfidenceClamp(float f)
+void PropertyValue::setConfidenceClamp(signed char f)
 {
 	// Clamp to make sure it's between 0 and 1.
 	if ( f < 0 ) f = 0;
@@ -22,7 +22,7 @@ Variant PropertyValue::value() const
 	return _value;
 }
 
-float PropertyValue::confidence() const
+signed char PropertyValue::confidence() const
 {
 	return _confidence;
 }

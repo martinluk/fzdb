@@ -73,7 +73,7 @@ void EntityProperty::append(const std::vector<PropertyValue> &list)
 void EntityProperty::setConcrete(const Variant &value)
 {
 	clear();
-	append(PropertyValue(value, 1.0f));
+	append(PropertyValue(value, 255));
 }
 
 void EntityProperty::clear()

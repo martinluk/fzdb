@@ -2,6 +2,8 @@
 #define MODEL_ENTITY_H
 
 #include <map>
+#include <vector>
+
 #include "./EntityProperty.h"
 
 // Represents an entity in the graph database.
@@ -50,6 +52,16 @@ public:
 	// Returns the number of properties present.
 	int propertyCount() const;
 
+	// Permenantly copies all data from entity into this entity
+	void merge(Entity& entity);
+
+  // Adds a link to entity 'entity' such that data from entity is returned
+  // in queries to this entity
+	void link(Entity* entity);
+
+	// Removes the link to entity 'entity'
+	void unlink(Entity* entity);
+
 private:
 	// Here (if C++ will let us), we use a const string reference as the key.
 	// This avoids us from storing duplicate strings.
@@ -58,6 +70,7 @@ private:
 	const unsigned int _type;
 
 	std::map<unsigned int, EntityProperty> _propertyTable;
+	std::vector<Entity*> _linkedEntities;
 };
 
 #endif	// MODEL_ENTITY_H
