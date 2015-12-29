@@ -1,9 +1,9 @@
 #include "Parser.h"
 
 //tokenises str
-std::vector<std::string> FSparqlParser::Tokenize(std::string str) {
+TokenList FSparqlParser::Tokenize(std::string str) {
 
-	std::vector<std::string> results;
+	TokenList results;
 	std::string buffer;
 	bool speechMarks = false;
 	bool squareBrackets = false;
@@ -14,7 +14,7 @@ std::vector<std::string> FSparqlParser::Tokenize(std::string str) {
 	for (auto iter = str.begin(); iter != str.end(); iter++) {
 		if ((*iter == '\n' || *iter == ' ' || *iter == '\t') && !speechMarks && !squareBrackets && !triangleBrackets && !filter) {
 			if (buffer.length() > 0) {
-				results.push_back(buffer);
+				results.push_back(std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType::NOTIMPLEMENTED, 0, 0), buffer));
 				buffer.clear();
 			}
 			typing = false;
@@ -23,11 +23,11 @@ std::vector<std::string> FSparqlParser::Tokenize(std::string str) {
 
 			if ((*iter == '{' || *iter == '}' || *iter == ';' || *iter == ',' || *iter == '.' || (*iter == ':' && typing == false)) && !speechMarks && !squareBrackets && !filter) {
 				if (buffer.length() > 0) {
-					results.push_back(buffer);
+					results.push_back(std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType::NOTIMPLEMENTED, 0, 0), buffer));
 					buffer.clear();
 				}
 				buffer.push_back(*iter);
-				results.push_back(buffer);
+				results.push_back(std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType::NOTIMPLEMENTED, 0, 0), buffer));
 				buffer.clear();
 			}
 			else {
@@ -72,7 +72,7 @@ std::vector<std::string> FSparqlParser::Tokenize(std::string str) {
 	}
 
 	if (buffer.length() > 0) {
-		results.push_back(buffer);
+		results.push_back(std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType::NOTIMPLEMENTED, 0, 0), buffer));
 		buffer.clear();
 	}
 
@@ -80,41 +80,41 @@ std::vector<std::string> FSparqlParser::Tokenize(std::string str) {
 }
 
 //parses a block of triples
-std::vector<model::Triple> FSparqlParser::ParseTriples(StringIterator&& iter, StringIterator end) {
+std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end) {
 	std::vector<model::Triple> triples;
 	std::string sub;
 	std::string pred;
 	int pos = 0;
 
-	while (iter != end && *iter != "}") {
+	while (iter != end && iter->second != "}") {
 
-		if (*iter != ";" && *iter != "," && *iter != ".") {
+		if (iter->second != ";" && iter->second != "," && iter->second != ".") {
 			switch (pos) {
 			case 0:
-				sub = *iter;
+				sub = iter->second;
 				pos = 1;
 				break;
 			case 1:
-				pred = *iter;
+				pred = iter->second;
 				pos = 2;
 				break;
 			case 2:
-				model::Triple trip(sub, pred, *iter);
+				model::Triple trip(sub, pred, iter->second);
 				triples.push_back(trip);
 				break;
 			}
 		}
 		else {
 
-			if (*iter == ".") {
+			if (iter->second == ".") {
 				pos = 0;
 			}
 
-			if (*iter == ";") {
+			if (iter->second == ";") {
 				pos = 1;
 			}
 
-			if (*iter == ",") {
+			if (iter->second == ",") {
 				pos = 2;
 			}
 		}
@@ -126,15 +126,15 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(StringIterator&& iter, St
 }
 
 //parses a { } block
-TriplesBlock FSparqlParser::ParseInsert(StringIterator&& iter, StringIterator end) {
+TriplesBlock FSparqlParser::ParseInsert(TokenIterator&& iter, TokenIterator end) {
 
 	TriplesBlock output;
 
-	if (*iter == "{") {
+	if (iter->second == "{") {
 		iter++;
 		output = TriplesBlock(ParseTriples(std::move(iter), end));
 
-		if (*iter == "}") {
+		if (iter->second == "}") {
 			iter++;
 		}
 	}
@@ -144,22 +144,22 @@ TriplesBlock FSparqlParser::ParseInsert(StringIterator&& iter, StringIterator en
 
 
 //parses prolouge
-StringMap FSparqlParser::ParseSources(StringIterator&& iter, StringIterator end) {
+StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
 
 	StringMap sources;
 
-	while (iter != end && *iter != "INSERT" &&  *iter != "SELECT" && *iter != "DELETE") {
+	while (iter != end && iter->second != "INSERT" &&  iter->second != "SELECT" && iter->second != "DELETE") {
 
 		std::string name;
 
-		name = *iter;
+		name = iter->second;
 		iter++;
 
 		if (iter != end) {
-			if (*iter == ":") {
+			if (iter->second == ":") {
 				iter++;
 				if (iter != end) {
-					sources[name] = *iter;
+					sources[name] = iter->second;
 					iter++;
 				}
 			}
@@ -170,7 +170,7 @@ StringMap FSparqlParser::ParseSources(StringIterator&& iter, StringIterator end)
 }
 
 //parses a tokenised list of strings to give a query object
-Query FSparqlParser::ParseAll(std::vector<std::string> tokens) {
+Query FSparqlParser::ParseAll(TokenList tokens) {
 
 	auto iter = tokens.begin();
 
@@ -182,15 +182,15 @@ Query FSparqlParser::ParseAll(std::vector<std::string> tokens) {
 
 	while (iter != tokens.end()) {
 
-		if (*iter == "SOURCE") {
+		if (iter->second == "SOURCE") {
 			*iter++;
 			sources = ParseSources(std::move(iter), tokens.end());
 			continue;
 		}
 
-		if (*iter == "INSERT") {
+		if (iter->second == "INSERT") {
 			*iter++;
-			if (*iter == "DATA") {
+			if (iter->second == "DATA") {
 				iter++;
 				type = QueryType::INSERT;
 				conditions = ParseInsert(std::move(iter), tokens.end());
@@ -198,13 +198,13 @@ Query FSparqlParser::ParseAll(std::vector<std::string> tokens) {
 			continue;
 		}
 
-		if (*iter == "WHERE") {
+		if (iter->second == "WHERE") {
 			*iter++;
 			whereClause = ParseInsert(std::move(iter), tokens.end());
 			continue;
 		}
 
-		if (*iter == "PING") {
+		if (iter->second == "PING") {
 			*iter++;
 			type = QueryType::PING;
 
@@ -215,12 +215,12 @@ Query FSparqlParser::ParseAll(std::vector<std::string> tokens) {
 			break;
 		}
 
-		if (*iter == "ECHO") {
+		if (iter->second == "ECHO") {
 			*iter++;
 			type = QueryType::DEBUGECHO;
 
 			if (iter != tokens.end()) {
-				data0 = *iter;
+				data0 = iter->second;
 				*iter++;
 				if (iter != tokens.end()) {
 					throw ParseException("ECHO only takes one argument");
@@ -230,7 +230,7 @@ Query FSparqlParser::ParseAll(std::vector<std::string> tokens) {
 			break;
 		}
 
-		throw ParseException("Unknown symbol: " + *iter);
+		throw ParseException("Unknown symbol: " + iter->second);
 	}
 
 	return Query(type, sources, conditions, whereClause, data0);

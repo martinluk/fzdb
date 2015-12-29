@@ -8,14 +8,28 @@
 
 #include "model/Triple.h"
 
-enum class Tokens {
-	SELECT
+enum class ParsedTokenType {
+	VARIABLE = 1,
+	STRING = 2,
+	INT = 3,
+	NOTIMPLEMENTED = 4
+};
+
+struct TokenInfo {
+public:
+	ParsedTokenType type;
+	unsigned int lineNumber;
+	unsigned int charPosition;
+
+	TokenInfo(ParsedTokenType ptt, unsigned int lineNo, unsigned int charPos) :
+		type(ptt), lineNumber(lineNo), charPosition(charPos) { }
 };
 
 //TODO: this whole file could do with tidying up
 
-using StringIterator = std::vector<std::string>::iterator;
 using StringMap = std::map<std::string, std::string>;
+using TokenList = std::vector<std::pair<TokenInfo, std::string>>;
+using TokenIterator = TokenList::iterator;
 
 //General exception class for parsing
 //TODO: extend to show line and column
@@ -88,11 +102,11 @@ public:
 
 class FSparqlParser {
 public:
-	static std::vector<std::string> Tokenize(std::string str);
-	static std::vector<model::Triple> ParseTriples(StringIterator&& iter, StringIterator end);
-	static TriplesBlock ParseInsert(StringIterator&& iter, StringIterator end);
-	static StringMap ParseSources(StringIterator&& iter, StringIterator end);
-	static Query ParseAll(std::vector<std::string> tokens);
+	static TokenList Tokenize(std::string str);
+	static std::vector<model::Triple> ParseTriples(TokenIterator&& iter, TokenIterator end);
+	static TriplesBlock ParseInsert(TokenIterator&& iter, TokenIterator end);
+	static StringMap ParseSources(TokenIterator&& iter, TokenIterator end);
+	static Query ParseAll(TokenList tokens);
 };
 
 #endif
