@@ -167,7 +167,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					subType = model::Subject::Type::VARIABLE;
 					break;
 				default:
-					throw std::exception("Invalid type for subject");
+					throw std::runtime_error("Invalid type for subject");
 				}
 				pos = 1;
 				break;
@@ -181,7 +181,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					predType = model::Predicate::Type::VARIABLE;
 					break;
 				default:
-					throw std::exception("Invalid type for predicate");
+					throw std::runtime_error("Invalid type for predicate");
 				}
 				pos = 2;
 				break;
@@ -201,7 +201,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					objType = model::Object::Type::ENTITYREF;
 					break;
 				default:
-					throw std::exception("Invalid type for object");
+					throw std::runtime_error("Invalid type for object");
 				}
 				model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), model::Object(objType, iter->second));
 				triples.push_back(trip);
