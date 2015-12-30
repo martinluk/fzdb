@@ -9,10 +9,24 @@
 #include "model/Triple.h"
 
 enum class ParsedTokenType {
-	VARIABLE = 1,
-	STRING = 2,
-	INT = 3,
-	NOTIMPLEMENTED = 4
+	VARIABLE,
+	STRING,
+	INT,
+	NOTIMPLEMENTED,
+	PROPERTY,
+	ENTITYREF,
+	
+	//keywords
+	KEYWORD_SELECT,
+	KEYWORD_WHERE,
+	KEYWORD_INSERT,
+	KEYWORD_DELETE,
+
+	//structural
+	OPEN_CURLBRACE,
+	CLOSE_CURLBRACE,
+	SPLITTER1,
+	SPLITTER2
 };
 
 struct TokenInfo {
@@ -28,7 +42,8 @@ public:
 //TODO: this whole file could do with tidying up
 
 using StringMap = std::map<std::string, std::string>;
-using TokenList = std::vector<std::pair<TokenInfo, std::string>>;
+using TokenItem = std::pair<TokenInfo, std::string>;
+using TokenList = std::vector<TokenItem>;
 using TokenIterator = TokenList::iterator;
 
 //General exception class for parsing
@@ -101,6 +116,8 @@ public:
 };
 
 class FSparqlParser {
+private:
+	static TokenItem identifyToken(std::string str, unsigned int line, unsigned int chr);
 public:
 	static TokenList Tokenize(std::string str);
 	static std::vector<model::Triple> ParseTriples(TokenIterator&& iter, TokenIterator end);

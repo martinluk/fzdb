@@ -39,12 +39,13 @@ int main(int argc, char* argv[]) {
 WHERE {
     $a <forename> $forename ;
     <surname> "Abad" ;
-    <birthplace> "Liverpool"
+    <birthplace> "Liverpool" ;
+	<brother> entity:32
 })";
 
 	auto tokens = FSparqlParser::Tokenize(query);
 	for (auto i = tokens.begin(); i != tokens.end(); ++i) {
-		std::cout << i->second << std::endl;
+		std::cout << i->second << " : " << ((int)i->first.type) << std::endl;
 	}
 	//return 0;
 

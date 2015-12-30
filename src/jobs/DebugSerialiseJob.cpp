@@ -1,15 +1,15 @@
 #include "./DebugSerialiseJob.h"
+
 #include <sstream>
 #include <string>
 #include <iomanip>
 #include <cassert>
 
-#include "../model/Variant.h"
-#include "../model/PropertyValue.h"
+#include "../model/ISerialisable.h"
 
 std::string testSerialise(const ISerialisable* ser)
 {
-	std::stringstream log;
+	/*std::stringstream log;
 	
 	Serialiser serialiser;
 	ser->serialise(serialiser);
@@ -45,7 +45,8 @@ std::string testSerialise(const ISerialisable* ser)
 		log << "\n";
 	}
 
-	return log.str();
+	return log.str();*/
+	return "";
 }
 
 DebugSerialiseJob::DebugSerialiseJob(ISession* session) : Job(session)
@@ -53,7 +54,7 @@ DebugSerialiseJob::DebugSerialiseJob(ISession* session) : Job(session)
 }
 
 QueryResult DebugSerialiseJob::execute()
-{
+{/*
 	Variant vs("Sample string");
 	Variant vi(5);
 	PropertyValue val1(vs, 1.0f);
@@ -104,5 +105,6 @@ QueryResult DebugSerialiseJob::execute()
 	QueryResult result;
 	result.setValue("type", "string");
 	result.setValue(std::string("response"), log.str());
-	return result;
+	return result;*/
+	return QueryResult();
 }
