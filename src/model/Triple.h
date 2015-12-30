@@ -7,22 +7,29 @@
 namespace model {
 
 	enum class TripleComponentType {
-		Entity,
-		Variable,
+		EntityRef,
+		String,
+		Integer,
 		Property,
-		Value
+		Variable
 	};
 
 	struct Subject {
 	public:
-		TripleComponentType type;
+
+		enum class Type {
+			ENTITYREF,
+			VARIABLE
+		};
+
+		Type type;
 		std::string value;
 
 		Subject() { }
 
-		Subject(TripleComponentType t, std::string val) : value(val) {
+		Subject(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != TripleComponentType::Entity && type != TripleComponentType::Variable) {
+			if (type != Type::ENTITYREF && type != Type::VARIABLE) {
 				//is bad, but be one of those
 			}
 		}
@@ -30,14 +37,20 @@ namespace model {
 	
 	struct Predicate {
 	public:
-		TripleComponentType type;
+
+		enum class Type {
+			PROPERTY,
+			VARIABLE
+		};
+
+		Type type;
 		std::string value;
 
 		Predicate() { }
 
-		Predicate(TripleComponentType t, std::string val) : value(val) {
+		Predicate(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != TripleComponentType::Property && type != TripleComponentType::Variable) {
+			if (type != Type::PROPERTY && type != Type::VARIABLE) {
 				//is bad, but be one of those
 			}
 		}
@@ -45,16 +58,21 @@ namespace model {
 
 	struct Object {
 	public:
-		TripleComponentType type;
+
+		enum class Type {
+			ENTITYREF,
+			STRING,
+			VARIABLE,
+			INT
+		};
+
+		Type type;
 		std::string value;
 
 		Object() { }
 
-		Object(TripleComponentType t, std::string val) : value(val) {
+		Object(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != TripleComponentType::Value && type != TripleComponentType::Variable && type != TripleComponentType::Entity) {
-				//is bad, but be one of those
-			}
 		}
 	};
 
@@ -66,8 +84,7 @@ namespace model {
     Predicate predicate;
     Object object;
 
-    Triple(std::string sub, std::string pred, std::string obj);
-
+	Triple(Subject sub, Predicate pred, Object obj) : subject(sub), predicate(pred), object(obj) {}
 	std::vector<std::string> variables();
   };
 

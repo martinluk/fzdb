@@ -45,7 +45,7 @@ WHERE {
 
 	auto tokens = FSparqlParser::Tokenize(query);
 	for (auto i = tokens.begin(); i != tokens.end(); ++i) {
-		std::cout << i->second << " : " << ((int)i->first.type) << std::endl;
+		std::cout << i->second << " : " << ((int)i->first.type) << " : " << i->first.lineNumber << ":" << i->first.charPosition << std::endl;
 	}
 	//return 0;
 
