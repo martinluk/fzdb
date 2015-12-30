@@ -13,6 +13,7 @@
 #include "model/Triple.h"
 
 #include "Parser.h"
+#include "model/Triple.h"
 
 /**
  * @brief Entry point for the application
@@ -50,9 +51,10 @@ WHERE {
 	//return 0;
 
   /////////////////////////////////////////////////////////////////////////////
-  Singletons::entityManager()->AddProperty("<forename>", 1);
-  Singletons::entityManager()->AddProperty("<surname>", 2);
+  Singletons::entityManager()->AddProperty("forename", 1);
+  Singletons::entityManager()->AddProperty("surname", 2);
 
+  //TEST DATA
   Entity* e1 = Singletons::entityManager()->createEntity();
   e1->insertProperty<model::types::String>(new EntityProperty<model::types::String>(1, std::vector < model::types::String> {
 	  model::types::String(80, "fred")
@@ -75,9 +77,14 @@ WHERE {
 	  model::types::String(60, "smith")
   }));
 
+  //TEST QUERY
   std::vector<model::Triple> tripleVector{
-	model::Triple("$a", "<forename>", "fred"),
-	model::Triple("$a", "<surname>", "smith")
+	model::Triple(model::Subject(model::Subject::Type::VARIABLE, "$a"), 
+		model::Predicate(model::Predicate::Type::PROPERTY, "forename"), 
+		model::Object(model::Object::Type::STRING, "fred")),
+	model::Triple(model::Subject(model::Subject::Type::VARIABLE, "$a"),
+		model::Predicate(model::Predicate::Type::PROPERTY, "surname"),
+		model::Object(model::Object::Type::STRING, "smith"))
   };
   Singletons::entityManager()->BGP2(tripleVector);
   ///////////////////////////////////////////////////////////////

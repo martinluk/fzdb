@@ -115,18 +115,35 @@ void EntityManager::BGP2(std::vector<model::Triple> conditions)
 		
 		for (auto conditionsIter = conditions.cbegin(); conditionsIter != conditions.end(); conditionsIter++) {
 
-			if (conditionsIter->subject.type == model::TripleComponentType::Entity && conditionsIter->object.type == model::TripleComponentType::Variable) {
+			if (conditionsIter->subject.type == model::Subject::Type::ENTITYREF && conditionsIter->object.type == model::Object::Type::VARIABLE) {
 				
 			}
 
-			if (conditionsIter->subject.type == model::TripleComponentType::Variable && conditionsIter->object.type == model::TripleComponentType::Value) {
+			if (conditionsIter->subject.type == model::Subject::Type::VARIABLE && ((int)conditionsIter->object.type & model::Object::VALUE_MASK)) {
 
+				//get the property id
 				unsigned int propertyId = _propertyNames[conditionsIter->predicate.value];
 
+				//if the current entity has the property
 				if (currentEntity->hasProperty(propertyId)) {
-					auto val = currentEntity->getProperty<model::types::String>(propertyId)->values();
+					
+					bool conditionIsTrue = false;
 
-					if (val[0].value() == conditionsIter->object.value) {
+					//match based on type in the triple
+					switch (conditionsIter->object.type) {
+					case model::Object::Type::STRING: {
+						std::vector<model::types::String> val = currentEntity->getProperty<model::types::String>(propertyId)->values();
+						conditionIsTrue = val[0].value() == conditionsIter->object.value;
+						break;
+					}
+					case model::Object::Type::INT: {
+						std::vector<model::types::Int> val = currentEntity->getProperty<model::types::Int>(propertyId)->values();
+						conditionIsTrue = atoi(conditionsIter->object.value.c_str()) == val[0].value();
+						break;
+					}
+					}					
+
+					if (conditionIsTrue) {
 
 						if (variableAssignments.find(conditionsIter->subject.value) == variableAssignments.end()) {
 							variableAssignments[conditionsIter->subject.value] = std::to_string(currentEntity->getHandle());

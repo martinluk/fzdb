@@ -60,11 +60,13 @@ namespace model {
 	public:
 
 		enum class Type {
-			ENTITYREF,
-			STRING,
-			VARIABLE,
-			INT
+			VARIABLE = 0b1000,
+			ENTITYREF = 0b1000,
+			STRING = 0b1001,
+			INT = 0b1010			
 		};
+
+		const static int VALUE_MASK = 0b1000;
 
 		Type type;
 		std::string value;
