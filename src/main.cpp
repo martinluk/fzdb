@@ -86,7 +86,7 @@ WHERE {
 		model::Predicate(model::Predicate::Type::PROPERTY, "surname"),
 		model::Object(model::Object::Type::STRING, "smith"))
   };
-  Singletons::entityManager()->BGP2(tripleVector);
+  auto res = Singletons::entityManager()->BGP2(tripleVector);
   ///////////////////////////////////////////////////////////////
 
 

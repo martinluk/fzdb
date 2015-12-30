@@ -6,6 +6,7 @@
 
 #include "../QueryResult.h"
 #include "./Triple.h"
+#include "../VariableSet.h"
 
 // TODO: We need smart pointers! We need to have the manager own the entity
 // and entities should not have delete called on them externally.
@@ -26,7 +27,7 @@ public:
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult BGP(std::vector<model::Triple> conditions);
 
-	void BGP2(std::vector <model::Triple> conditions);
+	VariableSet BGP2(std::vector <model::Triple> conditions);
 
 private:	
 

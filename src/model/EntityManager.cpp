@@ -102,10 +102,10 @@ QueryResult EntityManager::BGP(std::vector<model::Triple> conditions)
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-void EntityManager::BGP2(std::vector<model::Triple> conditions)
+VariableSet EntityManager::BGP2(std::vector<model::Triple> conditions)
 {
 	std::vector<Entity::EHandle_t> passed;
-	QueryResult result;
+	VariableSet result;
 
 	for (auto iter = entities_.cbegin(); iter != entities_.cend(); iter++) {
 
@@ -165,20 +165,9 @@ void EntityManager::BGP2(std::vector<model::Triple> conditions)
 		}
 
 		if (pass) {
-			if (result.hasValue("$a")) {
-				boost::property_tree::ptree child1;
-				child1.put("", currentEntity->getHandle());
-				result.getElement("$a").push_back(std::make_pair("", child1));
-			}
-			else {
-				boost::property_tree::ptree children;
-				boost::property_tree::ptree child1;
-				child1.put("", currentEntity->getHandle());
-				children.push_back(std::make_pair("", child1));
-				result.root().add_child("$a", children);
-			}
+			result.add("$a", std::to_string(currentEntity->getHandle()), VariableSet::VariableType::ENTITYREF);
 		}
 	}
 
-
+	return result;
 }
