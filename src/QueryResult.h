@@ -2,36 +2,28 @@
 #define FUZZY_QUERYRESULTS
 
 #include <string>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <rapidjson\document.h>
 
 class QueryResult
 {
 private:
-  boost::property_tree::ptree _ptree;
+  rapidjson::Document _document;
 public:
   QueryResult();
 
-  template<typename T>
-  void setValue(std::string key, T value) {
-	  _ptree.put<T>(key, value);
+  void setValue(const std::string key, std::string value) {
+	  rapidjson::Value val, name;
+	  val.SetString(value.c_str(), _document.GetAllocator());
+	  name.SetString(key.c_str(), _document.GetAllocator());
+	  _document.AddMember(name, val, _document.GetAllocator());
   }
 
-  template<typename T>
-  T getValue(std::string key) {
-	  return _ptree.get_child(key).get_value<T>();
+ std::string getValue(std::string key) {
+	 return _document[key.c_str()].GetString();
   }
 
-  boost::property_tree::ptree getElement(std::string key) {
-	  return _ptree.get_child(key);
-  }
-
-  bool hasValue(std::string key) {
-	  return _ptree.find(key) != _ptree.not_found();
-  }
-
-  boost::property_tree::ptree root() {
-	  return _ptree;
+  rapidjson::Document* root() {
+	  return &_document;
   }
 
   std::string toJSON();

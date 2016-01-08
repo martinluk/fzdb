@@ -1,12 +1,16 @@
 #include "QueryResult.h"
 
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 QueryResult::QueryResult() {
-  
+	_document.SetObject();
 }
 
 std::string QueryResult::toJSON()
 {
-	std::stringstream ss;
-	boost::property_tree::json_parser::write_json(ss, _ptree);
-	return ss.str();
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	_document.Accept(writer);	
+	return buffer.GetString();
 }
