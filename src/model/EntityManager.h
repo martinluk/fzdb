@@ -22,12 +22,11 @@ public:
 
 	void AddProperty(std::string name, unsigned int val) {
 		_propertyNames[name] = val;
-	}
+	}	
 
-	// Basic Graph Processing - returns a list of the variables in conditions
-	QueryResult BGP(std::vector<model::Triple> conditions);
+	VariableSet BGP(std::vector <model::Triple> conditions);
 
-	VariableSet BGP2(std::vector <model::Triple> conditions);
+	void Insert(std::vector<model::Triple> triples);
 
 private:	
 
@@ -35,11 +34,14 @@ private:
 	// numerical nature of the entity handles. O(log n) is still pretty good.
 	typedef std::map<Entity::EHandle_t, Entity*> EntityMap;
 
-	EntityMap entities_;
-	Entity::EHandle_t lastHandle_;
+	EntityMap _entities;
+	Entity::EHandle_t _lastHandle;
 
 	std::map<std::string, unsigned int> _entityTypeNames;
 	std::map<std::string, unsigned int> _propertyNames;
+
+	// Basic Graph Processing - returns a list of the variables in conditions
+	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H

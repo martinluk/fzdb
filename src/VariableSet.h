@@ -19,7 +19,7 @@ public:
 
 	VariableSet() { }
 	
-	void add(std::string&& var, std::string&& value, VariableType&& type) {
+	void add(const std::string&& var, std::string&& value, VariableType&& type) {
 		if (_data.find(var) == _data.cend()) {
 			_data[var] = std::pair<std::vector<std::string>, VariableType>(std::vector<std::string>{ value }, type);
 		}
@@ -29,6 +29,10 @@ public:
 			}
 			_data[var].first.push_back(value);
 		}
+	}
+
+	const std::map<std::string, std::pair<std::vector<std::string>, VariableType>> getData() {
+		return _data;
 	}
 
 private:

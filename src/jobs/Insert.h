@@ -1,5 +1,5 @@
-#ifndef FUZZY_JOBS_BGP
-#define FUZZY_JOBS_BGP
+#ifndef FUZZY_JOBS_INSERT
+#define FUZZY_JOBS_INSERT
 
 #include "../Job.h"
 #include "../model/Triple.h"
@@ -8,11 +8,11 @@
 
 #include <string>
 
-class BGP : public Job
+class Insert : public Job
 {
 public:
 
-  BGP(ISession* session, Query message);
+  Insert(ISession* session, Query query);
 
 
   // Inherited via Job

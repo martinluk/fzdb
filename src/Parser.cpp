@@ -335,6 +335,13 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			break;
 		}
 
+		if (iter->first.type == ParsedTokenType::KEYWORD_SELECT) {
+			*iter++;
+			type = QueryType::SELECT;
+			whereClause = ParseInsert(std::move(iter), tokens.end());
+			break;
+		}
+
 		throw ParseException("Unknown symbol: " + iter->second);
 	}
 

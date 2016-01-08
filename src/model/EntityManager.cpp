@@ -4,12 +4,12 @@
 
 EntityManager::EntityManager()
 {
-	lastHandle_ = Entity::INVALID_EHANDLE;
+	_lastHandle = Entity::INVALID_EHANDLE;
 }
 
 EntityManager::~EntityManager()
 {
-	for (EntityMap::iterator it = entities_.begin(); it != entities_.end(); ++it)
+	for (EntityMap::iterator it = _entities.begin(); it != _entities.end(); ++it)
 	{
 		delete it->second;
 	}
@@ -17,16 +17,16 @@ EntityManager::~EntityManager()
 
 Entity* EntityManager::createEntity()
 {
-	lastHandle_++;
-	assert(lastHandle_ != Entity::INVALID_EHANDLE);
+	_lastHandle++;
+	assert(_lastHandle != Entity::INVALID_EHANDLE);
 
-	Entity* e = new Entity(0, lastHandle_);
-	entities_.insert(std::pair<Entity::EHandle_t, Entity*>(lastHandle_, e));
+	Entity* e = new Entity(0, _lastHandle);
+	_entities.insert(std::pair<Entity::EHandle_t, Entity*>(_lastHandle, e));
 
 	return e;
 }
 
-QueryResult EntityManager::BGP(std::vector<model::Triple> conditions)
+QueryResult EntityManager::SeparateTriples(std::vector<model::Triple> conditions)
 {
 	std::map<std::string, std::vector<std::string>> variables;
 
@@ -102,16 +102,15 @@ QueryResult EntityManager::BGP(std::vector<model::Triple> conditions)
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-VariableSet EntityManager::BGP2(std::vector<model::Triple> conditions)
+VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 {
 	std::vector<Entity::EHandle_t> passed;
 	VariableSet result;
 
-	for (auto iter = entities_.cbegin(); iter != entities_.cend(); iter++) {
+	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 
 		Entity* currentEntity = iter->second;
 		std::map<std::string, std::string> variableAssignments;
-		bool pass = true;
 		
 		for (auto conditionsIter = conditions.cbegin(); conditionsIter != conditions.end(); conditionsIter++) {
 
@@ -145,7 +144,9 @@ VariableSet EntityManager::BGP2(std::vector<model::Triple> conditions)
 
 					if (conditionIsTrue) {
 
-						if (variableAssignments.find(conditionsIter->subject.value) == variableAssignments.end()) {
+						result.add(std::move(conditionsIter->subject.value), std::to_string(currentEntity->getHandle()), VariableSet::VariableType::ENTITYREF);
+
+						/*if (variableAssignments.find(conditionsIter->subject.value) == variableAssignments.end()) {
 							variableAssignments[conditionsIter->subject.value] = std::to_string(currentEntity->getHandle());
 						}
 						else {
@@ -153,21 +154,42 @@ VariableSet EntityManager::BGP2(std::vector<model::Triple> conditions)
 								pass = false;
 								break;
 							}
-						}
+						}*/
 
-					}
-					else {
-						pass = false;
-						break;
 					}
 				}
 			}			
 		}
-
-		if (pass) {
-			result.add("$a", std::to_string(currentEntity->getHandle()), VariableSet::VariableType::ENTITYREF);
-		}
 	}
 
 	return result;
+}
+
+void EntityManager::Insert(std::vector<model::Triple> triples) {
+	auto iter = triples.cbegin();
+	auto end = triples.cend();
+	for (; iter != end; iter++) {
+		auto triple = *iter;
+
+		auto entity_id = std::stoll(triple.subject.value);
+
+		//create the entity if it doesn't exist
+		if (_entities.find(entity_id) == _entities.end()) {
+			_entities[entity_id] = new Entity(1);
+		}
+
+		Entity* currentEntity = _entities[entity_id];
+
+		unsigned int propertyId = _propertyNames[triple.predicate.value];
+
+		//add property
+		if (currentEntity->hasProperty(propertyId)) {
+			currentEntity->getProperty<model::types::String>(propertyId)->append(model::types::String(80, triple.object.value));
+		}
+		else {
+			currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String> {
+				model::types::String(80, triple.object.value)
+			}));
+		}		
+	}
 }

@@ -60,6 +60,7 @@ WHERE {
   Singletons::entityManager()->AddProperty("surname", 2);
 
   //TEST DATA
+  /*
   Entity* e1 = Singletons::entityManager()->createEntity();
   e1->insertProperty<model::types::String>(new EntityProperty<model::types::String>(1, std::vector < model::types::String> {
 	  model::types::String(80, "fred")
@@ -80,8 +81,8 @@ WHERE {
   e3->insertProperty<model::types::String>(new EntityProperty<model::types::String>(2, std::vector < model::types::String> {
 	  model::types::String(80, "smoth"),
 	  model::types::String(60, "smith")
-  }));
-
+  }));*/
+  /*
   //TEST QUERY
   std::vector<model::Triple> tripleVector{
 	model::Triple(model::Subject(model::Subject::Type::VARIABLE, "$a"), 
@@ -93,7 +94,7 @@ WHERE {
   };
   auto res = Singletons::entityManager()->BGP2(tripleVector);
   ///////////////////////////////////////////////////////////////
-
+  */
 
   /*
   *   HANDLE COMMAND LINE ARGUMENTS
