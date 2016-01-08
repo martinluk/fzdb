@@ -44,7 +44,12 @@ WHERE {
 	<brother> entity:32
 })";
 
+	query = R"(INSERT DATA {
+  entity:1 <forename> "John"
+})";
+
 	auto tokens = FSparqlParser::Tokenize(query);
+	Query query2 = FSparqlParser::ParseAll(tokens);
 	for (auto i = tokens.begin(); i != tokens.end(); ++i) {
 		std::cout << i->second << " : " << ((int)i->first.type) << " : " << i->first.lineNumber << ":" << i->first.charPosition << std::endl;
 	}

@@ -49,6 +49,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
 	if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
 	if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
+	if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr), str);
 }
@@ -152,10 +153,9 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 	model::Predicate::Type predType;
 	int pos = 0;
 
-	while (iter != end && iter->first.type == ParsedTokenType::CLOSE_CURLBRACE) {
+	while (iter != end && iter->first.type != ParsedTokenType::CLOSE_CURLBRACE) {
 
-		//if (iter->second != ";" && iter->second != "," && iter->second != ".") {
-		if ((int)iter->first.type & TOKEN_SPLITTER_MASK) {
+		if (((int)iter->first.type & TOKEN_SPLITTER_MASK) == 0) {
 			switch (pos) {
 			case 0:
 				sub = iter->second;
@@ -295,7 +295,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_INSERT) {
 			*iter++;
-			if (iter->second == "DATA") {
+			if (iter->first.type == ParsedTokenType::KEYWORD_DATA) {
 				iter++;
 				type = QueryType::INSERT;
 				conditions = ParseInsert(std::move(iter), tokens.end());
