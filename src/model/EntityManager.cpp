@@ -143,19 +143,7 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 					}					
 
 					if (conditionIsTrue) {
-
 						result.add(std::move(conditionsIter->subject.value), std::to_string(currentEntity->getHandle()), VariableSet::VariableType::ENTITYREF);
-
-						/*if (variableAssignments.find(conditionsIter->subject.value) == variableAssignments.end()) {
-							variableAssignments[conditionsIter->subject.value] = std::to_string(currentEntity->getHandle());
-						}
-						else {
-							if (variableAssignments[conditionsIter->subject.value] != std::to_string(currentEntity->getHandle())) {
-								pass = false;
-								break;
-							}
-						}*/
-
 					}
 				}
 			}			

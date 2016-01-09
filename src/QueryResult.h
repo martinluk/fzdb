@@ -13,17 +13,25 @@ public:
 
   void setValue(const std::string key, std::string value) {
 	  rapidjson::Value val, name;
-	  val.SetString(value.c_str(), _document.GetAllocator());
-	  name.SetString(key.c_str(), _document.GetAllocator());
-	  _document.AddMember(name, val, _document.GetAllocator());
+	  val.SetString(value.c_str(), allocator());
+	  name.SetString(key.c_str(), allocator());
+	  _document.AddMember(name, val, allocator());
+  }
+
+  void setValue(rapidjson::Value&& key, rapidjson::Value&& value) {
+	  _document.AddMember(key, value, allocator());
+  }
+
+  rapidjson::MemoryPoolAllocator<>& allocator() {
+	  return _document.GetAllocator();
   }
 
  std::string getValue(std::string key) {
 	 return _document[key.c_str()].GetString();
   }
 
-  rapidjson::Document* root() {
-	  return &_document;
+  rapidjson::Document& root() {
+	  return _document;
   }
 
   std::string toJSON();

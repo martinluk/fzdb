@@ -71,6 +71,7 @@ GroupSources(src)
 add_executable(fuzzy-database ${SOURCES} ${HEADERS})
 add_dependencies(fuzzy-database nowide)
 add_dependencies(fuzzy-database spdlog)
+add_dependencies(fuzzy-database rapidjson)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
