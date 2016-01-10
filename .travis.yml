@@ -24,6 +24,7 @@ install:
   - mkdir -p build
   - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=DEBUG
+  - ls /home/travis/build/matann/fuzzy-database/build/rapidjson-prefix/src/rapidjson/include
 script:
   - cmake --build .
   - ctest -V -C debug
