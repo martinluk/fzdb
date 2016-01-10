@@ -3,7 +3,7 @@
 #include "../model/EntityManager.h"
 #include "../VariableSet.h"
 
-#include <rapidjson\document.h>
+#include <rapidjson/document.h>
 
 BGP::BGP(ISession* session, Query query) : Job(session), _query(query)
 {
