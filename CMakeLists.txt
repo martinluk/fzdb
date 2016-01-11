@@ -6,8 +6,6 @@ enable_testing()
 
 INCLUDE(ExternalProject)
 
-enable_testing()
-
 if(UNIX)
   set (CMAKE_CXX_FLAGS "-std=c++11")
   set (CMAKE_VERBOSE_MAKEFILE true )
@@ -35,12 +33,16 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/boost-nowide.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gmock.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/spdlog.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/rapidjson.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
 include_directories(${Boost_INCLUDE_DIRS}) 
 include_directories(${GTEST_INCLUDE_DIRS}) 
 include_directories(${SPDLOG_INCLUDE_DIRS}) 
+include_directories(${RAPIDJSON_INCLUDE_DIRS}) 
+
+message("DEBUG: ${RAPIDJSON_INCLUDE_DIRS}")
 
 FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
@@ -71,6 +73,7 @@ GroupSources(src)
 add_executable(fuzzy-database ${SOURCES} ${HEADERS})
 add_dependencies(fuzzy-database nowide)
 add_dependencies(fuzzy-database spdlog)
+add_dependencies(fuzzy-database rapidjson)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})

@@ -26,6 +26,7 @@ add_executable(fuzzy-database-test ${TEST_SOURCES} ${SOURCES_NO_MAIN} ${TEST_HEA
 add_dependencies(fuzzy-database-test nowide)
 add_dependencies(fuzzy-database-test gtest)
 add_dependencies(fuzzy-database-test spdlog)
+add_dependencies(fuzzy-database-test rapidjson)
 
 #remove main otherwise there are 2 main functions!
 

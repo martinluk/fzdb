@@ -1,13 +1,17 @@
+
 #include <boost/asio.hpp>
+#include <spdlog/spdlog.h>
 
 #include <iostream>
-#include "./server.h"
-
-#include "./singletons.h"
-#include "./JobFactory.h"
-#include "JobQueue.h"
-#include "spdlog/spdlog.h"
 #include <vector>
+
+#include "./server.h"
+#include "./singletons.h"
+
+#include "JobQueue.h"
+
+#include "model/EntityManager.h"
+#include "model/Triple.h"
 
 /**
  * @brief Entry point for the application
@@ -20,15 +24,15 @@
  */
 int main(int argc, char* argv[]) {
 
-  /*
-  *   DEFAULT SETTINGS
-  */
-  unsigned int port = 1407;
-  int loggingLevel = 0;
+	/*
+	*   DEFAULT SETTINGS
+	*/
+	unsigned int port = 1407;
+	int loggingLevel = 0;
 
-  Singletons::initialise();
+	Singletons::initialise();
 
-  /*
+ /*
   *   HANDLE COMMAND LINE ARGUMENTS
   */
   for (int i = 1; i < argc; ++i) {
@@ -103,7 +107,6 @@ int main(int argc, char* argv[]) {
     // we need to do for the connected client.
     // This creates the desired number of threads that will handle the jobs.
     JobQueue::Init(&io_service);
-	JobFactory::Init();
 
     // Next we create a TCP server. The server listens for information on
     // the specified port and creates sessions when data is received.

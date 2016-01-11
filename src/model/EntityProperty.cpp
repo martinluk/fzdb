@@ -2,67 +2,79 @@
 #include <cstring>
 #include <vector>
 
-EntityProperty::EntityProperty()
+template <typename T>
+EntityProperty<T>::EntityProperty()
 {
 	// Nothing to do - key will automatically be empty.
 }
 
-EntityProperty::EntityProperty(const std::string &key) :
-	key_(key)
+template <typename T>
+EntityProperty<T>::EntityProperty(const unsigned int& key) :
+	_key(key)
 {
 
 }
 
-EntityProperty::EntityProperty(const std::string &key,
-	const std::vector<PropertyValue> &values) : key_(key)
+template <typename T>
+EntityProperty<T>::EntityProperty(const unsigned int& key,
+	const std::vector<T> &values) : _key(key)
 {
 	append(values);
 }
 
-bool EntityProperty::isNull() const
+template <typename T>
+bool EntityProperty<T>::isNull() const
 {
-	return key_.empty();
+	return _key == 0;
 }
 
-bool EntityProperty::isConcrete() const
+template <typename T>
+bool EntityProperty<T>::isConcrete() const 
 {
-	if ( values_.size() != 1 ) return false;
+	if ( _values.size() != 1 ) return false;
 
 	// The confidence must be 1.
-	return values_[0].confidence() == 1.0f;
+	return _values[0].confidence() == 100;
 }
 
-bool EntityProperty::isEmpty() const
+template <typename T>
+bool EntityProperty<T>::isEmpty() const
 {
-	return values_.size() == 0;
+	return _values.size() == 0;
 }
 
-std::string EntityProperty::key() const
+template <typename T>
+unsigned int EntityProperty<T>::key() const
 {
-	return key_;
+	return _key;
 }
 
-std::vector<PropertyValue> EntityProperty::values() const
+template <typename T>
+std::vector<T> EntityProperty<T>::values() const
 {
-	return values_;
+	return _values;
 }
 
-int EntityProperty::count() const
+template <typename T>
+int EntityProperty<T>::count() const
 {
-	return values_.size();
+	return _values.size();
 }
 
-Variant EntityProperty::concreteValue() const
+//template <typename T>
+//Variant EntityProperty<T>::concreteValue() const
+//{
+//	return isConcrete() ? _values[0].value() : Variant();
+//}
+
+template <typename T>
+void EntityProperty<T>::append(const T &value)
 {
-	return isConcrete() ? values_[0].value() : Variant();
+	_values.push_back(value);
 }
 
-void EntityProperty::append(const PropertyValue &value)
-{
-	values_.push_back(value);
-}
-
-void EntityProperty::append(const std::vector<PropertyValue> &list)
+template <typename T>
+void EntityProperty<T>::append(const std::vector<T> &list)
 {
 	for ( int i = 0; i < list.size(); i++ )
 	{
@@ -70,29 +82,46 @@ void EntityProperty::append(const std::vector<PropertyValue> &list)
 	}
 }
 
-void EntityProperty::setConcrete(const Variant &value)
+//template <typename T>
+//void EntityProperty<T>::setConcrete(const Variant &value)
+//{
+//	clear();
+//	append(PropertyValue(value, 255));
+//}
+
+template <typename T>
+void EntityProperty<T>::clear()
 {
-	clear();
-	append(PropertyValue(value, 1.0f));
+	_values.clear();
 }
 
-void EntityProperty::clear()
+template <typename T>
+T EntityProperty<T>::value(int index) const
 {
-	values_.clear();
+	return _values[index];
 }
 
-PropertyValue EntityProperty::value(int index) const
+//template <typename T>
+//bool EntityProperty<T>::containsValue(T value)
+//{
+//	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
+//		if (iter->value().getString() == value) {
+//			return true;
+//		}
+//	}
+//	return false;
+//}
+
+template <typename T>
+const unsigned int& EntityProperty<T>::keyRef() const
 {
-	return values_[index];
+	return _key;
 }
 
-const std::string& EntityProperty::keyRef() const
+template <typename T>
+void EntityProperty<T>::serialise(Serialiser &serialiser) const
 {
-	return key_;
-}
-
-void EntityProperty::serialise(Serialiser &serialiser) const
-{
+	/*
 	// Serialisation format:
 	// + SerialHeader
 	// + ValueHeaderItems
@@ -105,8 +134,8 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 	
 	// Construct a header.
 	SerialHeader header;
-	header.keySize = key_.size()+1;
-	header.valueCount = values_.size();
+	header.keySize = sizeof(unsigned int);
+	header.valueCount = _values.size();
 	header.totalSize = 0;	// We don't yet know this.
 
 	// Add this to the list.
@@ -118,7 +147,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 
 	// We need to add a load of null ValueHeaderItems to the list too.
 	// All these will get updated as we go along.
-	std::size_t numValues = values_.size();
+	std::size_t numValues = _values.size();
 	ValueHeaderItem vHeader;
 	vHeader.size = 0;
 	for (std::size_t i = 0; i < numValues; i++)
@@ -128,7 +157,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 
 	// Also add our key string.
 	std::vector<char> strBuffer(header.keySize, NULL);
-	memcpy(strBuffer.data(), key_.c_str(), header.keySize-1);
+	memcpy(strBuffer.data(), (void*)_key, header.keySize);
 	propList.push_back(Serialiser::SerialProperty(strBuffer.data(),
 		header.keySize));
 
@@ -151,7 +180,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 		std::size_t sizeBefore = serialiser.size();
 
 		// Serialise the PropertyValue.
-		values_[i].serialise(serialiser);
+		_values[i].serialise(serialiser);
 
 		// See how large the serialiser now is.
 		std::size_t sizeAfter = serialiser.size();
@@ -162,9 +191,11 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 		// Record this.
 		pVHeader[i].size = valueSize;
 		pHeader->totalSize += valueSize;
-	}
+	}*/
 }
-EntityProperty EntityProperty::unserialise(const char* data)
+
+template <typename T>
+EntityProperty<T> EntityProperty<T>::unserialise(const char* data)
 {
 	// Serialisation format:
 	// + SerialHeader
@@ -173,7 +204,7 @@ EntityProperty EntityProperty::unserialise(const char* data)
 	// - Key
 	// - PropertyValues
 	// - ...
-
+	/*
 	// Firstly get the header.
 	const SerialHeader* pHeader =
 		reinterpret_cast<const SerialHeader*>(data);
@@ -183,8 +214,8 @@ EntityProperty EntityProperty::unserialise(const char* data)
 		reinterpret_cast<const ValueHeaderItem*>(data + sizeof(SerialHeader));
 	
 	// Get a pointer to the key.
-	const char* pKey =
-		reinterpret_cast<const char*>(data + sizeof(SerialHeader) +
+	const unsigned int pKey =
+		reinterpret_cast<unsigned int>(data + sizeof(SerialHeader) +
 		(pHeader->valueCount * sizeof(ValueHeaderItem)));
 	
 	// Get a pointer to the actual data.
@@ -205,5 +236,11 @@ EntityProperty EntityProperty::unserialise(const char* data)
 	}
 
 	// Return the property.
-	return EntityProperty(std::string(pKey), pvList);
+	return EntityProperty((unsigned int) pKey, pvList);*/
+	return EntityProperty<T>();
 }
+
+//template instantiations - parameters must be listed here in order to link
+template class EntityProperty < model::types::String >;
+template class EntityProperty < model::types::EntityRef >;
+template class EntityProperty < model::types::Int >;
