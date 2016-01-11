@@ -161,7 +161,7 @@ void EntityProperty::serialise(Serialiser &serialiser) const
 
 		// Record this.
 		pVHeader[i].size = valueSize;
-		pHeader->totalSize++;
+		pHeader->totalSize += valueSize;
 	}
 }
 EntityProperty EntityProperty::unserialise(const char* data)
