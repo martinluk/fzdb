@@ -1,18 +1,16 @@
+
 #include <boost/asio.hpp>
+#include <spdlog/spdlog.h>
 
 #include <iostream>
-#include "./server.h"
-
-#include "model/EntityManager.h"
-#include "./singletons.h"
-#include "./JobFactory.h"
-#include "JobQueue.h"
-#include "spdlog/spdlog.h"
 #include <vector>
 
-#include "model/Triple.h"
+#include "./server.h"
+#include "./singletons.h"
 
-#include "Parser.h"
+#include "JobQueue.h"
+
+#include "model/EntityManager.h"
 #include "model/Triple.h"
 
 /**
@@ -34,69 +32,7 @@ int main(int argc, char* argv[]) {
 
 	Singletons::initialise();
 
-	//////////////////////////////////////////////////////////////////////////////
-
-	std::string query = R"(SELECT $forename $a
-WHERE {
-    $a <forename> $forename ;
-    <surname> "Abad" ;
-    <birthplace> "Liverpool" ;
-	<brother> entity:32
-})";
-
-	query = R"(INSERT DATA {
-  entity:1 <forename> "John"
-})";
-
-	auto tokens = FSparqlParser::Tokenize(query);
-	Query query2 = FSparqlParser::ParseAll(tokens);
-	for (auto i = tokens.begin(); i != tokens.end(); ++i) {
-		std::cout << i->second << " : " << ((int)i->first.type) << " : " << i->first.lineNumber << ":" << i->first.charPosition << std::endl;
-	}
-	//return 0;
-
-  /////////////////////////////////////////////////////////////////////////////
-  Singletons::entityManager()->AddProperty("forename", 1);
-  Singletons::entityManager()->AddProperty("surname", 2);
-
-  //TEST DATA
-  /*
-  Entity* e1 = Singletons::entityManager()->createEntity();
-  e1->insertProperty<model::types::String>(new EntityProperty<model::types::String>(1, std::vector < model::types::String> {
-	  model::types::String(80, "fred")
-  }));
-  e1->insertProperty<model::types::String>(new EntityProperty<model::types::String>(2, std::vector < model::types::String> {
-	  model::types::String(80, "smith")
-  }));
-
-  Entity* e2 = Singletons::entityManager()->createEntity();
-  e2->insertProperty<model::types::String>(new EntityProperty<model::types::String>(1, std::vector < model::types::String> {
-	  model::types::String(80, "james")
-  }));
-
-  Entity* e3 = Singletons::entityManager()->createEntity();
-  e3->insertProperty<model::types::String>(new EntityProperty<model::types::String>(1, std::vector < model::types::String> {
-	  model::types::String(80, "fred")
-  }));
-  e3->insertProperty<model::types::String>(new EntityProperty<model::types::String>(2, std::vector < model::types::String> {
-	  model::types::String(80, "smoth"),
-	  model::types::String(60, "smith")
-  }));*/
-  /*
-  //TEST QUERY
-  std::vector<model::Triple> tripleVector{
-	model::Triple(model::Subject(model::Subject::Type::VARIABLE, "$a"), 
-		model::Predicate(model::Predicate::Type::PROPERTY, "forename"), 
-		model::Object(model::Object::Type::STRING, "fred")),
-	model::Triple(model::Subject(model::Subject::Type::VARIABLE, "$a"),
-		model::Predicate(model::Predicate::Type::PROPERTY, "surname"),
-		model::Object(model::Object::Type::STRING, "smith"))
-  };
-  auto res = Singletons::entityManager()->BGP2(tripleVector);
-  ///////////////////////////////////////////////////////////////
-  */
-
-  /*
+ /*
   *   HANDLE COMMAND LINE ARGUMENTS
   */
   for (int i = 1; i < argc; ++i) {
@@ -171,7 +107,6 @@ WHERE {
     // we need to do for the connected client.
     // This creates the desired number of threads that will handle the jobs.
     JobQueue::Init(&io_service);
-	JobFactory::Init();
 
     // Next we create a TCP server. The server listens for information on
     // the specified port and creates sessions when data is received.

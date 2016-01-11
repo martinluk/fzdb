@@ -1,7 +1,6 @@
 #include "./CommandInterpreter.h"
 
 #include "Job.h"
-#include "JobFactory.h"
 #include "JobQueue.h"
 
 #include "jobs/Ping.h"

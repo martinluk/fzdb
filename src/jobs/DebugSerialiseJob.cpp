@@ -101,10 +101,6 @@ QueryResult DebugSerialiseJob::execute()
 	log << "Unserialised PropertyValue 2:\n("
 	    << val2Uns.value().getInteger() << ","
 			<< val2Uns.confidence() << ")\n";
-
-	QueryResult result;
-	result.setValue("type", "string");
-	result.setValue(std::string("response"), log.str());
-	return result;*/
+			*/
 	return QueryResult();
 }
