@@ -24,6 +24,9 @@ std::string testSerialise(const model::ISerialisable* ser)
 	// i progresses in multiples of 8.
 	for (int i = 0; i < length; i += 8)
 	{
+                if ( i > 0 )
+                    log << "\n";
+
 		// j selects the characters in each batch of 8.
 		for(int j = 0; j < 8 && i+j < length; j++)
 		{
@@ -42,8 +45,6 @@ std::string testSerialise(const model::ISerialisable* ser)
 			else
 				log << buffer[i+j];
 		}
-
-		log << "\n";
 	}
 
         return log.str();

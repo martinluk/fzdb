@@ -2,6 +2,12 @@
 
 import socket, select, string, sys, json
 
+def printHelp():
+    print("Commands:")
+    print(":?              Show this help dialogue.")
+    print(":json [on/off]  Switches raw JSON display on or off.")
+    print(":quit           Quits the session.")
+
 # Hard-coded values for now.
 TCP_IP = 'localhost'
 TCP_PORT = 1407
@@ -18,11 +24,12 @@ except:	# We couldn't connect!
 	sys.exit()
 
 # The connection was successful.
-print("Connected to database on %s:%s. Type ':quit' to quit the session." % (TCP_IP, TCP_PORT))
+print("Connected to database on %s:%s. Type ':?' for help, or ':quit' to quit the session." % (TCP_IP, TCP_PORT))
 
 # We begin in sending mode, to listen for user input.
 sending = True
 promptSymbolRequired = True
+rawJson = False
 
 # Loop until we're told to stop:
 while True:
@@ -52,7 +59,7 @@ while True:
 
 	# If the socket is stdin, parse the command.
 	if sock == sys.stdin:
-		msg = sys.stdin.readline().rstrip("\n")
+                msg = sys.stdin.readline().rstrip("\n").strip()
 
 		# If the input was empty, just go round again.
 		if not msg:
@@ -63,6 +70,24 @@ while True:
 			print("Quitting session.")
 			commSocket.close()
 			sys.exit()
+
+                elif msg == ":?":
+                        printHelp()
+                        promptSymbolRequired = True
+                        continue
+
+                # Dumb but quick!
+                elif msg == ":json on":
+                        rawJson = True
+                        print("Raw JSON display turned on.")
+                        promptSymbolRequired = True
+                        continue
+
+                elif msg == ":json off":
+                        rawJson = False
+                        print("Raw JSON display turned off.")
+                        promptSymbolRequired = True;
+                        continue
 
 		# Otherwise, send the command.
 		# Later we'll want to do JSON conversion here.
@@ -85,8 +110,12 @@ while True:
 			sys.exit()
 		else:
 			# Write the response to the console.
-                        jsonobj = json.loads(data.decode('utf-8'))
-                        sys.stdout.write(jsonobj["response"])
+                        if rawJson == True:
+                            sys.stdout.write(data.decode('utf-8'))
+                        else:
+                            jsonobj = json.loads(data.decode('utf-8'))
+                            sys.stdout.write(jsonobj["response"])
+
                         sys.stdout.write("\n");
 
 			# Switch back into sending mode ready for the next command.
