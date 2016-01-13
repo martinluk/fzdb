@@ -1,13 +1,28 @@
 #ifndef FUZZY_MODEL_TYPES_BASE
 #define FUZZY_MODEL_TYPES_BASE
 
+#include "../ISerialisable.h"
+
 namespace model {
 	namespace types {
-		class Base {
+                class Base : public Model::ISerialisable
+                {
 		private:
 			unsigned char _confidence;
 
+                        struct SerialHeader
+                        {
+                            std::size_t size;   // Total serialised size in bytes, including this header.
+                        };
 		public:
+
+                        enum Subtype
+                        {
+                            TypeUndefined = 0,
+                            TypeInt32,
+                            TypeString,
+                            TypeEntityRef
+                        };
 
 			Base(unsigned char confidence) {
 				if (confidence > 100) confidence = 100;
@@ -21,6 +36,34 @@ namespace model {
 			void confidence(unsigned char confidence) {
 				_confidence = confidence;
 			}
+
+                        virtual std::size_t serialise(Serialiser &serialiser) const
+                        {
+                            std::size_t initialSize = serialiser.size();
+                            std::vector<Serialiser::SerialProperty> propList;
+
+                            SerialHeader header;
+                            header.size = 0;
+
+                            // Get the subtype - this is overridden by derived classes.
+                            Subtype st = subtype();
+
+                            propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+                            propList.push_back(Serialiser::SerialProperty(&st, sizeof(Subtype)));
+                            propList.push_back(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
+
+                            std::size_t serialisedBytes = serialiser.serialise(propList);
+
+                            SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
+                            pHeader->size = serialisedBytes;
+
+                            return serialisedBytes;
+                        }
+
+                        virtual Subtype subtype() const
+                        {
+                            return TypeUndefined;
+                        }
 		};
 
 		class ConfidenceCompare {

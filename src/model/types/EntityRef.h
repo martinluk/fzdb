@@ -18,6 +18,11 @@ namespace model {
 			EntityRef(unsigned char confidence, const EHandle_t value) : _value(value), Base(confidence) {}
 
 			EHandle_t value() { return _value; }
+
+                        virtual Subtype subtype() const
+                        {
+                            return TypeEntityRef;
+                        }
 		};
 	}
 }

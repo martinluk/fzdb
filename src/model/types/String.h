@@ -16,6 +16,11 @@ namespace model {
 			String(unsigned char confidence, const std::string value) : _value(value), Base(confidence) {}
 
 			std::string value() { return _value; }
+
+                        virtual Subtype subtype() const
+                        {
+                            return TypeString;
+                        }
 		};
 	}
 }

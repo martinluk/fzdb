@@ -7,14 +7,14 @@
 
 #include "../model/ISerialisable.h"
 
-std::string testSerialise(const ISerialisable* ser)
+std::string testSerialise(const Model::ISerialisable* ser)
 {
-	/*std::stringstream log;
+        std::stringstream log;
 	
 	Serialiser serialiser;
 	ser->serialise(serialiser);
 
-	const char* buffer = serialiser.cdata();
+        const char* buffer = serialiser.cbegin();
 	std::size_t length = serialiser.size();
 
 	log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
@@ -45,7 +45,7 @@ std::string testSerialise(const ISerialisable* ser)
 		log << "\n";
 	}
 
-	return log.str();*/
+        return log.str();
 	return "";
 }
 
@@ -54,53 +54,6 @@ DebugSerialiseJob::DebugSerialiseJob(ISession* session) : Job(session)
 }
 
 QueryResult DebugSerialiseJob::execute()
-{/*
-	Variant vs("Sample string");
-	Variant vi(5);
-	PropertyValue val1(vs, 1.0f);
-	PropertyValue val2(vi, 0.2f);
-
-	std::stringstream log;
-	log << "======== Testing string variant  ========\n";
-	log << "======== String: \"Sample String\" ========\n";
-	log << testSerialise(&vs) << "\n";
-
-	log << "======== Testing integer variant ========\n";
-	log << "======== Integer: 5              ========\n";
-	log << testSerialise(&vi) << "\n";
-
-	log << "======== Testing Property Value 1  ========\n";
-	log << testSerialise(&val1) << "\n";
-
-	log << "======== Testing Property Value 2  ========\n";
-	log << testSerialise(&val2) << "\n";
-
-	// Testing unserialising!
-	Serialiser s;
-	vs.serialise(s);
-	Variant vsUnserialised = Variant::unserialise(s.cdata());
-	log << "Unserialised variant string:\n"
-	    << vsUnserialised.getString() << "\n";
-
-	s.clear();
-	vi.serialise(s);
-	Variant viUnserialised = Variant::unserialise(s.cdata());
-	log << "Unserialised variant integer:\n"
-	    << viUnserialised.getInteger() << "\n";
-
-	s.clear();
-	val1.serialise(s);
-	PropertyValue val1Uns = PropertyValue::unserialise(s.cdata());
-	log << "Unserialised PropertyValue 1:\n("
-	    << val1Uns.value().getString() << ","
-			<< val1Uns.confidence() << ")\n";
-
-	s.clear();
-	val2.serialise(s);
-	PropertyValue val2Uns = PropertyValue::unserialise(s.cdata());
-	log << "Unserialised PropertyValue 2:\n("
-	    << val2Uns.value().getInteger() << ","
-			<< val2Uns.confidence() << ")\n";
-			*/
-	return QueryResult();
+{
+    return QueryResult();
 }

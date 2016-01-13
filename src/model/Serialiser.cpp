@@ -3,9 +3,10 @@
 
 Serialiser::Serialiser()
 {
+    lastSerialiseBytes_ = 0;
 }
 
-void Serialiser::serialise(const std::vector<SerialProperty> &properties)
+std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
 {
 	// Calculate the final size of all the data to be serialised.
 	std::size_t propSize = 0;
@@ -28,24 +29,43 @@ void Serialiser::serialise(const std::vector<SerialProperty> &properties)
 		serialData_.insert(startIt, first, last);
 		startIt += it->second;
 	}
+
+        lastSerialiseBytes_ = propSize;
+        return lastSerialiseBytes_;
 }
 
 void Serialiser::clear()
 {
 	serialData_.clear();
+        lastSerialiseBytes_ = 0;
 }
 
-char* Serialiser::data()
+char* Serialiser::begin()
 {
 	return serialData_.data();
 }
 
-const char* Serialiser::cdata() const
+const char* Serialiser::cbegin() const
 {
 	return serialData_.data();
+}
+
+char* Serialiser::end()
+{
+    return serialData_.data() + serialData_.size() - 1 ;
+}
+
+const char* Serialiser::cend() const
+{
+    return serialData_.data() + serialData_.size() - 1 ;
 }
 
 std::size_t Serialiser::size() const
 {
 	return serialData_.size();
+}
+
+std::size_t Serialiser::lastSerialiseBytes() const
+{
+    return lastSerialiseBytes_;
 }

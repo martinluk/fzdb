@@ -3,14 +3,18 @@
 
 #include "./Serialiser.h"
 
-// Implemented by classes that need to be serialised to a stream of bytes.
-class ISerialisable
+namespace Model
 {
-public:
-	virtual ~ISerialisable() {}
+    // Implemented by classes that need to be serialised to a stream of bytes.
+    class ISerialisable
+    {
+    public:
+            virtual ~ISerialisable() {}
 
-	// Serialise this object through the given serialiser.
-	virtual void serialise(Serialiser& serialiser) const = 0;
-};
+            // Serialise this object through the given serialiser.
+            // Returns the number of bytes serialised.
+            virtual std::size_t serialise(Serialiser& serialiser) const = 0;
+    };
+}
 
 #endif	// MODEL_ISERIALISABLE_H
