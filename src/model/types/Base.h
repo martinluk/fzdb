@@ -5,7 +5,7 @@
 
 namespace model {
 	namespace types {
-                class Base : public Model::ISerialisable
+                class Base : public model::ISerialisable
                 {
 		private:
 			unsigned char _confidence;

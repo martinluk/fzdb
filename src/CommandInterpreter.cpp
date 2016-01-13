@@ -8,6 +8,7 @@
 #include "jobs/Unknown.h"
 #include "jobs/Insert.h"
 #include "jobs/BGP.h"
+#include "jobs/DebugJob.h"
 
 #include "Parser.h"
 
@@ -31,12 +32,15 @@ void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command
 		case QueryType::SELECT:
 			JobQueue::AddJob(new BGP(session, query));
 			break;
+                case QueryType::DEBUGOTHER:
+                        JobQueue::AddJob(new DebugJob(session, query.data0));
+                        break;
 		default:
 			JobQueue::AddJob(new UnknownJob(session, command));
 		}
 	}
 	catch (ParseException ex) {
-		session->respond(std::string("Parse error: ") +  ex.what());
+                session->respond(std::string("Parse error: ") +  ex.what());
 	}
 }
 

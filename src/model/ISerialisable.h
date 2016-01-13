@@ -3,7 +3,7 @@
 
 #include "./Serialiser.h"
 
-namespace Model
+namespace model
 {
     // Implemented by classes that need to be serialised to a stream of bytes.
     class ISerialisable

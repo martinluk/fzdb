@@ -16,40 +16,41 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 		tokenType = ParsedTokenType::VARIABLE;
 	}
 
-	if (std::regex_match(str, stringRegex)) {
+        else if (std::regex_match(str, stringRegex)) {
 		tokenType = ParsedTokenType::STRING;
 		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("\""));
 	}
 
-	if (std::regex_match(str, propertyRegex)) {
+        else if (std::regex_match(str, propertyRegex)) {
 		tokenType = ParsedTokenType::PROPERTY;
 		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("<>"));
 	}
 
-	if (std::regex_match(str, entityRefRegex)) {
+        else if (std::regex_match(str, entityRefRegex)) {
 		tokenType = ParsedTokenType::ENTITYREF;
 		str = str.substr(7, str.length() - 7);
 	}
 
-	if (str == "{") tokenType = ParsedTokenType::OPEN_CURLBRACE;
+        else if (str == "{") tokenType = ParsedTokenType::OPEN_CURLBRACE;
 
-	if (str == "}") tokenType = ParsedTokenType::CLOSE_CURLBRACE;
+        else if (str == "}") tokenType = ParsedTokenType::CLOSE_CURLBRACE;
 
-	if (str == ";") tokenType = ParsedTokenType::SPLITTER2;
+        else if (str == ";") tokenType = ParsedTokenType::SPLITTER2;
 
-	if (str == ",") tokenType = ParsedTokenType::SPLITTER3;
+        else if (str == ",") tokenType = ParsedTokenType::SPLITTER3;
 
-	if (str == ".") tokenType = ParsedTokenType::SPLITTER1;
+        else if (str == ".") tokenType = ParsedTokenType::SPLITTER1;
 
 	//keywords
-	if (str == "SELECT") tokenType = ParsedTokenType::KEYWORD_SELECT;
-	if (str == "INSERT") tokenType = ParsedTokenType::KEYWORD_INSERT;
-	if (str == "DELETE") tokenType = ParsedTokenType::KEYWORD_DELETE;
-	if (str == "WHERE") tokenType = ParsedTokenType::KEYWORD_WHERE;
-	if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
-	if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
-	if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
-	if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
+        else if (str == "SELECT") tokenType = ParsedTokenType::KEYWORD_SELECT;
+        else if (str == "INSERT") tokenType = ParsedTokenType::KEYWORD_INSERT;
+        else if (str == "DELETE") tokenType = ParsedTokenType::KEYWORD_DELETE;
+        else if (str == "WHERE") tokenType = ParsedTokenType::KEYWORD_WHERE;
+        else if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
+        else if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
+        else if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
+        else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
+        else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr), str);
 }
@@ -334,6 +335,23 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 
 			break;
 		}
+
+                if (iter->first.type == ParsedTokenType::KEYWORD_DEBUG)
+                {
+                    *iter++;
+                    type = QueryType::DEBUGOTHER;
+
+                    if (iter != tokens.end())
+                    {
+                        data0 = iter->second;
+                        *iter++;
+                        if (iter != tokens.end())
+                        {
+                            throw ParseException("DEBUG commands take a maximum of one argument");
+                        }
+                    }
+                    break;
+                }
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_SELECT) {
 			*iter++;

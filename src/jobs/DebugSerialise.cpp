@@ -1,4 +1,4 @@
-#include "./DebugSerialiseJob.h"
+#include "./DebugSerialise.h"
 
 #include <sstream>
 #include <string>
@@ -6,8 +6,9 @@
 #include <cassert>
 
 #include "../model/ISerialisable.h"
+#include "../model/types/Int.h"
 
-std::string testSerialise(const Model::ISerialisable* ser)
+std::string testSerialise(const model::ISerialisable* ser)
 {
         std::stringstream log;
 	
@@ -46,14 +47,19 @@ std::string testSerialise(const Model::ISerialisable* ser)
 	}
 
         return log.str();
-	return "";
 }
 
-DebugSerialiseJob::DebugSerialiseJob(ISession* session) : Job(session)
+QueryResult DebugSerialise::execute()
 {
-}
+    std::stringstream log;
 
-QueryResult DebugSerialiseJob::execute()
-{
-    return QueryResult();
+    model::types::Base tBase(53);
+
+    log << "Testing serialisation of Base type.\n";
+    log << testSerialise(&tBase);
+
+    QueryResult result;
+    result.setValue("type", "string");
+    result.setValue(std::string("response"), log.str());
+    return result;
 }

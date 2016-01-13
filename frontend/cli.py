@@ -86,6 +86,7 @@ while True:
 		else:
 			# Write the response to the console.
 			sys.stdout.write(data.decode('utf-8'))
+                        sys.stdout.write("\n");
 
 			# Switch back into sending mode ready for the next command.
 			sending = True
