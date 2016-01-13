@@ -14,3 +14,11 @@ std::string QueryResult::toJSON()
 	_document.Accept(writer);	
 	return buffer.GetString();
 }
+
+QueryResult QueryResult::generateError(const std::string &errorString)
+{
+    QueryResult result;
+    result.setValue("type", "string");
+    result.setValue(std::string("response"), errorString);
+    return result;
+}

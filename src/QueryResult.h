@@ -35,6 +35,8 @@ public:
   }
 
   std::string toJSON();
+
+  static QueryResult generateError(const std::string &errorString);
 };
 
 #endif

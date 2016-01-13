@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import socket, select, string, sys
+import socket, select, string, sys, json
 
 # Hard-coded values for now.
 TCP_IP = 'localhost'
@@ -85,7 +85,8 @@ while True:
 			sys.exit()
 		else:
 			# Write the response to the console.
-			sys.stdout.write(data.decode('utf-8'))
+                        jsonobj = json.loads(data.decode('utf-8'))
+                        sys.stdout.write(jsonobj["response"])
                         sys.stdout.write("\n");
 
 			# Switch back into sending mode ready for the next command.
