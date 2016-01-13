@@ -13,6 +13,7 @@ class Permission {
 		enum PermissionType {ViewDB, ModifyDB, UserOp};
 		bool checkPermission(UserGroup group, PermissionType permType);
 		void assertPermission(UserGroup group, PermissionType permType);
+		//TODO Can be refactored using a struct
 		bool guestPermission(PermissionType permType);
 		bool editorPermission(PermissionType permType);
 		bool adminPermission(PermissionType permType);

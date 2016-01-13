@@ -40,6 +40,9 @@ bool Permission::guestPermission(PermissionType permType) {
 			return false;
 		case UserOp:
 			return false;
+		default:
+			//A new user group was added, but permission is not updated here.
+			assert(false);
 	}
 }
 
@@ -51,6 +54,9 @@ bool Permission::editorPermission(PermissionType permType) {
 			return true;
 		case UserOp:
 			return false;
+		default:
+			//A new user group was added, but permission is not updated here.
+			assert(false);
 	}
 }
 
@@ -62,6 +68,9 @@ bool Permission::adminPermission(PermissionType permType) {
 			return false;
 		case UserOp:
 			return true;
+		default:
+			//A new user group was added, but permission is not updated here.
+			assert(false);
 	}
 }
 
