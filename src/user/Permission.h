@@ -10,7 +10,11 @@ class Permission {
 		void assertUserOpPermission(UserGroup group);
 
 	private: 
-		enum PermissionType{ViewDB, ModifyDB, UserOp};
+		enum PermissionType {ViewDB, ModifyDB, UserOp};
 		bool checkPermission(UserGroup group, PermissionType permType);
-		bool guestPermissio
+		void assertPermission(UserGroup group, PermissionType permType);
+		bool guestPermission(PermissionType permType);
+		bool editorPermission(PermissionType permType);
+		bool adminPermission(PermissionType permType);
+
 };
