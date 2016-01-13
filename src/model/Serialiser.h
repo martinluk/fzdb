@@ -15,6 +15,7 @@ public:
 
 	// Serialise the given list of properties.
         std::size_t serialise(const std::vector<SerialProperty> &properties);
+        std::size_t serialise(const SerialProperty &property);
 
 	// Clear all data.
 	void clear();

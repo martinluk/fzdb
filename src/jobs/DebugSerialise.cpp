@@ -8,12 +8,13 @@
 #include "../model/ISerialisable.h"
 #include "../model/types/Int.h"
 
-std::string testSerialise(const model::ISerialisable* ser)
+std::string testSerialise(const model::types::Base* ser)
 {
         std::stringstream log;
-	
 	Serialiser serialiser;
-	ser->serialise(serialiser);
+
+        model::types::Base::TypeSerialiser typeSerialiser(ser);
+        typeSerialiser.serialise(serialiser);
 
         const char* buffer = serialiser.cbegin();
 	std::size_t length = serialiser.size();
@@ -32,8 +33,8 @@ std::string testSerialise(const model::ISerialisable* ser)
 		{
 			if ( j > 0 )
 				log << " ";
-
-			log << std::setfill ('0') << std::setw(2) << std::hex << static_cast<int>(buffer[i+j]);
+                        int num = buffer[i+j];
+                        log << std::setfill ('0') << std::setw(2) << std::hex << num;
 		}
 
 		log << "\t";
@@ -55,9 +56,13 @@ QueryResult DebugSerialise::execute()
     std::stringstream log;
 
     model::types::Base tBase(53);
+    model::types::Int tInt(72, 1337);
 
     log << "Testing serialisation of Base type.\n";
-    log << testSerialise(&tBase);
+    log << testSerialise(&tBase) << "\n";
+
+    log << "Testing serialisation of Int type.\n";
+    log << testSerialise(&tInt);
 
     QueryResult result;
     result.setValue("type", "string");

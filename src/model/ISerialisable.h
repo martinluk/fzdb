@@ -3,6 +3,7 @@
 
 #include "./Serialiser.h"
 
+// TODO: Do we still need this interface?
 namespace model
 {
     // Implemented by classes that need to be serialised to a stream of bytes.

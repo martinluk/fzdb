@@ -1,19 +1,15 @@
 #ifndef FUZZY_MODEL_TYPES_BASE
 #define FUZZY_MODEL_TYPES_BASE
 
-#include "../ISerialisable.h"
+#include "../Serialiser.h"
+#include <cassert>
 
 namespace model {
 	namespace types {
-                class Base : public model::ISerialisable
+                class Base
                 {
 		private:
 			unsigned char _confidence;
-
-                        struct SerialHeader
-                        {
-                            std::size_t size;   // Total serialised size in bytes, including this header.
-                        };
 		public:
 
                         enum Subtype
@@ -23,6 +19,49 @@ namespace model {
                             TypeString,
                             TypeEntityRef
                         };
+
+                        class TypeSerialiser
+                        {
+                        public:
+                            TypeSerialiser(const Base* t) : baseType_(t) {}
+
+                            struct SerialHeader
+                            {
+                                std::size_t size;   // Total serialised size, in bytes.
+                                Subtype subtype;    // Subtype identifier for this type.
+                            };
+
+                            static Subtype identify(const char* serialisedData)
+                            {
+                                return reinterpret_cast<const SerialHeader*>(serialisedData)->subtype;
+                            }
+
+                            std::size_t serialise(Serialiser &serialiser) const
+                            {
+                                std::size_t initialSize = serialiser.size();
+                                SerialHeader header;
+                                header.size = 0;
+                                header.subtype = baseType_->subtype();
+
+                                Serialiser::SerialProperty prop(&header, sizeof(SerialHeader));
+                                std::size_t baseBytes = serialiser.serialise(prop);
+                                std::size_t derivedBytes = baseType_->serialiseSubclass(serialiser);
+
+                                serialiser.reinterpretCast<SerialHeader*>(initialSize)->size = baseBytes + derivedBytes;
+                                return baseBytes + derivedBytes;
+                            }
+
+                            template <typename T>
+                            static T unserialise(const char* serialisedData)
+                            {
+                                return T(serialisedData);
+                            }
+
+                        private:
+                            const Base*   baseType_;
+                        };
+
+                        friend class TypeSerialiser;
 
 			Base(unsigned char confidence) {
 				if (confidence > 100) confidence = 100;
@@ -37,32 +76,28 @@ namespace model {
 				_confidence = confidence;
 			}
 
-                        virtual std::size_t serialise(Serialiser &serialiser) const
-                        {
-                            std::size_t initialSize = serialiser.size();
-                            std::vector<Serialiser::SerialProperty> propList;
-
-                            SerialHeader header;
-                            header.size = 0;
-
-                            // Get the subtype - this is overridden by derived classes.
-                            Subtype st = subtype();
-
-                            propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
-                            propList.push_back(Serialiser::SerialProperty(&st, sizeof(Subtype)));
-                            propList.push_back(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
-
-                            std::size_t serialisedBytes = serialiser.serialise(propList);
-
-                            SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
-                            pHeader->size = serialisedBytes;
-
-                            return serialisedBytes;
-                        }
-
                         virtual Subtype subtype() const
                         {
                             return TypeUndefined;
+                        }
+
+                protected:
+                        // Called when serialising.
+                        virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+                        {
+                            // Serialise the confidence.
+                            return serialiser.serialise(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
+                        }
+
+                        // Called to construct from serialised data.
+                        Base(const char* &serialisedData)
+                        {
+                            // The data should point to our confidence value.
+                            _confidence = *(reinterpret_cast<const unsigned char*>(serialisedData));
+
+                            // We have to increment the pointer (which is actually a reference to a pointer)
+                            // so that the next class can get its data.
+                            serialisedData += sizeof(unsigned char);
                         }
 		};
 

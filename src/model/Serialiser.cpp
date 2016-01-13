@@ -34,6 +34,19 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
         return lastSerialiseBytes_;
 }
 
+std::size_t Serialiser::serialise(const SerialProperty &property)
+{
+    std::size_t propSize = property.second;
+    std::size_t prevSize = serialData_.size();
+    serialData_.reserve(prevSize + propSize);
+    auto startIt = serialData_.begin() + prevSize;
+    const char* first = static_cast<const char*>(property.first);
+    const char* last = first + property.second;
+    serialData_.insert(startIt, first, last);
+    lastSerialiseBytes_ = propSize;
+    return lastSerialiseBytes_;
+}
+
 void Serialiser::clear()
 {
 	serialData_.clear();
