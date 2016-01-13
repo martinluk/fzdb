@@ -14,10 +14,6 @@ void Permission::assertUserOpPermission(UserGroup group) {
 	assert(checkPermission(group, UserOp));
 }
 
-void Permission::assertPermission(UserGroup group, PermissionType permType){
-	assert(checkPermission(group, permType));
-}
-
 bool Permission::checkPermission(UserGroup group, PermissionType permType) {
 	switch(group) {
 		case GUEST:
@@ -31,3 +27,41 @@ bool Permission::checkPermission(UserGroup group, PermissionType permType) {
 			assert(false);
 	}
 }
+
+void Permission::assertPermission(UserGroup group, PermissionType permType){
+	assert(checkPermission(group, permType));
+}
+
+bool Permission::guestPermission(PermissionType permType) {
+	switch(permType) {
+		case ViewDB:
+			return true;
+		case ModifyDB:
+			return false;
+		case UserOp:
+			return false;
+	}
+}
+
+bool Permission::editorPermission(PermissionType permType) {
+	switch(permType) {
+		case ViewDB:
+			return true;
+		case ModifyDB:
+			return true;
+		case UserOp:
+			return false;
+	}
+}
+
+bool Permission::adminPermission(PermissionType permType) {
+	switch(permType) {
+		case ViewDB:
+			return true;
+		case ModifyDB:
+			return false;
+		case UserOp:
+			return true;
+	}
+}
+
