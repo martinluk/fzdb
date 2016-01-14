@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <string>
 
-class Encryption {
+class Hashing {
 	public:
 		//Also expecting **password** is a hash and salted client side too
 		std::string validate(std::string userName, std::string password, std::string expectedHash);

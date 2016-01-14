@@ -1,8 +1,8 @@
 #include <limits.h>
 #include "gtest/gtest.h"
-#include "user/Encryption.h"
+#include "user/Hashing.h"
 
-class EncryptionTest : public ::testing::Test {
+class HashingTest : public ::testing::Test {
 protected:
 	virtual void setUp() {
 
@@ -12,13 +12,13 @@ protected:
 	}
 };
 
-TEST_F(EncryptionTest, sha1hash) {
-	Encryption e;
+TEST_F(HashingTest, sha1hash) {
+	Hashing e;
 	std::string hash = e.sha1hash("pwsalt");
 	EXPECT_STREQ(hash.c_str(),"2bfa821dd4f3af5adfb5734457839bed7b324819");
 }
 
-TEST_F(EncryptionTest, genSalt) {
-	Encryption e;
+TEST_F(HashingTest, genSalt) {
+	Hashing e;
 	std::string hash = e.genSalt();
 }
