@@ -177,37 +177,16 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		switch (triple.object.type) {
 		case model::Object::Type::STRING:
-			//add property
-			if (currentEntity->hasProperty(propertyId)) {
-				currentEntity->getProperty<model::types::String>(propertyId)->append(model::types::String(80, triple.object.value));
-			}
-			else {
-				currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String> {
-					model::types::String(80, triple.object.value)
-				}));
-			}
+			this->addToEntity<model::types::String, std::string>(currentEntity, propertyId, triple.object.value,
+				[](std::string str) { return str; });
 			break;
 		case model::Object::Type::ENTITYREF:
-			//add property
-			if (currentEntity->hasProperty(propertyId)) {
-				currentEntity->getProperty<model::types::EntityRef>(propertyId)->append(model::types::EntityRef(80, std::stoll(triple.object.value)));
-			}
-			else {
-				currentEntity->insertProperty<model::types::EntityRef>(new EntityProperty<model::types::EntityRef>(propertyId, std::vector < model::types::EntityRef> {
-					model::types::EntityRef(80, std::stoll(triple.object.value))
-				}));
-			}
+			this->addToEntity<model::types::EntityRef, long long>(currentEntity, propertyId, triple.object.value,
+				[](std::string str) { return std::stoll(str); });
 			break;
 		case model::Object::Type::INT:
-			//add property
-			if (currentEntity->hasProperty(propertyId)) {
-				currentEntity->getProperty<model::types::Int>(propertyId)->append(model::types::Int(80, std::stoi(triple.object.value)));
-			}
-			else {
-				currentEntity->insertProperty<model::types::Int>(new EntityProperty<model::types::Int>(propertyId, std::vector < model::types::Int> {
-					model::types::Int(80, std::stoi(triple.object.value))
-				}));
-			}
+			this->addToEntity<model::types::Int, int>(currentEntity, propertyId, triple.object.value,
+				[](std::string str) { return std::stoi(str); });
 			break;
 		}
 

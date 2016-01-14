@@ -2,6 +2,7 @@
 #define MODEL_ENTITY_MANAGER_H
 
 #include <map>
+#include <functional>
 #include "./Entity.h"
 
 #include "../QueryResult.h"
@@ -42,6 +43,18 @@ private:
 
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
+
+	template<typename T, typename S>
+	void addToEntity(Entity* currentEntity, unsigned int propertyId, std::string str, std::function<S(std::string)> converter) {
+		if (currentEntity->hasProperty(propertyId)) {
+			currentEntity->getProperty<T>(propertyId)->append(T(80, converter(str)));
+		}
+		else {
+			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T> {
+				T(80, converter(str))
+			}));
+		}
+	}
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H
