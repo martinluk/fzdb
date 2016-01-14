@@ -14,7 +14,7 @@ protected:
 
 TEST_F(EncryptionTest, hash) {
 	Encryption e;
-	std::string hash = e.hash("pw","salt");
+	std::string hash = e.sha1hash("pw","salt");
 	EXPECT_STREQ(hash.c_str(),"2bfa821dd4f3af5adfb5734457839bed7b324819");
 }
 
