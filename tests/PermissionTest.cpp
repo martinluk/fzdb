@@ -14,6 +14,8 @@ protected:
 
 TEST_F(PermissionTest, assertViewDBPermission) {
 	Permission p;
-	//p.assertViewDBPermission(GUEST); TODO Link enum to test case
-
+	p.assertViewDBPermission(GUEST);
+	p.assertViewDBPermission(EDITOR);
+	p.assertViewDBPermission(ADMIN);
 }
+
