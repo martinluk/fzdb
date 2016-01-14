@@ -18,3 +18,7 @@ TEST_F(EncryptionTest, sha1hash) {
 	EXPECT_STREQ(hash.c_str(),"2bfa821dd4f3af5adfb5734457839bed7b324819");
 }
 
+TEST_F(EncryptionTest, genSalt) {
+	Encryption e;
+	std::string hash = e.genSalt();
+}

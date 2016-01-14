@@ -1,8 +1,10 @@
 #include <sstream>
 #include <string>
-#include "./Encryption.h"
+#include "user/Encryption.h"
 #include <iostream>
 #include <boost/uuid/sha1.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 std::string Encryption::sha1hash(std::string password) {
 	boost::uuids::detail::sha1 sha1;
@@ -15,4 +17,13 @@ std::string Encryption::sha1hash(std::string password) {
 		hexHash << std::hex <<digest[i];
     }
 	return hexHash.str();
+}
+
+std::string Encryption::genSalt() {
+	//Referenced http://pragmaticjoe.blogspot.co.uk/2015/02/how-to-generate-sha1-hash-in-c.html
+	boost::uuids::random_generator gen;
+	boost::uuids::uuid salt = gen();
+	std::string ssalt = boost::uuids::to_string(salt);
+	ssalt.erase(std::remove(ssalt.begin(), ssalt.end(), '-'), ssalt.end());
+	return ssalt;
 }
