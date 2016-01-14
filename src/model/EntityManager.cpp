@@ -140,6 +140,11 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 						conditionIsTrue = atoi(conditionsIter->object.value.c_str()) == val[0].value();
 						break;
 					}
+					case model::Object::Type::ENTITYREF: {
+						std::vector<model::types::EntityRef> val = currentEntity->getProperty<model::types::EntityRef>(propertyId)->values();
+						conditionIsTrue = std::stoll(conditionsIter->object.value.c_str()) == val[0].value();
+						break;
+					}
 					}					
 
 					if (conditionIsTrue) {
@@ -170,14 +175,42 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		unsigned int propertyId = _propertyNames[triple.predicate.value];
 
-		//add property
-		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<model::types::String>(propertyId)->append(model::types::String(80, triple.object.value));
+		switch (triple.object.type) {
+		case model::Object::Type::STRING:
+			//add property
+			if (currentEntity->hasProperty(propertyId)) {
+				currentEntity->getProperty<model::types::String>(propertyId)->append(model::types::String(80, triple.object.value));
+			}
+			else {
+				currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String> {
+					model::types::String(80, triple.object.value)
+				}));
+			}
+			break;
+		case model::Object::Type::ENTITYREF:
+			//add property
+			if (currentEntity->hasProperty(propertyId)) {
+				currentEntity->getProperty<model::types::EntityRef>(propertyId)->append(model::types::EntityRef(80, std::stoll(triple.object.value)));
+			}
+			else {
+				currentEntity->insertProperty<model::types::EntityRef>(new EntityProperty<model::types::EntityRef>(propertyId, std::vector < model::types::EntityRef> {
+					model::types::EntityRef(80, std::stoll(triple.object.value))
+				}));
+			}
+			break;
+		case model::Object::Type::INT:
+			//add property
+			if (currentEntity->hasProperty(propertyId)) {
+				currentEntity->getProperty<model::types::Int>(propertyId)->append(model::types::Int(80, std::stoi(triple.object.value)));
+			}
+			else {
+				currentEntity->insertProperty<model::types::Int>(new EntityProperty<model::types::Int>(propertyId, std::vector < model::types::Int> {
+					model::types::Int(80, std::stoi(triple.object.value))
+				}));
+			}
+			break;
 		}
-		else {
-			currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String> {
-				model::types::String(80, triple.object.value)
-			}));
-		}		
+
+				
 	}
 }
