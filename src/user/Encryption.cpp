@@ -1,3 +1,4 @@
+#include <sstream>
 #include <string>
 #include "./Encryption.h"
 #include <iostream>
@@ -10,5 +11,10 @@ std::string Encryption::hash(std::string password, std::string salt) {
 	sha1.process_bytes(strToHash.c_str(), strToHash.size());
 	unsigned int digest[5];
 	sha1.get_digest(digest);
-	return digest;
+	//Digest is now a 20 bytes, transforming to hex
+	std::stringstream hexHash;
+    for(int i=0; i<sizeof(digest)/sizeof(int); ++i) {
+		hexHash << std::hex <<digest[i];
+    }
+	return hexHash.str();
 }
