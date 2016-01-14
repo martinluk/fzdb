@@ -1,4 +1,3 @@
-#include "./UserGroups.h"
 #include "./Permission.h"
 #include <cassert>
 
