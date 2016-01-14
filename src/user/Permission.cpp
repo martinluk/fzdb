@@ -3,15 +3,15 @@
 #include <cassert>
 
 void Permission::assertViewDBPermission(UserGroup group) {
-	assert(checkPermission(group, ViewDB));
+	assertPermission(group, ViewDB);
 }
 
 void Permission::assertModifyDBPermission(UserGroup group) {
-	assert(checkPermission(group, ModifyDB));
+	assertPermission(group, ModifyDB);
 }
 
 void Permission::assertUserOpPermission(UserGroup group) {
-	assert(checkPermission(group, UserOp));
+	assertPermission(group, UserOp);
 }
 
 bool Permission::checkPermission(UserGroup group, PermissionType permType) {
@@ -29,7 +29,9 @@ bool Permission::checkPermission(UserGroup group, PermissionType permType) {
 }
 
 void Permission::assertPermission(UserGroup group, PermissionType permType){
-	assert(checkPermission(group, permType));
+	if (!checkPermission(group, permType)) {
+		throw (UserPermissionException(group, permType));
+	}
 }
 
 bool Permission::guestPermission(PermissionType permType) {

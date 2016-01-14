@@ -19,3 +19,20 @@ TEST_F(PermissionTest, assertViewDBPermission) {
 	p.assertViewDBPermission(ADMIN);
 }
 
+TEST_F(PermissionTest, assertModifyDBPermission) {
+	Permission p;
+	try {
+		p.assertModifyDBPermission(GUEST);
+		FAIL();
+	} catch (UserPermissionException &e) {
+
+	}
+	p.assertModifyDBPermission(EDITOR);
+	try {
+		p.assertModifyDBPermission(ADMIN);
+		FAIL();
+	} catch (UserPermissionException &e) {
+
+	}
+}
+
