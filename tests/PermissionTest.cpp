@@ -36,3 +36,20 @@ TEST_F(PermissionTest, assertModifyDBPermission) {
 	}
 }
 
+TEST_F(PermissionTest, assertUserOpPermission) {
+	Permission p;
+	try {
+		p.assertUserOpPermission(GUEST);
+		FAIL();
+	} catch (UserPermissionException &e) {
+
+	}
+	try {
+		p.assertUserOpPermission(EDITOR);
+		FAIL();
+	} catch (UserPermissionException &e) {
+
+	}
+	p.assertUserOpPermission(ADMIN);
+}
+
