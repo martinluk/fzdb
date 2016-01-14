@@ -7,9 +7,8 @@
 std::string Encryption::hash(std::string password, std::string salt) {
 	boost::uuids::detail::sha1 sha1;
 	std::string strToHash = password.append(salt);
-    sha1.process_bytes(strToHash.c_str(), strToHash.size());
+	sha1.process_bytes(strToHash.c_str(), strToHash.size());
 	unsigned int digest[5];
-	s.get_digest(digest);
-	
-	return "";
+	sha1.get_digest(digest);
+	return digest;
 }
