@@ -37,9 +37,24 @@ private:
 
 	EntityMap _entities;
 	Entity::EHandle_t _lastHandle;
+	unsigned int _lastProperty;
 
 	std::map<std::string, unsigned int> _entityTypeNames;
 	std::map<std::string, unsigned int> _propertyNames;
+
+	unsigned int getPropertyName(std::string str, bool addIfMissing) {
+		auto iter = _propertyNames.find(str);
+		if (iter == _propertyNames.cend()) {
+			if (addIfMissing) {
+				_propertyNames[str] = ++_lastProperty;
+				return _lastProperty;
+			}
+			else {
+				return 0;
+			}
+		}
+		return iter->second;
+	}
 
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);

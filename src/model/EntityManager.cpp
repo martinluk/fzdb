@@ -5,6 +5,7 @@
 EntityManager::EntityManager()
 {
 	_lastHandle = Entity::INVALID_EHANDLE;
+	_lastProperty = 0;
 }
 
 EntityManager::~EntityManager()
@@ -121,7 +122,7 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 			if (conditionsIter->subject.type == model::Subject::Type::VARIABLE && ((int)conditionsIter->object.type & model::Object::VALUE_MASK)) {
 
 				//get the property id
-				unsigned int propertyId = _propertyNames[conditionsIter->predicate.value];
+				unsigned int propertyId = this->getPropertyName(conditionsIter->predicate.value, false);
 
 				//if the current entity has the property
 				if (currentEntity->hasProperty(propertyId)) {
@@ -173,7 +174,7 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		Entity* currentEntity = _entities[entity_id];
 
-		unsigned int propertyId = _propertyNames[triple.predicate.value];
+		unsigned int propertyId = this->getPropertyName(triple.predicate.value, true);
 
 		switch (triple.object.type) {
 		case model::Object::Type::STRING:
@@ -181,7 +182,7 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 				[](std::string str) { return str; });
 			break;
 		case model::Object::Type::ENTITYREF:
-			this->addToEntity<model::types::EntityRef, long long>(currentEntity, propertyId, triple.object.value,
+			this->addToEntity<model::types::EntityRef, Entity::EHandle_t>(currentEntity, propertyId, triple.object.value,
 				[](std::string str) { return std::stoll(str); });
 			break;
 		case model::Object::Type::INT:
