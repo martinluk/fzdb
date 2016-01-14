@@ -4,7 +4,7 @@
 #include <iostream>
 #include <boost/uuid/sha1.hpp>
 
-std::string Encryption::hash(std::string password, std::string salt) {
+std::string Encryption::sha1hash(std::string password, std::string salt) {
 	boost::uuids::detail::sha1 sha1;
 	std::string strToHash = password.append(salt);
 	sha1.process_bytes(strToHash.c_str(), strToHash.size());
