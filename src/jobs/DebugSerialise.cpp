@@ -33,7 +33,10 @@ std::string testSerialise(const model::types::Base* ser)
 		{
 			if ( j > 0 )
 				log << " ";
-                        int num = buffer[i+j];
+
+                        // If we don't cast to unsigned char, the int will sometimes end up
+                        // with a negative sign and spam 'ffffff', which we don't want.
+                        int num = static_cast<unsigned char>(buffer[i+j]);
                         log << std::setfill ('0') << std::setw(2) << std::hex << num;
 		}
 
