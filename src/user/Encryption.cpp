@@ -4,10 +4,9 @@
 #include <iostream>
 #include <boost/uuid/sha1.hpp>
 
-std::string Encryption::sha1hash(std::string password, std::string salt) {
+std::string Encryption::sha1hash(std::string password) {
 	boost::uuids::detail::sha1 sha1;
-	std::string strToHash = password.append(salt);
-	sha1.process_bytes(strToHash.c_str(), strToHash.size());
+	sha1.process_bytes(password.c_str(), password.size());
 	unsigned int digest[5];
 	sha1.get_digest(digest);
 	//Digest is now a 20 bytes, transforming to hex
