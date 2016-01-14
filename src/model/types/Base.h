@@ -3,10 +3,12 @@
 
 #include "../Serialiser.h"
 #include <cassert>
+#include <cstring>
+#include "../ILogString.h"
 
 namespace model {
 	namespace types {
-                class Base
+                class Base : public ILogString
                 {
 		private:
 			unsigned char _confidence;
@@ -40,6 +42,13 @@ namespace model {
                             {
                                 std::size_t initialSize = serialiser.size();
                                 SerialHeader header;
+
+                                // Things I learned today: the size of a struct is sometimes padded to
+                                // make byte alignment better. This means that if we don't zero out the
+                                // struct initially, we might sometimes get trash at the end of it which
+                                // is confusing.
+                                memset(&header, 0, sizeof(SerialHeader));
+
                                 header.size = 0;
                                 header.subtype = baseType_->subtype();
 
@@ -49,12 +58,6 @@ namespace model {
 
                                 serialiser.reinterpretCast<SerialHeader*>(initialSize)->size = baseBytes + derivedBytes;
                                 return baseBytes + derivedBytes;
-                            }
-
-                            template <typename T>
-                            static T unserialise(const char* serialisedData)
-                            {
-                                return T(serialisedData);
                             }
 
                         private:
@@ -72,13 +75,18 @@ namespace model {
 				return _confidence;
 			}
 
-			void confidence(unsigned char confidence) {
+                        void setConfidence(unsigned char confidence) {
 				_confidence = confidence;
 			}
 
                         virtual Subtype subtype() const
                         {
                             return TypeUndefined;
+                        }
+
+                        virtual std::string logString() const
+                        {
+                            return std::string("Base(") + std::to_string(_confidence) + std::string(")");
                         }
 
                 protected:

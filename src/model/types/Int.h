@@ -28,6 +28,12 @@ namespace model {
                                     + serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
                         }
 
+                        virtual std::string logString() const
+                        {
+                            return std::string("Int(") + std::to_string(_value) + std::string(",")
+                                    + std::to_string(confidence()) + std::string(")");
+                        }
+
                 protected:
                         Int(const char* &serialisedData) : Base(serialisedData)
                         {

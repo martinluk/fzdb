@@ -56,10 +56,15 @@ std::string testSerialise(const model::types::Base* ser)
 
 QueryResult DebugSerialise::execute()
 {
+    using namespace model::types;
+
     std::stringstream log;
 
-    model::types::Base tBase(53);
-    model::types::Int tInt(72, 1337);
+    Base tBase(53);
+    Int tInt(72, 1337);
+
+    log << "Size of Subtype enum is " << sizeof(Base::Subtype) << " bytes.\n";
+    log << "Size of SerialHeader is " << sizeof(Base::TypeSerialiser::SerialHeader) << " bytes.\n";
 
     log << "Testing serialisation of Base type.\n";
     log << testSerialise(&tBase) << "\n";
