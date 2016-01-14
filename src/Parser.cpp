@@ -1,32 +1,32 @@
 #include "Parser.h"
 
-#include <regex>
 #include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
-	std::regex variableRegex("\\$.*");
-	std::regex stringRegex("\".*\"");
-	std::regex propertyRegex("<.*>");
-	std::regex entityRefRegex("entity:[0-9]+");
+	boost::regex variableRegex("\\$.*");
+	boost::regex stringRegex("\".*\"");
+	boost::regex propertyRegex("<.*>");
+	boost::regex entityRefRegex("entity:[0-9]+");
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
-	if (std::regex_match(str, variableRegex)) {
+	if (boost::regex_match(str, variableRegex)) {
 		tokenType = ParsedTokenType::VARIABLE;
 	}
 
-        else if (std::regex_match(str, stringRegex)) {
+        else if (boost::regex_match(str, stringRegex)) {
 		tokenType = ParsedTokenType::STRING;
 		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("\""));
 	}
 
-        else if (std::regex_match(str, propertyRegex)) {
+        else if (boost::regex_match(str, propertyRegex)) {
 		tokenType = ParsedTokenType::PROPERTY;
 		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("<>"));
 	}
 
-        else if (std::regex_match(str, entityRefRegex)) {
+        else if (boost::regex_match(str, entityRefRegex)) {
 		tokenType = ParsedTokenType::ENTITYREF;
 		str = str.substr(7, str.length() - 7);
 	}
