@@ -6,6 +6,8 @@
 #include <map>
 #include <typeinfo>
 
+#include <stdexcept>
+
 
 class VariableSet {
 
