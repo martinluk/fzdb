@@ -131,13 +131,13 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 					//match based on type in the triple
 					switch (conditionsIter->object.type) {
 					case model::Object::Type::STRING: {
-						std::vector<model::types::String> val = currentEntity->getProperty<model::types::String>(propertyId)->values();
-						conditionIsTrue = val[0].value() == conditionsIter->object.value;
+                                                std::vector<model::types::String*> val = currentEntity->getProperty<model::types::String>(propertyId)->values();
+                                                conditionIsTrue = val[0]->value() == conditionsIter->object.value;
 						break;
 					}
 					case model::Object::Type::INT: {
-						std::vector<model::types::Int> val = currentEntity->getProperty<model::types::Int>(propertyId)->values();
-						conditionIsTrue = atoi(conditionsIter->object.value.c_str()) == val[0].value();
+                                                std::vector<model::types::Int*> val = currentEntity->getProperty<model::types::Int>(propertyId)->values();
+                                                conditionIsTrue = atoi(conditionsIter->object.value.c_str()) == val[0]->value();
 						break;
 					}
 					}					
@@ -172,11 +172,11 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		//add property
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<model::types::String>(propertyId)->append(model::types::String(80, triple.object.value));
+                        currentEntity->getProperty<model::types::String>(propertyId)->append(new model::types::String(80, triple.object.value));
 		}
 		else {
-			currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String> {
-				model::types::String(80, triple.object.value)
+                        currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String*> {
+                                new model::types::String(80, triple.object.value)
 			}));
 		}		
 	}

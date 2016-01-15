@@ -5,51 +5,52 @@
 #include <iomanip>
 #include <cassert>
 
-#include "../model/ISerialisable.h"
+#include "../model/TypeSerialiser.h"
+#include "../model/types/Base.h"
 #include "../model/types/Int.h"
 
 std::string testSerialise(const model::types::Base* ser)
 {
         std::stringstream log;
-	Serialiser serialiser;
+        Serialiser serialiser;
 
-        model::types::Base::TypeSerialiser typeSerialiser(ser);
+        model::types::TypeSerialiser typeSerialiser(ser);
         typeSerialiser.serialise(serialiser);
 
         const char* buffer = serialiser.cbegin();
-	std::size_t length = serialiser.size();
+        std::size_t length = serialiser.size();
 
-	log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
-	log << std::hex << std::setfill ('0') << std::setw(2);
+        log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
+        log << std::hex << std::setfill ('0') << std::setw(2);
 	
-	// i progresses in multiples of 8.
-	for (int i = 0; i < length; i += 8)
-	{
+        // i progresses in multiples of 8.
+        for (int i = 0; i < length; i += 8)
+        {
                 if ( i > 0 )
                     log << "\n";
 
-		// j selects the characters in each batch of 8.
-		for(int j = 0; j < 8 && i+j < length; j++)
-		{
-			if ( j > 0 )
-				log << " ";
+                // j selects the characters in each batch of 8.
+                for(int j = 0; j < 8 && i+j < length; j++)
+                {
+                        if ( j > 0 )
+                                log << " ";
 
                         // If we don't cast to unsigned char, the int will sometimes end up
                         // with a negative sign and spam 'ffffff', which we don't want.
                         int num = static_cast<unsigned char>(buffer[i+j]);
                         log << std::setfill ('0') << std::setw(2) << std::hex << num;
-		}
+                }
 
-		log << "\t";
+                log << "\t";
 
-		for(int j = 0; j < 8 && i+j < length; j++)
-		{
-			if ( buffer[i+j] < 32 || buffer[i+j] > 126 )
-				log << '.';
-			else
-				log << buffer[i+j];
-		}
-	}
+                for(int j = 0; j < 8 && i+j < length; j++)
+                {
+                        if ( buffer[i+j] < 32 || buffer[i+j] > 126 )
+                                log << '.';
+                        else
+                                log << buffer[i+j];
+                }
+        }
 
         return log.str();
 }
@@ -59,18 +60,36 @@ QueryResult DebugSerialise::execute()
     using namespace model::types;
 
     std::stringstream log;
+    Serialiser serialiser;
 
     Base tBase(53);
     Int tInt(72, 1337);
 
-    log << "Size of Subtype enum is " << sizeof(Base::Subtype) << " bytes.\n";
-    log << "Size of SerialHeader is " << sizeof(Base::TypeSerialiser::SerialHeader) << " bytes.\n";
-
     log << "Testing serialisation of Base type.\n";
     log << testSerialise(&tBase) << "\n";
 
+    {
+        serialiser.clear();
+        TypeSerialiser tser(&tBase);
+        tser.serialise(serialiser);
+        Base* newBase = tser.unserialise(serialiser.cbegin());
+        log << "Unserialised Base: " << newBase->logString() << "\n";
+        delete newBase;
+    }
+
+    log << "\n";
+
     log << "Testing serialisation of Int type.\n";
-    log << testSerialise(&tInt);
+    log << testSerialise(&tInt) << "\n";
+
+    {
+        serialiser.clear();
+        TypeSerialiser tser(&tInt);
+        tser.serialise(serialiser);
+        Base* newBase = tser.unserialise(serialiser.cbegin());
+        log << "Unserialised Int: " << newBase->logString() << "\n";
+        delete newBase;
+    }
 
     QueryResult result;
     result.setValue("type", "string");

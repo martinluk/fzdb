@@ -9,6 +9,7 @@ namespace model {
 	namespace types {
 		class Int : public Base {
 		private:
+                    friend class TypeSerialiser;
                         int32_t _value;
 
 		public:

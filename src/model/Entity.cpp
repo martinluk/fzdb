@@ -10,6 +10,11 @@ Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(typ
 {
 }
 
+Entity::~Entity()
+{
+    deleteAllProperties();
+}
+
 bool Entity::isNull() const
 {
 	return handle_ == INVALID_EHANDLE;
@@ -22,23 +27,38 @@ int Entity::propertyCount() const
 
 void Entity::removeProperty(const unsigned int &key)
 {
-	_propertyTable.erase(key);
+    try
+    {
+        delete _propertyTable.at(key);
+        _propertyTable.erase(key);
+    }
+    catch (const std::out_of_range &ex)
+    {
+
+    }
 }
 
 bool Entity::hasProperty(const unsigned int& key)
 {
-	if (_propertyTable.find(key) == _propertyTable.cend()) {
-		return false;
-	}
-	return true;
+    return _propertyTable.find(key) != _propertyTable.cend();
 }
 
 void Entity::clearProperties()
 {
-	_propertyTable.clear();
+    deleteAllProperties();
+    _propertyTable.clear();
 }
 
 Entity::EHandle_t Entity::getHandle() const
 {
 	return handle_;
+}
+
+void Entity::deleteAllProperties()
+{
+    // Make a list of pointers - I'm not sure whether deleting things as
+    for ( auto it = _propertyTable.begin(); it != _propertyTable.end(); ++it )
+    {
+        delete it->second;
+    }
 }

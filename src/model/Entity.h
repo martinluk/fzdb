@@ -9,6 +9,7 @@
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.
 // An entity's handle cannot be changed once it is instanciated.
+// An entity owns all of its EntityProperties and will delete them as appropriate.
 class Entity
 {
 public:
@@ -24,14 +25,14 @@ public:
 	// Constructs an entity with the given handle.
 	Entity(unsigned int type, EHandle_t handle);
 
+        ~Entity();
+
 	// Returns whether this entity is null, ie. whether it has an invalid handle.
 	bool isNull() const;
 
 	// Getters:
 
 	// Returns the property with the given key, or a null property if this is not found.
-	// TODO: This may be slow unless/until properties and their related classes are made
-	// to be implicitly shared, as a copy of the property has to be made.
 	template<typename T>
 	EntityProperty<T>* getProperty(const unsigned int &key) const {
 		auto it = _propertyTable.find(key);
@@ -39,7 +40,7 @@ public:
 			return new EntityProperty<T>();
 		}
 		
-		////TODO: Add error messages
+                // TODO: Add error messages
 		try {
 			EntityProperty<T>* prop = dynamic_cast<EntityProperty<T>*>(it->second);
 			return prop;
@@ -82,16 +83,15 @@ public:
 	// Permenantly copies all data from entity into this entity
 	void merge(Entity& entity);
 
-  // Adds a link to entity 'entity' such that data from entity is returned
-  // in queries to this entity
+        // Adds a link to entity 'entity' such that data from entity is returned
+        // in queries to this entity
 	void link(Entity* entity);
 
 	// Removes the link to entity 'entity'
 	void unlink(Entity* entity);
 
 private:
-	// Here (if C++ will let us), we use a const string reference as the key.
-	// This avoids us from storing duplicate strings.
+    void deleteAllProperties();
 
 	const EHandle_t	handle_;
 	const unsigned int _type;
