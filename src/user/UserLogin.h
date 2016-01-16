@@ -9,21 +9,22 @@ struct UserAttributes {
 	UserGroup userGroup;
 };
 
+//Make this a singleton?, have std::vector<UserAttribute>
 class UserOperations {
 	protected: 
-		std::string pathToLoginFile();
-		UserAttributes getUser(std::string userName);
+		static std::string pathToLoginFile();
+		static UserAttributes getUser(std::string userName);
 };
 
 class UserLogin : public UserOperations { 
 	public : 
-		void login(std::string userName, std::string password);
+		static void login(std::string userName, std::string password);
 };
 
 //XXX Do I want to check admin permission Session object, maybe in constructor?
 class UserAdmin : public UserOperations {
 	public:
-		void addUser(std::string userName, std::string password, UserGroup userGroup);
-		void removeUser(std::string userName);
-		void changeUserGroup(std::string userName, UserGroup newUserGroup);
+		static void addUser(std::string userName, std::string password, UserGroup userGroup);
+		static void removeUser(std::string userName);
+		static void changeUserGroup(std::string userName, UserGroup newUserGroup);
 };
