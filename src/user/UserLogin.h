@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <string>
+#include <set>
 #include <user/Permission.h>
 
 struct UserAttributes {
@@ -9,20 +10,22 @@ struct UserAttributes {
 	UserGroup userGroup;
 };
 
-//Make this a singleton?, have std::vector<UserAttribute>
-class UserOperations {
+class UserFileOperations {
 	protected: 
 		static std::string pathToLoginFile();
-		static UserAttributes getUser(std::string userName);
+	private:
+		UserFileOperations();
+		static std::set<UserAttributes> userFileCache;
+		static void loadCacheFromFile();
+		static void saveCacheToFile();
 };
 
-class UserLogin : public UserOperations { 
+class UserLogin : public UserFileOperations { 
 	public : 
 		static void login(std::string userName, std::string password);
 };
 
-//XXX Do I want to check admin permission Session object, maybe in constructor?
-class UserAdmin : public UserOperations {
+class UserAdmin : public UserFileOperations {
 	public:
 		static void addUser(std::string userName, std::string password, UserGroup userGroup);
 		static void removeUser(std::string userName);
