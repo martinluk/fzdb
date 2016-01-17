@@ -1,6 +1,8 @@
 #include <stdexcept>
+#include "./ISession.h"
+#include "./session.h"
 #include <string>
-#include <set>
+#include <map>
 #include <user/Permission.h>
 
 struct UserAttributes {
@@ -12,8 +14,14 @@ struct UserAttributes {
 
 class UserNotExistException : public runtime_error {
 	public:
-		   UserPermissionException(std::string username): runtime_error("Given user name does not exist") {}
+		   UserNotExistException(): runtime_error("user not exist") {}
 };
+
+class UserAlreadyExistException : public runtime_error {
+	public:
+		   UserAlreadyExistException(): runtime_error("user already exist") {}
+};
+
 
 class UserFileOperations {
 	protected: 
@@ -25,18 +33,18 @@ class UserFileOperations {
 		static void loadCacheFromFile();
 		static void saveCacheToFile();
 		static std::string pathToLoginFile();
-		static std::set<UserAttributes> userFileCache;
+		static std::map<std::string, UserAttributes> userFileCache;
 };
 
 class UserLogin : public UserFileOperations { 
 	public : 
-		static void login(std::string userName, std::string password);
+		static void login(ISession* session, std::string userName, std::string password);
 };
 
 class UserAdmin : public UserFileOperations {
 	public:
-		static void addUser(std::string userName, std::string password, UserGroup userGroup);
-		static void removeUser(std::string userName);
-		static void changeUserGroup(std::string userName, UserGroup newUserGroup);
+		static void addUser(ISession* session,std::string userName, std::string password, UserGroup userGroup);
+		static void removeUser(ISession* session,std::string userName);
+		static void changeUserGroup(ISession* session,std::string userName, UserGroup newUserGroup);
 	protected:
 };
