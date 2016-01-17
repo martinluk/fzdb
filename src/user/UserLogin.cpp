@@ -1,9 +1,9 @@
 #include <user/UserLogin.h>
 #include <boost/filesystem.hpp>
 
+
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
-	using namespace boost::filesystem;
 	return boost::filesystem::current_path().string();
 }
 void UserFileOperations::addUser(UserAttributes userAttributes) {
@@ -11,21 +11,17 @@ void UserFileOperations::addUser(UserAttributes userAttributes) {
 	loadCacheFromFile();
 	//Assert that no such user already exist, otherwise throw exception
 	std::string newUserName=userAttributes.userName;
-	if (this.userFileCache.count(newUserName)) {
+	if (this->userFileCache.count(newUserName)) {
 		throw new UserAlreadyExistException;
 	}
 	//Add into cache
-	userFileCache[newUserName]=userAttributes;
+	//userFileCache[newUserName]=userAttributes;
 	//save cache from file
 	saveCacheToFile();
 }
 void UserFileOperations::removeUser(std::string userName) {
 	//load cache from file?
 	loadCacheFromFile();
-	if (!this.userFileCache.count(userName)) {
-		throw new UserNotExistException();
-	}
-	userFileCache.erase(userName);
 	//save cache from file?
 	saveCacheToFile();
 }

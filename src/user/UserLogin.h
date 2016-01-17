@@ -25,9 +25,9 @@ class UserAlreadyExistException : public runtime_error {
 
 class UserFileOperations {
 	protected: 
-		static void addUser(UserAttributes userAttributes);
-		static void removeUser(std::string userName);
-		static void updateUser(std::string userName,UserAttributes newAttributes);
+		void addUser(UserAttributes userAttributes);
+		void removeUser(std::string userName);
+		void updateUser(std::string userName,UserAttributes newAttributes);
 	private:
 		UserFileOperations() {};
 		static void loadCacheFromFile();
@@ -35,6 +35,9 @@ class UserFileOperations {
 		static std::string pathToLoginFile();
 		static std::map<std::string, UserAttributes> userFileCache;
 };
+//Initialise cache map
+std::map<<std::string, UserAttributes> UserFileOperations::userFileCache;
+
 
 class UserLogin : public UserFileOperations { 
 	public : 
