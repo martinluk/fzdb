@@ -3,6 +3,8 @@
 
 #include <map>
 #include <functional>
+#include <algorithm> 
+
 #include "./Entity.h"
 
 #include "../QueryResult.h"
