@@ -108,57 +108,34 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 	std::vector<Entity::EHandle_t> passed;
 	VariableSet result;
 
-	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
+	//sort by entropy
+	std::sort(conditions.begin(), conditions.end(), [](model::Triple t1, model::Triple t2) { return t1.Entropy() < t2.Entropy(); });
 
-		Entity* currentEntity = iter->second;
-		std::map<std::string, std::string> variableAssignments;
-		
-		for (auto conditionsIter = conditions.cbegin(); conditionsIter != conditions.end(); conditionsIter++) {
+	//iterate over conditions
+	for (auto conditionsIter = conditions.cbegin(); conditionsIter != conditions.end(); conditionsIter++) {
 
-			if (conditionsIter->subject.type == model::Subject::Type::ENTITYREF && conditionsIter->object.type == model::Object::Type::VARIABLE) {
-				
-			}
+		//There are 7 valid combinations
 
-			if (conditionsIter->subject.type == model::Subject::Type::VARIABLE && ((int)conditionsIter->object.type & model::Object::VALUE_MASK)) {
+		if (conditionsIter->subject.type == model::Subject::Type::VARIABLE) {
+			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
 
-				//get the property id
-				unsigned int propertyId = this->getPropertyName(conditionsIter->predicate.value, false);
-
-				//if the current entity has the property
-				if (currentEntity->hasProperty(propertyId)) {
-					
-					bool conditionIsTrue = false;
-
-					//match based on type in the triple
-					switch (conditionsIter->object.type) {
-					case model::Object::Type::STRING: {
-						std::vector<model::types::String> val = currentEntity->getProperty<model::types::String>(propertyId)->values();
-						conditionIsTrue = val[0].value() == conditionsIter->object.value;
-						break;
-					}
-					case model::Object::Type::INT: {
-						std::vector<model::types::Int> val = currentEntity->getProperty<model::types::Int>(propertyId)->values();
-						conditionIsTrue = atoi(conditionsIter->object.value.c_str()) == val[0].value();
-						break;
-					}
-					case model::Object::Type::ENTITYREF: {
-						std::vector<model::types::EntityRef> val = currentEntity->getProperty<model::types::EntityRef>(propertyId)->values();
-						conditionIsTrue = std::stoll(conditionsIter->object.value.c_str()) == val[0].value();
-						break;
-					}
-					}					
-
-					if (conditionIsTrue) {
-						result.add(std::move(conditionsIter->subject.value), std::to_string(currentEntity->getHandle()), VariableSet::VariableType::ENTITYREF);
-					}
+					//option 1
+					this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
 				}
-			}			
+				else {
+
+					//option 2
+					this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
+				}
+			}
 		}
 	}
 
 	return result;
 }
 
+//Inserts new data into the data store
 void EntityManager::Insert(std::vector<model::Triple> triples) {
 	auto iter = triples.cbegin();
 	auto end = triples.cend();
@@ -169,12 +146,12 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		//create the entity if it doesn't exist
 		if (_entities.find(entity_id) == _entities.end()) {
-			_entities[entity_id] = new Entity(1);
+			_entities[entity_id] = new Entity(1, ++_lastHandle);
 		}
 
 		Entity* currentEntity = _entities[entity_id];
 
-		unsigned int propertyId = this->getPropertyName(triple.predicate.value, true);
+		unsigned int propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeString, true);
 
 		switch (triple.object.type) {
 		case model::Object::Type::STRING:

@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+#include "./Triple.h"
+
 #include "./EntityProperty.h"
 
 // Represents an entity in the graph database.
@@ -72,6 +74,28 @@ public:
 
 	// Tests if the entity has a property
 	bool hasProperty(const unsigned int &key);
+
+	// Tests if the entity meets the condition
+	bool meetsCondition(unsigned int propertyId, const model::Object&& obj) {
+		if (!hasProperty(propertyId)) return false;
+
+		switch (obj.type) {
+			case model::Object::Type::STRING: {
+				auto val = getProperty<model::types::String>(propertyId)->values();
+				return val[0].Equals(obj.value);
+			}
+			case model::Object::Type::INT: {
+				auto val = getProperty<model::types::Int>(propertyId)->values();
+				return val[0].Equals(obj.value);
+			}
+			case model::Object::Type::ENTITYREF: {
+				auto val = getProperty<model::types::EntityRef>(propertyId)->values();
+				return val[0].Equals(obj.value);
+			}
+			default:
+				return false;
+		}		
+	}
 
 	// Clears all properties on the entity.
 	void clearProperties();

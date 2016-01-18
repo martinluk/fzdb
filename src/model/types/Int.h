@@ -11,10 +11,10 @@ namespace model {
 		private:
 			const int32_t _value;
 
-                        struct SerialHeader
-                        {
-                            std::size_t size;       // Total serialised size of this object in bytes, including base serialisation.
-                        };
+			struct SerialHeader
+			{
+				std::size_t size;       // Total serialised size of this object in bytes, including base serialisation.
+			};
 		public:
 
 			Int(const int32_t value) : _value(value), Base(100) {}
@@ -22,39 +22,44 @@ namespace model {
 
 			int32_t value() { return _value; }
 
-                        virtual Subtype subtype() const
-                        {
-                            return TypeInt32;
-                        }
+			virtual Subtype subtype() const
+			{
+				return Subtype::TypeInt32;
+			}
 
-                        virtual std::size_t serialise(Serialiser &serialiser) const
-                        {
-                            std::vector<Serialiser::SerialProperty> propList;
-                            std::size_t initialSize = serialiser.size();
+			// Inherited via Base
+			virtual bool Equals(const std::string val) override {
+				return _value == std::stoi(val);
+			}
 
-                            // Create a header to serialise first.
-                            SerialHeader header;
-                            header.size = 0;
+			virtual std::size_t serialise(Serialiser &serialiser) const
+			{
+				std::vector<Serialiser::SerialProperty> propList;
+				std::size_t initialSize = serialiser.size();
 
-                            // Serialise this before anything else.
-                            propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
-                            serialiser.serialise(propList);
-                            propList.clear();
+				// Create a header to serialise first.
+				SerialHeader header;
+				header.size = 0;
 
-                            // Serialise the base.
-                            std::size_t baseBytes = Base::serialise(serialiser);
+				// Serialise this before anything else.
+				propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+				serialiser.serialise(propList);
+				propList.clear();
 
-                            // Serialise our value.
-                            propList.push_back(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
-                            std::size_t ourBytes = serialiser.serialise(propList);
-                            propList.clear();
+				// Serialise the base.
+				std::size_t baseBytes = Base::serialise(serialiser);
 
-                            // Get a pointer to the original header.
-                            SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
-                            pHeader->size = baseBytes + ourBytes;
+				// Serialise our value.
+				propList.push_back(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
+				std::size_t ourBytes = serialiser.serialise(propList);
+				propList.clear();
 
-                            return baseBytes + ourBytes;
-                        }
+				// Get a pointer to the original header.
+				SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
+				pHeader->size = baseBytes + ourBytes;
+
+				return baseBytes + ourBytes;
+			}
 		};
 	}
 }

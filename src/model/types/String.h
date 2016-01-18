@@ -17,10 +17,15 @@ namespace model {
 
 			std::string value() { return _value; }
 
-                        virtual Subtype subtype() const
-                        {
-                            return TypeString;
-                        }
+            virtual Subtype subtype() const
+            {
+                return Subtype::TypeString;
+            }
+
+			// Inherited via Base
+			virtual bool Equals(const std::string val) override {
+				return _value == val;
+			}
 		};
 	}
 }

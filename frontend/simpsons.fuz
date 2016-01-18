@@ -1,0 +1,18 @@
+INSERT DATA {
+
+	entity:1 <forename> "Homer";
+	<surname> "Simpson";
+	<drinks> "Beer";
+	<age> 48 .
+
+	entity:2 <forename> "Marge";
+	<surname> "Simpson";
+	<age> 46 .
+
+	entity:3 <forename> "Ned";
+	<surname> "Flanders" .
+
+	entity:4 <forename> "Moe";
+	<surname> "Szyslak";
+	<occupation> "Bartender"
+}

@@ -19,10 +19,15 @@ namespace model {
 
 			EHandle_t value() { return _value; }
 
-                        virtual Subtype subtype() const
-                        {
-                            return TypeEntityRef;
-                        }
+			// Inherited via Base
+			virtual bool Equals(const std::string val) override {
+				return _value == std::stoll(val);
+			}
+
+			virtual Subtype subtype() const
+			{
+				return Subtype::TypeEntityRef;
+			}
 		};
 	}
 }
