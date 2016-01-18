@@ -11,7 +11,7 @@ namespace model {
 	namespace types {
 		class EntityRef : public Base {
 		private:
-			const EHandle_t _value;
+                        EHandle_t _value;
 		public:
 
 			EntityRef(const EHandle_t value) : _value(value), Base(100) {}
@@ -22,6 +22,25 @@ namespace model {
                         virtual Subtype subtype() const
                         {
                             return TypeEntityRef;
+                        }
+
+                        virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+                        {
+                            return Base::serialiseSubclass(serialiser)
+                                    + serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
+                        }
+
+                        virtual std::string logString() const
+                        {
+                            return std::string("EntityRef(\"") + std::to_string(_value) + std::string("\",")
+                                    + std::to_string(confidence()) + std::string(")");
+                        }
+
+                protected:
+                        EntityRef(const char* &serialisedData) : Base(serialisedData)
+                        {
+                            _value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
+                            serialisedData += sizeof(_value);
                         }
 		};
 	}
