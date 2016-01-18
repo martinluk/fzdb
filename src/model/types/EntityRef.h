@@ -11,11 +11,12 @@ namespace model {
 	namespace types {
 		class EntityRef : public Base {
 		private:
+                    friend class TypeSerialiser;
                         EHandle_t _value;
 		public:
 
-			EntityRef(const EHandle_t value) : _value(value), Base(100) {}
-			EntityRef(unsigned char confidence, const EHandle_t value) : _value(value), Base(confidence) {}
+                        EntityRef(const EHandle_t value) : _value(value), Base(100) {}
+                        EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value) {}
 
 			EHandle_t value() { return _value; }
 
@@ -32,7 +33,7 @@ namespace model {
 
                         virtual std::string logString() const
                         {
-                            return std::string("EntityRef(\"") + std::to_string(_value) + std::string("\",")
+                            return std::string("EntityRef(") + std::to_string(_value) + std::string(",")
                                     + std::to_string(confidence()) + std::string(")");
                         }
 

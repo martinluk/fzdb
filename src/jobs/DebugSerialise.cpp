@@ -8,6 +8,8 @@
 #include "../model/TypeSerialiser.h"
 #include "../model/types/Base.h"
 #include "../model/types/Int.h"
+#include "../model/types/String.h"
+#include "../model/types/EntityRef.h"
 
 std::string testSerialise(const model::types::Base* ser)
 {
@@ -63,7 +65,9 @@ QueryResult DebugSerialise::execute()
     Serialiser serialiser;
 
     Base tBase(53);
-    Int tInt(72, 1337);
+    Int tInt(1337, (unsigned char)72);
+    String tString(std::string("Body of Baywatch, face of Crimewatch"), 26);
+    EntityRef tEntRef((EHandle_t)1234, 99);
 
     log << "Testing serialisation of Base type.\n";
     log << testSerialise(&tBase) << "\n";
@@ -88,6 +92,34 @@ QueryResult DebugSerialise::execute()
         tser.serialise(serialiser);
         Base* newBase = tser.unserialise(serialiser.cbegin());
         log << "Unserialised Int: " << newBase->logString() << "\n";
+        delete newBase;
+    }
+
+    log << "\n";
+
+    log << "Testing serialisation of String type.\n";
+    log << testSerialise(&tString) << "\n";
+
+    {
+        serialiser.clear();
+        TypeSerialiser tser(&tString);
+        tser.serialise(serialiser);
+        Base* newBase = tser.unserialise(serialiser.cbegin());
+        log << "Unserialised String: " << newBase->logString() << "\n";
+        delete newBase;
+    }
+
+    log << "\n";
+
+    log << "Testing serialisation of EntityRef type.\n";
+    log << testSerialise(&tEntRef) << "\n";
+
+    {
+        serialiser.clear();
+        TypeSerialiser tser(&tEntRef);
+        tser.serialise(serialiser);
+        Base* newBase = tser.unserialise(serialiser.cbegin());
+        log << "Unserialised EntityRef: " << newBase->logString() << "\n";
         delete newBase;
     }
 

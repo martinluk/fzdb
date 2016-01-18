@@ -9,12 +9,13 @@
 namespace model {
 	namespace types {
 		class String : public Base {
-		private: 
+                private:
+                    friend class TypeSerialiser;
                         std::string _value;
 		public:
 
-			String(const std::string value) : _value(value), Base(100) {}
-			String(unsigned char confidence, const std::string value) : _value(value), Base(confidence) {}
+                        String(const std::string value) : _value(value), Base(100) {}
+                        String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value) {}
 
 			std::string value() { return _value; }
 

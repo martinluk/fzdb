@@ -13,8 +13,8 @@ namespace model {
                         int32_t _value;
 
 		public:
-			Int(const int32_t value) : _value(value), Base(100) {}
-			Int(unsigned char confidence, const int32_t value) : _value(value), Base(confidence) {}
+                        Int(const int32_t value) : _value(value), Base(100) {}
+                        Int(int32_t value, unsigned char confidence) : Base(confidence), _value(value) {}
 
 			int32_t value() { return _value; }
 

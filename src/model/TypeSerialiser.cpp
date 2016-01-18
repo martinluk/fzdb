@@ -1,6 +1,8 @@
 #include "TypeSerialiser.h"
 #include "types/Base.h"
 #include "types/Int.h"
+#include "types/String.h"
+#include "types/EntityRef.h"
 
 namespace model
 {
@@ -45,6 +47,12 @@ namespace model
 
             case Base::TypeInt32:
                 return new Int(serialisedData);
+
+            case Base::TypeString:
+                return new String(serialisedData);
+
+            case Base::TypeEntityRef:
+                return new EntityRef(serialisedData);
 
             default:
                 return NULL;

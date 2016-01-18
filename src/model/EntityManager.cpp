@@ -172,11 +172,11 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		//add property
 		if (currentEntity->hasProperty(propertyId)) {
-                        currentEntity->getProperty<model::types::String>(propertyId)->append(new model::types::String(80, triple.object.value));
+                        currentEntity->getProperty<model::types::String>(propertyId)->append(new model::types::String(triple.object.value, 80));
 		}
 		else {
                         currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String*> {
-                                new model::types::String(80, triple.object.value)
+                                new model::types::String(triple.object.value, 80)
 			}));
 		}		
 	}
