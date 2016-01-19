@@ -8,15 +8,17 @@
 
 #include "model/types/Base.h"
 
+using VariableType = model::types::Base::Subtype;
+
 class VariableSet {
 
 public:
 
 	VariableSet() { }
 	
-	void add(const std::string&& var, std::string&& value, model::types::Base::Subtype&& type) {
+	void add(const std::string&& var, std::string&& value, VariableType&& type) {
 		if (_data.find(var) == _data.cend()) {
-			_data[var] = std::pair<std::vector<std::string>, model::types::Base::Subtype>(std::vector<std::string>{ value }, type);
+			_data[var] = std::pair<std::vector<std::string>, VariableType>(std::vector<std::string>{ value }, type);
 		}
 		else {
 			if (type != _data[var].second) {
@@ -26,7 +28,7 @@ public:
 		}
 	}
 
-	const std::map<std::string, std::pair<std::vector<std::string>, model::types::Base::Subtype>> getData() {
+	const std::map<std::string, std::pair<std::vector<std::string>, VariableType>> getData() {
 		return _data;
 	}
 
@@ -34,7 +36,7 @@ public:
 		return _data.find(name) != _data.cend();
 	}
 
-	const model::types::Base::Subtype typeOf(std::string name) {
+	const VariableType typeOf(std::string name) {
 		return _data[name].second;
 	}
 
@@ -43,6 +45,6 @@ public:
 	}
 
 private:
-	std::map<std::string, std::pair<std::vector<std::string>, model::types::Base::Subtype>> _data;
+	std::map<std::string, std::pair<std::vector<std::string>, VariableType>> _data;
 };
 #endif // !FUZZY_VARIABLESET

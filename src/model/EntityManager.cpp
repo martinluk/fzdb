@@ -119,14 +119,43 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 		if (conditionsIter->subject.type == model::Subject::Type::VARIABLE) {
 			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
-
-					//option 1
+					//option 1 - $a <prop> value
 					this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
 				}
 				else {
-
-					//option 2
+					//option 2 - $a <prop> $b
 					this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
+				}
+			}
+			else {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//option3 - $a $b value
+					//this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
+				}
+				else {
+					//option 4 - $a $b $c
+					//this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
+				}
+			}
+		}
+		else {
+			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//doesn't contain any variables.. is meaningless
+				}
+				else {
+					//option 5 - entity <prop> $c
+					this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate), conditionsIter->object.value);
+				}
+			}
+			else {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//option 7 - entity $b value
+					//this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
+				}
+				else {
+					//option 8 - entity $b $c
+					//this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
 				}
 			}
 		}

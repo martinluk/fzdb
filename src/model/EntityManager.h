@@ -31,6 +31,10 @@ public:
 
 	void Insert(std::vector<model::Triple> triples);
 
+	bool EntityExists(Entity::EHandle_t handle) {
+		return _entities.find(handle) != _entities.cend();
+	}
+
 private:	
 
 	// TODO: This could be an unordered map, but we may want to utilise the
@@ -154,6 +158,26 @@ private:
 			}
 
 		}
+	}
+
+	void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) {
+
+		//TODO: Check variable types
+
+		//get the entity handle
+		Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
+
+		//get the property id
+		const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
+
+		if (EntityExists(entityRef)) {
+			Entity* entity = _entities[entityRef];
+			if (entity->hasProperty(propertyId)) {
+				variableSet.add(std::move(variableName),
+					entity->getProperty<model::types::String>(propertyId)->values()[0].value(),
+					model::types::Base::Subtype::TypeString);
+			}
+		}		
 	}
 };
 
