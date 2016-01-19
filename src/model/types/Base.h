@@ -21,7 +21,10 @@ namespace model {
 				TypeUndefined = 0,
 				TypeInt32,
 				TypeString,
-				TypeEntityRef
+				TypeEntityRef,
+
+				//Doesn't have an associated type
+				PropertyReference
 			};
 
 			Base(unsigned char confidence) {

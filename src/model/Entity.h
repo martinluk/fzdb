@@ -52,6 +52,11 @@ public:
 		return new EntityProperty<T>();
 	}
 
+	IEntityProperty* getProperty(const unsigned int &key) const {
+		auto it = _propertyTable.find(key);
+		return it->second;
+	}
+
 	// Returns this entity's handle.
 	EHandle_t getHandle() const;
 
@@ -87,15 +92,15 @@ public:
 		switch (obj.type) {
 			case model::Object::Type::STRING: {
 				auto val = getProperty<model::types::String>(propertyId)->values();
-				return val[0].Equals(obj.value);
+				return val[0]->Equals(obj.value);
 			}
 			case model::Object::Type::INT: {
 				auto val = getProperty<model::types::Int>(propertyId)->values();
-				return val[0].Equals(obj.value);
+				return val[0]->Equals(obj.value);
 			}
 			case model::Object::Type::ENTITYREF: {
 				auto val = getProperty<model::types::EntityRef>(propertyId)->values();
-				return val[0].Equals(obj.value);
+				return val[0]->Equals(obj.value);
 			}
 			default:
 				return false;

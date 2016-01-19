@@ -71,11 +71,11 @@ private:
 	template<typename T, typename S>
 	void addToEntity(Entity* currentEntity, unsigned int propertyId, std::string str, std::function<S(std::string)> converter) {
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(T(80, converter(str)));
+			currentEntity->getProperty<T>(propertyId)->append(new T(80, converter(str)));
 		}
 		else {
-			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T> {
-				T(80, converter(str))
+			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T*> {
+				new T(80, converter(str))
 			}));
 		}
 	}
@@ -95,6 +95,8 @@ private:
 					Entity* currentEntity = _entities[std::stoll(val)];
 					return !currentEntity->meetsCondition(propertyId, std::move(object));
 				}), entities.end());
+
+				variableSet.replaceValuesFor(variableName, entities);
 
 			}
 			else {
@@ -135,8 +137,8 @@ private:
 				for (auto entity : entities) {
 					Entity* currentEntity = _entities[std::stoll(entity)];					
 					variableSet.add(std::move(variableName2), 
-						currentEntity->getProperty<model::types::String>(propertyId)->values()[0].value(), 
-						model::types::Base::Subtype::TypeString);
+						currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
+						std::move(_propertyTypes[propertyId]));
 				}
 
 			}
@@ -153,8 +155,8 @@ private:
 			if (currentEntity->hasProperty(propertyId)) {
 				variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
 				variableSet.add(std::move(variableName2), 
-					currentEntity->getProperty<model::types::String>(propertyId)->values()[0].value(), 
-					model::types::Base::Subtype::TypeString);
+					currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
+					std::move(_propertyTypes[propertyId]));
 			}
 
 		}
@@ -175,24 +177,10 @@ private:
 			for (auto prop : entity.second->properties()) {
 
 				variableSet.add(std::move(variableName), std::to_string(entity.first), model::types::Base::Subtype::TypeEntityRef);
-				variableSet.add(std::move(variableName2), std::to_string(prop.first), model::types::Base::Subtype::TypeInt32);
+				variableSet.add(std::move(variableName2), std::to_string(prop.first), model::types::Base::Subtype::PropertyReference);
 
 				auto type = _propertyTypes[prop.first];
-				std::string val;
-				switch (type) {
-					case model::types::Base::Subtype::TypeString: {
-						val = entity.second->getProperty<model::types::String>(prop.first)->values()[0].toString();
-						break;
-					}
-					case model::types::Base::Subtype::TypeInt32: {
-						val = entity.second->getProperty<model::types::Int>(prop.first)->values()[0].toString();
-						break;
-					}
-					case model::types::Base::Subtype::TypeEntityRef: {
-						val = entity.second->getProperty<model::types::EntityRef>(prop.first)->values()[0].toString();
-						break;
-					}
-				}
+				std::string val = entity.second->getProperty(prop.first)->baseValues()[0]->toString();
 				variableSet.add(std::move(variableName3), std::move(val), std::move(type));
 			}
 		}
@@ -212,8 +200,8 @@ private:
 			Entity* entity = _entities[entityRef];
 			if (entity->hasProperty(propertyId)) {
 				variableSet.add(std::move(variableName),
-					entity->getProperty<model::types::String>(propertyId)->values()[0].value(),
-					model::types::Base::Subtype::TypeString);
+					entity->getProperty(propertyId)->baseValues()[0]->toString(),
+					std::move(_propertyTypes[propertyId]));
 			}
 		}		
 	}

@@ -18,6 +18,7 @@ public:
 		bool a = true;
 	}
 	virtual int count() const = 0;
+	virtual std::vector<model::types::Base*> baseValues() const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -41,7 +42,7 @@ class EntityProperty : public IEntityProperty
 		EntityProperty();
 		EntityProperty(const unsigned int &key);
 		EntityProperty(const unsigned int &key,
-			const std::vector<T> &values);
+			const std::vector<T*> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
 		// Internally, a property is null if its key is an empty string.
@@ -58,8 +59,15 @@ class EntityProperty : public IEntityProperty
 		// Getters
 		unsigned int key() const;
 		const unsigned int& keyRef() const;
-		std::vector<T> values() const;
-		T value(int index) const;
+		std::vector<T*> values() const;
+
+		std::vector<model::types::Base*> baseValues() const override {
+			std::vector<model::types::Base*> out;
+			for (auto vals : _values) out.push_back(vals);
+			return out;
+		}
+
+		T* value(int index) const;
 		int count() const;
 
 		//T getValue(unsigned int index);
@@ -73,10 +81,10 @@ class EntityProperty : public IEntityProperty
 		// Setters:
 
 		// Appends a value to the value list.
-		void append(const T &value);
+		void append(T* value);
 
 		// Appends a list of values.
-		void append(const std::vector<T> &list);
+		void append(const std::vector<T*> &list);
 
 		// Makes this property concrete, with the given variant value.
 		//void setConcrete(const Variant &value);
@@ -107,7 +115,7 @@ class EntityProperty : public IEntityProperty
 		//};
 
 		unsigned int _key;
-		std::vector<T> _values;
+		std::vector<T*> _values;
 		//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 

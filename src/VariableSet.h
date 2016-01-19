@@ -44,6 +44,10 @@ public:
 		return _data[name].first;
 	}
 
+	void replaceValuesFor(std::string name, std::vector<std::string> data) {
+		_data[name].first = data;
+	}
+
 private:
 	std::map<std::string, std::pair<std::vector<std::string>, VariableType>> _data;
 };

@@ -2,6 +2,8 @@ INSERT DATA {
 
 	entity:1 <forename> "Homer";
 	<surname> "Simpson";
+	<age> 46 ;
+	<wife> entity:2;
 	<drinks> "Beer" .
 
 	entity:2 <forename> "Marge";

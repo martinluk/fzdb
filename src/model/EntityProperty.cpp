@@ -17,7 +17,7 @@ EntityProperty<T>::EntityProperty(const unsigned int& key) :
 
 template <typename T>
 EntityProperty<T>::EntityProperty(const unsigned int& key,
-	const std::vector<T> &values) : _key(key)
+	const std::vector<T*> &values) : _key(key)
 {
 	append(values);
 }
@@ -34,7 +34,7 @@ bool EntityProperty<T>::isConcrete() const
 	if ( _values.size() != 1 ) return false;
 
 	// The confidence must be 1.
-	return _values[0].confidence() == 100;
+	return _values[0]->confidence() == 100;
 }
 
 template <typename T>
@@ -50,7 +50,7 @@ unsigned int EntityProperty<T>::key() const
 }
 
 template <typename T>
-std::vector<T> EntityProperty<T>::values() const
+std::vector<T*> EntityProperty<T>::values() const
 {
 	return _values;
 }
@@ -68,13 +68,13 @@ int EntityProperty<T>::count() const
 //}
 
 template <typename T>
-void EntityProperty<T>::append(const T &value)
+void EntityProperty<T>::append(T* value)
 {
-	_values.push_back(value);
+	_values.emplace_back(value);
 }
 
 template <typename T>
-void EntityProperty<T>::append(const std::vector<T> &list)
+void EntityProperty<T>::append(const std::vector<T*> &list)
 {
 	for ( int i = 0; i < list.size(); i++ )
 	{
@@ -96,7 +96,7 @@ void EntityProperty<T>::clear()
 }
 
 template <typename T>
-T EntityProperty<T>::value(int index) const
+T* EntityProperty<T>::value(int index) const
 {
 	return _values[index];
 }
