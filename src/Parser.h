@@ -20,6 +20,7 @@ enum class ParsedTokenType {
         NOTIMPLEMENTED = 0x3,
         PROPERTY       = 0x4,
         ENTITYREF      = 0x5,
+		CONFIDENCE_RATING = 0x8,
 
 	//structural
         OPEN_CURLBRACE  = 0x6,
@@ -104,8 +105,8 @@ enum class QueryType {
 	INSERT,
 	DEL,
 	PING,
-        DEBUGECHO,
-        DEBUGOTHER,
+    DEBUGECHO,
+    DEBUGOTHER,
 	USER
 };
 
@@ -131,6 +132,8 @@ public:
 class FSparqlParser {
 private:
 	static TokenItem identifyToken(std::string str, unsigned int line, unsigned int chr);
+
+	static std::string parseConfidenceRating(TokenIterator&& iter, TokenIterator end);
 public:
 	static TokenList Tokenize(std::string str);
 	static std::vector<model::Triple> ParseTriples(TokenIterator&& iter, TokenIterator end);

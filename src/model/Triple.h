@@ -68,6 +68,9 @@ namespace model {
 
 		const static int VALUE_MASK = 0b1000;
 
+		unsigned char certainty;
+		bool hasCertainty;
+
 		static inline bool IsValue(Type t) {
 			return ((int)t & model::Object::VALUE_MASK) != 0;
 		}
@@ -75,9 +78,13 @@ namespace model {
 		Type type;
 		std::string value;
 
-		Object() { }
+		Object() : hasCertainty(false) { }
 
-		Object(Type t, std::string val) : value(val) {
+		Object(Type t, std::string val) : value(val), hasCertainty(false) {
+			type = t;
+		}
+
+		Object(Type t, std::string val, unsigned char cert) : value(val), certainty(cert), hasCertainty(true) {
 			type = t;
 		}
 	};

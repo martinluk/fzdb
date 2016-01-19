@@ -69,13 +69,16 @@ private:
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 
 	template<typename T, typename S>
-	void addToEntity(Entity* currentEntity, unsigned int propertyId, std::string str, std::function<S(std::string)> converter) {
+	void addToEntity(Entity* currentEntity, unsigned int propertyId, model::Object&& object, std::function<S(std::string)> converter) {
+
+		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
+
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(new T(80, converter(str)));
+			currentEntity->getProperty<T>(propertyId)->append(new T(confidence, converter(object.value)));
 		}
 		else {
 			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T*> {
-				new T(80, converter(str))
+				new T(confidence, converter(object.value))
 			}));
 		}
 	}

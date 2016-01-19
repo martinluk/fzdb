@@ -184,17 +184,17 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 		switch (triple.object.type) {
 		case model::Object::Type::STRING:
 			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeString, true);
-			this->addToEntity<model::types::String, std::string>(currentEntity, propertyId, triple.object.value,
+			this->addToEntity<model::types::String, std::string>(currentEntity, propertyId, std::move(triple.object),
 				[](std::string str) { return str; });
 			break;
 		case model::Object::Type::ENTITYREF:
 			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeEntityRef, true);
-			this->addToEntity<model::types::EntityRef, Entity::EHandle_t>(currentEntity, propertyId, triple.object.value,
+			this->addToEntity<model::types::EntityRef, Entity::EHandle_t>(currentEntity, propertyId, std::move(triple.object),
 				[](std::string str) { return std::stoll(str); });
 			break;
 		case model::Object::Type::INT:
 			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeInt32, true);
-			this->addToEntity<model::types::Int, int>(currentEntity, propertyId, triple.object.value,
+			this->addToEntity<model::types::Int, int>(currentEntity, propertyId, std::move(triple.object),
 				[](std::string str) { return std::stoi(str); });
 			break;
 		}

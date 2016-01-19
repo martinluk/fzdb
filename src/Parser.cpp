@@ -10,6 +10,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	boost::regex propertyRegex("<.*>");
 	boost::regex entityRefRegex("entity:[0-9]+");
 	boost::regex intRegex("[0-9]+");
+	boost::regex simpleConfidenceRatingRegex("\\[[0-9]+\\]");
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
@@ -17,44 +18,50 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 		tokenType = ParsedTokenType::VARIABLE;
 	}
 
-        else if (boost::regex_match(str, stringRegex)) {
+	else if (boost::regex_match(str, stringRegex)) {
 		tokenType = ParsedTokenType::STRING;
 		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("\""));
 	}
 
-        else if (boost::regex_match(str, propertyRegex)) {
+	else if (boost::regex_match(str, propertyRegex)) {
 		tokenType = ParsedTokenType::PROPERTY;
 		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("<>"));
 	}
 
-        else if (boost::regex_match(str, entityRefRegex)) {
+	else if (boost::regex_match(str, entityRefRegex)) {
 		tokenType = ParsedTokenType::ENTITYREF;
 		str = str.substr(7, str.length() - 7);
 	}
-		else if (boost::regex_match(str, intRegex)) {
-			tokenType = ParsedTokenType::INT;
+
+	else if (boost::regex_match(str, intRegex)) {
+		tokenType = ParsedTokenType::INT;
 	}
 
-        else if (str == "{") tokenType = ParsedTokenType::OPEN_CURLBRACE;
+	else if (boost::regex_match(str, simpleConfidenceRatingRegex)) {
+		tokenType = ParsedTokenType::CONFIDENCE_RATING;
+		str = str.substr(1, str.length() - 2);
+	}
 
-        else if (str == "}") tokenType = ParsedTokenType::CLOSE_CURLBRACE;
+	else if (str == "{") tokenType = ParsedTokenType::OPEN_CURLBRACE;
 
-        else if (str == ";") tokenType = ParsedTokenType::SPLITTER2;
+	else if (str == "}") tokenType = ParsedTokenType::CLOSE_CURLBRACE;
 
-        else if (str == ",") tokenType = ParsedTokenType::SPLITTER3;
+	else if (str == ";") tokenType = ParsedTokenType::SPLITTER2;
 
-        else if (str == ".") tokenType = ParsedTokenType::SPLITTER1;
+	else if (str == ",") tokenType = ParsedTokenType::SPLITTER3;
+
+	else if (str == ".") tokenType = ParsedTokenType::SPLITTER1;
 
 	//keywords
-        else if (str == "SELECT") tokenType = ParsedTokenType::KEYWORD_SELECT;
-        else if (str == "INSERT") tokenType = ParsedTokenType::KEYWORD_INSERT;
-        else if (str == "DELETE") tokenType = ParsedTokenType::KEYWORD_DELETE;
-        else if (str == "WHERE") tokenType = ParsedTokenType::KEYWORD_WHERE;
-        else if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
-        else if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
-        else if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
-        else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
-        else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
+	else if (str == "SELECT") tokenType = ParsedTokenType::KEYWORD_SELECT;
+	else if (str == "INSERT") tokenType = ParsedTokenType::KEYWORD_INSERT;
+	else if (str == "DELETE") tokenType = ParsedTokenType::KEYWORD_DELETE;
+	else if (str == "WHERE") tokenType = ParsedTokenType::KEYWORD_WHERE;
+	else if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
+	else if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
+	else if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
+	else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
+	else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr), str);
 }
@@ -72,7 +79,7 @@ TokenList FSparqlParser::Tokenize(std::string str) {
 
 	unsigned int lineNo = 0;
 	unsigned int charNo = 0;
-	
+
 	for (auto iter = str.begin(); iter != str.end(); iter++, charNo++) {
 
 		//if (*iter == '\n') {
@@ -85,7 +92,7 @@ TokenList FSparqlParser::Tokenize(std::string str) {
 			if (buffer.length() > 0) {
 
 				results.push_back(identifyToken(buffer, lineNo, charNo - buffer.length()));
-			
+
 				buffer.clear();
 			}
 			typing = false;
@@ -150,6 +157,15 @@ TokenList FSparqlParser::Tokenize(std::string str) {
 	return results;
 }
 
+std::string FSparqlParser::parseConfidenceRating(TokenIterator&& iter, TokenIterator end) {
+	if (iter->first.type == ParsedTokenType::CONFIDENCE_RATING) {
+		std::string val = iter->second;
+		iter++;
+		return val;
+	}
+	return "";
+}
+
 //parses a block of triples
 std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end) {
 	std::vector<model::Triple> triples;
@@ -192,6 +208,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 				break;
 			case 2:
 				model::Object::Type objType;
+				std::string confidence = parseConfidenceRating(std::move(iter), end);
 				switch (iter->first.type) {
 				case ParsedTokenType::STRING:
 					objType = model::Object::Type::STRING;
@@ -208,7 +225,14 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 				default:
 					throw std::runtime_error("Invalid type for object");
 				}
-				model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), model::Object(objType, iter->second));
+				model::Object o;
+				if (confidence.empty()) {
+					o = model::Object(objType, iter->second);
+				}
+				else {
+					o = model::Object(objType, iter->second, std::stoul(confidence));
+				}
+				model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o);
 				triples.push_back(trip);
 				break;
 			}
@@ -340,22 +364,22 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			break;
 		}
 
-                if (iter->first.type == ParsedTokenType::KEYWORD_DEBUG)
-                {
-                    *iter++;
-                    type = QueryType::DEBUGOTHER;
+		if (iter->first.type == ParsedTokenType::KEYWORD_DEBUG)
+		{
+			*iter++;
+			type = QueryType::DEBUGOTHER;
 
-                    if (iter != tokens.end())
-                    {
-                        data0 = iter->second;
-                        *iter++;
-                        if (iter != tokens.end())
-                        {
-                            throw ParseException("DEBUG commands take a maximum of one argument");
-                        }
-                    }
-                    break;
-                }
+			if (iter != tokens.end())
+			{
+				data0 = iter->second;
+				*iter++;
+				if (iter != tokens.end())
+				{
+					throw ParseException("DEBUG commands take a maximum of one argument");
+				}
+			}
+			break;
+		}
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_SELECT) {
 			*iter++;
