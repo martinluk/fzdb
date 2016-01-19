@@ -5,10 +5,12 @@
 #include <string>
 #include <map>
 #include <typeinfo>
+#include <stdexcept>
 
 #include "model/types/Base.h"
 
 using VariableType = model::types::Base::Subtype;
+
 
 class VariableSet {
 
