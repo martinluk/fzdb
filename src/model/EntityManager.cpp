@@ -134,7 +134,7 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 				}
 				else {
 					//option 4 - $a $b $c
-					//this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
+					this->Scan4(std::move(result), conditionsIter->subject.value, conditionsIter->predicate.value, conditionsIter->object.value);
 				}
 			}
 		}

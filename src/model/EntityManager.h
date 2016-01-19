@@ -160,6 +160,44 @@ private:
 		}
 	}
 
+	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const std::string variableName3) {
+
+		//TODO: Check variable types
+
+		//TODO: Cover cases where the variables have been used before :/
+		if (variableSet.contains(variableName) || variableSet.contains(variableName2) || variableSet.contains(variableName3)) {
+			return;
+		}
+		
+		//If no variables have been used so far, get EVERYTHING!
+
+		for (auto entity : _entities) {
+			for (auto prop : entity.second->properties()) {
+
+				variableSet.add(std::move(variableName), std::to_string(entity.first), model::types::Base::Subtype::TypeEntityRef);
+				variableSet.add(std::move(variableName2), std::to_string(prop.first), model::types::Base::Subtype::TypeInt32);
+
+				auto type = _propertyTypes[prop.first];
+				std::string val;
+				switch (type) {
+					case model::types::Base::Subtype::TypeString: {
+						val = entity.second->getProperty<model::types::String>(prop.first)->values()[0].toString();
+						break;
+					}
+					case model::types::Base::Subtype::TypeInt32: {
+						val = entity.second->getProperty<model::types::Int>(prop.first)->values()[0].toString();
+						break;
+					}
+					case model::types::Base::Subtype::TypeEntityRef: {
+						val = entity.second->getProperty<model::types::EntityRef>(prop.first)->values()[0].toString();
+						break;
+					}
+				}
+				variableSet.add(std::move(variableName3), std::move(val), std::move(type));
+			}
+		}
+	}
+
 	void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) {
 
 		//TODO: Check variable types

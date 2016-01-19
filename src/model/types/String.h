@@ -22,6 +22,10 @@ namespace model {
                 return Subtype::TypeString;
             }
 
+			virtual std::string toString() override {
+				return _value;
+			}
+
 			// Inherited via Base
 			virtual bool Equals(const std::string val) override {
 				return _value == val;

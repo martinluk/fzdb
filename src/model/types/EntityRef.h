@@ -24,6 +24,10 @@ namespace model {
 				return _value == std::stoll(val);
 			}
 
+			virtual std::string toString() override {
+				return std::to_string(_value);
+			}
+
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeEntityRef;

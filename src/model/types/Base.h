@@ -33,6 +33,9 @@ namespace model {
 				return false;
 			};
 
+			virtual std::string toString() {
+				return "";
+			}
 
 			unsigned char confidence() const {
 				return _confidence;

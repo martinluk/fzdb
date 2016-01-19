@@ -75,6 +75,11 @@ public:
 	// Tests if the entity has a property
 	bool hasProperty(const unsigned int &key);
 
+	// Returns read only reference to the property table
+	const std::map<unsigned int, IEntityProperty*>& properties() const {
+		return _propertyTable;
+	}
+
 	// Tests if the entity meets the condition
 	bool meetsCondition(unsigned int propertyId, const model::Object&& obj) {
 		if (!hasProperty(propertyId)) return false;

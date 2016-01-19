@@ -32,6 +32,10 @@ namespace model {
 				return _value == std::stoi(val);
 			}
 
+			virtual std::string toString() override {
+				return std::to_string(_value);
+			}
+
 			virtual std::size_t serialise(Serialiser &serialiser) const
 			{
 				std::vector<Serialiser::SerialProperty> propList;
