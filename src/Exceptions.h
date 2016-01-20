@@ -8,7 +8,7 @@ public:
 	NotImplementedException(const char* message) : logic_error(message) {
 
 	}
-	virtual char const * what() const { return "Function not yet implemented."; }
+	const char* what() const noexcept override { return "Function not yet implemented."; }
 };
 
 
