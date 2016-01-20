@@ -2,6 +2,8 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
+#include "../Exceptions.h"
+
 Insert::Insert(ISession* session, Query query) : Job(session), _query(query)
 {
 }
@@ -9,6 +11,11 @@ Insert::Insert(ISession* session, Query query) : Job(session), _query(query)
 QueryResult Insert::execute()
 {
 	QueryResult result;
-	Singletons::entityManager()->Insert(_query.conditions.triples);
+	try {
+		Singletons::entityManager()->Insert(_query.conditions.triples);
+	}
+	catch (MismatchedTypeException ex) {
+		result = QueryResult::generateError(ex.what());
+	}
 	return result;
 }

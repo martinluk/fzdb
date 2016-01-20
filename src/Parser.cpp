@@ -188,7 +188,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					subType = model::Subject::Type::VARIABLE;
 					break;
 				default:
-					throw std::runtime_error("Invalid type for subject");
+					throw ParseException("Unknown symbol: " + iter->second);
 				}
 				pos = 1;
 				break;
@@ -202,7 +202,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					predType = model::Predicate::Type::VARIABLE;
 					break;
 				default:
-					throw std::runtime_error("Invalid type for predicate");
+					throw ParseException("Unknown symbol: " + iter->second);
 				}
 				pos = 2;
 				break;
@@ -223,7 +223,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					objType = model::Object::Type::ENTITYREF;
 					break;
 				default:
-					throw std::runtime_error("Invalid type for object");
+					throw ParseException("Unknown symbol: " + iter->second);
 				}
 				model::Object o;
 				if (confidence.empty()) {
@@ -239,17 +239,19 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 		}
 		else {
 
-			if (iter->first.type == ParsedTokenType::SPLITTER1) {
+			switch (iter->first.type) {
+			case ParsedTokenType::SPLITTER1: 
 				pos = 0;
-			}
-
-			if (iter->first.type == ParsedTokenType::SPLITTER2) {
+				break;
+			case ParsedTokenType::SPLITTER2:
 				pos = 1;
-			}
-
-			if (iter->first.type == ParsedTokenType::SPLITTER3) {
+				break;
+			case ParsedTokenType::SPLITTER3:
 				pos = 2;
-			}
+				break;
+			default:
+				throw ParseException("Unknown symbol: " + iter->second);
+			}			
 		}
 
 		iter++;
@@ -263,14 +265,22 @@ TriplesBlock FSparqlParser::ParseInsert(TokenIterator&& iter, TokenIterator end)
 
 	TriplesBlock output;
 
-	if (iter->first.type == ParsedTokenType::OPEN_CURLBRACE) {
-		iter++;
-		output = TriplesBlock(ParseTriples(std::move(iter), end));
+	if (iter == end)
+		throw ParseException("Unexpected EOF");
 
-		if (iter->first.type == ParsedTokenType::CLOSE_CURLBRACE) {
-			iter++;
-		}
-	}
+	if(iter->first.type != ParsedTokenType::OPEN_CURLBRACE)
+		throw ParseException("Expected { found " + iter->second);
+
+	iter++;
+	output = TriplesBlock(ParseTriples(std::move(iter), end));
+
+	if (iter == end)
+		throw ParseException("Unexpected EOF");
+	
+	if (iter->first.type != ParsedTokenType::CLOSE_CURLBRACE)
+		throw ParseException("Expected } found " + iter->second);
+
+	iter++;
 
 	return output;
 }

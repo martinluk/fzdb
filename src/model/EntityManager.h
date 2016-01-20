@@ -63,6 +63,11 @@ private:
 				return 0;
 			}
 		}
+
+		if (_propertyTypes[iter->second] != type) {
+			throw MismatchedTypeException("mismatched types!");
+		}
+
 		return iter->second;
 	}
 
