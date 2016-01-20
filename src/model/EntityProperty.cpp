@@ -110,6 +110,12 @@ void EntityProperty<T>::deleteAllValues()
     }
 }
 
+template <typename T>
+model::types::Base* EntityProperty<T>::baseValue(int index) const
+{
+    return dynamic_cast<model::types::Base*>(value(index));
+}
+
 // Template instantiations - parameters must be listed here in order to link
 template class EntityProperty < model::types::String >;
 template class EntityProperty < model::types::EntityRef >;

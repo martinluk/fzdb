@@ -15,7 +15,7 @@ namespace model
         public:
             TypeSerialiser(const Base* type);
 
-            std::size_t serialise(Serialiser &serialiser) const;
+            std::size_t serialise(Serialiser &serialiser);
             Base* unserialise(const char* serialisedData);
 
         private:

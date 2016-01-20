@@ -16,6 +16,8 @@ public:
 		bool a = true;
 	}
 	virtual int count() const = 0;
+        virtual model::types::Base* baseValue(int index) const = 0;
+        virtual unsigned int key() const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -58,11 +60,13 @@ class EntityProperty : public IEntityProperty
 		bool isEmpty() const;
 
 		// Getters
-		unsigned int key() const;
 		const unsigned int& keyRef() const;
                 std::vector<T*> values() const;
                 T* value(int index) const;
-		int count() const;
+
+                virtual int count() const;
+                virtual model::types::Base* baseValue(int index) const;
+                virtual unsigned int key() const;
 
 		// Setters:
 

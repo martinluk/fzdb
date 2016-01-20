@@ -12,6 +12,7 @@
 // An entity owns all of its EntityProperties and will delete them as appropriate.
 class Entity
 {
+    friend class EntitySerialiser;
 public:
 	// Typedef for an entity handle. This should uniquely identify an entity.
 	typedef unsigned long long EHandle_t;
