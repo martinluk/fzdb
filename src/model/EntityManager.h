@@ -10,6 +10,7 @@
 #include "../QueryResult.h"
 #include "./Triple.h"
 #include "../VariableSet.h"
+#include "../Exceptions.h"
 
 // TODO: We need smart pointers! We need to have the manager own the entity
 // and entities should not have delete called on them externally.

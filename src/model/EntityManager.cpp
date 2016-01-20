@@ -131,6 +131,7 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 				if (model::Object::IsValue(conditionsIter->object.type)) {
 					//option3 - $a $b value
 					//this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
+					throw new NotImplementedException("Queries of the form $a $b value are not yet implemented");
 				}
 				else {
 					//option 4 - $a $b $c
@@ -151,11 +152,11 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 			else {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
 					//option 7 - entity $b value
-					//this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
+					throw new NotImplementedException("Queries of the form entity $b value are not yet implemented");
 				}
 				else {
 					//option 8 - entity $b $c
-					//this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
+					throw new NotImplementedException("Queries of the form entity $b $c are not yet implemented");
 				}
 			}
 		}
