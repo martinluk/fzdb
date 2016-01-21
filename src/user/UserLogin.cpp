@@ -1,5 +1,4 @@
 #include <user/UserLogin.h>
-//#include <user/Permission.h>
 #include <boost/filesystem.hpp>
 #include <user/Hashing.h>
 std::string UserFileOperations::pathToLoginFile() {
@@ -76,11 +75,16 @@ void UserAdmin::addUser(UserGroup currentUserGroup, std::string userName, std::s
 	a.userGroup=userGroup;
 	super::addUser(a);
 }
-void UserAdmin::removeUser(UserGroup currentUserGroup, std::string currentUserName,std::string userName) {
-
+void UserAdmin::removeUser(UserGroup currentUserGroup, std::string userName) {
+	Permission::assertUserOpPermission(currentUserGroup);
+	super::removeUser(userName);
 }
-void UserAdmin::changeUserGroup(UserGroup currentUserGroup, std::string currentUserName,std::string userName, UserGroup newUserGroup) {
 
+void UserAdmin::changeUserGroup(UserGroup currentUserGroup,std::string userName, UserGroup newUserGroup) {
+	Permission::assertUserOpPermission(currentUserGroup);
+	UserAttributes a = super::getUserAttributes(userName);
+	a.userGroup=newUserGroup;
+	super::updateUser(a.userName,a);
 }
 
 //TODO

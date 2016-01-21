@@ -53,8 +53,8 @@ class UserCommonOperation : public UserFileOperations {
 class UserAdmin : public UserFileOperations {
 	public:
 		static void addUser(UserGroup currentUserGroup, std::string userName, std::string password, UserGroup userGroup);
-		static void removeUser(UserGroup currentUserGroup, std::string currentUserName,std::string userName);
-		static void changeUserGroup(UserGroup currentUerGroup, std::string currentUserName,std::string userName, UserGroup newUserGroup);
+		static void removeUser(UserGroup currentUserGroup,std::string userName);
+		static void changeUserGroup(UserGroup currentUserGroup,std::string userName, UserGroup newUserGroup);
 	private:
 		typedef UserFileOperations super;
 };
