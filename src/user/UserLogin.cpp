@@ -20,30 +20,40 @@ void UserFileOperations::addUser(UserAttributes userAttributes) {
 	saveCacheToFile();
 }
 void UserFileOperations::removeUser(std::string userName) {
-	//load cache from file?
+	//load cache from file
 	loadCacheFromFile();
 	if((this->userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
-	//TODO Remove the entry
-	//save cache from file?
+	//Remove the entry
+	this->userFileCache.erase(userName);
+	//save cache from file
 	saveCacheToFile();
 }
 void UserFileOperations::updateUser(std::string userName, UserAttributes newAttributes) {
-	//load cache from file?
+	//load cache from file
 	loadCacheFromFile();
-	//TODO Update user attribute at 
-	//save cache from file?
+	if((this->userFileCache.count(userName))>0) {
+		throw new UserNotExistException;
+	}
+	//Update user attribute at 
+	this->userFileCache[userName]=newAttributes;
+	//save cache from file
 	saveCacheToFile();
 }
-void UserFileOperations::loadCacheFromFile() {
-}
-void UserFileOperations::saveCacheToFile() {
+UserAttributes UserFileOperations::getUserAttributes(std::string userName){
+	//load cache from file
+	loadCacheFromFile();
+	if((this->userFileCache.count(userName))>0) {
+		throw new UserNotExistException;
+	}
+	return this->userFileCache[userName];
 }
 
-void UserLogin::login(ISession* session, std::string userName, std::string password) {
-	//Login 
-	//assert is currently guest
-	//Throw exception if username cant find, combo does not match.
+//TODO
+void UserFileOperations::loadCacheFromFile() {
+}
+//TODO
+void UserFileOperations::saveCacheToFile() {
 }
 

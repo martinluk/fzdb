@@ -28,6 +28,7 @@ class UserFileOperations {
 		void addUser(UserAttributes userAttributes);
 		void removeUser(std::string userName);
 		void updateUser(std::string userName,UserAttributes newAttributes);
+		UserAttributes getUserAttributes(std::string userName);
 	private:
 		UserFileOperations() {};
 		static void loadCacheFromFile();
@@ -39,15 +40,15 @@ class UserFileOperations {
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
 
-class UserLogin : public UserFileOperations { 
+class UserCommonOperation : public UserFileOperations { 
 	public : 
-		static void login(ISession* session, std::string userName, std::string password);
+		UserGroup login(std::string userName, std::string password);
 };
 
 class UserAdmin : public UserFileOperations {
 	public:
-		static void addUser(ISession* session,std::string userName, std::string password, UserGroup userGroup);
-		static void removeUser(ISession* session,std::string userName);
-		static void changeUserGroup(ISession* session,std::string userName, UserGroup newUserGroup);
+		static void addUser(std::string userName, std::string password, UserGroup userGroup);
+		static void removeUser(std::string userName);
+		static void changeUserGroup(std::string userName, UserGroup newUserGroup);
 	protected:
 };
