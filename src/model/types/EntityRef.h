@@ -14,7 +14,7 @@ namespace model {
                     friend class TypeSerialiser;
                         EHandle_t _value;
 		public:
-
+                        EntityRef() : _value(0), Base(100) {}
                         EntityRef(const EHandle_t value) : _value(value), Base(100) {}
                         EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value) {}
 

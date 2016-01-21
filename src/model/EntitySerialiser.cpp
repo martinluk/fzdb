@@ -3,6 +3,7 @@
 #include <vector>
 #include "TypeSerialiser.h"
 #include "EntityProperty.h"
+#include <cassert>
 
 struct SerialHeader
 {
@@ -14,10 +15,11 @@ struct SerialHeader
 
 struct PropertyHeader
 {
-    std::size_t     offset;     // Offset of property data from beginning of the entire serialisation.
-    std::size_t     size;       // Size of serialised property data in bytes. This includes all values.
-    unsigned int    key;        // Property key.
-    std::size_t     valueCount; // How many values this property contains.
+    std::size_t                 offset;     // Offset of property data from beginning of the entire serialisation.
+    std::size_t                 size;       // Size of serialised property data in bytes. This includes all values.
+    unsigned int                key;        // Property key.
+    model::types::Base::Subtype subtype;    // Type identifier for the values this property contains.
+    std::size_t                 valueCount; // How many values this property contains.
 };
 
 EntitySerialiser::EntitySerialiser(const Entity *ent) : _entity(ent)
@@ -83,6 +85,7 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser)
         pPropHeader->key = prop->key();
         pPropHeader->valueCount = prop->count();
         pPropHeader->offset = (propDataBegin - origSize) + propDataOffset;
+        pPropHeader->subtype = prop->subtype();
 
         // Increment our counters
         propDataOffset += propSerialisedSize;
@@ -94,7 +97,65 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser)
     pHeader->size = serialiser.size() - origSize;
 }
 
+template <typename T>
+void populate(Entity* ent, const PropertyHeader* header, const char* data)
+{
+    using namespace model::types;
+
+    std::vector<T*> values;
+    for ( int i = 0; i < header->valueCount; i++ )
+    {
+        // Data is automatically incremented.
+        std::size_t advance = 0;
+        T* val = dynamic_cast<T*>(TypeSerialiser::unserialise(data, &advance));
+        assert(val);
+        values.push_back(val);
+        data += advance;
+    }
+
+    ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
+}
+
 Entity* EntitySerialiser::unserialise(const char *serialData)
 {
-    return NULL;
+    using namespace model::types;
+
+//    for ( int i = 0; i < valueCount; i++ )
+//    {
+//        // serialisedData will be incremented.
+//        T* val = dynamic_cast<T*>(TypeSerialiser::unserialise(serialisedData));
+//        assert(val);
+//        append(val);
+//    }
+
+    const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialData);
+
+    // Create an entity shell.
+    Entity* ent = new Entity(pHeader->type, pHeader->handle);
+
+    const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(SerialHeader));
+    for ( int i = 0; i < pHeader->propertyCount; i++ )
+    {
+        const PropertyHeader* p = &(pPropHeaders[i]);
+        const char* data = serialData + p->offset;
+
+        switch (p->subtype)
+        {
+        case Base::Subtype::TypeInt32:
+            populate<Int>(ent, p, data);
+            break;
+
+        case Base::Subtype::TypeString:
+            populate<String>(ent, p, data);
+            break;
+
+        case Base::Subtype::TypeEntityRef:
+            populate<EntityRef>(ent, p, data);
+
+        default:
+            assert(false);
+        }
+    }
+
+    return ent;
 }

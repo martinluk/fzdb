@@ -17,6 +17,7 @@ public:
 	virtual std::vector<model::types::Base*> baseValues() const = 0;
 	virtual unsigned int key() const = 0;
 	virtual model::types::Base* baseValue(int index) const = 0;
+        virtual model::types::Base::Subtype subtype() const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -37,6 +38,7 @@ public:
 template <typename T>
 class EntityProperty : public IEntityProperty
 {
+    friend class EntitySerialiser;
 	public:
 		// Constructs a null property. This can be used for returning 'null',
 		// for example if no property matches a given search.
@@ -78,6 +80,7 @@ class EntityProperty : public IEntityProperty
                 virtual int count() const;
                 virtual model::types::Base* baseValue(int index) const;
                 virtual unsigned int key() const;
+                virtual model::types::Base::Subtype subtype() const { return _subtype; }
 
 		// Setters:
 
@@ -95,8 +98,11 @@ class EntityProperty : public IEntityProperty
 
 	private:
 		void deleteAllValues();
+                void initSubtype();
+
 		unsigned int _key;
 		std::vector<T*> _values;
+                model::types::Base::Subtype _subtype;
 		//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 

@@ -12,7 +12,7 @@ public:
     EntitySerialiser(const Entity* ent);
 
     std::size_t serialise(Serialiser &serialiser);
-    Entity* unserialise(const char* serialData);
+    static Entity* unserialise(const char* serialData);
 
 private:
     const Entity*   _entity;

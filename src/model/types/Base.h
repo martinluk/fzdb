@@ -27,7 +27,7 @@ namespace model {
 				PropertyReference
 			};
 
-			Base(unsigned char confidence) {
+                        Base(unsigned char confidence = 100) {
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
 			}

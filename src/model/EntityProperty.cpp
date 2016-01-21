@@ -1,25 +1,36 @@
 #include "./EntityProperty.h"
 #include <cstring>
 #include <vector>
+#include "TypeSerialiser.h"
+
+template <typename T>
+void EntityProperty<T>::initSubtype()
+{
+    using namespace model::types;
+    Base* b = new T();
+    _subtype = b->subtype();
+    delete b;
+}
 
 template <typename T>
 EntityProperty<T>::EntityProperty()
 {
-	// Nothing to do - key will automatically be empty.
+    initSubtype();
 }
 
 template <typename T>
 EntityProperty<T>::EntityProperty(const unsigned int& key) :
 	_key(key)
 {
-
+    initSubtype();
 }
 
 template <typename T>
 EntityProperty<T>::EntityProperty(const unsigned int& key,
 	const std::vector<T*> &values) : _key(key)
 {
-	append(values);
+    initSubtype();
+    append(values);
 }
 
 template <typename T>

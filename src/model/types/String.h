@@ -13,7 +13,7 @@ namespace model {
                     friend class TypeSerialiser;
                         std::string _value;
 		public:
-
+                        String() : _value(), Base(100) {}
                         String(const std::string value) : _value(value), Base(100) {}
                         String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value) {}
 

@@ -128,8 +128,8 @@ public:
 private:
     void deleteAllProperties();
 
-	const EHandle_t	handle_;
-	const unsigned int _type;
+        EHandle_t	handle_;
+        unsigned int _type;
 
 	std::map<unsigned int, IEntityProperty*> _propertyTable;
 	std::vector<Entity*> _linkedEntities;

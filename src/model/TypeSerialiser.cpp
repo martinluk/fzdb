@@ -35,28 +35,43 @@ namespace model
             return bytesSerialised;
         }
 
-        Base* TypeSerialiser::unserialise(const char *serialisedData)
+        Base* TypeSerialiser::unserialise(const char* serialisedData, std::size_t* advance)
         {
+            const char* begin = serialisedData;
+
             const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
             serialisedData += sizeof(SerialHeader);
+            Base* b = NULL;
 
             switch (pHeader->subtype)
             {
             case Base::Subtype::TypeUndefined:
-                return new Base(serialisedData);
+                b = new Base(serialisedData);
+                break;
 
             case Base::Subtype::TypeInt32:
-                return new Int(serialisedData);
+                b = new Int(serialisedData);
+                break;
 
             case Base::Subtype::TypeString:
-                return new String(serialisedData);
+                b = new String(serialisedData);
+                break;
 
             case Base::Subtype::TypeEntityRef:
-                return new EntityRef(serialisedData);
+                b = new EntityRef(serialisedData);
+                break;
 
             default:
-                return NULL;
+                b = NULL;
+                break;
             }
+
+            if ( advance )
+            {
+                *advance = serialisedData - begin;
+            }
+
+            return b;
         }
     }
 }
