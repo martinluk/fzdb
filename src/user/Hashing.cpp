@@ -27,3 +27,8 @@ std::string Hashing::genSalt() {
 	ssalt.erase(std::remove(ssalt.begin(), ssalt.end(), '-'), ssalt.end());
 	return ssalt;
 }
+
+std::string Hashing::hashPassword(std::string userName, std::string password) {
+	return sha1hash(userName+password);
+
+}
