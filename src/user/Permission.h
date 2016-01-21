@@ -3,21 +3,21 @@
  * Permission
  * This class provides methods that given UserGroup enum, asserts whether usergroup has given permission
  */
-enum UserGroup { GUEST, EDITOR, ADMIN };
-enum PermissionType {ViewDB, ModifyDB, UserOp};
+enum class UserGroup { GUEST, EDITOR, ADMIN };
+enum class PermissionType {ViewDB, ModifyDB, UserOp};
 class Permission {
 	public:
-		void assertViewDBPermission(UserGroup group);
-		void assertModifyDBPermission(UserGroup group);
-		void assertUserOpPermission(UserGroup group);
+		static void assertViewDBPermission(UserGroup group);
+		static void assertModifyDBPermission(UserGroup group);
+		static void assertUserOpPermission(UserGroup group);
 
 	private: 
-		bool checkPermission(UserGroup group, PermissionType permType);
-		void assertPermission(UserGroup group, PermissionType permType);
+		static bool checkPermission(UserGroup group, PermissionType permType);
+		static void assertPermission(UserGroup group, PermissionType permType);
 		//TODO Can be refactored using a struct
-		bool guestPermission(PermissionType permType);
-		bool editorPermission(PermissionType permType);
-		bool adminPermission(PermissionType permType);
+		static bool guestPermission(PermissionType permType);
+		static bool editorPermission(PermissionType permType);
+		static bool adminPermission(PermissionType permType);
 };
 
 using std::runtime_error;
