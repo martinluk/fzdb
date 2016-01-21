@@ -1,8 +1,7 @@
 #include <user/UserLogin.h>
-#include <user/Hashing.h>
+//#include <user/Permission.h>
 #include <boost/filesystem.hpp>
-
-
+#include <user/Hashing.h>
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
 	return boost::filesystem::current_path().string();
@@ -60,13 +59,27 @@ UserGroup UserCommonOperation::login(std::string userName, std::string password)
 		throw new LoginUnsuccessfulException;
 	}
 	std::string actualHash = currUserAttr.passwordHash;
-	Hashing h;
 	std::string currSalt = currUserAttr.salt;
-	std::string ourHash = h.hashPassword(userName, currSalt , password);
+	std::string ourHash = Hashing::hashPassword(userName, currSalt , password);
 	if (ourHash != actualHash) {
 		throw new LoginUnsuccessfulException;
 	}
 	return currUserAttr.userGroup;
+}
+
+void UserAdmin::addUser(UserGroup currentUserGroup, std::string userName, std::string password, UserGroup userGroup) {
+	Permission::assertUserOpPermission(currentUserGroup);
+	UserAttributes a;
+	a.userName=userName;
+	a.salt=Hashing::genSalt();
+	a.passwordHash=Hashing::hashPassword(userName,a.salt,password);
+	a.userGroup=userGroup;
+	super::addUser(a);
+}
+void UserAdmin::removeUser(UserGroup currentUserGroup, std::string currentUserName,std::string userName) {
+
+}
+void UserAdmin::changeUserGroup(UserGroup currentUserGroup, std::string currentUserName,std::string userName, UserGroup newUserGroup) {
 
 }
 
