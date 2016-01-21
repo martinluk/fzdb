@@ -1,4 +1,5 @@
 #include <user/UserLogin.h>
+#include <user/Hashing.h>
 #include <boost/filesystem.hpp>
 
 
@@ -11,7 +12,7 @@ void UserFileOperations::addUser(UserAttributes userAttributes) {
 	loadCacheFromFile();
 	//Assert that no such user already exist, otherwise throw exception
 	std::string newUserName=userAttributes.userName;
-	if (this->userFileCache.count(newUserName)==0) {
+	if (userFileCache.count(newUserName)==0) {
 		throw new UserAlreadyExistException;
 	}
 	//Add into cache
@@ -22,32 +23,51 @@ void UserFileOperations::addUser(UserAttributes userAttributes) {
 void UserFileOperations::removeUser(std::string userName) {
 	//load cache from file
 	loadCacheFromFile();
-	if((this->userFileCache.count(userName))>0) {
+	if((userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
 	//Remove the entry
-	this->userFileCache.erase(userName);
+	userFileCache.erase(userName);
 	//save cache from file
 	saveCacheToFile();
 }
 void UserFileOperations::updateUser(std::string userName, UserAttributes newAttributes) {
 	//load cache from file
 	loadCacheFromFile();
-	if((this->userFileCache.count(userName))>0) {
+	if((userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
 	//Update user attribute at 
-	this->userFileCache[userName]=newAttributes;
+	userFileCache[userName]=newAttributes;
 	//save cache from file
 	saveCacheToFile();
 }
 UserAttributes UserFileOperations::getUserAttributes(std::string userName){
 	//load cache from file
 	loadCacheFromFile();
-	if((this->userFileCache.count(userName))>0) {
+	if((userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
-	return this->userFileCache[userName];
+	return userFileCache[userName];
+}
+
+UserGroup UserCommonOperation::login(std::string userName, std::string password) {
+	UserAttributes currUserAttr;
+	//See if user exist
+	try {
+		currUserAttr = getUserAttributes(userName);
+	} catch (UserNotExistException e ){
+		throw new LoginUnsuccessfulException;
+	}
+	std::string actualHash = currUserAttr.passwordHash;
+	Hashing h;
+	std::string currSalt = currUserAttr.salt;
+	std::string ourHash = h.hashPassword(userName, currSalt , password);
+	if (ourHash != actualHash) {
+		throw new LoginUnsuccessfulException;
+	}
+	return currUserAttr.userGroup;
+
 }
 
 //TODO

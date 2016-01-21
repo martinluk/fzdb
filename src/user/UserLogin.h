@@ -22,13 +22,18 @@ class UserAlreadyExistException : public runtime_error {
 		   UserAlreadyExistException(): runtime_error("user already exist") {}
 };
 
+class LoginUnsuccessfulException : public runtime_error { 
+	public:
+		LoginUnsuccessfulException(): runtime_error("Login-name/password combination not correct") {}
+};
+
 
 class UserFileOperations {
 	protected: 
 		void addUser(UserAttributes userAttributes);
 		void removeUser(std::string userName);
 		void updateUser(std::string userName,UserAttributes newAttributes);
-		UserAttributes getUserAttributes(std::string userName);
+		static UserAttributes getUserAttributes(std::string userName);
 	private:
 		UserFileOperations() {};
 		static void loadCacheFromFile();
@@ -42,7 +47,7 @@ std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
 class UserCommonOperation : public UserFileOperations { 
 	public : 
-		UserGroup login(std::string userName, std::string password);
+		static UserGroup login(std::string userName, std::string password);
 };
 
 class UserAdmin : public UserFileOperations {

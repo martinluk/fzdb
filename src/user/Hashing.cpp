@@ -28,7 +28,7 @@ std::string Hashing::genSalt() {
 	return ssalt;
 }
 
-std::string Hashing::hashPassword(std::string userName, std::string password) {
-	return sha1hash(userName+password);
+std::string Hashing::hashPassword(std::string userName, std::string salt, std::string password) {
+	return sha1hash(userName+salt+password);
 
 }
