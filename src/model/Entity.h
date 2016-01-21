@@ -62,6 +62,8 @@ public:
 	// Returns this entity's handle.
 	EHandle_t getHandle() const;
 
+        unsigned int getType() const;
+
 	// Setters:
 
 	// Inserts the given property into this entity.

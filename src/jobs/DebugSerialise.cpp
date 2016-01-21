@@ -84,6 +84,8 @@ std::string testSerialise(const Entity* ent)
 std::string printEntity(const Entity* ent)
 {
     return std::string("Entity(")
+            + std::to_string(ent->getType()) + std::string(", ")
+            + std::to_string(ent->getHandle()) + std::string(", ")
             + std::to_string(ent->propertyCount())
             + std::string(")");
 }
@@ -94,7 +96,7 @@ std::string printEntityProperty(const IEntityProperty* prop)
 
     for ( int i = 0; i < prop->count(); i++ )
     {
-        str += std::string(",\n") + prop->baseValue(i)->logString();
+        str += std::string(",\n    ") + prop->baseValue(i)->logString();
     }
 
     str += std::string("\n)");
@@ -170,12 +172,24 @@ QueryResult DebugSerialise::execute()
     log << "\n";
 
     Entity ent(12345, 67890);
-    std::vector<String*> values;
-    values.push_back(new String("This", 100));
-    values.push_back(new String("Is", 90));
-    values.push_back(new String("A", 80));
-    values.push_back(new String("Test", 72));
-    ent.insertProperty<String>(new EntityProperty<String>(1, values));
+
+    {
+        std::vector<String*> values;
+        values.push_back(new String("This", 100));
+        values.push_back(new String("Is", 90));
+        values.push_back(new String("A", 80));
+        values.push_back(new String("Test", 72));
+        ent.insertProperty<String>(new EntityProperty<String>(1, values));
+    }
+
+    {
+        std::vector<Int*> values;
+        values.push_back(new Int(1337, 100));
+        values.push_back(new Int(420, 90));
+        values.push_back(new Int(8008, 80));
+        values.push_back(new Int(2112, 72));
+        ent.insertProperty<Int>(new EntityProperty<Int>(2, values));
+    }
 
     log << "Testing serialisation of Entity.\n";
     log << testSerialise(&ent) << "\n";
@@ -188,10 +202,15 @@ QueryResult DebugSerialise::execute()
         log << "Unserialised entity: " << printEntity(newEnt) << "\nProperties:\n";
 
         const std::map<unsigned int, IEntityProperty*> &propTable = newEnt->properties();
+        bool begin = true;
         for ( auto it = propTable.cbegin(); it != propTable.cend(); ++it )
         {
-            log << printEntityProperty(it->second) << "\n";
+            if ( !begin ) log << ",\n";
+            log << printEntityProperty(it->second);
+            begin = false;
         }
+
+        log << "\n";
 
         delete newEnt;
     }

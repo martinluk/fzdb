@@ -62,3 +62,8 @@ void Entity::deleteAllProperties()
         delete it->second;
     }
 }
+
+unsigned int Entity::getType() const
+{
+    return _type;
+}
