@@ -40,7 +40,10 @@ void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command
 		}
 	}
 	catch (ParseException ex) {
-                session->respond(QueryResult::generateError(std::string("Parse error: ") +  ex.what()).toJSON());
+		session->respond(QueryResult::generateError(std::string("Parse error: ") +  ex.what()).toJSON());
+	}
+	catch (std::exception& ex) {
+		session->respond(QueryResult::generateError(std::string("Unexpected error: ") + ex.what()).toJSON());
 	}
 }
 

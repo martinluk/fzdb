@@ -22,7 +22,7 @@ namespace model {
 
                         virtual Subtype subtype() const
                         {
-                            return TypeEntityRef;
+                            return Subtype::TypeEntityRef;
                         }
 
                         virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
@@ -37,6 +37,14 @@ namespace model {
                                     + std::to_string(confidence()) + std::string(")");
                         }
 
+			// Inherited via Base
+			virtual bool Equals(const std::string val) override {
+				return _value == std::stoll(val);
+			}
+
+			virtual std::string toString() override {
+				return std::to_string(_value);
+			}
                 protected:
                         EntityRef(const char* &serialisedData) : Base(serialisedData)
                         {

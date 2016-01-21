@@ -42,16 +42,16 @@ namespace model
 
             switch (pHeader->subtype)
             {
-            case Base::TypeUndefined:
+            case Base::Subtype::TypeUndefined:
                 return new Base(serialisedData);
 
-            case Base::TypeInt32:
+            case Base::Subtype::TypeInt32:
                 return new Int(serialisedData);
 
-            case Base::TypeString:
+            case Base::Subtype::TypeString:
                 return new String(serialisedData);
 
-            case Base::TypeEntityRef:
+            case Base::Subtype::TypeEntityRef:
                 return new EntityRef(serialisedData);
 
             default:

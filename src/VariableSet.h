@@ -5,17 +5,16 @@
 #include <string>
 #include <map>
 #include <typeinfo>
+#include <stdexcept>
+
+#include "model/types/Base.h"
+
+using VariableType = model::types::Base::Subtype;
 
 
 class VariableSet {
 
 public:
-
-	enum class VariableType {
-		STRING,
-		INT,
-		ENTITYREF
-	};
 
 	VariableSet() { }
 	
@@ -33,6 +32,22 @@ public:
 
 	const std::map<std::string, std::pair<std::vector<std::string>, VariableType>> getData() {
 		return _data;
+	}
+
+	const bool contains(std::string name) {
+		return _data.find(name) != _data.cend();
+	}
+
+	const VariableType typeOf(std::string name) {
+		return _data[name].second;
+	}
+
+	const std::vector<std::string> getValuesFor(std::string name) {
+		return _data[name].first;
+	}
+
+	void replaceValuesFor(std::string name, std::vector<std::string> data) {
+		_data[name].first = data;
 	}
 
 private:

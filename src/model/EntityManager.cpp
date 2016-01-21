@@ -5,6 +5,7 @@
 EntityManager::EntityManager()
 {
 	_lastHandle = Entity::INVALID_EHANDLE;
+	_lastProperty = 0;
 }
 
 EntityManager::~EntityManager()
@@ -107,52 +108,64 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 	std::vector<Entity::EHandle_t> passed;
 	VariableSet result;
 
-	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
+	//sort by entropy
+	std::sort(conditions.begin(), conditions.end(), [](model::Triple t1, model::Triple t2) { return t1.Entropy() < t2.Entropy(); });
 
-		Entity* currentEntity = iter->second;
-		std::map<std::string, std::string> variableAssignments;
-		
-		for (auto conditionsIter = conditions.cbegin(); conditionsIter != conditions.end(); conditionsIter++) {
+	//iterate over conditions
+	for (auto conditionsIter = conditions.cbegin(); conditionsIter != conditions.end(); conditionsIter++) {
 
-			if (conditionsIter->subject.type == model::Subject::Type::ENTITYREF && conditionsIter->object.type == model::Object::Type::VARIABLE) {
-				
-			}
+		//There are 7 valid combinations
 
-			if (conditionsIter->subject.type == model::Subject::Type::VARIABLE && ((int)conditionsIter->object.type & model::Object::VALUE_MASK)) {
-
-				//get the property id
-				unsigned int propertyId = _propertyNames[conditionsIter->predicate.value];
-
-				//if the current entity has the property
-				if (currentEntity->hasProperty(propertyId)) {
-					
-					bool conditionIsTrue = false;
-
-					//match based on type in the triple
-					switch (conditionsIter->object.type) {
-					case model::Object::Type::STRING: {
-                                                std::vector<model::types::String*> val = currentEntity->getProperty<model::types::String>(propertyId)->values();
-                                                conditionIsTrue = val[0]->value() == conditionsIter->object.value;
-						break;
-					}
-					case model::Object::Type::INT: {
-                                                std::vector<model::types::Int*> val = currentEntity->getProperty<model::types::Int>(propertyId)->values();
-                                                conditionIsTrue = atoi(conditionsIter->object.value.c_str()) == val[0]->value();
-						break;
-					}
-					}					
-
-					if (conditionIsTrue) {
-						result.add(std::move(conditionsIter->subject.value), std::to_string(currentEntity->getHandle()), VariableSet::VariableType::ENTITYREF);
-					}
+		if (conditionsIter->subject.type == model::Subject::Type::VARIABLE) {
+			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//option 1 - $a <prop> value
+					this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
 				}
-			}			
+				else {
+					//option 2 - $a <prop> $b
+					this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value);
+				}
+			}
+			else {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//option3 - $a $b value
+					//this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
+					throw NotImplementedException("Queries of the form $a $b value are not yet implemented");
+				}
+				else {
+					//option 4 - $a $b $c
+					this->Scan4(std::move(result), conditionsIter->subject.value, conditionsIter->predicate.value, conditionsIter->object.value);
+				}
+			}
+		}
+		else {
+			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//doesn't contain any variables.. is meaningless
+				}
+				else {
+					//option 5 - entity <prop> $c
+					this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate), conditionsIter->object.value);
+				}
+			}
+			else {
+				if (model::Object::IsValue(conditionsIter->object.type)) {
+					//option 7 - entity $b value
+					throw NotImplementedException("Queries of the form entity $b value are not yet implemented");
+				}
+				else {
+					//option 8 - entity $b $c
+					throw NotImplementedException("Queries of the form entity $b $c are not yet implemented");
+				}
+			}
 		}
 	}
 
 	return result;
 }
 
+//Inserts new data into the data store
 void EntityManager::Insert(std::vector<model::Triple> triples) {
 	auto iter = triples.cbegin();
 	auto end = triples.cend();
@@ -163,21 +176,28 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		//create the entity if it doesn't exist
 		if (_entities.find(entity_id) == _entities.end()) {
-			_entities[entity_id] = new Entity(1);
+			_entities[entity_id] = new Entity(1, ++_lastHandle);
 		}
 
-		Entity* currentEntity = _entities[entity_id];
+		Entity* currentEntity = _entities[entity_id];		
+		unsigned int propertyId;
 
-		unsigned int propertyId = _propertyNames[triple.predicate.value];
-
-		//add property
-		if (currentEntity->hasProperty(propertyId)) {
-                        currentEntity->getProperty<model::types::String>(propertyId)->append(new model::types::String(triple.object.value, 80));
+		switch (triple.object.type) {
+		case model::Object::Type::STRING:
+			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeString, true);
+			this->addToEntity<model::types::String, std::string>(currentEntity, propertyId, std::move(triple.object),
+				[](std::string str) { return str; });
+			break;
+		case model::Object::Type::ENTITYREF:
+			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeEntityRef, true);
+			this->addToEntity<model::types::EntityRef, Entity::EHandle_t>(currentEntity, propertyId, std::move(triple.object),
+				[](std::string str) { return std::stoll(str); });
+			break;
+		case model::Object::Type::INT:
+			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeInt32, true);
+			this->addToEntity<model::types::Int, int>(currentEntity, propertyId, std::move(triple.object),
+				[](std::string str) { return std::stoi(str); });
+			break;
 		}
-		else {
-                        currentEntity->insertProperty<model::types::String>(new EntityProperty<model::types::String>(propertyId, std::vector < model::types::String*> {
-                                new model::types::String(triple.object.value, 80)
-			}));
-		}		
 	}
 }

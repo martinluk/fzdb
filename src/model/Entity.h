@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+#include "./Triple.h"
+
 #include "./EntityProperty.h"
 
 // Represents an entity in the graph database.
@@ -52,6 +54,11 @@ public:
 		return new EntityProperty<T>();
 	}
 
+	IEntityProperty* getProperty(const unsigned int &key) const {
+		auto it = _propertyTable.find(key);
+		return it->second;
+	}
+
 	// Returns this entity's handle.
 	EHandle_t getHandle() const;
 
@@ -74,6 +81,33 @@ public:
 
 	// Tests if the entity has a property
 	bool hasProperty(const unsigned int &key);
+
+	// Returns read only reference to the property table
+	const std::map<unsigned int, IEntityProperty*>& properties() const {
+		return _propertyTable;
+	}
+
+	// Tests if the entity meets the condition
+	bool meetsCondition(unsigned int propertyId, const model::Object&& obj) {
+		if (!hasProperty(propertyId)) return false;
+
+		switch (obj.type) {
+			case model::Object::Type::STRING: {
+				auto val = getProperty<model::types::String>(propertyId)->values();
+				return val[0]->Equals(obj.value);
+			}
+			case model::Object::Type::INT: {
+				auto val = getProperty<model::types::Int>(propertyId)->values();
+				return val[0]->Equals(obj.value);
+			}
+			case model::Object::Type::ENTITYREF: {
+				auto val = getProperty<model::types::EntityRef>(propertyId)->values();
+				return val[0]->Equals(obj.value);
+			}
+			default:
+				return false;
+		}		
+	}
 
 	// Clears all properties on the entity.
 	void clearProperties();

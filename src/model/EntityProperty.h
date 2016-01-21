@@ -12,12 +12,11 @@
 
 class IEntityProperty {
 public:
-	virtual ~IEntityProperty() {
-		bool a = true;
-	}
+	virtual ~IEntityProperty() {}
 	virtual int count() const = 0;
-        virtual model::types::Base* baseValue(int index) const = 0;
-        virtual unsigned int key() const = 0;
+	virtual std::vector<model::types::Base*> baseValues() const = 0;
+	virtual unsigned int key() const = 0;
+	virtual model::types::Base* baseValue(int index) const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -44,8 +43,9 @@ class EntityProperty : public IEntityProperty
 		// isNull() will return true.
 		EntityProperty();
 		EntityProperty(const unsigned int &key);
-                EntityProperty(const unsigned int &key, const std::vector<T*> &values);
-                ~EntityProperty();
+		~EntityProperty();
+		EntityProperty(const unsigned int &key,
+			const std::vector<T*> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
 		// Internally, a property is null if its key is an empty string.
@@ -61,8 +61,19 @@ class EntityProperty : public IEntityProperty
 
 		// Getters
 		const unsigned int& keyRef() const;
-                std::vector<T*> values() const;
-                T* value(int index) const;
+		std::vector<T*> values() const;
+
+		std::vector<model::types::Base*> baseValues() const override {
+			std::vector<model::types::Base*> out;
+			for (auto vals : _values) out.push_back(vals);
+			return out;
+		}
+
+		T* value(int index) const;
+
+		//T getValue(unsigned int index);
+
+		//bool containsValue(T value);
 
                 virtual int count() const;
                 virtual model::types::Base* baseValue(int index) const;
@@ -71,18 +82,22 @@ class EntityProperty : public IEntityProperty
 		// Setters:
 
 		// Appends a value to the value list.
-                void append(T* value);
+		void append(T* value);
 
 		// Appends a list of values.
-                void append(const std::vector<T*> &list);
+		void append(const std::vector<T*> &list);
+
+		// Makes this property concrete, with the given variant value.
+		//void setConcrete(const Variant &value);
 
 		// Clears this property of any values.
 		void clear();
 
 	private:
-            void deleteAllValues();
+		void deleteAllValues();
 		unsigned int _key;
-                std::vector<T*> _values;
+		std::vector<T*> _values;
+		//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

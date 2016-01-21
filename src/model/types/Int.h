@@ -18,10 +18,10 @@ namespace model {
 
 			int32_t value() { return _value; }
 
-                        virtual Subtype subtype() const
-                        {
-                            return TypeInt32;
-                        }
+			virtual Subtype subtype() const
+			{
+				return Subtype::TypeInt32;
+			}
 
                         virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
                         {
@@ -34,6 +34,15 @@ namespace model {
                             return std::string("Int(") + std::to_string(_value) + std::string(",")
                                     + std::to_string(confidence()) + std::string(")");
                         }
+
+			// Inherited via Base
+			virtual bool Equals(const std::string val) override {
+				return _value == std::stoi(val);
+			}
+
+			virtual std::string toString() override {
+				return std::to_string(_value);
+			}
 
                 protected:
                         Int(const char* &serialisedData) : Base(serialisedData)

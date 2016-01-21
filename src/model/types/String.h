@@ -21,7 +21,7 @@ namespace model {
 
                         virtual Subtype subtype() const
                         {
-                            return TypeString;
+                            return Subtype::TypeString;
                         }
 
                         virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
@@ -40,6 +40,15 @@ namespace model {
                             return std::string("String(\"") + _value + std::string("\",")
                                     + std::to_string(confidence()) + std::string(")");
                         }
+
+			virtual std::string toString() override {
+				return _value;
+			}
+
+			// Inherited via Base
+			virtual bool Equals(const std::string val) override {
+				return _value == val;
+			}
 
                 protected:
                         String(const char* &serialisedData) : Base(serialisedData)

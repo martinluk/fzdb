@@ -8,23 +8,36 @@
 
 namespace model {
 	namespace types {
-                class Base : public ILogString
-                {
+		class Base : public ILogString
+		{
 		private:
-                    friend class TypeSerialiser;
-                    unsigned char _confidence;
+			friend class TypeSerialiser;
+			unsigned char _confidence;
+
 		public:
-                        enum Subtype
-                        {
-                            TypeUndefined = 0,
-                            TypeInt32,
-                            TypeString,
-                            TypeEntityRef
-                        };
+
+			enum class Subtype
+			{
+				TypeUndefined = 0,
+				TypeInt32,
+				TypeString,
+				TypeEntityRef,
+
+				//Doesn't have an associated type
+				PropertyReference
+			};
 
 			Base(unsigned char confidence) {
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
+			}
+
+			virtual bool Equals(const std::string val) {
+				return false;
+			};
+
+			virtual std::string toString() {
+				return "";
 			}
 
 			unsigned char confidence() const {
@@ -37,7 +50,7 @@ namespace model {
 
                         virtual Subtype subtype() const
                         {
-                            return TypeUndefined;
+                            return Subtype::TypeUndefined;
                         }
 
                         virtual std::string logString() const
