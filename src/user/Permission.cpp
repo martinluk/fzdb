@@ -1,25 +1,26 @@
-#include "./Permission.h"
+#include <user/Permission.h>
 #include <cassert>
 
+
 void Permission::assertViewDBPermission(UserGroup group) {
-	assertPermission(group, ViewDB);
+	assertPermission(group, PermissionType::ViewDB);
 }
 
 void Permission::assertModifyDBPermission(UserGroup group) {
-	assertPermission(group, ModifyDB);
+	assertPermission(group, PermissionType::ModifyDB);
 }
 
 void Permission::assertUserOpPermission(UserGroup group) {
-	assertPermission(group, UserOp);
+	assertPermission(group, PermissionType::UserOp);
 }
 
 bool Permission::checkPermission(UserGroup group, PermissionType permType) {
 	switch(group) {
-		case GUEST:
+		case UserGroup::GUEST:
 			return guestPermission(permType);
-		case EDITOR:
+		case UserGroup::EDITOR:
 			return editorPermission(permType);
-		case ADMIN:
+		case UserGroup::ADMIN:
 			return adminPermission(permType);
 		default:
 			//A new user group was added, but permission is not updated here.
@@ -35,11 +36,11 @@ void Permission::assertPermission(UserGroup group, PermissionType permType){
 
 bool Permission::guestPermission(PermissionType permType) {
 	switch(permType) {
-		case ViewDB:
+		case PermissionType::ViewDB:
 			return true;
-		case ModifyDB:
+		case PermissionType::ModifyDB:
 			return false;
-		case UserOp:
+		case PermissionType::UserOp:
 			return false;
 		default:
 			//A new user group was added, but permission is not updated here.
@@ -49,11 +50,11 @@ bool Permission::guestPermission(PermissionType permType) {
 
 bool Permission::editorPermission(PermissionType permType) {
 	switch(permType) {
-		case ViewDB:
+		case PermissionType::ViewDB:
 			return true;
-		case ModifyDB:
+		case PermissionType::ModifyDB:
 			return true;
-		case UserOp:
+		case PermissionType::UserOp:
 			return false;
 		default:
 			//A new user group was added, but permission is not updated here.
@@ -63,11 +64,11 @@ bool Permission::editorPermission(PermissionType permType) {
 
 bool Permission::adminPermission(PermissionType permType) {
 	switch(permType) {
-		case ViewDB:
+		case PermissionType::ViewDB:
 			return true;
-		case ModifyDB:
+		case PermissionType::ModifyDB:
 			return false;
-		case UserOp:
+		case PermissionType::UserOp:
 			return true;
 		default:
 			//A new user group was added, but permission is not updated here.
