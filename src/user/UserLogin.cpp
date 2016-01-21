@@ -87,10 +87,10 @@ void UserAdmin::changeUserGroup(UserGroup currentUserGroup,std::string userName,
 	super::updateUser(a.userName,a);
 }
 
-//TODO
+//TODO I am going to use Boost serialization to do this, hopefully do it tomorrow
 void UserFileOperations::loadCacheFromFile() {
 }
-//TODO
+//TODO I am going to use Boost serialization to do this, hopefully do it tomorrow
 void UserFileOperations::saveCacheToFile() {
 }
 
