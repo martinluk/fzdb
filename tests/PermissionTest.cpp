@@ -14,22 +14,22 @@ protected:
 
 TEST_F(PermissionTest, assertViewDBPermission) {
 	Permission p;
-	p.assertViewDBPermission(GUEST);
-	p.assertViewDBPermission(EDITOR);
-	p.assertViewDBPermission(ADMIN);
+	p.assertViewDBPermission(UserGroup::GUEST);
+	p.assertViewDBPermission(UserGroup::EDITOR);
+	p.assertViewDBPermission(UserGroup::ADMIN);
 }
 
 TEST_F(PermissionTest, assertModifyDBPermission) {
 	Permission p;
 	try {
-		p.assertModifyDBPermission(GUEST);
+		p.assertModifyDBPermission(UserGroup::GUEST);
 		FAIL();
 	} catch (UserPermissionException &e) {
 
 	}
-	p.assertModifyDBPermission(EDITOR);
+	p.assertModifyDBPermission(UserGroup::EDITOR);
 	try {
-		p.assertModifyDBPermission(ADMIN);
+		p.assertModifyDBPermission(UserGroup::ADMIN);
 		FAIL();
 	} catch (UserPermissionException &e) {
 
@@ -39,17 +39,17 @@ TEST_F(PermissionTest, assertModifyDBPermission) {
 TEST_F(PermissionTest, assertUserOpPermission) {
 	Permission p;
 	try {
-		p.assertUserOpPermission(GUEST);
+		p.assertUserOpPermission(UserGroup::GUEST);
 		FAIL();
 	} catch (UserPermissionException &e) {
 
 	}
 	try {
-		p.assertUserOpPermission(EDITOR);
+		p.assertUserOpPermission(UserGroup::EDITOR);
 		FAIL();
 	} catch (UserPermissionException &e) {
 
 	}
-	p.assertUserOpPermission(ADMIN);
+	p.assertUserOpPermission(UserGroup::ADMIN);
 }
 
