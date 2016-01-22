@@ -2,13 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-#ifdef WINDOWS
-    #include <direct.h>
-    #define GetCurrentDir _getcwd
-#else
-    #include <unistd.h>
-    #define GetCurrentDir getcwd
- #endif
+#include <boost/filesystem.hpp>
 
 namespace FileSystem
 {
@@ -38,10 +32,7 @@ namespace FileSystem
     }
     
     std::string workingDirectory()
-    {
-        char path[FILENAME_MAX];
-        GetCurrentDir(path, FILENAME_MAX);
-        path[FILENAME_MAX-1] = '\0';
-        return std::string(path);
+    {		
+		return boost::filesystem::current_path().generic_string();
     }
 }
