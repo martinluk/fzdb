@@ -17,6 +17,7 @@
 // We also need mutexes!
 class EntityManager
 {
+    friend class GraphSerialiser;
 public:
 	EntityManager();
 	~EntityManager();
@@ -35,6 +36,8 @@ public:
 	bool EntityExists(Entity::EHandle_t handle) {
 		return _entities.find(handle) != _entities.cend();
 	}
+    
+    std::vector<Entity*> entityList() const;
 
 private:	
 
@@ -49,6 +52,8 @@ private:
 	std::map<std::string, unsigned int> _entityTypeNames;
 	std::map<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
+    
+    void insertEntity(Entity* ent);
 
 	//TODO: Add more type checking
 	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {

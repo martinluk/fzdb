@@ -2,6 +2,7 @@
 #include <vector>
 #include "../Util.h"
 #include "DebugSerialise.h"
+#include "DebugSaveFile.h"
 
 DebugJob::DebugJob(ISession *session, std::string message) : Job(session)
 {
@@ -23,6 +24,10 @@ QueryResult DebugJob::execute()
     if ( list[0] == "SERIALISE" )
     {
         return DebugSerialise::execute();
+    }
+    else if ( list[0] == "SAVEFILE" )
+    {
+        return DebugSaveFile::execute();
     }
 
     QueryResult result;
