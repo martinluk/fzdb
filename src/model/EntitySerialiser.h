@@ -11,7 +11,7 @@ class EntitySerialiser
 public:
     EntitySerialiser(const Entity* ent);
 
-    std::size_t serialise(Serialiser &serialiser);
+    std::size_t serialise(Serialiser &serialiser) const;
     static Entity* unserialise(const char* serialData);
 
 private:

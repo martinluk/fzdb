@@ -27,7 +27,7 @@ EntitySerialiser::EntitySerialiser(const Entity *ent) : _entity(ent)
 
 }
 
-std::size_t EntitySerialiser::serialise(Serialiser &serialiser)
+std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
 {
     typedef std::map<unsigned int, IEntityProperty*> PropertyTable;
 

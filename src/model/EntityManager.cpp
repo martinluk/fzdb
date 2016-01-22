@@ -78,7 +78,7 @@ QueryResult EntityManager::SeparateTriples(std::vector<model::Triple> conditions
 				variables[vars[0]].push_back(vars[2]);
 			}
 
-			if (variables.find(vars[2]) == variables.end()) {
+	 		if (variables.find(vars[2]) == variables.end()) {
 				variables[vars[2]] = vars;
 			}
 			else {
@@ -149,7 +149,7 @@ VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
 					this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate), conditionsIter->object.value);
 				}
 			}
-			else {
+	 		else {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
 					//option 7 - entity $b value
 					throw NotImplementedException("Queries of the form entity $b value are not yet implemented");
@@ -200,4 +200,28 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 			break;
 		}
 	}
+}
+
+std::vector<Entity*> EntityManager::entityList() const
+{
+    std::vector<Entity*> list;
+    
+    for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
+    {
+        list.push_back(it->second);
+    }
+    
+    return list;
+}
+
+// TODO: Do we need some sort of handle renumber function too?
+void EntityManager::insertEntity(Entity *ent)
+{
+    assert(ent->getHandle() != Entity::INVALID_EHANDLE);
+    assert(_entities.find(ent->getHandle()) == _entities.end());
+    
+    if ( _lastHandle < ent->getHandle() )
+        _lastHandle = ent->getHandle();
+    
+    _entities.insert(std::pair<Entity::EHandle_t, Entity*>(ent->getHandle(), ent));
 }

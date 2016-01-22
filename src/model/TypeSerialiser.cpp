@@ -18,7 +18,7 @@ namespace model
         {
         }
 
-        std::size_t TypeSerialiser::serialise(Serialiser &serialiser)
+        std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
         {
             std::size_t initialSize = serialiser.size();
             SerialHeader header;
