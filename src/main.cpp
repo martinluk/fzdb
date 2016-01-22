@@ -5,6 +5,9 @@
 #include <iostream>
 #include <vector>
 
+#include <signal.h>
+#include <cassert>
+
 #include "./server.h"
 #include "./singletons.h"
 
@@ -12,6 +15,26 @@
 
 #include "model/EntityManager.h"
 #include "model/Triple.h"
+
+boost::asio::io_service* pIOService = NULL;
+
+void shutDownApplication()
+{
+    JobQueue::Shutdown();
+    Singletons::shutdown();
+}
+
+void sigHandler(int s)
+{
+    // Ctrl-C is signal 2. Should this even get called if it's a different signal?
+    assert(s == 2);
+    
+    std::cout << "Caught SIGINT, shutting down." << std::endl;
+    
+    pIOService->stop();     // This needs to be here before shutting down, or we don't actually stop.
+    shutDownApplication();
+    exit(0);
+}
 
 /**
  * @brief Entry point for the application
@@ -64,7 +87,8 @@ int main(int argc, char* argv[]) {
       } else { 
         std::cerr << argv[i] <<" option requires one argument." << std::endl;
         return 1;
-      }  
+      }    JobQueue::Shutdown();
+      Singletons::shutdown();
     }
   }
 
@@ -85,6 +109,12 @@ int main(int argc, char* argv[]) {
   {
       std::cout << "Log failed: " << ex.what() << std::endl;
   }
+  
+  struct sigaction sigIntHandler;
+  sigIntHandler.sa_handler = &sigHandler;
+  sigemptyset(&sigIntHandler.sa_mask);
+  sigIntHandler.sa_flags = 0;
+  sigaction(SIGINT, &sigIntHandler, NULL);
 
   /*
   *   START THE SERVER
@@ -99,6 +129,7 @@ int main(int argc, char* argv[]) {
     // Create the IO service.
     // This is essentially a link to the OS' IO system.
     boost::asio::io_service io_service;
+    pIOService = &io_service;
 
     // We use a work object to keep the service busy and prevent it from returning.
     boost::asio::io_service::work work(io_service);
@@ -119,7 +150,7 @@ int main(int argc, char* argv[]) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
 
-  JobQueue::Shutdown();
-  Singletons::shutdown();
+  shutDownApplication();
+  pIOService = NULL;
   return 0;
 }
