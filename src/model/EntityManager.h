@@ -79,17 +79,16 @@ private:
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 
-	template<typename T, typename S>
-	void addToEntity(Entity* currentEntity, unsigned int propertyId, model::Object&& object, std::function<S(std::string)> converter) {
-
+	template<typename T>
+	void addToEntity(Entity* currentEntity, unsigned int propertyId, model::Object&& object) {
 		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
 
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(new T(converter(object.value), confidence));
+			currentEntity->getProperty<T>(propertyId)->append(new T(object.value, confidence));
 		}
 		else {
 			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T*> {
-				new T(converter(object.value), confidence)
+				new T(object.value, confidence)
 			}));
 		}
 	}
