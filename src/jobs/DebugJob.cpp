@@ -3,6 +3,7 @@
 #include "../Util.h"
 #include "DebugSerialise.h"
 #include "DebugSaveFile.h"
+#include "DebugLoadFile.h"
 
 DebugJob::DebugJob(ISession *session, std::string message) : Job(session)
 {
@@ -28,6 +29,10 @@ QueryResult DebugJob::execute()
     else if ( list[0] == "SAVEFILE" )
     {
         return DebugSaveFile::execute();
+    }
+    else if ( list[0] == "LOADFILE" )
+    {
+        return DebugLoadFile::execute();
     }
 
     QueryResult result;

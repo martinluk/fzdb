@@ -11,31 +11,32 @@ namespace model {
 	namespace types {
 		class EntityRef : public Base {
 		private:
-                    friend class TypeSerialiser;
-                        EHandle_t _value;
+			friend class TypeSerialiser;
+			EHandle_t _value;
 		public:
-                        EntityRef() : _value(0), Base(100) {}
-                        EntityRef(const EHandle_t value) : _value(value), Base(100) {}
-                        EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value) {}
+			EntityRef() : _value(0), Base(100) {}
+			EntityRef(const EHandle_t value) : _value(value), Base(100) {}
+			EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value) {}
+			EntityRef(std::string value, unsigned char confidence) : EntityRef(std::atoll(value.c_str()), confidence) {}
 
 			EHandle_t value() { return _value; }
+			
+			virtual Subtype subtype() const
+			{
+				return Subtype::TypeEntityRef;
+			}
 
-                        virtual Subtype subtype() const
-                        {
-                            return Subtype::TypeEntityRef;
-                        }
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+			{
+				return Base::serialiseSubclass(serialiser)
+					+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
+			}
 
-                        virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-                        {
-                            return Base::serialiseSubclass(serialiser)
-                                    + serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
-                        }
-
-                        virtual std::string logString() const
-                        {
-                            return std::string("EntityRef(") + std::to_string(_value) + std::string(",")
-                                    + std::to_string(confidence()) + std::string(")");
-                        }
+			virtual std::string logString() const
+			{
+				return std::string("EntityRef(") + std::to_string(_value) + std::string(",")
+					+ std::to_string(confidence()) + std::string(")");
+			}
 
 			// Inherited via Base
 			virtual bool Equals(const std::string val) override {
@@ -45,12 +46,12 @@ namespace model {
 			virtual std::string toString() override {
 				return std::to_string(_value);
 			}
-                protected:
-                        EntityRef(const char* &serialisedData) : Base(serialisedData)
-                        {
-                            _value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
-                            serialisedData += sizeof(_value);
-                        }
+		protected:
+			EntityRef(const char* &serialisedData) : Base(serialisedData)
+			{
+				_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
+				serialisedData += sizeof(_value);
+			}
 		};
 	}
 }

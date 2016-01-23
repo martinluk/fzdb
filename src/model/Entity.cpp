@@ -1,4 +1,5 @@
 #include "./Entity.h"
+#include <stdexcept>
 
 const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 

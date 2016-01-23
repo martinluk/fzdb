@@ -95,6 +95,7 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
     // Record the total serialised size.
     SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
     pHeader->size = serialiser.size() - origSize;
+	return pHeader->size;
 }
 
 template <typename T>

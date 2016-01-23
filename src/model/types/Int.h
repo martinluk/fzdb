@@ -9,13 +9,14 @@ namespace model {
 	namespace types {
 		class Int : public Base {
 		private:
-                    friend class TypeSerialiser;
-                        int32_t _value;
+			friend class TypeSerialiser;
+			int32_t _value;
 
 		public:
-                        Int() : _value(0), Base(100) {}
-                        Int(const int32_t value) : _value(value), Base(100) {}
-                        Int(int32_t value, unsigned char confidence) : Base(confidence), _value(value) {}
+			Int() : _value(0), Base(100) {}
+			Int(const int32_t value) : _value(value), Base(100) {}
+			Int(int32_t value, unsigned char confidence) : Base(confidence), _value(value) {}
+			Int(std::string value, unsigned char confidence) : Int(std::atoi(value.c_str()), confidence) {}
 
 			int32_t value() { return _value; }
 
@@ -24,17 +25,17 @@ namespace model {
 				return Subtype::TypeInt32;
 			}
 
-                        virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-                        {
-                            return Base::serialiseSubclass(serialiser)
-                                    + serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
-                        }
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+			{
+				return Base::serialiseSubclass(serialiser)
+					+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
+			}
 
-                        virtual std::string logString() const
-                        {
-                            return std::string("Int(") + std::to_string(_value) + std::string(",")
-                                    + std::to_string(confidence()) + std::string(")");
-                        }
+			virtual std::string logString() const
+			{
+				return std::string("Int(") + std::to_string(_value) + std::string(",")
+					+ std::to_string(confidence()) + std::string(")");
+			}
 
 			// Inherited via Base
 			virtual bool Equals(const std::string val) override {
@@ -45,14 +46,14 @@ namespace model {
 				return std::to_string(_value);
 			}
 
-                protected:
-                        Int(const char* &serialisedData) : Base(serialisedData)
-                        {
-                            // Base will have incremented the pointer appropriately.
-                            // We can now copy in our value.
-                            _value = *(reinterpret_cast<const int32_t*>(serialisedData));
-                            serialisedData += sizeof(int32_t);
-                        }
+		protected:
+			Int(const char* &serialisedData) : Base(serialisedData)
+			{
+				// Base will have incremented the pointer appropriately.
+				// We can now copy in our value.
+				_value = *(reinterpret_cast<const int32_t*>(serialisedData));
+				serialisedData += sizeof(int32_t);
+			}
 		};
 	}
 }
