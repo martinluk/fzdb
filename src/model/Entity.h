@@ -5,14 +5,14 @@
 #include <vector>
 
 #include "./Triple.h"
-
 #include "./EntityProperty.h"
+#include "ILogString.h"
 
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.
 // An entity's handle cannot be changed once it is instanciated.
 // An entity owns all of its EntityProperties and will delete them as appropriate.
-class Entity
+class Entity : public ILogString
 {
     friend class EntitySerialiser;
 public:
@@ -126,6 +126,8 @@ public:
 
 	// Removes the link to entity 'entity'
 	void unlink(Entity* entity);
+    
+    virtual std::string logString() const override;
 
 private:
     void deleteAllProperties();

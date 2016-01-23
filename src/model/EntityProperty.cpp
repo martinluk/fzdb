@@ -127,6 +127,19 @@ model::types::Base* EntityProperty<T>::baseValue(int index) const
     return dynamic_cast<model::types::Base*>(value(index));
 }
 
+template<typename T>
+std::string EntityProperty<T>::logString() const
+{
+    return std::string("EntityProperty<")
+            //+ std::string(model::types::Base::SubtypeString[(int)_subtype])
+            + std::string(model::types::Base::SubtypeString(_subtype))
+            + std::string(">(")
+            + std::to_string(_key)
+            + std::string(", [")
+            + std::to_string(_values.size())
+            + std::string("])");
+}
+
 // Template instantiations - parameters must be listed here in order to link
 template class EntityProperty < model::types::String >;
 template class EntityProperty < model::types::EntityRef >;

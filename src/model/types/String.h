@@ -37,7 +37,7 @@ namespace model {
 
 			virtual std::string logString() const
 			{
-				return std::string("String(\"") + _value + std::string("\",")
+				return std::string("String(\"") + _value + std::string("\", ")
 					+ std::to_string(confidence()) + std::string(")");
 			}
 

@@ -41,6 +41,8 @@ public:
     std::size_t entityCount() const;
     
     void clearAll();
+    
+    std::string dumpContents() const;
 
 private:	
 

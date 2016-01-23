@@ -34,7 +34,7 @@ namespace model {
 
 			virtual std::string logString() const
 			{
-				return std::string("EntityRef(") + std::to_string(_value) + std::string(",")
+				return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
 					+ std::to_string(confidence()) + std::string(")");
 			}
 

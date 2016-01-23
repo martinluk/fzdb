@@ -26,6 +26,30 @@ namespace model {
 				//Doesn't have an associated type
 				PropertyReference
 			};
+            
+            // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
+            // Until then, we use an ugly workaround.
+            //static const char* SubtypeString[];
+            static const char* SubtypeString(Subtype type)
+            {
+                switch (type)
+                {
+                case Subtype::TypeInt32:
+                    return "Int32";
+                    
+                case Subtype::TypeString:
+                    return "String";
+                    
+                case Subtype::TypeEntityRef:
+                    return "EntityRef";
+                    
+                case Subtype::PropertyReference:
+                    return "PropertyReference";
+                    
+                default:
+                    return "Undefined";
+                }
+            }
 
                         Base(unsigned char confidence = 100) {
 				if (confidence > 100) confidence = 100;
@@ -34,7 +58,7 @@ namespace model {
 
 			virtual bool Equals(const std::string val) {
 				return false;
-			};
+			}
 
 			virtual std::string toString() {
 				return "";

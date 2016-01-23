@@ -1,6 +1,7 @@
 #include "./EntityManager.h"
 #include <cassert>
 #include <set>
+#include <sstream>
 
 EntityManager::EntityManager()
 {
@@ -236,4 +237,44 @@ void EntityManager::clearAll()
 std::size_t EntityManager::entityCount() const
 {
     return _entities.size();
+}
+
+std::string EntityManager::dumpContents() const
+{
+    std::stringstream str;
+    str << "Number of entities: " << _entities.size() << "\n";
+    
+    for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
+    {
+        const Entity* ent = it->second;
+        str << ent->logString() << "\n";
+        if ( ent->propertyCount() > 0 )
+        {
+            str << "{\n";
+            
+            const std::map<unsigned int, IEntityProperty*> &propMap = ent->properties();
+            for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
+            {
+                IEntityProperty* prop = it2->second;
+                str << "  " << prop->logString() << "\n";
+                
+                if ( prop->count() > 0 )
+                {
+                    str << "  {\n";
+                    
+                    for ( int i = 0; i < prop->count(); i++ )
+                    {
+                        model::types::Base* val = prop->baseValue(i);
+                        str << "    " << val->logString() << "\n";
+                    }
+                    
+                    str << "  }\n";
+                }
+            }
+            
+            str << "}\n";
+        }
+    }
+    
+    return str.str();
 }

@@ -32,6 +32,8 @@ QueryResult DebugSaveFile::execute()
     values.push_back(new String("Catherine", 5));
     e2->insertProperty<String>(new EntityProperty<String>(2, values));
     
+    log << "Data to be serialised:\n\n" << manager.dumpContents() << "\n";
+    
     // Serialise the graph.
     Serialiser serialiser;
     GraphSerialiser gSerialiser(&manager);

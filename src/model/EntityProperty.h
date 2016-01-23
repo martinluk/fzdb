@@ -9,8 +9,10 @@
 #include "./types/String.h"
 #include "./types/EntityRef.h"
 #include "./types/Int.h"
+#include "ILogString.h"
 
-class IEntityProperty {
+class IEntityProperty : public ILogString
+{
 public:
 	virtual ~IEntityProperty() {}
 	virtual int count() const = 0;
@@ -95,10 +97,12 @@ class EntityProperty : public IEntityProperty
 
 		// Clears this property of any values.
 		void clear();
+        
+        virtual std::string logString() const override;
 
 	private:
 		void deleteAllValues();
-                void initSubtype();
+        void initSubtype();
 
 		unsigned int _key;
 		std::vector<T*> _values;

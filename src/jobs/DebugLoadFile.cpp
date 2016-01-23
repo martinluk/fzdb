@@ -22,7 +22,7 @@ QueryResult DebugLoadFile::execute()
     bool success = FileSystem::readFile(filename, buffer);
     if ( !success )
     {
-        log << "Unable to read file '" << filename << "'. Does the file exist?\n";
+        log << "Unable to read file '" << filename << "'. Have you run SAVEFILE previously?\n";
     }
     else
     {
@@ -31,7 +31,8 @@ QueryResult DebugLoadFile::execute()
         GraphSerialiser gSer(&manager);
         gSer.unserialise(buffer.data());
         
-        log << "Number of entities read: " << manager.entityCount() << "\n";
+        log << "Data dump from EntityManager:\n\n";
+        log << manager.dumpContents();
     }
     
     QueryResult result;

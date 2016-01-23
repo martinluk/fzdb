@@ -68,3 +68,14 @@ unsigned int Entity::getType() const
 {
     return _type;
 }
+
+std::string Entity::logString() const
+{
+    return std::string("Entity(")
+            + std::to_string(_type)
+            + std::string(", ")
+            + std::to_string(handle_)
+            + std::string(", [")
+            + std::to_string(_propertyTable.size())
+            + std::string("])");
+}
