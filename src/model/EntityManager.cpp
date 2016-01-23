@@ -222,3 +222,18 @@ void EntityManager::insertEntity(Entity *ent)
     
     _entities.insert(std::pair<Entity::EHandle_t, Entity*>(ent->getHandle(), ent));
 }
+
+void EntityManager::clearAll()
+{
+    _entities.clear();
+    _lastHandle = Entity::INVALID_EHANDLE;
+    _lastProperty = 0;
+    _entityTypeNames.clear();
+    _propertyNames.clear();
+    _propertyTypes.clear();
+}
+
+std::size_t EntityManager::entityCount() const
+{
+    return _entities.size();
+}

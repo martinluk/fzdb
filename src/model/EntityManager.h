@@ -38,6 +38,9 @@ public:
 	}
     
     std::vector<Entity*> entityList() const;
+    std::size_t entityCount() const;
+    
+    void clearAll();
 
 private:	
 

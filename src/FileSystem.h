@@ -10,6 +10,11 @@ namespace FileSystem
     bool writeFile(const std::string &filename, const Serialiser &serialiser);
     bool writeFile(const std::string &filename, const char* begin, std::size_t size);
     
+    bool readFile(const std::string &filename, std::vector<char> &buffer);
+    bool readFile(const std::string &filename, char* buffer, std::size_t length);
+    
+    std::size_t fileLength(const std::string &filename);
+    
     std::string workingDirectory();
 }
 
