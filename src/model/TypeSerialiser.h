@@ -16,6 +16,8 @@ namespace model
             TypeSerialiser(const Base* type);
 
             std::size_t serialise(Serialiser &serialiser) const;
+
+            // TODO: This is probably unsafe without a length parameter!
             static Base* unserialise(const char* serialisedData, std::size_t* advance = NULL);
 
         private:

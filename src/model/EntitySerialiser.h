@@ -12,6 +12,8 @@ public:
     EntitySerialiser(const Entity* ent);
 
     std::size_t serialise(Serialiser &serialiser) const;
+
+    // TODO: This is probably unsafe without a length parameter!
     static Entity* unserialise(const char* serialData);
 
 private:

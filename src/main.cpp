@@ -53,44 +53,74 @@ int main(int argc, char* argv[]) {
 	unsigned int port = 1407;
 	int loggingLevel = 0;
 
-	Singletons::initialise();
-
  /*
   *   HANDLE COMMAND LINE ARGUMENTS
   */
-  for (int i = 1; i < argc; ++i) {
-
-    if (std::string(argv[i]) == "--log" || std::string(argv[i]) == "-l") {
-      if (i + 1 < argc) { // Make sure we aren't at the end of argv!
+  for (int i = 1; i < argc; ++i)
+  {
+    std::string arg(argv[i]);
+    if (arg == "--log" || arg == "-l")
+    {
+      // Make sure we aren't at the end of argv!
+      if (i + 1 < argc)
+      {
         auto loggingVar = argv[++i];
-        if(std::string(loggingVar) == "file") {
+        if(std::string(loggingVar) == "file")
+        {
           loggingLevel = 1;
-        } else {
+        }
+        else
+        {
           std::cerr << "ERROR: Unknown logging option" << std::endl;
         }          
         continue;
-      } else {
+      }
+      else
+      {
         std::cerr << argv[i] <<" option requires one argument." << std::endl;
         return 1;
       }  
     }
 
-    if (std::string(argv[i]) == "--port" || std::string(argv[i]) == "-p") {
-      if (i + 1 < argc) { // Make sure we aren't at the end of argv!
-        try {
+    if (arg == "--port" || arg == "-p")
+    {
+      // Make sure we aren't at the end of argv!
+      if (i + 1 < argc)
+      {
+        try
+        {
           port = std::stoul(argv[++i]);
-        } catch(std::invalid_argument e) {
+        }
+        catch(std::invalid_argument e)
+        {
           std::cerr << "Error: Port must be a valid unsigned integer" << std::endl;
           return 1;
         }
         continue;
-      } else { 
+      }
+      else
+      {
         std::cerr << argv[i] <<" option requires one argument." << std::endl;
         return 1;
-      }    JobQueue::Shutdown();
-      Singletons::shutdown();
+      }
+    }
+
+    if (arg == "--file" || arg == "-f")
+    {
+      if ( i+1 < argc )
+      {
+        Singletons::setDataFilePath(std::string(argv[i+1]));
+        continue;
+      }
+      else
+      {
+        std::cerr << argv[i] <<" option requires one argument." << std::endl;
+        return 1;
+      }
     }
   }
+
+  Singletons::initialise();
 
   /*
   *   INITIALISE LOGGING

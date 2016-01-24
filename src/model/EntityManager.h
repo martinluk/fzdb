@@ -44,6 +44,9 @@ public:
     
     std::string dumpContents() const;
 
+    bool saveToFile(const std::string &filename);
+    bool loadFromFile(const std::string &filename);
+
 private:	
 
 	// TODO: This could be an unordered map, but we may want to utilise the

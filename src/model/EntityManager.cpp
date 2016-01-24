@@ -2,6 +2,8 @@
 #include <cassert>
 #include <set>
 #include <sstream>
+#include "../FileSystem.h"
+#include "GraphSerialiser.h"
 
 EntityManager::EntityManager()
 {
@@ -277,4 +279,34 @@ std::string EntityManager::dumpContents() const
     }
     
     return str.str();
+}
+
+bool EntityManager::saveToFile(const std::string &filename)
+{
+    Serialiser serialiser;
+    GraphSerialiser gSer(this);
+    gSer.serialise(serialiser);
+    return FileSystem::writeFile(filename, serialiser);
+}
+
+bool EntityManager::loadFromFile(const std::string &filename)
+{
+    std::size_t fileSize = FileSystem::fileLength(filename);
+    if ( fileSize < 1 )
+        return false;
+
+    char* buffer = new char[fileSize];
+    bool success = FileSystem::readFile(filename, buffer, fileSize);
+    if ( !success )
+    {
+        delete[] buffer;
+        return false;
+    }
+
+    clearAll();
+    GraphSerialiser gSer(this);
+    gSer.unserialise(buffer);
+    delete[] buffer;
+
+    return true;
 }

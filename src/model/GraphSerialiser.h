@@ -14,6 +14,7 @@ public:
     std::size_t serialise(Serialiser &serialiser) const;
     
     // NOTE: This function does not clear the current list of entities within the manager.
+    // TODO: This is probably unsafe without a length parameter!
     void unserialise(const char* serialisedData);
     
 private:
