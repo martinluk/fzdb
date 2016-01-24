@@ -291,12 +291,12 @@ bool EntityManager::saveToFile(const std::string &filename)
 
 bool EntityManager::loadFromFile(const std::string &filename)
 {
-    std::size_t fileSize = FileSystem::fileLength(filename);
-    if ( fileSize < 1 )
+    std::size_t size = FileSystem::dataLength(filename);
+    if ( size < 1 )
         return false;
 
-    char* buffer = new char[fileSize];
-    bool success = FileSystem::readFile(filename, buffer, fileSize);
+    char* buffer = new char[size];
+    bool success = FileSystem::readFile(filename, buffer, size);
     if ( !success )
     {
         delete[] buffer;
