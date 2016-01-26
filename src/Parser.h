@@ -26,6 +26,7 @@ enum class ParsedTokenType {
 	//structural
         OPEN_CURLBRACE  = 0x6,
         CLOSE_CURLBRACE = 0x7,
+        FILTER = 0x9,
 	
 	//keywords
         KEYWORD_SELECT = TOKEN_KEYWORD_MASK | 0x0,

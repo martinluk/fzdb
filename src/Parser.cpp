@@ -13,6 +13,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	boost::regex entityRefRegex("entity:[0-9]+");
 	boost::regex intRegex("[0-9]+");
 	boost::regex simpleConfidenceRatingRegex("\\[[0-9]+\\]");
+   boost::regex filterRegex("FILTER(.*)");
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
@@ -37,6 +38,12 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 
 	else if (boost::regex_match(str, intRegex)) {
 		tokenType = ParsedTokenType::INT;
+	}
+
+   else if (boost::regex_match(str, filterRegex)) {
+		tokenType = ParsedTokenType::FILTER;
+      str = str.substr(7, str.length() - 8);
+      boost::algorithm::trim_if(str, boost::algorithm::is_any_of(" "));
 	}
 
 	else if (boost::regex_match(str, simpleConfidenceRatingRegex)) {
@@ -118,7 +125,7 @@ TokenList FSparqlParser::Tokenize(std::string str) {
 					typing = true;
 				}
 
-				if (buffer == "FILTER(") {
+				if (buffer == "FILTER") {
 					filter = true;
 				}
 

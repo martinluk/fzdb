@@ -16,6 +16,8 @@
 #include "model/EntityManager.h"
 #include "model/Triple.h"
 
+#include "Parser.h"
+
 boost::asio::io_service* pIOService = NULL;
 
 void shutDownApplication()
@@ -46,6 +48,13 @@ void sigHandler(int s)
  * @return Error code
  */
 int main(int argc, char* argv[]) {
+/*
+   auto tokens = FSparqlParser::Tokenize("SELECT { $a <forename> 'Fred'; <age> $b . FILTER( $b > 12 ) }");
+   for(auto tok : tokens) {
+      std::cout << tok.second << std::endl;   
+   }
+
+   return 0;*/
 
 	/*
 	*   DEFAULT SETTINGS
