@@ -3,6 +3,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
+#include "filters/RegexFilter.h"
+
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
 	boost::regex variableRegex("\\$.*");
@@ -167,8 +169,8 @@ std::string FSparqlParser::parseConfidenceRating(TokenIterator&& iter, TokenIter
 }
 
 //parses a block of triples
-std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end) {
-	std::vector<model::Triple> triples;
+TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end) {
+   TriplesBlock tripleBlock;
 	std::string sub, pred;
 	model::Subject::Type subType;
 	model::Predicate::Type predType;
@@ -233,7 +235,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					o = model::Object(objType, iter->second, std::stoul(confidence));
 				}
 				model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o);
-				triples.push_back(trip);
+            tripleBlock.Add(std::move(trip));
 				break;
 			}
 		}
@@ -257,7 +259,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 		iter++;
 	}
 
-	return triples;
+	return tripleBlock;
 }
 
 //parses a { } block
@@ -272,7 +274,7 @@ TriplesBlock FSparqlParser::ParseInsert(TokenIterator&& iter, TokenIterator end)
 		throw ParseException("Expected { found " + iter->second);
 
 	iter++;
-	output = TriplesBlock(ParseTriples(std::move(iter), end));
+	output = ParseTriples(std::move(iter), end);
 
 	if (iter == end)
 		throw ParseException("Unexpected EOF");
@@ -312,6 +314,10 @@ StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
 	return sources;
 }
 */
+
+IFilter* FSparqlParser::parseFilter(const std::string&& filterDescription) {
+   return new RegexFilter("r");
+}
 
 //parses a tokenised list of strings to give a query object
 Query FSparqlParser::ParseAll(TokenList tokens) {

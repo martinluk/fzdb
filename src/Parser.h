@@ -7,6 +7,7 @@
 #include <map>
 
 #include "model/Triple.h"
+#include "filters/IFilter.h"
 
 #define TOKEN_SPLITTER_MASK 0b010000
 #define TOKEN_KEYWORD_MASK 0b100000
@@ -84,7 +85,7 @@ struct TriplesBlock {
 public:
 	std::vector<model::Triple> triples;
 	std::string name;
-	std::vector<std::string> filters;
+	std::vector<IFilter*> filters;
 
 	TriplesBlock(std::vector<model::Triple> trip, std::string n) {
 		triples = trip;
@@ -96,6 +97,14 @@ public:
 	}
 
 	TriplesBlock() {}
+
+   void Add(const model::Triple&& triple) {
+      triples.emplace_back(triple);   
+   } 
+
+   void Add(IFilter* filter) {
+      filters.push_back(filter);   
+   }
 };
 
 //Types of query
@@ -134,9 +143,10 @@ private:
 	static TokenItem identifyToken(std::string str, unsigned int line, unsigned int chr);
 
 	static std::string parseConfidenceRating(TokenIterator&& iter, TokenIterator end);
+   static IFilter* parseFilter(const std::string&& filterDescription);
 public:
 	static TokenList Tokenize(std::string str);
-	static std::vector<model::Triple> ParseTriples(TokenIterator&& iter, TokenIterator end);
+	static TriplesBlock ParseTriples(TokenIterator&& iter, TokenIterator end);
 	static TriplesBlock ParseInsert(TokenIterator&& iter, TokenIterator end);
 	static StringMap ParseSources(TokenIterator&& iter, TokenIterator end);
 	static Query ParseAll(TokenList tokens);
