@@ -413,7 +413,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		if (iter->first.type == ParsedTokenType::KEYWORD_SAVE)
 		{
 			*iter++;
-			type = QueryType::LOAD;
+			type = QueryType::SAVE;
 
 			if (iter != tokens.end())
 			{
