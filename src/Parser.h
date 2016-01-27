@@ -47,12 +47,13 @@ enum class ParsedTokenType {
 
 struct TokenInfo {
 public:
-	ParsedTokenType type;
-	unsigned int lineNumber;
-	unsigned int charPosition;
+	const ParsedTokenType type;
+	const unsigned int lineNumber;
+	const unsigned int charPosition;
+	const std::string data0;
 
-	TokenInfo(ParsedTokenType ptt, unsigned int lineNo, unsigned int charPos) :
-		type(ptt), lineNumber(lineNo), charPosition(charPos) { }
+	TokenInfo(ParsedTokenType ptt, unsigned int lineNo, unsigned int charPos, std::string dat0) :
+		type(ptt), lineNumber(lineNo), charPosition(charPos), data0(dat0) { }
 };
 
 //TODO: this whole file could do with tidying up
@@ -146,7 +147,7 @@ private:
 	static TokenItem identifyToken(std::string str, unsigned int line, unsigned int chr);
 
 	static std::string parseConfidenceRating(TokenIterator&& iter, TokenIterator end);
-   static IFilter* parseFilter(const std::string&& filterDescription);
+   static IFilter* parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription);
 public:
 	static TokenList Tokenize(std::string str);
 	static TriplesBlock ParseTriples(TokenIterator&& iter, TokenIterator end);

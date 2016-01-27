@@ -19,6 +19,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
    boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
 
    boost::smatch matches;
+   std::string data0 = "";
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
@@ -48,6 +49,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 
    else if (boost::regex_match(str, matches, filterRegex)) {
 		tokenType = ParsedTokenType::FILTER;
+		data0 = matches[1];
       str = matches[2];
 	}
 
@@ -77,7 +79,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
 	else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
 
-	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr), str);
+	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
 
 //tokenises str
@@ -205,7 +207,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
                pos = 1;
 					break;
             case ParsedTokenType::FILTER:
-               tripleBlock.Add(parseFilter(std::move(iter->second)));
+               tripleBlock.Add(parseFilter(std::move(iter->first), std::move(iter->second)));
 			   pos = 0;
                break;
                
@@ -336,9 +338,14 @@ StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
 }
 */
 
-IFilter* FSparqlParser::parseFilter(const std::string&& filterDescription) {
+IFilter* FSparqlParser::parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription) {
    IFilter* output = nullptr;
-   if(GreaterThanFilter::TestAndCreate(&output, filterDescription)) return output;
+   if (filterInfo.data0.length() > 0) {
+	   if (filterInfo.data0 == "regex" && RegexFilter::TestAndCreate(&output, filterDescription)) return output;
+   }
+   else {
+	   if (GreaterThanFilter::TestAndCreate(&output, filterDescription)) return output;
+   }   
    throw ParseException("Invalid filter description");
 }
 

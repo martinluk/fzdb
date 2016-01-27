@@ -180,10 +180,10 @@ private:
 
 			Entity* currentEntity = iter->second;
 			if (currentEntity->hasProperty(propertyId)) {
-				variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
+				auto rowId = variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
 				variableSet.add(std::move(variableName2), 
 					currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
-					std::move(_propertyTypes[propertyId]));
+					std::move(_propertyTypes[propertyId]), rowId);
 			}
 
 		}

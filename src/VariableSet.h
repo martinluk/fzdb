@@ -28,7 +28,7 @@ public:
 		
 	}
 	
-	void add(const std::string&& var, std::string&& value, VariableType&& type) {
+	unsigned int add(const std::string&& var, std::string&& value, VariableType&& type) {
 		if (_metaData.find(var) == _metaData.cend()) {
 			throw new std::runtime_error("Unexpected variable");
 		}
@@ -46,6 +46,30 @@ public:
 			newRow[_metaData[var].second] = value;
 			_variablesUsed[_metaData[var].second] = true;
 			_values.push_back(newRow);
+			return _values.size() - 1;
+		}
+	}
+
+	void add(const std::string&& var, std::string&& value, VariableType&& type, unsigned int row) {
+
+		if (row >= _values.size()) {
+			throw new std::runtime_error("Attempting to add to a non-existent row");
+		}
+
+		if (_metaData.find(var) == _metaData.cend()) {
+			throw new std::runtime_error("Unexpected variable");
+		}
+		else {
+			if (type != _metaData[var].first) {
+				if (_metaData[var].first == VariableType::TypeUndefined) {
+					_metaData[var].first = type;
+				}
+				else {
+					throw new std::runtime_error("Attempted to mix variable types!");
+				}
+			}
+			_variablesUsed[_metaData[var].second] = true;
+			_values[row][_metaData[var].second] = value;
 		}
 	}
 
