@@ -200,6 +200,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 					break;
 				case ParsedTokenType::VARIABLE:
 					subType = model::Subject::Type::VARIABLE;
+					tripleBlock.variables.insert(iter->second);
                pos = 1;
 					break;
             case ParsedTokenType::FILTER:
@@ -218,6 +219,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 					break;
 				case ParsedTokenType::VARIABLE:
 					predType = model::Predicate::Type::VARIABLE;
+					tripleBlock.variables.insert(iter->second);
 					break;
 				default:
 					throw ParseException("Unknown symbol: " + iter->second);
@@ -233,6 +235,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 					break;
 				case ParsedTokenType::VARIABLE:
 					objType = model::Object::Type::VARIABLE;
+					tripleBlock.variables.insert(iter->second);
 					break;
 				case ParsedTokenType::INT:
 					objType = model::Object::Type::INT;

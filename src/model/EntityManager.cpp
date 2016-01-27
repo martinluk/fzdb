@@ -106,10 +106,10 @@ QueryResult EntityManager::SeparateTriples(std::vector<model::Triple> conditions
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-VariableSet EntityManager::BGP(std::vector<model::Triple> conditions)
+VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
 {
-	std::vector<Entity::EHandle_t> passed;
-	VariableSet result;
+	VariableSet result(triplesBlock.variables);
+	auto conditions = triplesBlock.triples;
 
 	//sort by entropy
 	std::sort(conditions.begin(), conditions.end(), [](model::Triple t1, model::Triple t2) { return t1.Entropy() < t2.Entropy(); });

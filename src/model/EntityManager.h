@@ -9,6 +9,7 @@
 
 #include "../QueryResult.h"
 #include "./Triple.h"
+#include "./Parser.h"
 #include "../VariableSet.h"
 #include "../Exceptions.h"
 
@@ -29,7 +30,7 @@ public:
 		_propertyNames[name] = val;
 	}	
 
-	VariableSet BGP(std::vector <model::Triple> conditions);
+	VariableSet BGP(TriplesBlock triplesBlock);
 
 	void Insert(std::vector<model::Triple> triples);
 
@@ -107,17 +108,15 @@ private:
 		unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
 
 		//the variable has been used before, we only need to iterate over valid values from before
-		if (variableSet.contains(variableName)) {
+		if (variableSet.used(variableName)) {
 			if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
 
-				auto entities = variableSet.getValuesFor(variableName);
+				unsigned char varIndex = variableSet.indexOf(variableName);
 
-				entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this] (std::string val) {
-					Entity* currentEntity = _entities[std::stoll(val)];
+				variableSet.getData().erase(std::remove_if(variableSet.getData().begin(), variableSet.getData().end(), [&, this, varIndex](std::vector<std::string> row) {
+					Entity* currentEntity = _entities[std::stoll(row[varIndex])];
 					return !currentEntity->meetsCondition(propertyId, std::move(object));
-				}), entities.end());
-
-				variableSet.replaceValuesFor(variableName, entities);
+				}), variableSet.getData().end());
 
 			}
 			else {
@@ -145,21 +144,21 @@ private:
 		//TODO: consider the case where variableName2 is already in variableSet
 
 		//the variable has been used before, we only need to iterate over valid values from before
-		if (variableSet.contains(variableName)) {
+		if (variableSet.used(variableName)) {
 			if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
 
-				auto entities = variableSet.getValuesFor(variableName);
+				unsigned char varIndex = variableSet.indexOf(variableName),
+					varIndex2 = variableSet.indexOf(variableName2);
 
-				entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this](std::string val) {
-					Entity* currentEntity = _entities[std::stoll(val)];
+				variableSet.getData().erase(std::remove_if(variableSet.getData().begin(), variableSet.getData().end(), [&, this, varIndex](std::vector<std::string> row) {
+					Entity* currentEntity = _entities[std::stoll(row[varIndex])];
 					return !currentEntity->hasProperty(propertyId);
-				}), entities.end());
+				}), variableSet.getData().end());
 
-				for (auto entity : entities) {
-					Entity* currentEntity = _entities[std::stoll(entity)];					
-					variableSet.add(std::move(variableName2), 
-						currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
-						std::move(_propertyTypes[propertyId]));
+				//TODO: but what about the type of the new data being added? :/
+				for (auto row : variableSet.getData()) {
+					Entity* currentEntity = _entities[std::stoll(row[varIndex])];		
+					row[varIndex2] = currentEntity->getProperty(propertyId)->baseValues()[0]->toString();
 				}
 
 			}

@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <vector>
+#include <set>
 #include <string>
 #include <map>
 
@@ -87,6 +88,7 @@ public:
 	std::vector<model::Triple> triples;
 	std::string name;
 	std::vector<IFilter*> filters;
+	std::set<std::string> variables;
 
 	TriplesBlock(std::vector<model::Triple> trip, std::string n) {
 		triples = trip;

@@ -151,11 +151,13 @@ int main(int argc, char* argv[]) {
       std::cout << "Log failed: " << ex.what() << std::endl;
   }
   
+#if PLATFORM != PLATFORM_WINDOWS
   struct sigaction sigIntHandler;
   sigIntHandler.sa_handler = &sigHandler;
   sigemptyset(&sigIntHandler.sa_mask);
   sigIntHandler.sa_flags = 0;
   sigaction(SIGINT, &sigIntHandler, NULL);
+#endif
 
   /*
   *   START THE SERVER
