@@ -137,13 +137,15 @@ public:
 	TriplesBlock conditions;
 	TriplesBlock whereClause;
 	std::string data0;
+	std::vector<std::string> selectLine;
 
-	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0) {
+	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline) {
 		type = t;
 		sources = s;
 		conditions = cond;
 		whereClause = wh;
 		data0 = dat0;
+		selectLine = selectline;
 	}
 };
 
@@ -158,6 +160,7 @@ public:
 	static TriplesBlock ParseTriples(TokenIterator&& iter, TokenIterator end);
 	static TriplesBlock ParseInsert(TokenIterator&& iter, TokenIterator end);
 	static StringMap ParseSources(TokenIterator&& iter, TokenIterator end);
+	static std::vector<std::string> ParseSelectLine(TokenIterator&& iter, TokenIterator end);
 	static Query ParseAll(TokenList tokens);
 };
 

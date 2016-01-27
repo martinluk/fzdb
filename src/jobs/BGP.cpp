@@ -32,11 +32,17 @@ QueryResult BGP::execute()
 		for (auto iter = data->cbegin(); iter != data->cend(); iter++) {
 
 			rapidjson::Value val2;
-			val2.SetArray();
-			for (auto iter2 = iter->cbegin(); iter2 != iter->cend(); iter2++) {
+			val2.SetObject();
+
+			for (auto iter2 = _query.selectLine.cbegin(); iter2 != _query.selectLine.cend(); iter2++) {
+				auto i = variables.indexOf(*iter2);		
+				
 				rapidjson::Value val3;
-				val3.SetString(iter2->c_str(), result.allocator());
-				val2.PushBack(val3, result.allocator());
+				val3.SetString((*iter)[i].c_str(), result.allocator());
+
+				rapidjson::Value varName;
+				varName.SetString((*iter2).c_str(), result.allocator());
+				val2.AddMember(varName, val3, result.allocator());
 			}
 
 			val.PushBack(val2, result.allocator());

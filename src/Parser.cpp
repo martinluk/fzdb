@@ -351,6 +351,15 @@ IFilter* FSparqlParser::parseFilter(const TokenInfo&& filterInfo, const std::str
    throw ParseException("Invalid filter description");
 }
 
+std::vector<std::string> FSparqlParser::ParseSelectLine(TokenIterator&& iter, TokenIterator end) {
+	std::vector<std::string> output;
+	while (iter != end && iter->first.type == ParsedTokenType::VARIABLE) {
+		output.push_back(iter->second);
+		iter++;
+	}
+	return output;
+}
+
 //parses a tokenised list of strings to give a query object
 Query FSparqlParser::ParseAll(TokenList tokens) {
 
@@ -360,6 +369,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 	StringMap sources;
 	TriplesBlock conditions;
 	TriplesBlock whereClause;
+	std::vector<std::string> selectLine;
 	std::string data0;
 
 	while (iter != tokens.end()) {
@@ -464,14 +474,21 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		}
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_SELECT) {
-			*iter++;
+			iter++;
 			type = QueryType::SELECT;
-			whereClause = ParseInsert(std::move(iter), tokens.end());
+			selectLine = ParseSelectLine(std::move(iter), tokens.end());
+			if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+				iter++;
+				whereClause = ParseInsert(std::move(iter), tokens.end());
+			}
+			else {
+				throw ParseException("Expected 'WHERE'");
+			}
 			break;
 		}
 
 		throw ParseException("Unknown symbol: " + iter->second);
 	}
 
-	return Query(type, sources, conditions, whereClause, data0);
+	return Query(type, sources, conditions, whereClause, data0, selectLine);
 }
