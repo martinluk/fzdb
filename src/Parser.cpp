@@ -3,43 +3,59 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
+#include <iostream>
+
+#include "./filters/RegexFilter.h"
+#include "./filters/OrderingFilters.h"
+
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
-	boost::regex variableRegex("\\$.*");
-	boost::regex stringRegex("\".*\"");
-	boost::regex propertyRegex("<.*>");
-	boost::regex entityRefRegex("entity:[0-9]+");
+	boost::regex variableRegex("\\$(.+)");
+	boost::regex stringRegex("\"(.*)\"");
+	boost::regex propertyRegex("<(.*)>");
+	boost::regex entityRefRegex("entity:([0-9]+)");
 	boost::regex intRegex("[0-9]+");
-	boost::regex simpleConfidenceRatingRegex("\\[[0-9]+\\]");
+	boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
+   boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
+
+   boost::smatch matches;
+   std::string data0 = "";
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
-	if (boost::regex_match(str, variableRegex)) {
+	if (boost::regex_match(str, matches, variableRegex)) {
 		tokenType = ParsedTokenType::VARIABLE;
+		str = matches[1];
 	}
 
-	else if (boost::regex_match(str, stringRegex)) {
+	else if (boost::regex_match(str, matches, stringRegex)) {
 		tokenType = ParsedTokenType::STRING;
-		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("\""));
+      str = matches[1];
 	}
 
-	else if (boost::regex_match(str, propertyRegex)) {
+	else if (boost::regex_match(str, matches, propertyRegex)) {
 		tokenType = ParsedTokenType::PROPERTY;
-		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("<>"));
+      str = matches[1];
 	}
 
-	else if (boost::regex_match(str, entityRefRegex)) {
+	else if (boost::regex_match(str, matches, entityRefRegex)) {
 		tokenType = ParsedTokenType::ENTITYREF;
-		str = str.substr(7, str.length() - 7);
+      str = matches[1];
 	}
 
 	else if (boost::regex_match(str, intRegex)) {
 		tokenType = ParsedTokenType::INT;
 	}
 
-	else if (boost::regex_match(str, simpleConfidenceRatingRegex)) {
+   else if (boost::regex_match(str, matches, filterRegex)) {
+		tokenType = ParsedTokenType::FILTER;
+		data0 = matches[1];
+      str = matches[2];
+	}
+
+	else if (boost::regex_match(str, matches, simpleConfidenceRatingRegex)) {
 		tokenType = ParsedTokenType::CONFIDENCE_RATING;
-		str = str.substr(1, str.length() - 2);
+      str = matches[1];
 	}
 
 	else if (str == "{") tokenType = ParsedTokenType::OPEN_CURLBRACE;
@@ -65,7 +81,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "LOAD") tokenType = ParsedTokenType::KEYWORD_LOAD;
 	else if (str == "SAVE") tokenType = ParsedTokenType::KEYWORD_SAVE;
 
-	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr), str);
+	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
 
 //tokenises str
@@ -118,7 +134,7 @@ TokenList FSparqlParser::Tokenize(std::string str) {
 					typing = true;
 				}
 
-				if (buffer == "FILTER(") {
+				if (buffer == "FILTER") {
 					filter = true;
 				}
 
@@ -169,8 +185,8 @@ std::string FSparqlParser::parseConfidenceRating(TokenIterator&& iter, TokenIter
 }
 
 //parses a block of triples
-std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end) {
-	std::vector<model::Triple> triples;
+TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end) {
+   TriplesBlock tripleBlock;
 	std::string sub, pred;
 	model::Subject::Type subType;
 	model::Predicate::Type predType;
@@ -185,14 +201,21 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 				switch (iter->first.type) {
 				case ParsedTokenType::ENTITYREF:
 					subType = model::Subject::Type::ENTITYREF;
+               pos = 1;
 					break;
 				case ParsedTokenType::VARIABLE:
 					subType = model::Subject::Type::VARIABLE;
+					tripleBlock.variables.insert(iter->second);
+               pos = 1;
 					break;
+            case ParsedTokenType::FILTER:
+               tripleBlock.Add(parseFilter(std::move(iter->first), std::move(iter->second)));
+			   pos = 0;
+               break;
+               
 				default:
 					throw ParseException("Unknown symbol: " + iter->second);
-				}
-				pos = 1;
+				}				
 				break;
 			case 1:
 				pred = iter->second;
@@ -202,6 +225,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					break;
 				case ParsedTokenType::VARIABLE:
 					predType = model::Predicate::Type::VARIABLE;
+					tripleBlock.variables.insert(iter->second);
 					break;
 				default:
 					throw ParseException("Unknown symbol: " + iter->second);
@@ -217,6 +241,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					break;
 				case ParsedTokenType::VARIABLE:
 					objType = model::Object::Type::VARIABLE;
+					tripleBlock.variables.insert(iter->second);
 					break;
 				case ParsedTokenType::INT:
 					objType = model::Object::Type::INT;
@@ -235,7 +260,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 					o = model::Object(objType, iter->second, std::stoul(confidence));
 				}
 				model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o);
-				triples.push_back(trip);
+            tripleBlock.Add(std::move(trip));
 				break;
 			}
 		}
@@ -259,7 +284,7 @@ std::vector<model::Triple> FSparqlParser::ParseTriples(TokenIterator&& iter, Tok
 		iter++;
 	}
 
-	return triples;
+	return tripleBlock;
 }
 
 //parses a { } block
@@ -274,7 +299,7 @@ TriplesBlock FSparqlParser::ParseInsert(TokenIterator&& iter, TokenIterator end)
 		throw ParseException("Expected { found " + iter->second);
 
 	iter++;
-	output = TriplesBlock(ParseTriples(std::move(iter), end));
+	output = ParseTriples(std::move(iter), end);
 
 	if (iter == end)
 		throw ParseException("Unexpected EOF");
@@ -314,6 +339,17 @@ StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
 	return sources;
 }
 */
+
+IFilter* FSparqlParser::parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription) {
+   IFilter* output = nullptr;
+   if (filterInfo.data0.length() > 0) {
+	   if (filterInfo.data0 == "regex" && RegexFilter::TestAndCreate(&output, filterDescription)) return output;
+   }
+   else {
+	   if (GreaterThanFilter::TestAndCreate(&output, filterDescription)) return output;
+   }   
+   throw ParseException("Invalid filter description");
+}
 
 //parses a tokenised list of strings to give a query object
 Query FSparqlParser::ParseAll(TokenList tokens) {

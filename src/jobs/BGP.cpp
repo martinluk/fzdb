@@ -13,26 +13,37 @@ BGP::BGP(ISession* session, Query query) : Job(session), _query(query)
 QueryResult BGP::execute()
 {
 	QueryResult result;
-	//result.setValue("type", "string");
-	//result.setValue(std::string("response"), _message);
 	try {
-		VariableSet variables = Singletons::entityManager()->BGP(_query.whereClause.triples);
+      //run BGP
+		VariableSet variables = Singletons::entityManager()->BGP(_query.whereClause);
+
+      //run filters against query
+      for(auto filter : _query.whereClause.filters) {
+		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), [&, this](std::vector<std::string> row) {
+			  return !filter->Test(std::move(row), variables.getMetaData());
+		  }), variables.getData()->end());
+      }
+
+      //encode result as JSON
 		auto data = variables.getData();
 
-		for (auto iter = data.cbegin(); iter != data.cend(); iter++) {
-			rapidjson::Value val;
-			val.SetArray();
+		rapidjson::Value val;
+		val.SetArray();
+		for (auto iter = data->cbegin(); iter != data->cend(); iter++) {
 
-			for (auto iter2 = iter->second.first.cbegin(); iter2 != iter->second.first.cend(); iter2++) {
-				rapidjson::Value val2;
-				val2.SetString(iter2->c_str(), result.allocator());
-				val.PushBack(val2, result.allocator());
+			rapidjson::Value val2;
+			val2.SetArray();
+			for (auto iter2 = iter->cbegin(); iter2 != iter->cend(); iter2++) {
+				rapidjson::Value val3;
+				val3.SetString(iter2->c_str(), result.allocator());
+				val2.PushBack(val3, result.allocator());
 			}
 
-			rapidjson::Value varName;
-			varName.SetString(iter->first.c_str(), result.allocator());
-			result.setValue(std::move(varName), std::move(val));
+			val.PushBack(val2, result.allocator());
 		}
+		rapidjson::Value varName;
+		varName.SetString("result", result.allocator());
+		result.setValue(std::move(varName), std::move(val));
 	}
 	catch (NotImplementedException ex) {
 		result = QueryResult::generateError(ex.what());

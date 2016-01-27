@@ -9,6 +9,7 @@
 
 #include "../QueryResult.h"
 #include "./Triple.h"
+#include "./Parser.h"
 #include "../VariableSet.h"
 #include "../Exceptions.h"
 
@@ -29,7 +30,7 @@ public:
 		_propertyNames[name] = val;
 	}	
 
-	VariableSet BGP(std::vector <model::Triple> conditions);
+	VariableSet BGP(TriplesBlock triplesBlock);
 
 	void Insert(std::vector<model::Triple> triples);
 
@@ -84,6 +85,14 @@ private:
 		return iter->second;
 	}
 
+	unsigned int getPropertyName(std::string str) {
+		auto iter = _propertyNames.find(str);
+		if (iter == _propertyNames.cend()) {
+			return 0;
+		}
+		return iter->second;
+	}
+
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 
@@ -107,17 +116,15 @@ private:
 		unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
 
 		//the variable has been used before, we only need to iterate over valid values from before
-		if (variableSet.contains(variableName)) {
+		if (variableSet.used(variableName)) {
 			if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
 
-				auto entities = variableSet.getValuesFor(variableName);
+				unsigned char varIndex = variableSet.indexOf(variableName);
 
-				entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this] (std::string val) {
-					Entity* currentEntity = _entities[std::stoll(val)];
+				variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(), [&, this, varIndex](std::vector<std::string> row) {
+					Entity* currentEntity = _entities[std::stoll(row[varIndex])];
 					return !currentEntity->meetsCondition(propertyId, std::move(object));
-				}), entities.end());
-
-				variableSet.replaceValuesFor(variableName, entities);
+				}), variableSet.getData()->end());
 
 			}
 			else {
@@ -140,28 +147,27 @@ private:
 	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2) {
 
 		//get the property id
-		const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
+		const unsigned int propertyId = this->getPropertyName(predicate.value);
 
 		//TODO: consider the case where variableName2 is already in variableSet
 
 		//the variable has been used before, we only need to iterate over valid values from before
-		if (variableSet.contains(variableName)) {
+		if (variableSet.used(variableName)) {
 			if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
 
-				auto entities = variableSet.getValuesFor(variableName);
+				unsigned char varIndex = variableSet.indexOf(variableName),
+					varIndex2 = variableSet.indexOf(variableName2);
 
-				entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this](std::string val) {
-					Entity* currentEntity = _entities[std::stoll(val)];
+				variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(), [&, this, varIndex](std::vector<std::string> row) {
+					Entity* currentEntity = _entities[std::stoll(row[varIndex])];
 					return !currentEntity->hasProperty(propertyId);
-				}), entities.end());
+				}), variableSet.getData()->end());
 
-				for (auto entity : entities) {
-					Entity* currentEntity = _entities[std::stoll(entity)];					
-					variableSet.add(std::move(variableName2), 
-						currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
-						std::move(_propertyTypes[propertyId]));
-				}
-
+				//TODO: but what about the type of the new data being added? :/
+				for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+					Entity* currentEntity = _entities[std::stoll((*iter)[varIndex])];
+					(*iter)[varIndex2] = currentEntity->getProperty(propertyId)->baseValues()[0]->toString();
+				}				
 			}
 			else {
 				//TODO: TypeException
@@ -174,10 +180,10 @@ private:
 
 			Entity* currentEntity = iter->second;
 			if (currentEntity->hasProperty(propertyId)) {
-				variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
+				auto rowId = variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
 				variableSet.add(std::move(variableName2), 
 					currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
-					std::move(_propertyTypes[propertyId]));
+					std::move(_propertyTypes[propertyId]), rowId);
 			}
 
 		}
