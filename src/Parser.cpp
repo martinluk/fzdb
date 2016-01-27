@@ -62,6 +62,8 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
 	else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
 	else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
+	else if (str == "LOAD") tokenType = ParsedTokenType::KEYWORD_LOAD;
+	else if (str == "SAVE") tokenType = ParsedTokenType::KEYWORD_SAVE;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr), str);
 }
@@ -386,6 +388,40 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 				if (iter != tokens.end())
 				{
 					throw ParseException("DEBUG commands take a maximum of one argument");
+				}
+			}
+			break;
+		}
+		
+		if (iter->first.type == ParsedTokenType::KEYWORD_LOAD)
+		{
+			*iter++;
+			type = QueryType::LOAD;
+
+			if (iter != tokens.end())
+			{
+				data0 = iter->second;
+				*iter++;
+				if (iter != tokens.end())
+				{
+					throw ParseException("LOAD commands take a maximum of one argument");
+				}
+			}
+			break;
+		}
+		
+		if (iter->first.type == ParsedTokenType::KEYWORD_SAVE)
+		{
+			*iter++;
+			type = QueryType::LOAD;
+
+			if (iter != tokens.end())
+			{
+				data0 = iter->second;
+				*iter++;
+				if (iter != tokens.end())
+				{
+					throw ParseException("SAVE commands take a maximum of one argument");
 				}
 			}
 			break;

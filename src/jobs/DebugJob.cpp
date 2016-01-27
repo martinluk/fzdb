@@ -5,7 +5,7 @@
 #include "DebugSaveFile.h"
 #include "DebugLoadFile.h"
 
-DebugJob::DebugJob(ISession *session, std::string message) : Job(session)
+DebugJob::DebugJob(ISession *session, const std::string &message) : Job(session)
 {
     _message = message;
 }

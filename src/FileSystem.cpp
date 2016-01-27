@@ -1,6 +1,7 @@
 #include "FileSystem.h"
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 #include <boost/filesystem.hpp>
 
@@ -17,7 +18,7 @@ struct FileHeader
 
 namespace FileSystem
 {
-    bool writeFile(const std::string &filename, const char *begin, std::size_t size)
+    void writeFile(const std::string &filename, const char *begin, std::size_t size)
     {
         std::fstream file;
 
@@ -37,20 +38,19 @@ namespace FileSystem
             file.write(reinterpret_cast<const char*>(&header), sizeof(FileHeader));
             file.write(begin, size);
         }
-        catch (const std::exception &)
+        catch (const std::exception &ex)
         {
             file.close();
-            return false;
+            throw ex;
         }
         
         file.close();
-        return true;
         
     }
     
-    bool writeFile(const std::string &filename, const Serialiser &serialiser)
+    void writeFile(const std::string &filename, const Serialiser &serialiser)
     {
-        return writeFile(filename, serialiser.cbegin(), serialiser.size());
+        writeFile(filename, serialiser.cbegin(), serialiser.size());
     }
     
     std::string workingDirectory()
@@ -58,7 +58,7 @@ namespace FileSystem
         return boost::filesystem::current_path().generic_string();
     }
     
-    bool readFile(const std::string &filename, char *buffer, std::size_t length)
+    void readFile(const std::string &filename, char *buffer, std::size_t length)
     {
         std::fstream file;
         
@@ -72,7 +72,7 @@ namespace FileSystem
             if ( flen <= sizeof(FileHeader) )
             {
                 file.close();
-                return false;
+				throw std::length_error("File too small to contain valid data");
             }
 
             // Hopefully reading automatically advances the read point in the file?
@@ -84,33 +84,35 @@ namespace FileSystem
                  header.identifier[1] != 'Z' ||
                  header.identifier[2] != 'D' ||
                  header.identifier[3] != 'B' ||
-                 header.version != FZDB_VERSION ||  // Check it's the version we're expecting.
-                 length < header.size)              // Check there's enough space to read the file.
+                 header.version != FZDB_VERSION)	// Check it's the version we're expecting.
             {
-                file.close();
-                return false;
+                throw FileFormatError();
             }
+			
+			if ( length < header.size )
+			{
+				throw std::length_error("Buffer provided was too small to store the file data");
+			}
             
             file.read(buffer, header.size);
         }
-        catch (const std::exception &)
+        catch (const std::exception &ex)
         {
             file.close();
-            return false;
+            throw ex;
         }
         
         file.close();
-        return true;
     }
 
-    bool readFile(const std::string &filename, std::vector<char> &buffer)
+    void readFile(const std::string &filename, std::vector<char> &buffer)
     {
         std::size_t length = dataLength(filename);
         if ( length < 1 )
-            return false;
+            throw std::length_error("File contained no data");
 
         buffer.resize(length);
-        return readFile(filename, buffer.data(), buffer.size());
+        readFile(filename, buffer.data(), buffer.size());
     }
     
     std::size_t fileLength(const std::string &filename)

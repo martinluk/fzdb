@@ -42,8 +42,16 @@ QueryResult DebugSaveFile::execute()
     
     // Write to a file.
     log << "Working directory: " << FileSystem::workingDirectory() << "\n";
-    
-    bool success = FileSystem::writeFile(FileSystem::workingDirectory() + std::string("/DebugSaveFile.bin"), serialiser);
+	
+	bool success = true;
+	try
+	{
+		FileSystem::writeFile(FileSystem::workingDirectory() + std::string("/DebugSaveFile.bin"), serialiser);
+	}
+	catch (const std::exception &)
+	{
+		success = false;
+	}
     
     log << "File write success: " << success << "\n";
     

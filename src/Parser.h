@@ -8,6 +8,7 @@
 
 #include "model/Triple.h"
 
+// Values that don't collide with masks range from 0x0 to 0xf.
 #define TOKEN_SPLITTER_MASK 0b010000
 #define TOKEN_KEYWORD_MASK 0b100000
 
@@ -36,6 +37,8 @@ enum class ParsedTokenType {
         KEYWORD_SOURCE = TOKEN_KEYWORD_MASK | 0x6,
         KEYWORD_DATA   = TOKEN_KEYWORD_MASK | 0x7,
         KEYWORD_DEBUG  = TOKEN_KEYWORD_MASK | 0x8,
+		KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
+		KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -107,6 +110,8 @@ enum class QueryType {
 	PING,
     DEBUGECHO,
     DEBUGOTHER,
+    LOAD,
+    SAVE,
 	USER
 };
 

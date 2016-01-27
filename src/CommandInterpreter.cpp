@@ -9,6 +9,7 @@
 #include "jobs/Insert.h"
 #include "jobs/BGP.h"
 #include "jobs/DebugJob.h"
+#include "jobs/LoadFileJob.h"
 
 #include "Parser.h"
 
@@ -32,9 +33,12 @@ void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command
 		case QueryType::SELECT:
 			JobQueue::AddJob(new BGP(session, query));
 			break;
-                case QueryType::DEBUGOTHER:
-                        JobQueue::AddJob(new DebugJob(session, query.data0));
-                        break;
+		case QueryType::DEBUGOTHER:
+			JobQueue::AddJob(new DebugJob(session, query.data0));
+			break;
+		case QueryType::LOAD:
+			JobQueue::AddJob(new LoadFileJob(session, query.data0));
+			break;
 		default:
 			JobQueue::AddJob(new UnknownJob(session, command));
 		}

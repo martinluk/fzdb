@@ -11,7 +11,7 @@
 class DebugJob : public Job
 {
 public:
-        DebugJob(ISession* session, std::string message);
+        DebugJob(ISession* session, const std::string &message);
 
         // Inherited via Job
         virtual QueryResult execute() override;

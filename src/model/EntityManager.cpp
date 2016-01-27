@@ -286,7 +286,17 @@ bool EntityManager::saveToFile(const std::string &filename)
     Serialiser serialiser;
     GraphSerialiser gSer(this);
     gSer.serialise(serialiser);
-    return FileSystem::writeFile(filename, serialiser);
+	
+	bool success = true;
+	try
+	{
+		FileSystem::writeFile(filename, serialiser);
+	}
+	catch (const std::exception &)
+	{
+		success = false;
+	}
+    return success;
 }
 
 bool EntityManager::loadFromFile(const std::string &filename)
@@ -296,7 +306,17 @@ bool EntityManager::loadFromFile(const std::string &filename)
         return false;
 
     char* buffer = new char[size];
-    bool success = FileSystem::readFile(filename, buffer, size);
+	
+	bool success = true;
+	try
+	{
+		FileSystem::readFile(filename, buffer, size);
+	}
+	catch (const std::exception &)
+	{
+		success = false;
+	}
+    
     if ( !success )
     {
         delete[] buffer;

@@ -10,7 +10,7 @@ namespace Singletons
 	void initialise();
 	void shutdown();
 
-        void setDataFilePath(const std::string &path);
+    void setDataFilePath(const std::string &path);
 	EntityManager* entityManager();
 }
 
