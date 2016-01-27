@@ -1,6 +1,11 @@
 #include <user/UserLogin.h>
 #include <boost/filesystem.hpp>
 #include <user/Hashing.h>
+
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/document.h"
+
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
 	return boost::filesystem::current_path().string();
@@ -18,6 +23,7 @@ void UserFileOperations::addUser(UserAttributes userAttributes) {
 	//save cache from file
 	saveCacheToFile();
 }
+
 void UserFileOperations::removeUser(std::string userName) {
 	//load cache from file
 	loadCacheFromFile();
@@ -29,6 +35,7 @@ void UserFileOperations::removeUser(std::string userName) {
 	//save cache from file
 	saveCacheToFile();
 }
+
 void UserFileOperations::updateUser(std::string userName, UserAttributes newAttributes) {
 	//load cache from file
 	loadCacheFromFile();
@@ -40,6 +47,7 @@ void UserFileOperations::updateUser(std::string userName, UserAttributes newAttr
 	//save cache from file
 	saveCacheToFile();
 }
+
 UserAttributes UserFileOperations::getUserAttributes(std::string userName){
 	//load cache from file
 	loadCacheFromFile();
@@ -87,10 +95,24 @@ void UserAdmin::changeUserGroup(UserGroup currentUserGroup,std::string userName,
 	super::updateUser(a.userName,a);
 }
 
-//TODO I am going to use Boost serialization to do this, hopefully do it tomorrow
 void UserFileOperations::loadCacheFromFile() {
 }
-//TODO I am going to use Boost serialization to do this, hopefully do it tomorrow
 void UserFileOperations::saveCacheToFile() {
-}
+	//Using iterator to iterate through the elements in cache
+	std::map<std::string, UserAttributes>::iterator iter = userFileCache.begin();
+	std::map<std::string, UserAttributes>::iterator eiter = userFileCache.end();
+	//TODO Add default user, maybe using static boolean to see if init-ed
+	//Writing cache to string
+	rapidjson::StringBuffer s;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+	//Refer to example http://bit.ly/1KakUqr
+	//Also serializing struct http://bit.ly/23sQ4jd
+	//writer.StartObject();
 
+	for(;iter!=eiter;++iter) {
+		//writer.
+	}
+
+	std::string json = s.GetString();
+}
+ 
