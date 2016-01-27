@@ -53,6 +53,10 @@ public:
 		return &_values;
 	}
 
+	std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData() {
+		return _metaData;
+	}
+
 	const bool contains(std::string name) {
 		return _metaData.find(name) != _metaData.cend();
 	}

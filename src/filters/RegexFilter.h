@@ -8,12 +8,14 @@
 class RegexFilter : public IFilter {
 private:
    boost::regex _pattern;
+   std::string _variable;
 public:
 
-   RegexFilter(std::string pattern) : _pattern(boost::regex(_pattern)) {}
+   RegexFilter(const std::string variable, std::string pattern) : _pattern(boost::regex(_pattern)), _variable(variable) {}
 
-   bool Test(const std::vector<std::string>&& values) override {
-      return boost::regex_match(values[0], _pattern);
+   bool Test(const std::vector<std::string>&& values, std::map<std::string, std::pair<model::types::Base::Subtype, unsigned char>>&& variables) override {
+	   unsigned char aa = variables[_variable].second;
+	   return boost::regex_match(values[aa], _pattern);
    }
 
 };

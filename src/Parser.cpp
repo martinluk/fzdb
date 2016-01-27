@@ -10,7 +10,7 @@
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
-	boost::regex variableRegex("\\$.*");
+	boost::regex variableRegex("\\$(.+)");
 	boost::regex stringRegex("\"(.*)\"");
 	boost::regex propertyRegex("<(.*)>");
 	boost::regex entityRefRegex("entity:([0-9]+)");
@@ -22,8 +22,9 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
-	if (boost::regex_match(str, variableRegex)) {
+	if (boost::regex_match(str, matches, variableRegex)) {
 		tokenType = ParsedTokenType::VARIABLE;
+		str = matches[1];
 	}
 
 	else if (boost::regex_match(str, matches, stringRegex)) {
@@ -205,8 +206,9 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 					break;
             case ParsedTokenType::FILTER:
                tripleBlock.Add(parseFilter(std::move(iter->second)));
+			   pos = 0;
                break;
-               pos = 0;
+               
 				default:
 					throw ParseException("Unknown symbol: " + iter->second);
 				}				
@@ -335,8 +337,8 @@ StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
 */
 
 IFilter* FSparqlParser::parseFilter(const std::string&& filterDescription) {
-   IFilter* output;
-   if(GreaterThanFilter::TestAndCreate(output, filterDescription)) return output;
+   IFilter* output = nullptr;
+   if(GreaterThanFilter::TestAndCreate(&output, filterDescription)) return output;
    throw ParseException("Invalid filter description");
 }
 

@@ -19,7 +19,9 @@ QueryResult BGP::execute()
 
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
-               
+		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), [&, this](std::vector<std::string> row) {
+			  return !filter->Test(std::move(row), variables.getMetaData());
+		  }), variables.getData()->end());
       }
 
       //encode result as JSON
