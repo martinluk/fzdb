@@ -13,10 +13,16 @@ BGP::BGP(ISession* session, Query query) : Job(session), _query(query)
 QueryResult BGP::execute()
 {
 	QueryResult result;
-	//result.setValue("type", "string");
-	//result.setValue(std::string("response"), _message);
 	try {
+      //run BGP
 		VariableSet variables = Singletons::entityManager()->BGP(_query.whereClause.triples);
+
+      //run filters against query
+      for(auto filter : _query.whereClause.filters) {
+               
+      }
+
+      //encode result as JSON
 		auto data = variables.getData();
 
 		for (auto iter = data.cbegin(); iter != data.cend(); iter++) {

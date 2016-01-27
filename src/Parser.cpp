@@ -5,7 +5,8 @@
 
 #include <iostream>
 
-#include "filters/RegexFilter.h"
+#include "./filters/RegexFilter.h"
+#include "./filters/OrderingFilters.h"
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
@@ -195,14 +196,19 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 				switch (iter->first.type) {
 				case ParsedTokenType::ENTITYREF:
 					subType = model::Subject::Type::ENTITYREF;
+               pos = 1;
 					break;
 				case ParsedTokenType::VARIABLE:
 					subType = model::Subject::Type::VARIABLE;
+               pos = 1;
 					break;
+            case ParsedTokenType::FILTER:
+               tripleBlock.Add(parseFilter(std::move(iter->second)));
+               break;
+               pos = 0;
 				default:
 					throw ParseException("Unknown symbol: " + iter->second);
-				}
-				pos = 1;
+				}				
 				break;
 			case 1:
 				pred = iter->second;
@@ -326,7 +332,9 @@ StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
 */
 
 IFilter* FSparqlParser::parseFilter(const std::string&& filterDescription) {
-   return new RegexFilter("r");
+   IFilter* output;
+   if(GreaterThanFilter::TestAndCreate(output, filterDescription)) return output;
+   throw ParseException("Invalid filter description");
 }
 
 //parses a tokenised list of strings to give a query object

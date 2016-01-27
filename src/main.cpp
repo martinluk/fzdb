@@ -54,6 +54,8 @@ int main(int argc, char* argv[]) {
       std::cout << tok.second << std::endl;   
    }
 
+   Query query = FSparqlParser::ParseAll(tokens);
+
    return 0;*/
 
 	/*
