@@ -3,17 +3,21 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
+#include <iostream>
+
 #include "filters/RegexFilter.h"
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
 	boost::regex variableRegex("\\$.*");
-	boost::regex stringRegex("\".*\"");
-	boost::regex propertyRegex("<.*>");
-	boost::regex entityRefRegex("entity:[0-9]+");
+	boost::regex stringRegex("\"(.*)\"");
+	boost::regex propertyRegex("<(.*)>");
+	boost::regex entityRefRegex("entity:([0-9]+)");
 	boost::regex intRegex("[0-9]+");
-	boost::regex simpleConfidenceRatingRegex("\\[[0-9]+\\]");
-   boost::regex filterRegex("FILTER(.*)");
+	boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
+   boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
+
+   boost::smatch matches;
 
 	ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
@@ -21,34 +25,33 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 		tokenType = ParsedTokenType::VARIABLE;
 	}
 
-	else if (boost::regex_match(str, stringRegex)) {
+	else if (boost::regex_match(str, matches, stringRegex)) {
 		tokenType = ParsedTokenType::STRING;
-		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("\""));
+      str = matches[1];
 	}
 
-	else if (boost::regex_match(str, propertyRegex)) {
+	else if (boost::regex_match(str, matches, propertyRegex)) {
 		tokenType = ParsedTokenType::PROPERTY;
-		boost::algorithm::trim_if(str, boost::algorithm::is_any_of("<>"));
+      str = matches[1];
 	}
 
-	else if (boost::regex_match(str, entityRefRegex)) {
+	else if (boost::regex_match(str, matches, entityRefRegex)) {
 		tokenType = ParsedTokenType::ENTITYREF;
-		str = str.substr(7, str.length() - 7);
+      str = matches[1];
 	}
 
 	else if (boost::regex_match(str, intRegex)) {
 		tokenType = ParsedTokenType::INT;
 	}
 
-   else if (boost::regex_match(str, filterRegex)) {
+   else if (boost::regex_match(str, matches, filterRegex)) {
 		tokenType = ParsedTokenType::FILTER;
-      str = str.substr(7, str.length() - 8);
-      boost::algorithm::trim_if(str, boost::algorithm::is_any_of(" "));
+      str = matches[2];
 	}
 
-	else if (boost::regex_match(str, simpleConfidenceRatingRegex)) {
+	else if (boost::regex_match(str, matches, simpleConfidenceRatingRegex)) {
 		tokenType = ParsedTokenType::CONFIDENCE_RATING;
-		str = str.substr(1, str.length() - 2);
+      str = matches[1];
 	}
 
 	else if (str == "{") tokenType = ParsedTokenType::OPEN_CURLBRACE;

@@ -49,7 +49,7 @@ void sigHandler(int s)
  */
 int main(int argc, char* argv[]) {
 /*
-   auto tokens = FSparqlParser::Tokenize("SELECT { $a <forename> 'Fred'; <age> $b . FILTER( $b > 12 ) }");
+   auto tokens = FSparqlParser::Tokenize("SELECT { $a <forename> \"Fred\"; <age> $b . FILTER( $b > 12 ) }");
    for(auto tok : tokens) {
       std::cout << tok.second << std::endl;   
    }
