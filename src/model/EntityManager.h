@@ -85,6 +85,14 @@ private:
 		return iter->second;
 	}
 
+	unsigned int getPropertyName(std::string str) {
+		auto iter = _propertyNames.find(str);
+		if (iter == _propertyNames.cend()) {
+			return 0;
+		}
+		return iter->second;
+	}
+
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 
@@ -113,10 +121,10 @@ private:
 
 				unsigned char varIndex = variableSet.indexOf(variableName);
 
-				variableSet.getData().erase(std::remove_if(variableSet.getData().begin(), variableSet.getData().end(), [&, this, varIndex](std::vector<std::string> row) {
+				variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(), [&, this, varIndex](std::vector<std::string> row) {
 					Entity* currentEntity = _entities[std::stoll(row[varIndex])];
 					return !currentEntity->meetsCondition(propertyId, std::move(object));
-				}), variableSet.getData().end());
+				}), variableSet.getData()->end());
 
 			}
 			else {
@@ -139,7 +147,7 @@ private:
 	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2) {
 
 		//get the property id
-		const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
+		const unsigned int propertyId = this->getPropertyName(predicate.value);
 
 		//TODO: consider the case where variableName2 is already in variableSet
 
@@ -150,17 +158,16 @@ private:
 				unsigned char varIndex = variableSet.indexOf(variableName),
 					varIndex2 = variableSet.indexOf(variableName2);
 
-				variableSet.getData().erase(std::remove_if(variableSet.getData().begin(), variableSet.getData().end(), [&, this, varIndex](std::vector<std::string> row) {
+				variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(), [&, this, varIndex](std::vector<std::string> row) {
 					Entity* currentEntity = _entities[std::stoll(row[varIndex])];
 					return !currentEntity->hasProperty(propertyId);
-				}), variableSet.getData().end());
+				}), variableSet.getData()->end());
 
 				//TODO: but what about the type of the new data being added? :/
-				for (auto row : variableSet.getData()) {
-					Entity* currentEntity = _entities[std::stoll(row[varIndex])];		
-					row[varIndex2] = currentEntity->getProperty(propertyId)->baseValues()[0]->toString();
-				}
-
+				for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+					Entity* currentEntity = _entities[std::stoll((*iter)[varIndex])];
+					(*iter)[varIndex2] = currentEntity->getProperty(propertyId)->baseValues()[0]->toString();
+				}				
 			}
 			else {
 				//TODO: TypeException

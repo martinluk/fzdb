@@ -49,8 +49,8 @@ public:
 		}
 	}
 
-	std::vector<std::vector<std::string>>& getData() {
-		return _values;
+	std::vector<std::vector<std::string>>* getData() {
+		return &_values;
 	}
 
 	const bool contains(std::string name) {

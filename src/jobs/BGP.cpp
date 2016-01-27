@@ -27,7 +27,7 @@ QueryResult BGP::execute()
 
 		rapidjson::Value val;
 		val.SetArray();
-		for (auto iter = data.cbegin(); iter != data.cend(); iter++) {			
+		for (auto iter = data->cbegin(); iter != data->cend(); iter++) {
 
 			rapidjson::Value val2;
 			val2.SetArray();
