@@ -23,7 +23,7 @@ public:
 	~EntityManager();
 
 	// Creates an entity on the heap and returns a pointer to it.
-	Entity* createEntity();
+	Entity* createEntity(const std::string &type);
 
 	void AddProperty(std::string name, unsigned int val) {
 		_propertyNames[name] = val;
@@ -47,7 +47,8 @@ public:
     bool saveToFile(const std::string &filename);
     bool loadFromFile(const std::string &filename);
 
-private:	
+private:
+	unsigned int getTypeID(const std::string &str);
 
 	// TODO: This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
@@ -56,8 +57,11 @@ private:
 	EntityMap _entities;
 	Entity::EHandle_t _lastHandle;
 	unsigned int _lastProperty;
+	unsigned int _lastTypeID;
 
+	// This maps string type names to entity type IDs.
 	std::map<std::string, unsigned int> _entityTypeNames;
+
 	std::map<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
     

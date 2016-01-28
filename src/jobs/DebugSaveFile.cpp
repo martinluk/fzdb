@@ -16,7 +16,7 @@ QueryResult DebugSaveFile::execute()
     EntityManager manager;
     
     // Create some entities.
-    Entity* e1 = manager.createEntity();
+	Entity* e1 = manager.createEntity(std::string());
     
     std::vector<String*> values;
     values.push_back(new String("Arnold", 75));
@@ -24,7 +24,7 @@ QueryResult DebugSaveFile::execute()
     values.push_back(new String("Clarence", 11));
     e1->insertProperty<String>(new EntityProperty<String>(1, values));
     
-    Entity* e2 = manager.createEntity();
+	Entity* e2 = manager.createEntity(std::string());
     
     values.clear();
     values.push_back(new String("Alice", 98));

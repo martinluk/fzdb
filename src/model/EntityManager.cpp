@@ -4,11 +4,15 @@
 #include <sstream>
 #include "../FileSystem.h"
 #include "GraphSerialiser.h"
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <cassert>
 
 EntityManager::EntityManager()
 {
 	_lastHandle = Entity::INVALID_EHANDLE;
 	_lastProperty = 0;
+	_lastTypeID = 0;
 }
 
 EntityManager::~EntityManager()
@@ -19,12 +23,14 @@ EntityManager::~EntityManager()
 	}
 }
 
-Entity* EntityManager::createEntity()
+Entity* EntityManager::createEntity(const std::string &type)
 {
+	unsigned int typeID = getTypeID(type);
+
 	_lastHandle++;
 	assert(_lastHandle != Entity::INVALID_EHANDLE);
 
-	Entity* e = new Entity(0, _lastHandle);
+	Entity* e = new Entity(typeID, _lastHandle);
 	_entities.insert(std::pair<Entity::EHandle_t, Entity*>(_lastHandle, e));
 
 	return e;
@@ -231,6 +237,7 @@ void EntityManager::clearAll()
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
     _lastProperty = 0;
+	_lastTypeID = 0;
     _entityTypeNames.clear();
     _propertyNames.clear();
     _propertyTypes.clear();
@@ -329,4 +336,37 @@ bool EntityManager::loadFromFile(const std::string &filename)
     delete[] buffer;
 
     return true;
+}
+
+unsigned int EntityManager::getTypeID(const std::string &str)
+{
+	// Makes the string uppercase.
+	// Because the string could be multi-byte, we cast our
+	// input to an ASCII string first. (This might not be
+	// the most intelligent thing to do though)
+	std::string uppercase(str.c_str());
+	std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
+	boost::algorithm::trim(uppercase);
+
+	// "Generic" type is an empty string.
+	// The ID for this is 0.
+	if ( uppercase.size() < 1 )
+		return 0;
+
+	unsigned int id = 0;
+	try
+	{
+		id = _entityTypeNames.at(str);
+	}
+	catch (const std::exception&)
+	{
+		// The string was not in the table yet.
+		// Assign it a new ID.
+		_lastTypeID++;
+		id = _lastTypeID;
+		assert(id > 0);
+		_entityTypeNames.insert(std::pair<std::string,unsigned int>(uppercase, id));
+	}
+
+	return id;
 }
