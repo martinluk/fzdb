@@ -123,9 +123,12 @@ void UserFileOperations::saveCacheToFile() {
 		//Create User Json Object Value
 		Value userOV;
 		userOV.SetObject();
-
 		//Adding attributes has time of string
-		userOV.AddMember("username","test",jsonDoc.GetAllocator());
+		const char* userNameStr = attr.userName.c_str();
+		Value usernameVal(kStringType);
+	
+		usernameVal.SetString(StringRef(userNameStr));
+		userOV.AddMember("username",usernameVal,jsonDoc.GetAllocator());
 		/*
 		userV.AddMember("passwordHash",attr.passwordHash,a);
 		userV.AddMember("salt",attr.salt,a);
