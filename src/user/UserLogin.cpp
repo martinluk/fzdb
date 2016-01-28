@@ -1,4 +1,5 @@
 #include <map>
+#include <cassert>
 #include "boost/assign.hpp"
 #include <user/UserLogin.h>
 #include <boost/filesystem.hpp>
@@ -139,8 +140,12 @@ void UserFileOperations::saveCacheToFile() {
 		//Casting usergroup to char
 		using namespace std;
 		using namespace boost::assign;
-		//map<UserGroup, char> translateUserGroupToChar = map_list_of (UserGr
 
+		map<UserGroup, char> groupCharMap; 
+		insert(groupCharMap) (UserGroup::ADMIN,'g') (UserGroup::EDITOR,'e') ;
+
+		//Logins cannot have user group guest.
+		assert(attr.userGroup != UserGroup::GUEST);
 
 		/*
 		//Cast usergroup into string
