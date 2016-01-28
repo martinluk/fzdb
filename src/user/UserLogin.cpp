@@ -117,13 +117,13 @@ void UserFileOperations::saveCacheToFile() {
 
 	Value userCollections(kArrayType);
 	for(;iter!=eiter;++iter) {
+		//Create User Json Object Value
+		Value userOV;
+		userOV.SetObject();
 
 		//Getting user from cache
 		UserAttributes attr = iter->second;
 
-		//Create User Json Object Value
-		Value userOV;
-		userOV.SetObject();
 		//Adding attributes has time of string
 		Value usernameVal;
 		usernameVal.SetString(StringRef(attr.userName.c_str(),attr.userName.length()));
@@ -141,18 +141,24 @@ void UserFileOperations::saveCacheToFile() {
 		using namespace std;
 		using namespace boost::assign;
 
-		map<UserGroup, char> groupCharMap; 
-		insert(groupCharMap) (UserGroup::ADMIN,'g') (UserGroup::EDITOR,'e') ;
+		map<UserGroup, unsigned int> groupIntMap; 
+		insert(groupIntMap) (UserGroup::ADMIN,0) (UserGroup::EDITOR,1) ;
 
 		//Logins cannot have user group guest.
-		assert(attr.userGroup != UserGroup::GUEST);
-
-		/*
-		//Cast usergroup into string
-
-		*/
+		UserGroup group = attr.userGroup;
+		assert(group != UserGroup::GUEST);
 		
+		Value userGroupInt;
+		userGroupInt.SetInt(groupIntMap[group]);
+		userOV.AddMember("userGroupInt",userGroupInt,allocator);
+
+		//Add the user object userCollections array
+		userCollections.PushBack(userOV, allocator);
 	}
+
+	//Add the userCollections array into main Json
+	
+	jsonDoc.AddMember("users",userCollections,allocator);
 
 	StringBuffer s;
 	Writer<StringBuffer> writer(s);
