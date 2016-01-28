@@ -5,6 +5,7 @@
 #include <boost/filesystem.hpp>
 #include <user/Hashing.h>
 #include "rapidjson/filewritestream.h"
+#include "rapidjson/filereadstream.h"
 #include <cstdio>
 
 #include "rapidjson/stringbuffer.h"
@@ -102,8 +103,6 @@ void UserAdmin::changeUserGroup(UserGroup currentUserGroup,std::string userName,
 	super::updateUser(a.userName,a);
 }
 
-void UserFileOperations::loadCacheFromFile() {
-}
 void UserFileOperations::saveCacheToFile() {
 	//Using iterator to iterate through the elements in cache
 	std::map<std::string, UserAttributes>::iterator iter = userFileCache.begin();
@@ -165,8 +164,8 @@ void UserFileOperations::saveCacheToFile() {
 	jsonDoc.AddMember("users",userCollections,allocator);
 
 	//Using rapidJson FileWriteStream to write to user file.
-	//
 	char writeBuffer[65536];
+	//XXX Window system should use wb?
 	FILE* fp = fopen(pathToLoginFile().c_str(),"w");
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	Writer<FileWriteStream> writer(os);
@@ -174,3 +173,33 @@ void UserFileOperations::saveCacheToFile() {
 	fclose(fp);
 }
  
+void UserFileOperations::loadCacheFromFile() {
+	using namespace rapidjson;
+	//XXX Window system should use rb?
+	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
+	char readBuffer[65536];
+	//Reading file using rapidjson reader
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document jsonDoc;
+	jsonDoc.ParseStream(is);
+	fclose(fp);
+
+	//Clearing userfile cache, ready for reloading
+	userFileCache.clear();
+
+	//Assert json is valid
+	assert(jsonDoc.IsObject());
+
+	//Assert has user array
+	assert(jsonDoc.HasMember("users"));
+	const Value& userArray=jsonDoc["users"];
+	assert(userArray.IsArray());
+
+	for (SizeType i=0; i<userArray.Size(); i++) {
+		const Value& userObject=userArray[i];
+		//Assert has each attribute in user object
+		//Add into cache
+
+	}
+
+}
