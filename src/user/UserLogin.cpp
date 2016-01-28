@@ -13,7 +13,9 @@
 
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
-	return boost::filesystem::current_path().string();
+	boost::filesystem::path dir = boost::filesystem::current_path();
+	dir /= "userFile.json";
+	return dir.string();
 }
 void UserFileOperations::addUser(UserAttributes userAttributes) {
 	//load cache from file
