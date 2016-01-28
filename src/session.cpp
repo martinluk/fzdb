@@ -23,6 +23,17 @@ TCPSession::TCPSession(boost::asio::io_service& io_service, TCPServer* parent, b
 	_uuid = identifier;
 }
 
+TCPSession::~TCPSession() {
+	try {
+		_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+		_socket.close();
+		spdlog::get("main")->info("[{:<}] {:<30}", _uuid, "Session deleted.");
+	}
+	catch (std::exception ex) {
+		std::cout << ex.what() << std::endl;
+	}
+}
+
 tcp::socket& TCPSession::socket() {
   return _socket;
 }
@@ -33,7 +44,7 @@ tcp::socket& TCPSession::socket() {
  */
 void TCPSession::start() {
   _socket.async_read_some(boost::asio::buffer(_data, max_length),
-    boost::bind(&TCPSession::handle_read, this,
+    boost::bind(&TCPSession::handle_read, shared_from_this(),
       boost::asio::placeholders::error,
       boost::asio::placeholders::bytes_transferred));
 }
@@ -52,7 +63,7 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   if ( _socketDisconnected(error) )
   {
   	// No need to call terminate() since we're already disconnected.
-  	_parent->signalSessionTerminated(this);
+  	//_parent->signalSessionTerminated(shared_from_this());
   	return;
   }
   
@@ -64,14 +75,14 @@ void TCPSession::handle_read(const boost::system::error_code& error,
     CommandInterpreter::ProcessCommand(this, _command);
     
     _socket.async_read_some(boost::asio::buffer(_data, max_length),
-      boost::bind(&TCPSession::handle_read, this,
+      boost::bind(&TCPSession::handle_read, shared_from_this(),
         boost::asio::placeholders::error,
         boost::asio::placeholders::bytes_transferred));
   } else {
     // TODO: Handle other errors.
   	// For now, just quit the session.
-  	terminate();
-  	_parent->signalSessionTerminated(this);
+  	//terminate();
+  	//_parent->signalSessionTerminated(shared_from_this());
   }
 }
 
@@ -86,8 +97,7 @@ void TCPSession::handle_write(const boost::system::error_code& error) {
   } else {
     // TODO: Handle errors.
     // For now, just terminate.
-    terminate();
-    _parent->signalSessionTerminated(this);
+   // _parent->signalSessionTerminated(shared_from_this());
   }
 }
 
@@ -104,11 +114,16 @@ void TCPSession::respond(const std::string response) {
       boost::asio::placeholders::error));
 }
 
-void TCPSession::terminate()
-{
-	_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-	_socket.close();
-}
+//void TCPSession::terminate()
+//{
+//	try {
+//		_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+//		_socket.close();
+//	}
+//	catch (std::exception ex) {
+//		std::cout << ex.what() << std::endl;
+//	}
+//}
 
 boost::uuids::uuid TCPSession::uuid()
 {

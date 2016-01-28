@@ -1,0 +1,10 @@
+{
+  "name": "fuzzy_database",
+  "version": "0.5.0",
+  "scripts": {
+    "test": "./node_modules/.bin/jasmine"
+  },
+  "dependencies": {
+    "jasmine": "^2.4.1"
+  }
+}

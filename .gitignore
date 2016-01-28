@@ -41,3 +41,5 @@ build
 
 .vagrant
 *~
+
+node_modules
