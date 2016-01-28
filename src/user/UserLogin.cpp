@@ -4,6 +4,8 @@
 #include <user/UserLogin.h>
 #include <boost/filesystem.hpp>
 #include <user/Hashing.h>
+#include "rapidjson/filewritestream.h"
+#include <cstdio>
 
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -160,8 +162,13 @@ void UserFileOperations::saveCacheToFile() {
 	
 	jsonDoc.AddMember("users",userCollections,allocator);
 
-	StringBuffer s;
-	Writer<StringBuffer> writer(s);
-	std::string json = s.GetString();
+	//Using rapidJson FileWriteStream to write to user file.
+	//
+	char writeBuffer[65536];
+	FILE* fp = fopen(pathToLoginFile().c_str(),"w");
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	Writer<FileWriteStream> writer(os);
+	jsonDoc.Accept(writer);
+	fclose(fp);
 }
  
