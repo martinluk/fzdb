@@ -1,21 +1,32 @@
-#include <map>
-#include <cassert>
-#include "boost/assign.hpp"
 #include <user/UserLogin.h>
-#include <boost/filesystem.hpp>
 #include <user/Hashing.h>
+
+#include "boost/assign.hpp"
+#include <boost/filesystem.hpp>
+
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
-#include <cstdio>
-
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/document.h"
 
+#include <cstdio>
+#include <map>
+#include <cassert>
+
+#define JSONFILENAME "userFile.json"
+
+#define USERNAME "username"
+#define HASH "passwordHash"
+#define SALT "salt"
+#define USERGROUPINT "userGroupInt"
+#define USERCOLLECTION "users"
+
+
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
 	boost::filesystem::path dir = boost::filesystem::current_path();
-	dir /= "userFile.json";
+	dir /= JSONFILENAME;
 	return dir.string();
 }
 void UserFileOperations::addUser(UserAttributes userAttributes) {
@@ -108,7 +119,6 @@ void UserFileOperations::saveCacheToFile() {
 	std::map<std::string, UserAttributes>::iterator iter = userFileCache.begin();
 	std::map<std::string, UserAttributes>::iterator eiter = userFileCache.end();
 	using namespace rapidjson;
-	//TODO Add default user, maybe using static boolean to see if init-ed
 	//Writing cache to string
 	Document jsonDoc;
 	Document::AllocatorType& allocator = jsonDoc.GetAllocator();
@@ -130,16 +140,15 @@ void UserFileOperations::saveCacheToFile() {
 		//Adding attributes has time of string
 		Value usernameVal;
 		usernameVal.SetString(StringRef(attr.userName.c_str(),attr.userName.length()));
-		//TODO Use pre-compiler for json names
-		userOV.AddMember("username",usernameVal,jsonDoc.GetAllocator());
+		userOV.AddMember(USERNAME,usernameVal,jsonDoc.GetAllocator());
 
 		Value passwordHashVal;
 		passwordHashVal.SetString(StringRef(attr.passwordHash.c_str(),attr.passwordHash.length()));
-		userOV.AddMember("passwordHash",passwordHashVal,jsonDoc.GetAllocator());
+		userOV.AddMember(HASH,passwordHashVal,jsonDoc.GetAllocator());
 
 		Value saltVal;
 		saltVal.SetString(StringRef(attr.salt.c_str(),attr.salt.length()));
-		userOV.AddMember("salt",saltVal,jsonDoc.GetAllocator());
+		userOV.AddMember(SALT,saltVal,jsonDoc.GetAllocator());
 
 		//Casting usergroup to char
 		using namespace std;
@@ -154,7 +163,7 @@ void UserFileOperations::saveCacheToFile() {
 		
 		Value userGroupInt;
 		userGroupInt.SetInt(groupIntMap[group]);
-		userOV.AddMember("userGroupInt",userGroupInt,allocator);
+		userOV.AddMember(USERGROUPINT,userGroupInt,allocator);
 
 		//Add the user object userCollections array
 		userCollections.PushBack(userOV, allocator);
@@ -162,7 +171,7 @@ void UserFileOperations::saveCacheToFile() {
 
 	//Add the userCollections array into main Json
 	
-	jsonDoc.AddMember("users",userCollections,allocator);
+	jsonDoc.AddMember(USERCOLLECTION,userCollections,allocator);
 
 	//Using rapidJson FileWriteStream to write to user file.
 	char writeBuffer[65536];
@@ -192,8 +201,8 @@ void UserFileOperations::loadCacheFromFile() {
 	assert(jsonDoc.IsObject());
 
 	//Assert has user array
-	assert(jsonDoc.HasMember("users"));
-	const Value& userArray=jsonDoc["users"];
+	assert(jsonDoc.HasMember(USERCOLLECTION));
+	const Value& userArray=jsonDoc[USERCOLLECTION];
 	assert(userArray.IsArray());
 
 	for (SizeType i=0; i<userArray.Size(); i++) {
@@ -202,10 +211,10 @@ void UserFileOperations::loadCacheFromFile() {
 		using namespace std;
 		//'FindMember' checks existence of member and obtain member at once
 		//TODO Use pre-compiler for json names
-		Value::ConstMemberIterator itrUser = userObject.FindMember("username");
-		Value::ConstMemberIterator itrHash = userObject.FindMember("passwordHash");
-		Value::ConstMemberIterator itrSalt = userObject.FindMember("salt");
-		Value::ConstMemberIterator itrGroupI = userObject.FindMember("userGroupInt");
+		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
+		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
+		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);
+		Value::ConstMemberIterator itrGroupI = userObject.FindMember(USERGROUPINT);
 		assert( itrUser != userObject.MemberEnd() &&
 				itrHash != userObject.MemberEnd() &&
 				itrSalt != userObject.MemberEnd() &&
@@ -219,7 +228,6 @@ void UserFileOperations::loadCacheFromFile() {
 		else if (groupNumber==0)
 			group=UserGroup::ADMIN;
 		else
-			//Invalid value of 
 			assert(false/*Invalid values in groupNumber in json user file*/);
 
 		//Interogating other string values
