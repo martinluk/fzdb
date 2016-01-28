@@ -1,3 +1,5 @@
+#include <map>
+#include "boost/assign.hpp"
 #include <user/UserLogin.h>
 #include <boost/filesystem.hpp>
 #include <user/Hashing.h>
@@ -101,18 +103,43 @@ void UserFileOperations::saveCacheToFile() {
 	//Using iterator to iterate through the elements in cache
 	std::map<std::string, UserAttributes>::iterator iter = userFileCache.begin();
 	std::map<std::string, UserAttributes>::iterator eiter = userFileCache.end();
+	using namespace rapidjson;
 	//TODO Add default user, maybe using static boolean to see if init-ed
 	//Writing cache to string
-	rapidjson::StringBuffer s;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+	Document jsonDoc;
+	Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+
 	//Refer to example http://bit.ly/1KakUqr
 	//Also serializing struct http://bit.ly/23sQ4jd
-	//writer.StartObject();
 
+	jsonDoc.SetObject();
+
+	Value userCollections(kArrayType);
 	for(;iter!=eiter;++iter) {
-		//writer.
+
+		//Getting user from cache
+		UserAttributes attr = iter->second;
+
+		//Create User Json Object Value
+		Value userOV;
+		userOV.SetObject();
+
+		//Adding attributes has time of string
+		userOV.AddMember("username","test",jsonDoc.GetAllocator());
+		/*
+		userV.AddMember("passwordHash",attr.passwordHash,a);
+		userV.AddMember("salt",attr.salt,a);
+		//Cast usergroup into string
+		using namespace std;
+		using namespace boost::assign;
+		//map<UserGroup, char> translateUserGroupToChar = map_list_of (UserGr
+
+		*/
+		
 	}
 
+	StringBuffer s;
+	Writer<StringBuffer> writer(s);
 	std::string json = s.GetString();
 }
  
