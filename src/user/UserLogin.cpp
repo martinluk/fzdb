@@ -130,6 +130,7 @@ void UserFileOperations::saveCacheToFile() {
 		//Adding attributes has time of string
 		Value usernameVal;
 		usernameVal.SetString(StringRef(attr.userName.c_str(),attr.userName.length()));
+		//TODO Use pre-compiler for json names
 		userOV.AddMember("username",usernameVal,jsonDoc.GetAllocator());
 
 		Value passwordHashVal;
@@ -197,8 +198,41 @@ void UserFileOperations::loadCacheFromFile() {
 
 	for (SizeType i=0; i<userArray.Size(); i++) {
 		const Value& userObject=userArray[i];
-		//Assert has each attribute in user object
+		assert(userObject.IsObject());
+		using namespace std;
+		//'FindMember' checks existence of member and obtain member at once
+		//TODO Use pre-compiler for json names
+		Value::ConstMemberIterator itrUser = userObject.FindMember("username");
+		Value::ConstMemberIterator itrHash = userObject.FindMember("passwordHash");
+		Value::ConstMemberIterator itrSalt = userObject.FindMember("salt");
+		Value::ConstMemberIterator itrGroupI = userObject.FindMember("userGroupInt");
+		assert( itrUser != userObject.MemberEnd() &&
+				itrHash != userObject.MemberEnd() &&
+				itrSalt != userObject.MemberEnd() &&
+				itrGroupI != userObject.MemberEnd());
+
+		//Casting user group int to user group
+		UserGroup group;
+		unsigned int groupNumber = itrHash->value.GetInt();
+		if (groupNumber==1) 
+			group=UserGroup::EDITOR;
+		else if (groupNumber==0)
+			group=UserGroup::ADMIN;
+		else
+			//Invalid value of 
+			assert(false/*Invalid values in groupNumber in json user file*/);
+
+		//Interogating other string values
+		string username = itrUser->value.GetString();
+		string hash = itrHash->value.GetString();
+		string salt = itrSalt->value.GetString();
+		//Add into a user attribute struct
+		UserAttributes attr;
+		attr.userName = username;
+		attr.passwordHash = hash;
+		attr.salt = salt;
 		//Add into cache
+		userFileCache[username]=attr;
 
 	}
 
