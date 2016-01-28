@@ -128,13 +128,22 @@ void UserFileOperations::saveCacheToFile() {
 		usernameVal.SetString(StringRef(attr.userName.c_str(),attr.userName.length()));
 		userOV.AddMember("username",usernameVal,jsonDoc.GetAllocator());
 
-		/*
-		userV.AddMember("passwordHash",attr.passwordHash,a);
-		userV.AddMember("salt",attr.salt,a);
-		//Cast usergroup into string
+		Value passwordHashVal;
+		passwordHashVal.SetString(StringRef(attr.passwordHash.c_str(),attr.passwordHash.length()));
+		userOV.AddMember("passwordHash",passwordHashVal,jsonDoc.GetAllocator());
+
+		Value saltVal;
+		saltVal.SetString(StringRef(attr.salt.c_str(),attr.salt.length()));
+		userOV.AddMember("salt",saltVal,jsonDoc.GetAllocator());
+
+		//Casting usergroup to char
 		using namespace std;
 		using namespace boost::assign;
 		//map<UserGroup, char> translateUserGroupToChar = map_list_of (UserGr
+
+
+		/*
+		//Cast usergroup into string
 
 		*/
 		
