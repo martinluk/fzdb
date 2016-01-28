@@ -16,6 +16,8 @@
 #include "model/EntityManager.h"
 #include "model/Triple.h"
 
+#include "platform.h"
+
 //windows specific to handle ctrl-c call
 #if PLATFORM == PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
