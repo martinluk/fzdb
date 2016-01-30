@@ -1,5 +1,4 @@
 #include "../session.h"
-#include "../user/UserLogin.h"
 #include "../Job.h"
 
 #include "QueryResult.h"

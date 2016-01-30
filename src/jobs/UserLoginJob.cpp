@@ -1,5 +1,7 @@
 #include "UserLoginJob.h"
 
+#include "../user/UserLogin.h"
+
 UserLoginJob::UserLoginJob(ISession* session, std::string username, std::string password) : Job(session) {
 	_username=username;
 	_password=password;
