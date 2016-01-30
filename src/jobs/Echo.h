@@ -10,7 +10,7 @@ class EchoJob : public Job
 {
 public:
 
-	EchoJob(ISession* session, std::string message);
+	EchoJob(std::shared_ptr<ISession> session, std::string message);
 
 
 	// Inherited via Job

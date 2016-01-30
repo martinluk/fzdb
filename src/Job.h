@@ -7,7 +7,7 @@
 class Job 
 {
 public:
-	Job(ISession* session) 
+	Job(std::shared_ptr<ISession> session) 
 	{
 		_session = session;
 	}
@@ -16,11 +16,11 @@ public:
 
 	virtual QueryResult execute() = 0;
 
-  ISession* Session() {
-    return _session;
-  }
+	std::shared_ptr<ISession> Session() {
+		return _session;
+	}
 protected:
-	ISession* _session;
+	std::shared_ptr<ISession> _session;
 };
 
 #endif

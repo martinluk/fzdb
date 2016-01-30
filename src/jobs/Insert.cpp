@@ -4,7 +4,7 @@
 
 #include "../Exceptions.h"
 
-Insert::Insert(ISession* session, Query query) : Job(session), _query(query)
+Insert::Insert(std::shared_ptr<ISession> session, Query query) : Job(session), _query(query)
 {
 }
 

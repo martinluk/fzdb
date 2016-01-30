@@ -12,7 +12,7 @@ class BGP : public Job
 {
 public:
 
-  BGP(ISession* session, Query message);
+  BGP(std::shared_ptr<ISession> session, Query message);
 
 
   // Inherited via Job

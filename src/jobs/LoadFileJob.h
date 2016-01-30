@@ -7,7 +7,7 @@
 class LoadFileJob : public Job
 {
 public:
-	LoadFileJob(ISession* session, const std::string &message);
+	LoadFileJob(std::shared_ptr<ISession> session, const std::string &message);
 
 	virtual QueryResult execute() override;
 	

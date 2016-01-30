@@ -7,12 +7,12 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
-LoadFileJob::LoadFileJob(ISession *session, const std::string &message) : Job(session)
+LoadFileJob::LoadFileJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session)
 {
 	_message = message;
 }
 
-SaveFileJob::SaveFileJob(ISession *session, const std::string &message) : Job(session)
+SaveFileJob::SaveFileJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session)
 {
 	_message = message;
 }

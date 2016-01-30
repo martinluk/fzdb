@@ -11,8 +11,7 @@ public:
 	virtual boost::asio::ip::tcp::socket& socket() = 0;
 	virtual void start() = 0;
 	virtual void respond(const std::string response) = 0;
-	virtual void terminate() = 0;
-        virtual boost::uuids::uuid uuid() = 0;
+    virtual boost::uuids::uuid uuid() = 0;
 	virtual ~ISession() {};
 protected:
 

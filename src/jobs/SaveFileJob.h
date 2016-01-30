@@ -7,7 +7,7 @@
 class SaveFileJob : public Job
 {
 public:
-	SaveFileJob(ISession* session, const std::string &message);
+	SaveFileJob(std::shared_ptr<ISession> session, const std::string &message);
 
 	virtual QueryResult execute() override;
 	

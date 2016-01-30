@@ -2,7 +2,7 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
-CreateEntityJob::CreateEntityJob(ISession* session) : Job(session)
+CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session) : Job(session)
 {
 }
 

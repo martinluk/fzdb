@@ -7,7 +7,7 @@
 class CreateEntityJob : public Job
 {
 public:
-	CreateEntityJob(ISession* session);
+	CreateEntityJob(std::shared_ptr<ISession> session);
 
 	virtual QueryResult execute() override;
 };
