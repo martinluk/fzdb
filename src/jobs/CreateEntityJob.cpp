@@ -9,7 +9,7 @@ CreateEntityJob::CreateEntityJob(ISession* session) : Job(session)
 QueryResult CreateEntityJob::execute()
 {
 	EntityManager* m = Singletons::entityManager();
-	Entity* e = m->createEntity();
+	std::shared_ptr<Entity> e = m->createEntity();
 
 	std::string id = std::to_string(e->getHandle());
 

@@ -13,19 +13,19 @@ EntityManager::EntityManager()
 
 EntityManager::~EntityManager()
 {
-	for (EntityMap::iterator it = _entities.begin(); it != _entities.end(); ++it)
+	/*for (EntityMap::iterator it = _entities.begin(); it != _entities.end(); ++it)
 	{
 		delete it->second;
-	}
+	}*/
 }
 
-Entity* EntityManager::createEntity()
+std::shared_ptr<Entity> EntityManager::createEntity()
 {
 	_lastHandle++;
 	assert(_lastHandle != Entity::INVALID_EHANDLE);
 
-	Entity* e = new Entity(0, _lastHandle);
-	_entities.insert(std::pair<Entity::EHandle_t, Entity*>(_lastHandle, e));
+	auto e = std::make_shared<Entity>(0, _lastHandle);
+	_entities.insert(std::pair<Entity::EHandle_t, std::shared_ptr<Entity>>(_lastHandle, e));
 
 	return e;
 }
@@ -179,32 +179,32 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 
 		//create the entity if it doesn't exist
 		if (_entities.find(entity_id) == _entities.end()) {
-			_entities[entity_id] = new Entity(1, ++_lastHandle);
+			_entities[entity_id] = std::make_shared<Entity>(1, ++_lastHandle);
 		}
 
-		Entity* currentEntity = _entities[entity_id];		
+		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
 		unsigned int propertyId;
 
 		switch (triple.object.type) {
 		case model::Object::Type::STRING:
 			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeString, true);
-			this->addToEntity<model::types::String>(currentEntity, propertyId, std::move(triple.object));
+			addToEntity<model::types::String>(currentEntity, propertyId, std::move(triple.object));
 			break;
 		case model::Object::Type::ENTITYREF:
 			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeEntityRef, true);
-			this->addToEntity<model::types::EntityRef>(currentEntity, propertyId, std::move(triple.object));
+			addToEntity<model::types::EntityRef>(currentEntity, propertyId, std::move(triple.object));
 			break;
 		case model::Object::Type::INT:
 			propertyId = this->getPropertyName(triple.predicate.value, model::types::Base::Subtype::TypeInt32, true);
-			this->addToEntity<model::types::Int>(currentEntity, propertyId, std::move(triple.object));
+			addToEntity<model::types::Int>(currentEntity, propertyId, std::move(triple.object));
 			break;
 		}
 	}
 }
 
-std::vector<Entity*> EntityManager::entityList() const
+std::vector<std::shared_ptr<Entity>> EntityManager::entityList() const
 {
-    std::vector<Entity*> list;
+    std::vector<std::shared_ptr<Entity>> list;
     
     for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
     {
@@ -215,7 +215,7 @@ std::vector<Entity*> EntityManager::entityList() const
 }
 
 // TODO: Do we need some sort of handle renumber function too?
-void EntityManager::insertEntity(Entity *ent)
+void EntityManager::insertEntity(std::shared_ptr<Entity> ent)
 {
     assert(ent->getHandle() != Entity::INVALID_EHANDLE);
     assert(_entities.find(ent->getHandle()) == _entities.end());
@@ -223,7 +223,7 @@ void EntityManager::insertEntity(Entity *ent)
     if ( _lastHandle < ent->getHandle() )
         _lastHandle = ent->getHandle();
     
-    _entities.insert(std::pair<Entity::EHandle_t, Entity*>(ent->getHandle(), ent));
+    _entities.insert(std::pair<Entity::EHandle_t, std::shared_ptr<Entity>>(ent->getHandle(), ent));
 }
 
 void EntityManager::clearAll()
@@ -248,7 +248,7 @@ std::string EntityManager::dumpContents() const
     
     for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
     {
-        const Entity* ent = it->second;
+        const std::shared_ptr<Entity> ent = it->second;
         str << ent->logString() << "\n";
         if ( ent->propertyCount() > 0 )
         {
@@ -331,14 +331,64 @@ bool EntityManager::loadFromFile(const std::string &filename)
     return true;
 }
 
-void EntityManager::linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2)
-{
+#pragma region linkingandmerging
+
+void EntityManager::linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
 	if (_links.find(entityId) == _links.end()) _links[entityId] = std::set<Entity::EHandle_t>();
 	if (_links.find(entityId2) == _links.end()) _links[entityId2] = std::set<Entity::EHandle_t>();
 
-	_links[entityId].insert(entityId2);
-	_links[entityId2].insert(entityId);
+	std::set<Entity::EHandle_t> newSet;
+
+	std::set_union(_links[entityId].begin(), _links[entityId].end(),
+					_links[entityId2].begin(), _links[entityId2].end(), 
+					std::inserter(newSet, newSet.begin()));
+
+	newSet.insert(entityId2);
+	newSet.insert(entityId);
+
+	_links[entityId] = newSet;
+	_links[entityId2] = newSet;
 }
+
+void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
+	//if they are not actually linked, return
+	if (_links.find(entityId) == _links.end() || _links.find(entityId2) == _links.end() ||
+		_links.find(entityId)->second.find(entityId2) == _links.find(entityId)->second.end() ||
+		_links.find(entityId2)->second.find(entityId) == _links.find(entityId2)->second.end()) {
+		return;
+	}
+}
+
+// Merges the entities with the given Ids. The entity with the higher Id number is deleted.
+void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
+	//we will keep the entity with the lower id
+	Entity::EHandle_t keep, lose;
+	auto sorted = std::minmax(entityId, entityId2);
+	keep = sorted.first;
+	lose = sorted.second;
+
+	//get the entities
+	std::shared_ptr<Entity> keepEntity = _entities[keep],
+		loseEntity = _entities[lose];
+
+	//check we are merging entities of the same type
+	if (keepEntity->getType() != loseEntity->getType()) {
+		throw new std::runtime_error("Attempted to merge entities of different types");
+	}
+
+	//copy the properties of loseEntity to keepEntity
+	for (auto prop : loseEntity->properties()) {
+		keepEntity->insertProperty(prop.second);
+	}
+
+	//delete EntityManager's ownership of loseEntity (will be automatically deleted)
+	_entities.erase(lose);
+}
+
+#pragma endregion linkingandmerging
 
 #pragma region scan_functions
 
@@ -354,7 +404,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 			unsigned char varIndex = variableSet.indexOf(variableName);
 
 			variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(), [&, this, varIndex](std::vector<std::string> row) {
-				Entity* currentEntity = _entities[std::stoll(row[varIndex])];
+				auto currentEntity = _entities[std::stoll(row[varIndex])];
 				return !currentEntity->meetsCondition(propertyId, std::move(object));
 			}), variableSet.getData()->end());
 
@@ -368,7 +418,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 	//the variable has not been used, add all the values found!
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 
-		Entity* currentEntity = iter->second;
+		auto currentEntity = iter->second;
 		if (currentEntity->meetsCondition(propertyId, std::move(object))) {
 			variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
 		}
@@ -391,13 +441,13 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 				varIndex2 = variableSet.indexOf(variableName2);
 
 			variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(), [&, this, varIndex](std::vector<std::string> row) {
-				Entity* currentEntity = _entities[std::stoll(row[varIndex])];
+				auto currentEntity = _entities[std::stoll(row[varIndex])];
 				return !currentEntity->hasProperty(propertyId);
 			}), variableSet.getData()->end());
 
 			//TODO: but what about the type of the new data being added? :/
 			for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
-				Entity* currentEntity = _entities[std::stoll((*iter)[varIndex])];
+				auto currentEntity = _entities[std::stoll((*iter)[varIndex])];
 				(*iter)[varIndex2] = currentEntity->getProperty(propertyId)->baseValues()[0]->toString();
 			}
 		}
@@ -410,7 +460,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 	//the variable has not been used, add all the values found!
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 
-		Entity* currentEntity = iter->second;
+		auto currentEntity = iter->second;
 		if (currentEntity->hasProperty(propertyId)) {
 			auto rowId = variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
 			variableSet.add(std::move(variableName2),
@@ -456,7 +506,7 @@ void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subj
 	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
 
 	if (EntityExists(entityRef)) {
-		Entity* entity = _entities[entityRef];
+		auto entity = _entities[entityRef];
 		if (entity->hasProperty(propertyId)) {
 			variableSet.add(std::move(variableName),
 				entity->getProperty(propertyId)->baseValues()[0]->toString(),

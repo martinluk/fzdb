@@ -78,6 +78,15 @@ public:
 		_propertyTable.insert(pair);
 	}
 
+	void insertProperty(IEntityProperty* prop) {
+		// Erase the property if it exists (If not, this will do nothing).
+		//propertyTable_.erase(prop.key());
+
+		// Insert the new one.
+		auto pair = std::make_pair<unsigned int, IEntityProperty*>(std::move(prop->key()), std::move(prop));
+		_propertyTable.insert(pair);
+	}
+
 	// Removes the property with the given key.
 	void removeProperty(const unsigned int &key);
 

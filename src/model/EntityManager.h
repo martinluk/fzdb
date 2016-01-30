@@ -24,7 +24,7 @@ public:
 	~EntityManager();
 
 	// Creates an entity on the heap and returns a pointer to it.
-	Entity* createEntity();
+	std::shared_ptr<Entity> createEntity();
 
 	void AddProperty(std::string name, unsigned int val) {
 		_propertyNames[name] = val;
@@ -38,7 +38,7 @@ public:
 		return _entities.find(handle) != _entities.cend();
 	}
     
-    std::vector<Entity*> entityList() const;
+    std::vector<std::shared_ptr<Entity>> entityList() const;
     std::size_t entityCount() const;
     
     void clearAll();
@@ -56,7 +56,7 @@ private:
 
 	// TODO: This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
-	typedef std::map<Entity::EHandle_t, Entity*> EntityMap;
+	typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;
 
 	EntityMap _entities;
 	std::map<Entity::EHandle_t, std::set<Entity::EHandle_t>> _links;
@@ -67,7 +67,7 @@ private:
 	std::map<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
     
-    void insertEntity(Entity* ent);
+    void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
 	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {
@@ -102,7 +102,7 @@ private:
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 
 	template<typename T>
-	void addToEntity(Entity* currentEntity, unsigned int propertyId, model::Object&& object) {
+	void addToEntity(std::shared_ptr<Entity> currentEntity, unsigned int propertyId, model::Object&& object) {
 		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
 
 		if (currentEntity->hasProperty(propertyId)) {
