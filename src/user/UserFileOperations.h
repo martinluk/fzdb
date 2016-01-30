@@ -18,7 +18,5 @@ class UserFileOperations {
 		static std::string pathToLoginFile();
 		static std::map<std::string, UserAttributes> userFileCache;
 };
-//Initialise cache map
-std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
 

@@ -22,6 +22,8 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
+//Initialise cache map
+std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
