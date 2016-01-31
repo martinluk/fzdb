@@ -11,12 +11,6 @@ ExternalProject_Add(
 ExternalProject_Get_Property(benchmark install_dir)
 set(BENCHMARK_INCLUDE_DIRS "${install_dir}/src/benchmark/include")
 
-if(MSVC)
-  set(BENCHMARK_LIBRARIES "${install_dir}/src/benchmark-build/src/Debug/benchmark.lib")
-elseif(GCC)
-  set(BENCHMARK_LIBRARIES "${install_dir}/src/benchmark-build/src/libbenchmark.a")
-endif()
-
 if(WIN32)
 find_library(SHLWAPI Shlwapi.lib) 
 else()
