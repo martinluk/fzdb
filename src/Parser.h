@@ -42,6 +42,9 @@ enum class ParsedTokenType {
         KEYWORD_DEBUG  = TOKEN_KEYWORD_MASK | 0x8,
 		KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
 		KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
+		KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
+		KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
+		KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -125,7 +128,10 @@ enum class QueryType {
     DEBUGOTHER,
     LOAD,
     SAVE,
-	USER
+	USER,
+	LINK,
+	UNLINK,
+	MERGE
 };
 
 //Aggregate query object - this should contain all info required to do a query
@@ -138,14 +144,16 @@ public:
 	TriplesBlock whereClause;
 	std::string data0;
 	std::vector<std::string> selectLine;
+	std::vector<long long int> entities;
 
-	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline) {
+	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline, std::vector<long long int> ents) {
 		type = t;
 		sources = s;
 		conditions = cond;
 		whereClause = wh;
 		data0 = dat0;
 		selectLine = selectline;
+		entities = ents;
 	}
 };
 

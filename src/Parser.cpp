@@ -80,6 +80,9 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
 	else if (str == "LOAD") tokenType = ParsedTokenType::KEYWORD_LOAD;
 	else if (str == "SAVE") tokenType = ParsedTokenType::KEYWORD_SAVE;
+	else if (str == "LINK") tokenType = ParsedTokenType::KEYWORD_LINK;
+	else if (str == "UNLINK") tokenType = ParsedTokenType::KEYWORD_UNLINK;
+	else if (str == "FINAL") tokenType = ParsedTokenType::KEYWORD_FINAL;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -371,6 +374,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 	TriplesBlock whereClause;
 	std::vector<std::string> selectLine;
 	std::string data0;
+	std::vector<long long int> entities;
 
 	while (iter != tokens.end()) {
 
@@ -487,8 +491,59 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			break;
 		}
 
+		//linking and merging
+		if (iter->first.type == ParsedTokenType::KEYWORD_LINK) {
+			iter++;
+			if (iter->first.type == ParsedTokenType::KEYWORD_FINAL) {
+				type = QueryType::MERGE;
+				iter++;
+				if(iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				entities.push_back(std::stoll(iter->second));
+				iter++;
+				if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				entities.push_back(std::stoll(iter->second));
+				if (iter != tokens.end()) {
+					throw ParseException("Link only takes 2 arguments");
+				}
+			}
+			else {
+				if (iter->first.type == ParsedTokenType::ENTITYREF) {
+					entities.push_back(std::stoll(iter->second));
+					type = QueryType::LINK;
+					iter++;
+					if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+					entities.push_back(std::stoll(iter->second));
+					if (iter != tokens.end()) {
+						throw ParseException("Link only takes 2 arguments");
+					}
+				}
+				else {
+					throw ParseException("Invalid arguments to link");
+				}
+			}
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_UNLINK) {
+			iter++;			
+			if (iter->first.type == ParsedTokenType::ENTITYREF) {
+				entities.push_back(std::stoll(iter->second));
+				type = QueryType::LINK;
+				iter++;
+				if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				entities.push_back(std::stoll(iter->second));
+				if (iter != tokens.end()) {
+					throw ParseException("Link only takes 2 arguments");
+				}
+			}
+			else {
+				throw ParseException("Invalid arguments to link");
+			}
+			break;
+		}
+
 		throw ParseException("Unknown symbol: " + iter->second);
 	}
 
-	return Query(type, sources, conditions, whereClause, data0, selectLine);
+	return Query(type, sources, conditions, whereClause, data0, selectLine, entities);
 }
