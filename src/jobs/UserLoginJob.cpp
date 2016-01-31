@@ -1,6 +1,6 @@
 #include "UserLoginJob.h"
 
-#include "../user/UserLogin.h"
+#include "../user/UserOperation.h"
 
 UserLoginJob::UserLoginJob(ISession* session, std::string username, std::string password) : Job(session) {
 	_username=username;
@@ -10,7 +10,7 @@ UserLoginJob::UserLoginJob(ISession* session, std::string username, std::string 
 QueryResult UserLoginJob::execute() {
 	QueryResult result;
 	try {
-		UserCommonOperation::login(_username,_password);
+		UserOperation::login(_username,_password);
 	} catch (LoginUnsuccessfulException ex) { 
 		result = QueryResult::generateError(ex.what());
 	}
