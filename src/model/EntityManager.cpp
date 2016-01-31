@@ -178,8 +178,10 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 		auto entity_id = std::stoll(triple.subject.value);
 
 		//create the entity if it doesn't exist
+		//TODO: are we doing incremental handles or what's in the query or both?
 		if (_entities.find(entity_id) == _entities.end()) {
-			_entities[entity_id] = std::make_shared<Entity>(1, ++_lastHandle);
+			
+			_entities[entity_id] = std::make_shared<Entity>(1, entity_id);
 		}
 
 		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
