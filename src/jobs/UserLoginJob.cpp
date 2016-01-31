@@ -14,7 +14,7 @@ QueryResult UserLoginJob::execute() {
 	QueryResult result;
 	try {
 		UserGroup currentGroup = UserOperation::login(_username,_password);
-		_session->setCurrentUserGroup(currentGroup);
+		_session->setCurrentUserName(_username);
 	} catch (LoginUnsuccessfulException ex) { 
 		result = QueryResult::generateError(ex.what());
 	}
