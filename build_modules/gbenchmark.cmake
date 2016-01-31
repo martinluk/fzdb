@@ -14,7 +14,7 @@ set(BENCHMARK_INCLUDE_DIRS "${install_dir}/src/benchmark/include")
 if(MSVC)
   set(BENCHMARK_LIBRARIES "${install_dir}/src/benchmark-build/src/Debug/benchmark.lib")
 elseif(GCC)
-  set(BENCHMARK_LIBRARIES "${install_dir}/src/benchmark-build/src/benchmark.a")
+  set(BENCHMARK_LIBRARIES "${install_dir}/src/benchmark-build/src/libbenchmark.a")
 endif()
 
 if(WIN32)
