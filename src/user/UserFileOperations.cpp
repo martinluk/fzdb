@@ -24,11 +24,13 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
+
 //Initialise cache map
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
 void UserFileOperations::initialize() { //TODO
 	//Empty file cache
+	userFileCache.clear();
 	if (ADD_ADMIN_ON_INIT) {
 		//Add admin into cache
 		UserAttributes admin;
@@ -37,8 +39,6 @@ void UserFileOperations::initialize() { //TODO
 		admin.passwordHash = "TODO" ; //TODO 
 		admin.userGroup = UserGroup::ADMIN;
 		addUser(admin);
-		//Save to json
-		saveCacheToFile();
 	} else { 
 		//Load from json
 		loadCacheFromFile();
@@ -52,11 +52,9 @@ std::string UserFileOperations::pathToLoginFile() {
 	return dir.string();
 }
 void UserFileOperations::addUser(UserAttributes userAttributes) {
-	//load cache from file
-	loadCacheFromFile();
 	//Assert that no such user already exist, otherwise throw exception
 	std::string newUserName=userAttributes.userName;
-	if (userFileCache.count(newUserName)==0) {
+	if (userFileCache.count(newUserName)>0) {
 		throw new UserAlreadyExistException;
 	}
 	//Add into cache
