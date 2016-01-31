@@ -26,6 +26,7 @@ add_dependencies(fuzzy-database-benchmark nowide)
 add_dependencies(fuzzy-database-benchmark benchmark)
 add_dependencies(fuzzy-database-benchmark spdlog)
 add_dependencies(fuzzy-database-benchmark rapidjson)
+add_dependencies(fuzzy-database-benchmark benchmark)
 
 #remove main otherwise there are 2 main functions!
 
