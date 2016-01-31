@@ -1,5 +1,4 @@
 #include <user/UserOperation.h>
-
 #include <user/UserFileOperations.h>
 #include <user/UserAttributes.h>
 #include <user/UserExceptions.h>

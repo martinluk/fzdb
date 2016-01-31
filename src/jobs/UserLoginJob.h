@@ -11,5 +11,6 @@ public:
 private:
 	std::string _username;
 	std::string _password;
+	ISession* _session;
 };
 
