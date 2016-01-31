@@ -6,7 +6,7 @@
 
 #include <rapidjson/document.h>
 
-BGP::BGP(ISession* session, Query query) : Job(session), _query(query)
+BGP::BGP(std::shared_ptr<ISession> session, Query query) : Job(session), _query(query)
 {
 }
 

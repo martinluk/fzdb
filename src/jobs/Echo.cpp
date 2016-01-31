@@ -1,6 +1,6 @@
 #include "Echo.h"
 
-EchoJob::EchoJob(ISession* session, std::string message) : Job(session)
+EchoJob::EchoJob(std::shared_ptr<ISession> session, std::string message) : Job(session)
 {
 	_message = message;
 }

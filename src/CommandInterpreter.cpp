@@ -14,7 +14,7 @@
 
 #include "Parser.h"
 
-void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command) {
+void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::string command) {
 
 	auto tokens = FSparqlParser::Tokenize(command);
 

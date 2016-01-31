@@ -31,10 +31,10 @@ public:
 private:
 
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
-	void handle_write(const boost::system::error_code& error);	
+	void handle_write(const boost::system::error_code& error);
 
 	tcp::socket _socket;
-	enum { max_length = 1024 };
+	enum { max_length = 1048576 };
 	char _data[max_length];
 	TCPServer*	_parent;
 	boost::uuids::uuid _uuid;

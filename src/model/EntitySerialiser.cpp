@@ -22,7 +22,7 @@ struct PropertyHeader
     std::size_t                 valueCount; // How many values this property contains.
 };
 
-EntitySerialiser::EntitySerialiser(const Entity *ent) : _entity(ent)
+EntitySerialiser::EntitySerialiser(const std::shared_ptr<Entity> ent) : _entity(ent)
 {
 
 }
@@ -99,7 +99,7 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
 }
 
 template <typename T>
-void populate(Entity* ent, const PropertyHeader* header, const char* data)
+void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const char* data)
 {
     using namespace model::types;
 
@@ -117,7 +117,7 @@ void populate(Entity* ent, const PropertyHeader* header, const char* data)
     ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
 }
 
-Entity* EntitySerialiser::unserialise(const char *serialData)
+std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
 {
     using namespace model::types;
 
@@ -132,7 +132,7 @@ Entity* EntitySerialiser::unserialise(const char *serialData)
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialData);
 
     // Create an entity shell.
-    Entity* ent = new Entity(pHeader->type, pHeader->handle);
+	std::shared_ptr<Entity> ent = std::make_shared<Entity>(pHeader->type, pHeader->handle);
 
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(SerialHeader));
     for ( int i = 0; i < pHeader->propertyCount; i++ )
