@@ -14,6 +14,8 @@
 #include <map>
 #include <cassert>
 
+#define ADD_ADMIN_ON_INIT true
+
 #define JSONFILENAME "userFile.json"
 
 #define USERNAME "username"
@@ -24,6 +26,24 @@
 
 //Initialise cache map
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
+
+void UserFileOperations::initialize() { //TODO
+	//Empty file cache
+	if (ADD_ADMIN_ON_INIT) {
+		//Add admin into cache
+		UserAttributes admin;
+		admin.userName = "admin";
+		admin.salt = "TODO" ;//TODO
+		admin.passwordHash = "TODO" ; //TODO 
+		admin.userGroup = UserGroup::ADMIN;
+		addUser(admin);
+		//Save to json
+		saveCacheToFile();
+	} else { 
+		//Load from json
+		loadCacheFromFile();
+	}
+}
 
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
