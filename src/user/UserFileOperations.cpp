@@ -15,6 +15,8 @@
 #include <cassert>
 
 #define ADD_ADMIN_ON_INIT true
+#define ADMIN_USERNAME "admin"
+#define ADMIN_PASSWORD "password"
 
 #define JSONFILENAME "userFile.json"
 
@@ -34,9 +36,9 @@ void UserFileOperations::initialize() { //TODO
 	if (ADD_ADMIN_ON_INIT) {
 		//Add admin into cache
 		UserAttributes admin;
-		admin.userName = "admin";
-		admin.salt = "TODO" ;//TODO
-		admin.passwordHash = "TODO" ; //TODO 
+		admin.userName = ADMIN_USERNAME;
+		admin.salt = Hashing::genSalt();
+		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
 		admin.userGroup = UserGroup::ADMIN;
 		addUser(admin);
 	} else { 
