@@ -17,10 +17,6 @@ elseif(GCC)
   set(BENCHMARK_LIBRARIES "${install_dir}/src/benchmark-build/src/benchmark.a")
 endif()
 
-message(${BENCHMARK_INCLUDE_DIRS})
-message(${BENCHMARK_LIBRARIES})
-
-
 if(WIN32)
 find_library(SHLWAPI Shlwapi.lib) 
 else()
