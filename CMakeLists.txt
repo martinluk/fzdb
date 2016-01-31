@@ -34,6 +34,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gtest.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gmock.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/spdlog.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/rapidjson.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build_modules/gbenchmark.cmake)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${Boost_Nowide_INCLUDES}) 
@@ -84,3 +85,4 @@ if(UNIX AND NOT APPLE)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/benchmarks)
