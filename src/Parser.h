@@ -3,10 +3,12 @@
 
 #include <iterator>
 #include <vector>
+#include <set>
 #include <string>
 #include <map>
 
 #include "model/Triple.h"
+#include "filters/IFilter.h"
 
 // Values that don't collide with masks range from 0x0 to 0xf.
 #define TOKEN_SPLITTER_MASK 0b010000
@@ -26,6 +28,7 @@ enum class ParsedTokenType {
 	//structural
         OPEN_CURLBRACE  = 0x6,
         CLOSE_CURLBRACE = 0x7,
+        FILTER = 0x9,
 	
 	//keywords
         KEYWORD_SELECT = TOKEN_KEYWORD_MASK | 0x0,
@@ -47,12 +50,13 @@ enum class ParsedTokenType {
 
 struct TokenInfo {
 public:
-	ParsedTokenType type;
-	unsigned int lineNumber;
-	unsigned int charPosition;
+	const ParsedTokenType type;
+	const unsigned int lineNumber;
+	const unsigned int charPosition;
+	const std::string data0;
 
-	TokenInfo(ParsedTokenType ptt, unsigned int lineNo, unsigned int charPos) :
-		type(ptt), lineNumber(lineNo), charPosition(charPos) { }
+	TokenInfo(ParsedTokenType ptt, unsigned int lineNo, unsigned int charPos, std::string dat0) :
+		type(ptt), lineNumber(lineNo), charPosition(charPos), data0(dat0) { }
 };
 
 //TODO: this whole file could do with tidying up
@@ -87,7 +91,8 @@ struct TriplesBlock {
 public:
 	std::vector<model::Triple> triples;
 	std::string name;
-	std::vector<std::string> filters;
+	std::vector<IFilter*> filters;
+	std::set<std::string> variables;
 
 	TriplesBlock(std::vector<model::Triple> trip, std::string n) {
 		triples = trip;
@@ -99,6 +104,14 @@ public:
 	}
 
 	TriplesBlock() {}
+
+   void Add(const model::Triple&& triple) {
+      triples.emplace_back(triple);   
+   } 
+
+   void Add(IFilter* filter) {
+      filters.push_back(filter);   
+   }
 };
 
 //Types of query
@@ -124,13 +137,15 @@ public:
 	TriplesBlock conditions;
 	TriplesBlock whereClause;
 	std::string data0;
+	std::vector<std::string> selectLine;
 
-	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0) {
+	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline) {
 		type = t;
 		sources = s;
 		conditions = cond;
 		whereClause = wh;
 		data0 = dat0;
+		selectLine = selectline;
 	}
 };
 
@@ -139,11 +154,13 @@ private:
 	static TokenItem identifyToken(std::string str, unsigned int line, unsigned int chr);
 
 	static std::string parseConfidenceRating(TokenIterator&& iter, TokenIterator end);
+   static IFilter* parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription);
 public:
 	static TokenList Tokenize(std::string str);
-	static std::vector<model::Triple> ParseTriples(TokenIterator&& iter, TokenIterator end);
+	static TriplesBlock ParseTriples(TokenIterator&& iter, TokenIterator end);
 	static TriplesBlock ParseInsert(TokenIterator&& iter, TokenIterator end);
 	static StringMap ParseSources(TokenIterator&& iter, TokenIterator end);
+	static std::vector<std::string> ParseSelectLine(TokenIterator&& iter, TokenIterator end);
 	static Query ParseAll(TokenList tokens);
 };
 

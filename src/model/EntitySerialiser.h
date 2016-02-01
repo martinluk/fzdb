@@ -3,21 +3,22 @@
 
 #include "Serialiser.h"
 #include <cstring>
+#include <memory>
 
 class Entity;
 
 class EntitySerialiser
 {
 public:
-    EntitySerialiser(const Entity* ent);
+    EntitySerialiser(const std::shared_ptr<Entity> ent);
 
     std::size_t serialise(Serialiser &serialiser) const;
 
     // TODO: This is probably unsafe without a length parameter!
-    static Entity* unserialise(const char* serialData);
+    static std::shared_ptr<Entity> unserialise(const char* serialData);
 
 private:
-    const Entity*   _entity;
+    const std::shared_ptr<Entity> _entity;
 };
 
 #endif  // MODEL_ENTITYSERIALISER_H

@@ -12,7 +12,7 @@ class Insert : public Job
 {
 public:
 
-  Insert(ISession* session, Query query);
+  Insert(std::shared_ptr<ISession> session, Query query);
 
 
   // Inherited via Job

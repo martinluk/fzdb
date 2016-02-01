@@ -14,7 +14,7 @@
 // An entity owns all of its EntityProperties and will delete them as appropriate.
 class Entity : public ILogString
 {
-    friend class EntitySerialiser;
+	friend class EntitySerialiser;
 public:
 	// Typedef for an entity handle. This should uniquely identify an entity.
 	typedef unsigned long long EHandle_t;
@@ -28,7 +28,7 @@ public:
 	// Constructs an entity with the given handle.
 	Entity(unsigned int type, EHandle_t handle);
 
-        ~Entity();
+	~Entity();
 
 	// Returns whether this entity is null, ie. whether it has an invalid handle.
 	bool isNull() const;
@@ -42,8 +42,8 @@ public:
 		if (it == _propertyTable.cend()) {
 			return new EntityProperty<T>();
 		}
-		
-                // TODO: Add error messages
+
+		// TODO: Add error messages
 		try {
 			EntityProperty<T>* prop = dynamic_cast<EntityProperty<T>*>(it->second);
 			return prop;
@@ -62,7 +62,7 @@ public:
 	// Returns this entity's handle.
 	EHandle_t getHandle() const;
 
-        unsigned int getType() const;
+	unsigned int getType() const;
 
 	// Setters:
 
@@ -75,6 +75,15 @@ public:
 
 		// Insert the new one.
 		auto pair = std::make_pair<unsigned int, IEntityProperty*>(std::move(prop->key()), (IEntityProperty*)prop);
+		_propertyTable.insert(pair);
+	}
+
+	void insertProperty(IEntityProperty* prop) {
+		// Erase the property if it exists (If not, this will do nothing).
+		//propertyTable_.erase(prop.key());
+
+		// Insert the new one.
+		auto pair = std::make_pair<unsigned int, IEntityProperty*>(std::move(prop->key()), std::move(prop));
 		_propertyTable.insert(pair);
 	}
 
@@ -94,21 +103,21 @@ public:
 		if (!hasProperty(propertyId)) return false;
 
 		switch (obj.type) {
-			case model::Object::Type::STRING: {
-				auto val = getProperty<model::types::String>(propertyId)->values();
-				return val[0]->Equals(obj.value);
-			}
-			case model::Object::Type::INT: {
-				auto val = getProperty<model::types::Int>(propertyId)->values();
-				return val[0]->Equals(obj.value);
-			}
-			case model::Object::Type::ENTITYREF: {
-				auto val = getProperty<model::types::EntityRef>(propertyId)->values();
-				return val[0]->Equals(obj.value);
-			}
-			default:
-				return false;
-		}		
+		case model::Object::Type::STRING: {
+			auto val = getProperty<model::types::String>(propertyId)->values();
+			return val[0]->Equals(obj.value);
+		}
+		case model::Object::Type::INT: {
+			auto val = getProperty<model::types::Int>(propertyId)->values();
+			return val[0]->Equals(obj.value);
+		}
+		case model::Object::Type::ENTITYREF: {
+			auto val = getProperty<model::types::EntityRef>(propertyId)->values();
+			return val[0]->Equals(obj.value);
+		}
+		default:
+			return false;
+		}
 	}
 
 	// Clears all properties on the entity.
@@ -117,23 +126,14 @@ public:
 	// Returns the number of properties present.
 	int propertyCount() const;
 
-	// Permenantly copies all data from entity into this entity
-	void merge(Entity& entity);
-
-        // Adds a link to entity 'entity' such that data from entity is returned
-        // in queries to this entity
-	void link(Entity* entity);
-
-	// Removes the link to entity 'entity'
-	void unlink(Entity* entity);
-    
-    virtual std::string logString() const override;
+	virtual std::string logString() const override;
 
 private:
-    void deleteAllProperties();
+	void deleteAllProperties();
 
-        EHandle_t	handle_;
-        unsigned int _type;
+	EHandle_t	handle_;
+	unsigned int _type;
+	bool _active;
 
 	std::map<unsigned int, IEntityProperty*> _propertyTable;
 	std::vector<Entity*> _linkedEntities;

@@ -6,5 +6,5 @@
 class CommandInterpreter
 {
 public:
-  static void ProcessCommand(TCPSession* session, std::string command);
+  static void ProcessCommand(std::shared_ptr<ISession> session, std::string command);
 };

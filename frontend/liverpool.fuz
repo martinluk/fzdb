@@ -1,0 +1,3537 @@
+INSERT DATA { 
+	entity:0 <forename> "Mariano" ;
+		<type> "person" .
+	entity:1 <forename> "Juan" ;
+		<type> "person" .
+	entity:2 <forename> "Maria Elvira Juliana" ;
+		<type> "person" .
+	entity:3 <forename> "Felipe Maria Castor Julian" ;
+		<type> "person" .
+	entity:4 <forename> "Ygnacio Marcos" ;
+		<type> "person" .
+	entity:5 <forename> "Luis Gonzaga Castor" ;
+		<type> "person" .
+	entity:6 <forename> "Maria Rosario Fermina" ;
+		<type> "person" .
+	entity:7 <forename> "Juan Bautista" ;
+		<type> "person" .
+	entity:8 <forename> "Antonio" ;
+		<type> "person" .
+	entity:9 <forename> "Luisa" ;
+		<type> "person" .
+	entity:10 <forename> "Anita" ;
+		<type> "person" .
+	entity:11 <forename> "Eusebio" ;
+		<type> "person" .
+	entity:12 <forename> "Martin" ;
+		<type> "person" .
+	entity:13 <forename> "Pedro" ;
+		<type> "person" .
+	entity:14 <forename> "Dionisia" ;
+		<type> "person" .
+	entity:15 <forename> "Guillermo" ;
+		<type> "person" .
+	entity:16 <forename> "Jose" ;
+		<type> "person" .
+	entity:17 <forename> "Gloria" ;
+		<type> "person" .
+	entity:18 <forename> "Maria de la Anunciacion" ;
+		<type> "person" .
+	entity:19 <forename> "Manuela" ;
+		<type> "person" .
+	entity:20 <forename> "Anastasia" ;
+		<type> "person" .
+	entity:21 <forename> "Francisca" ;
+		<type> "person" .
+	entity:22 <forename> "John" ;
+		<type> "person" .
+	entity:23 <forename> "Penelope W" ;
+		<type> "person" .
+	entity:24 <forename> "James F" ;
+		<type> "person" .
+	entity:25 <forename> "Josepha N" ;
+		<type> "person" .
+	entity:26 <forename> "Esteban" ;
+		<type> "person" .
+	entity:27 <forename> "Guileborne" ;
+		<type> "person" .
+	entity:28 <forename> "Victoria" ;
+		<type> "person" .
+	entity:29 <forename> "Maria" ;
+		<type> "person" .
+	entity:30 <forename> "Michael" ;
+		<type> "person" .
+	entity:31 <forename> "Birina" ;
+		<type> "person" .
+	entity:32 <forename> "Susie" ;
+		<type> "person" .
+	entity:33 <forename> "Emma de" ;
+		<type> "person" .
+	entity:34 <forename> "Victor" ;
+		<type> "person" .
+	entity:35 <forename> "Leopoldo" ;
+		<type> "person" .
+	entity:36 <forename> "Isidora" ;
+		<type> "person" .
+	entity:37 <forename> "Jose" ;
+		<type> "person" .
+	entity:38 <forename> "Christof" ;
+		<type> "person" .
+	entity:39 <forename> "Alfredo" ;
+		<type> "person" .
+	entity:40 <forename> "Francisco Antonio" ;
+		<type> "person" .
+	entity:41 <forename> "Ceferino" ;
+		<type> "person" .
+	entity:42 <forename> "Jose Antonio" ;
+		<type> "person" .
+	entity:43 <forename> "Alejandra" ;
+		<type> "person" .
+	entity:44 <forename> "Fermina" ;
+		<type> "person" .
+	entity:45 <forename> "Saturnino" ;
+		<type> "person" .
+	entity:46 <forename> "Serafin" ;
+		<type> "person" .
+	entity:47 <forename> "Emilio" ;
+		<type> "person" .
+	entity:48 <forename> "E" ;
+		<type> "person" .
+	entity:49 <forename> "Sarah" ;
+		<type> "person" .
+	entity:50 <forename> "Fernando" ;
+		<type> "person" .
+	entity:51 <forename> "Martha" ;
+		<type> "person" .
+	entity:52 <forename> "Rodrigo" ;
+		<type> "person" .
+	entity:53 <forename> "Elena" ;
+		<type> "person" .
+	entity:54 <forename> "Elisa" ;
+		<type> "person" .
+	entity:55 <forename> "Susana" ;
+		<type> "person" .
+	entity:56 <forename> "Eugenio" ;
+		<type> "person" .
+	entity:57 <forename> "Mrs William C" ;
+		<type> "person" .
+	entity:58 <forename> "Felipe" ;
+		<type> "person" .
+	entity:59 <forename> "Bahinte" ;
+		<type> "person" .
+	entity:60 <forename> "Felicia" ;
+		<type> "person" .
+	entity:61 <forename> "Frederick J" ;
+		<type> "person" .
+	entity:62 <forename> "Miguel" ;
+		<type> "person" .
+	entity:63 <forename> "Nicholas" ;
+		<type> "person" .
+	entity:64 <forename> "Jose" ;
+		<type> "person" .
+	entity:65 <forename> "Ysidoro" ;
+		<type> "person" .
+	entity:66 <forename> "Maria del Pilar" ;
+		<type> "person" .
+	entity:67 <forename> "Antonio" ;
+		<type> "person" .
+	entity:68 <forename> "Jose HB" ;
+		<type> "person" .
+	entity:69 <forename> "John" ;
+		<type> "person" .
+	entity:70 <forename> "Augusta" ;
+		<type> "person" .
+	entity:71 <forename> "Marcelino" ;
+		<type> "person" .
+	entity:72 <forename> "Peter" ;
+		<type> "person" .
+	entity:73 <forename> "Francisca" ;
+		<type> "person" .
+	entity:74 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:75 <forename> "Lucinda" ;
+		<type> "person" .
+	entity:76 <forename> "Pio Celestino" ;
+		<type> "person" .
+	entity:77 <forename> "Celestino" ;
+		<type> "person" .
+	entity:78 <forename> "Crisatonos" ;
+		<type> "person" .
+	entity:79 <forename> "Mariano" ;
+		<type> "person" .
+	entity:80 <forename> "Isabella" ;
+		<type> "person" .
+	entity:81 <forename> "James" ;
+		<type> "person" .
+	entity:82 <forename> "Eulogia" ;
+		<type> "person" .
+	entity:83 <forename> "Martin" ;
+		<type> "person" .
+	entity:84 <forename> "Henry" ;
+		<type> "person" .
+	entity:85 <forename> "NK" ;
+		<type> "person" .
+	entity:86 <forename> "Joseph" ;
+		<type> "person" .
+	entity:87 <forename> "Alfredo  " ;
+		<type> "person" .
+	entity:88 <forename> "Manuela" ;
+		<type> "person" .
+	entity:89 <forename> "Andrew" ;
+		<type> "person" .
+	entity:90 <forename> "Francisco" ;
+		<type> "person" .
+	entity:91 <forename> "Solomon" ;
+		<type> "person" .
+	entity:92 <forename> "Martina" ;
+		<type> "person" .
+	entity:93 <forename> "Segunda" ;
+		<type> "person" .
+	entity:94 <forename> "F" ;
+		<type> "person" .
+	entity:95 <forename> "Bartolomeo" ;
+		<type> "person" .
+	entity:96 <forename> "Pedro" ;
+		<type> "person" .
+	entity:97 <forename> "Louis" ;
+		<type> "person" .
+	entity:98 <forename> "Jose" ;
+		<type> "person" .
+	entity:99 <forename> "Jose" ;
+		<type> "person" .
+	entity:100 <forename> "Louis" ;
+		<type> "person" .
+	entity:101 <forename> "Emanual" ;
+		<type> "person" .
+	entity:102 <forename> "Manuel" ;
+		<type> "person" .
+	entity:103 <forename> "Bartolome" ;
+		<type> "person" .
+	entity:104 <forename> "James" ;
+		<type> "person" .
+	entity:105 <forename> "Fermin" ;
+		<type> "person" .
+	entity:106 <forename> "Maria Agustina" ;
+		<type> "person" .
+	entity:107 <forename> "Juana" ;
+		<type> "person" .
+	entity:108 <forename> "Juan" ;
+		<type> "person" .
+	entity:109 <forename> "Maria" ;
+		<type> "person" .
+	entity:110 <forename> "Francisco" ;
+		<type> "person" .
+	entity:111 <forename> "Segunda  " ;
+		<type> "person" .
+	entity:112 <forename> "Guadelupe" ;
+		<type> "person" .
+	entity:113 <forename> "Josefa Martina" ;
+		<type> "person" .
+	entity:114 <forename> "Nora M" ;
+		<type> "person" .
+	entity:115 <forename> "William Harold" ;
+		<type> "person" .
+	entity:116 <forename> "Calixto" ;
+		<type> "person" .
+	entity:117 <forename> "Dominico" ;
+		<type> "person" .
+	entity:118 <forename> "Josefa" ;
+		<type> "person" .
+	entity:119 <forename> "Maria Teresa" ;
+		<type> "person" .
+	entity:120 <forename> "Leon" ;
+		<type> "person" .
+	entity:121 <forename> "Matilda" ;
+		<type> "person" .
+	entity:122 <forename> "Paul" ;
+		<type> "person" .
+	entity:123 <forename> "Agustin" ;
+		<type> "person" .
+	entity:124 <forename> "Anselm " ;
+		<type> "person" .
+	entity:125 <forename> "Felisa" ;
+		<type> "person" .
+	entity:126 <forename> "Mary E" ;
+		<type> "person" .
+	entity:127 <forename> "Caroline" ;
+		<type> "person" .
+	entity:128 <forename> "William" ;
+		<type> "person" .
+	entity:129 <forename> "Ramon" ;
+		<type> "person" .
+	entity:130 <forename> "Virginia" ;
+		<type> "person" .
+	entity:131 <forename> "Martina" ;
+		<type> "person" .
+	entity:132 <forename> "Felicia" ;
+		<type> "person" .
+	entity:133 <forename> "Alfredo" ;
+		<type> "person" .
+	entity:134 <forename> "Catalina" ;
+		<type> "person" .
+	entity:135 <forename> "Isabel V" ;
+		<type> "person" .
+	entity:136 <forename> "Maria C" ;
+		<type> "person" .
+	entity:137 <forename> "Otilda" ;
+		<type> "person" .
+	entity:138 <forename> "Buenaventura" ;
+		<type> "person" .
+	entity:139 <forename> "Nicolasa" ;
+		<type> "person" .
+	entity:140 <forename> "Pedro" ;
+		<type> "person" .
+	entity:141 <forename> "Basilisa" ;
+		<type> "person" .
+	entity:142 <forename> "Isidoro" ;
+		<type> "person" .
+	entity:143 <forename> "Ramon" ;
+		<type> "person" .
+	entity:144 <forename> "Susannah" ;
+		<type> "person" .
+	entity:145 <forename> "Andres Avelino" ;
+		<type> "person" .
+	entity:146 <forename> "Juana" ;
+		<type> "person" .
+	entity:147 <forename> "Laureano" ;
+		<type> "person" .
+	entity:148 <forename> "Buenaventura" ;
+		<type> "person" .
+	entity:149 <forename> "Benita" ;
+		<type> "person" .
+	entity:150 <forename> "Ignacio" ;
+		<type> "person" .
+	entity:151 <forename> "Pedro" ;
+		<type> "person" .
+	entity:152 <forename> "Dolores" ;
+		<type> "person" .
+	entity:153 <forename> "Genara" ;
+		<type> "person" .
+	entity:154 <forename> "Angela" ;
+		<type> "person" .
+	entity:155 <forename> "Telesforo" ;
+		<type> "person" .
+	entity:156 <forename> "Eugenio Ramon" ;
+		<type> "person" .
+	entity:157 <forename> "Ramon" ;
+		<type> "person" .
+	entity:158 <forename> "Valentina" ;
+		<type> "person" .
+	entity:159 <forename> "Valentina J" ;
+		<type> "person" .
+	entity:160 <forename> "Antonia" ;
+		<type> "person" .
+	entity:161 <forename> "Paula" ;
+		<type> "person" .
+	entity:162 <forename> "Jose Martin" ;
+		<type> "person" .
+	entity:163 <forename> "Antonia" ;
+		<type> "person" .
+	entity:164 <forename> "Emiliano [?] Saunders" ;
+		<type> "person" .
+	entity:165 <forename> "Maria" ;
+		<type> "person" .
+	entity:166 <forename> "P" ;
+		<type> "person" .
+	entity:167 <forename> "Alvaro G" ;
+		<type> "person" .
+	entity:168 <forename> "Ignacio" ;
+		<type> "person" .
+	entity:169 <forename> "Ignacio" ;
+		<type> "person" .
+	entity:170 <forename> "Josefa" ;
+		<type> "person" .
+	entity:171 <forename> "Luis" ;
+		<type> "person" .
+	entity:172 <forename> "Maria" ;
+		<type> "person" .
+	entity:173 <forename> "Maria" ;
+		<type> "person" .
+	entity:174 <forename> "Simona" ;
+		<type> "person" .
+	entity:175 <forename> "Antio" ;
+		<type> "person" .
+	entity:176 <forename> "Hannah Maria" ;
+		<type> "person" .
+	entity:177 <forename> "Francisca" ;
+		<type> "person" .
+	entity:178 <forename> "Eusebio" ;
+		<type> "person" .
+	entity:179 <forename> "Philemeno" ;
+		<type> "person" .
+	entity:180 <forename> "Benita" ;
+		<type> "person" .
+	entity:181 <forename> "Dolores" ;
+		<type> "person" .
+	entity:182 <forename> "Maximina Dolores" ;
+		<type> "person" .
+	entity:183 <forename> "Juan" ;
+		<type> "person" .
+	entity:184 <forename> "Anthony" ;
+		<type> "person" .
+	entity:185 <forename> "Fasquina" ;
+		<type> "person" .
+	entity:186 <forename> "Yrena" ;
+		<type> "person" .
+	entity:187 <forename> "Louis" ;
+		<type> "person" .
+	entity:188 <forename> "Maria de los Dolores" ;
+		<type> "person" .
+	entity:189 <forename> "Margaret" ;
+		<type> "person" .
+	entity:190 <forename> "Anthony" ;
+		<type> "person" .
+	entity:191 <forename> "Louis" ;
+		<type> "person" .
+	entity:192 <forename> "Antonio" ;
+		<type> "person" .
+	entity:193 <forename> "Maria" ;
+		<type> "person" .
+	entity:194 <forename> "Adela C" ;
+		<type> "person" .
+	entity:195 <forename> "Frances D" ;
+		<type> "person" .
+	entity:196 <forename> "Alejandro" ;
+		<type> "person" .
+	entity:197 <forename> "Abibe" ;
+		<type> "person" .
+	entity:198 <forename> "Paulo" ;
+		<type> "person" .
+	entity:199 <forename> "Josefa" ;
+		<type> "person" .
+	entity:200 <forename> "Pety" ;
+		<type> "person" .
+	entity:201 <forename> "Toribio Nunez de" ;
+		<type> "person" .
+	entity:202 <forename> "Francisco" ;
+		<type> "person" .
+	entity:203 <forename> "Rose" ;
+		<type> "person" .
+	entity:204 <forename> "Patito" ;
+		<type> "person" .
+	entity:205 <forename> "Basilio" ;
+		<type> "person" .
+	entity:206 <forename> "Martina" ;
+		<type> "person" .
+	entity:207 <forename> "Felix" ;
+		<type> "person" .
+	entity:208 <forename> "Ramon" ;
+		<type> "person" .
+	entity:209 <forename> "Anastasia" ;
+		<type> "person" .
+	entity:210 <forename> "Alexandra" ;
+		<type> "person" .
+	entity:211 <forename> "Gabriel" ;
+		<type> "person" .
+	entity:212 <forename> "Flora" ;
+		<type> "person" .
+	entity:213 <forename> "Jose M de" ;
+		<type> "person" .
+	entity:214 <forename> "Santa" ;
+		<type> "person" .
+	entity:215 <forename> "Manuel" ;
+		<type> "person" .
+	entity:216 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:217 <forename> "Catherine" ;
+		<type> "person" .
+	entity:218 <forename> "Ciro" ;
+		<type> "person" .
+	entity:219 <forename> "Ishome P" ;
+		<type> "person" .
+	entity:220 <forename> "Charles" ;
+		<type> "person" .
+	entity:221 <forename> "Anthony" ;
+		<type> "person" .
+	entity:222 <forename> "Arthur H" ;
+		<type> "person" .
+	entity:223 <forename> "Placido" ;
+		<type> "person" .
+	entity:224 <forename> "Anastasio" ;
+		<type> "person" .
+	entity:225 <forename> "Maria Antonia" ;
+		<type> "person" .
+	entity:226 <forename> "Antonio" ;
+		<type> "person" .
+	entity:227 <forename> "Antonia" ;
+		<type> "person" .
+	entity:228 <forename> "Florencio" ;
+		<type> "person" .
+	entity:229 <forename> "Antonio" ;
+		<type> "person" .
+	entity:230 <forename> "Jose Julian" ;
+		<type> "person" .
+	entity:231 <forename> "Percy" ;
+		<type> "person" .
+	entity:232 <forename> "Zachariah" ;
+		<type> "person" .
+	entity:233 <forename> "Emma" ;
+		<type> "person" .
+	entity:234 <forename> "Jessie Jane" ;
+		<type> "person" .
+	entity:235 <forename> "Ellen" ;
+		<type> "person" .
+	entity:236 <forename> "Jessie Jane" ;
+		<type> "person" .
+	entity:237 <forename> "Federico" ;
+		<type> "person" .
+	entity:238 <forename> "Reyes" ;
+		<type> "person" .
+	entity:239 <forename> "Jose" ;
+		<type> "person" .
+	entity:240 <forename> "Francisco" ;
+		<type> "person" .
+	entity:241 <forename> "Victoria" ;
+		<type> "person" .
+	entity:242 <forename> "Manuela" ;
+		<type> "person" .
+	entity:243 <forename> "Pedro" ;
+		<type> "person" .
+	entity:244 <forename> "Salvador" ;
+		<type> "person" .
+	entity:245 <forename> "Norberto" ;
+		<type> "person" .
+	entity:246 <forename> "Juan" ;
+		<type> "person" .
+	entity:247 <forename> "Juana" ;
+		<type> "person" .
+	entity:248 <forename> "Ciriaca" ;
+		<type> "person" .
+	entity:249 <forename> "Mariano" ;
+		<type> "person" .
+	entity:250 <forename> "Emilia" ;
+		<type> "person" .
+	entity:251 <forename> "Eugenio" ;
+		<type> "person" .
+	entity:252 <forename> "Eustaquio" ;
+		<type> "person" .
+	entity:253 <forename> "Mary" ;
+		<type> "person" .
+	entity:254 <forename> "Rizardo" ;
+		<type> "person" .
+	entity:255 <forename> "Jose" ;
+		<type> "person" .
+	entity:256 <forename> "Jose" ;
+		<type> "person" .
+	entity:257 <forename> "Maria" ;
+		<type> "person" .
+	entity:258 <forename> "Jose" ;
+		<type> "person" .
+	entity:259 <forename> "Carmen" ;
+		<type> "person" .
+	entity:260 <forename> "Gloria" ;
+		<type> "person" .
+	entity:261 <forename> "Pedro" ;
+		<type> "person" .
+	entity:262 <forename> "Dionisia" ;
+		<type> "person" .
+	entity:263 <forename> "Gregoria" ;
+		<type> "person" .
+	entity:264 <forename> "Lucas" ;
+		<type> "person" .
+	entity:265 <forename> "Miguel" ;
+		<type> "person" .
+	entity:266 <forename> "Jose Miguel" ;
+		<type> "person" .
+	entity:267 <forename> "Antonio" ;
+		<type> "person" .
+	entity:268 <forename> "Benedicta" ;
+		<type> "person" .
+	entity:269 <forename> "Maura" ;
+		<type> "person" .
+	entity:270 <forename> "Patricio" ;
+		<type> "person" .
+	entity:271 <forename> "Martina" ;
+		<type> "person" .
+	entity:272 <forename> "Jose" ;
+		<type> "person" .
+	entity:273 <forename> "Teodoro" ;
+		<type> "person" .
+	entity:274 <forename> "Josefa" ;
+		<type> "person" .
+	entity:275 <forename> "Teodoro" ;
+		<type> "person" .
+	entity:276 <forename> "Diosa" ;
+		<type> "person" .
+	entity:277 <forename> "Jose" ;
+		<type> "person" .
+	entity:278 <forename> "Ramon" ;
+		<type> "person" .
+	entity:279 <forename> "Carmen" ;
+		<type> "person" .
+	entity:280 <forename> "Teresa" ;
+		<type> "person" .
+	entity:281 <forename> "Paulina" ;
+		<type> "person" .
+	entity:282 <forename> "Luis" ;
+		<type> "person" .
+	entity:283 <forename> "Rufina" ;
+		<type> "person" .
+	entity:284 <forename> "Carmen" ;
+		<type> "person" .
+	entity:285 <forename> "Leocadia" ;
+		<type> "person" .
+	entity:286 <forename> "Pedro" ;
+		<type> "person" .
+	entity:287 <forename> "Francisca" ;
+		<type> "person" .
+	entity:288 <forename> "Juliana" ;
+		<type> "person" .
+	entity:289 <forename> "Mary C" ;
+		<type> "person" .
+	entity:290 <forename> "Angela" ;
+		<type> "person" .
+	entity:291 <forename> "Henry" ;
+		<type> "person" .
+	entity:292 <forename> "Dolores de" ;
+		<type> "person" .
+	entity:293 <forename> "Anastasio" ;
+		<type> "person" .
+	entity:294 <forename> "Emilio" ;
+		<type> "person" .
+	entity:295 <forename> "Pedro" ;
+		<type> "person" .
+	entity:296 <forename> "Sebastian" ;
+		<type> "person" .
+	entity:297 <forename> "Francisco" ;
+		<type> "person" .
+	entity:298 <forename> "Jose" ;
+		<type> "person" .
+	entity:299 <forename> "Placida  " ;
+		<type> "person" .
+	entity:300 <forename> "Joaquin" ;
+		<type> "person" .
+	entity:301 <forename> "Juliana" ;
+		<type> "person" .
+	entity:302 <forename> "Gertrude" ;
+		<type> "person" .
+	entity:303 <forename> "Rose Elizabeth" ;
+		<type> "person" .
+	entity:304 <forename> "Anne" ;
+		<type> "person" .
+	entity:305 <forename> "Mary" ;
+		<type> "person" .
+	entity:306 <forename> "Constance" ;
+		<type> "person" .
+	entity:307 <forename> "Alfred" ;
+		<type> "person" .
+	entity:308 <forename> "Humbert" ;
+		<type> "person" .
+	entity:309 <forename> "Robert" ;
+		<type> "person" .
+	entity:310 <forename> "Mary Ann" ;
+		<type> "person" .
+	entity:311 <forename> "George" ;
+		<type> "person" .
+	entity:312 <forename> "William J" ;
+		<type> "person" .
+	entity:313 <forename> "Agnes J" ;
+		<type> "person" .
+	entity:314 <forename> "Emily P" ;
+		<type> "person" .
+	entity:315 <forename> "Frederick B" ;
+		<type> "person" .
+	entity:316 <forename> "Henry G" ;
+		<type> "person" .
+	entity:317 <forename> "Eliza" ;
+		<type> "person" .
+	entity:318 <forename> "Jose Fernandez Murg[?]" ;
+		<type> "person" .
+	entity:319 <forename> "Sarah" ;
+		<type> "person" .
+	entity:320 <forename> "Joze Margans[?]" ;
+		<type> "person" .
+	entity:321 <forename> "Benito" ;
+		<type> "person" .
+	entity:322 <forename> "Jose" ;
+		<type> "person" .
+	entity:323 <forename> "Antonia" ;
+		<type> "person" .
+	entity:324 <forename> "John" ;
+		<type> "person" .
+	entity:325 <forename> "Anita" ;
+		<type> "person" .
+	entity:326 <forename> "Anthony" ;
+		<type> "person" .
+	entity:327 <forename> "Frank" ;
+		<type> "person" .
+	entity:328 <forename> "Henry" ;
+		<type> "person" .
+	entity:329 <forename> "George W" ;
+		<type> "person" .
+	entity:330 <forename> "Robert" ;
+		<type> "person" .
+	entity:331 <forename> "Gertrude" ;
+		<type> "person" .
+	entity:332 <forename> "De A" ;
+		<type> "person" .
+	entity:333 <forename> "Maria" ;
+		<type> "person" .
+	entity:334 <forename> "Jose" ;
+		<type> "person" .
+	entity:335 <forename> "Jose" ;
+		<type> "person" .
+	entity:336 <forename> "Kate  " ;
+		<type> "person" .
+	entity:337 <forename> "John" ;
+		<type> "person" .
+	entity:338 <forename> "Bautista  " ;
+		<type> "person" .
+	entity:339 <forename> "William" ;
+		<type> "person" .
+	entity:340 <forename> "Luis G" ;
+		<type> "person" .
+	entity:341 <forename> "Liprmas" ;
+		<type> "person" .
+	entity:342 <forename> "Frank" ;
+		<type> "person" .
+	entity:343 <forename> "Francisco" ;
+		<type> "person" .
+	entity:344 <forename> "Jose" ;
+		<type> "person" .
+	entity:345 <forename> "Jose" ;
+		<type> "person" .
+	entity:346 <forename> "Antonio" ;
+		<type> "person" .
+	entity:347 <forename> "Consuela" ;
+		<type> "person" .
+	entity:348 <forename> "Jose" ;
+		<type> "person" .
+	entity:349 <forename> "Pedro" ;
+		<type> "person" .
+	entity:350 <forename> "Consuela" ;
+		<type> "person" .
+	entity:351 <forename> "Consuela" ;
+		<type> "person" .
+	entity:352 <forename> "Manuel M" ;
+		<type> "person" .
+	entity:353 <forename> "Simona" ;
+		<type> "person" .
+	entity:354 <forename> "Jose" ;
+		<type> "person" .
+	entity:355 <forename> "Antonio" ;
+		<type> "person" .
+	entity:356 <forename> "Maximino" ;
+		<type> "person" .
+	entity:357 <forename> "Juan" ;
+		<type> "person" .
+	entity:358 <forename> "Jose" ;
+		<type> "person" .
+	entity:359 <forename> "Mariano" ;
+		<type> "person" .
+	entity:360 <forename> "Hindes" ;
+		<type> "person" .
+	entity:361 <forename> "Miguel" ;
+		<type> "person" .
+	entity:362 <forename> "Jose F" ;
+		<type> "person" .
+	entity:363 <forename> "Jessie" ;
+		<type> "person" .
+	entity:364 <forename> "Thomas de" ;
+		<type> "person" .
+	entity:365 <forename> "Antonio" ;
+		<type> "person" .
+	entity:366 <forename> "Adolfo" ;
+		<type> "person" .
+	entity:367 <forename> "Antonio" ;
+		<type> "person" .
+	entity:368 <forename> "William" ;
+		<type> "person" .
+	entity:369 <forename> "Angle G" ;
+		<type> "person" .
+	entity:370 <forename> "George" ;
+		<type> "person" .
+	entity:371 <forename> "Antero" ;
+		<type> "person" .
+	entity:372 <forename> "Harriet" ;
+		<type> "person" .
+	entity:373 <forename> "Manuel" ;
+		<type> "person" .
+	entity:374 <forename> "Benjamin" ;
+		<type> "person" .
+	entity:375 <forename> "Manuel" ;
+		<type> "person" .
+	entity:376 <forename> "Manuel" ;
+		<type> "person" .
+	entity:377 <forename> "Roman" ;
+		<type> "person" .
+	entity:378 <forename> "Juan" ;
+		<type> "person" .
+	entity:379 <forename> "Plaza" ;
+		<type> "person" .
+	entity:380 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:381 <forename> "Jose" ;
+		<type> "person" .
+	entity:382 <forename> "Charlotte" ;
+		<type> "person" .
+	entity:383 <forename> "George" ;
+		<type> "person" .
+	entity:384 <forename> "Paulina" ;
+		<type> "person" .
+	entity:385 <forename> "Josefa" ;
+		<type> "person" .
+	entity:386 <forename> "Modestalanda" ;
+		<type> "person" .
+	entity:387 <forename> "John" ;
+		<type> "person" .
+	entity:388 <forename> "James" ;
+		<type> "person" .
+	entity:389 <forename> "Patrick S" ;
+		<type> "person" .
+	entity:390 <forename> "George" ;
+		<type> "person" .
+	entity:391 <forename> "Conrad ?" ;
+		<type> "person" .
+	entity:392 <forename> "Antonio" ;
+		<type> "person" .
+	entity:393 <forename> "Luisa" ;
+		<type> "person" .
+	entity:394 <forename> "Jose" ;
+		<type> "person" .
+	entity:395 <forename> "Clorinda" ;
+		<type> "person" .
+	entity:396 <forename> "Francisco" ;
+		<type> "person" .
+	entity:397 <forename> "Modesto" ;
+		<type> "person" .
+	entity:398 <forename> "Cisto" ;
+		<type> "person" .
+	entity:399 <forename> "Claude" ;
+		<type> "person" .
+	entity:400 <forename> "Ida de" ;
+		<type> "person" .
+	entity:401 <forename> "Antonio" ;
+		<type> "person" .
+	entity:402 <forename> "Josefa" ;
+		<type> "person" .
+	entity:403 <forename> "Justa" ;
+		<type> "person" .
+	entity:404 <forename> "Joao" ;
+		<type> "person" .
+	entity:405 <forename> "Jose" ;
+		<type> "person" .
+	entity:406 <forename> "Anna" ;
+		<type> "person" .
+	entity:407 <forename> "Armando" ;
+		<type> "person" .
+	entity:408 <forename> "Antonio" ;
+		<type> "person" .
+	entity:409 <forename> "Harriet" ;
+		<type> "person" .
+	entity:410 <forename> "Ann" ;
+		<type> "person" .
+	entity:411 <forename> "Margaret" ;
+		<type> "person" .
+	entity:412 <forename> "Jose" ;
+		<type> "person" .
+	entity:413 <forename> "Isabel" ;
+		<type> "person" .
+	entity:414 <forename> "Harriett F" ;
+		<type> "person" .
+	entity:415 <forename> "Ygnacia" ;
+		<type> "person" .
+	entity:416 <forename> "Pedro" ;
+		<type> "person" .
+	entity:417 <forename> "Prudencio" ;
+		<type> "person" .
+	entity:418 <forename> "Alberto" ;
+		<type> "person" .
+	entity:419 <forename> "Francisco" ;
+		<type> "person" .
+	entity:420 <forename> "John" ;
+		<type> "person" .
+	entity:421 <forename> "Flora" ;
+		<type> "person" .
+	entity:422 <forename> "John" ;
+		<type> "person" .
+	entity:423 <forename> "Annie" ;
+		<type> "person" .
+	entity:424 <forename> "Edward" ;
+		<type> "person" .
+	entity:425 <forename> "Thomas" ;
+		<type> "person" .
+	entity:426 <forename> "Maria Ellsworth" ;
+		<type> "person" .
+	entity:427 <forename> "Delphina" ;
+		<type> "person" .
+	entity:428 <forename> "Sarah" ;
+		<type> "person" .
+	entity:429 <forename> "Augusta Sarah" ;
+		<type> "person" .
+	entity:430 <forename> "Lola" ;
+		<type> "person" .
+	entity:431 <forename> "Hannah" ;
+		<type> "person" .
+	entity:432 <forename> "Tadeo" ;
+		<type> "person" .
+	entity:433 <forename> "Jos" ;
+		<type> "person" .
+	entity:434 <forename> "Pradentia" ;
+		<type> "person" .
+	entity:435 <forename> "Damin" ;
+		<type> "person" .
+	entity:436 <forename> "Amancia" ;
+		<type> "person" .
+	entity:437 <forename> "Antonio" ;
+		<type> "person" .
+	entity:438 <forename> "Manuel" ;
+		<type> "person" .
+	entity:439 <forename> "Jose Frietas de" ;
+		<type> "person" .
+	entity:440 <forename> "Ivas H" ;
+		<type> "person" .
+	entity:441 <forename> "Claud J" ;
+		<type> "person" .
+	entity:442 <forename> "Claudina" ;
+		<type> "person" .
+	entity:443 <forename> "John" ;
+		<type> "person" .
+	entity:444 <forename> "James" ;
+		<type> "person" .
+	entity:445 <forename> "Annie O" ;
+		<type> "person" .
+	entity:446 <forename> "Jose" ;
+		<type> "person" .
+	entity:447 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:448 <forename> "Eliza A" ;
+		<type> "person" .
+	entity:449 <forename> "Savour" ;
+		<type> "person" .
+	entity:450 <forename> "Henry" ;
+		<type> "person" .
+	entity:451 <forename> "Jose" ;
+		<type> "person" .
+	entity:452 <forename> "Jose" ;
+		<type> "person" .
+	entity:453 <forename> "Jose Maria" ;
+		<type> "person" .
+	entity:454 <forename> "Paula" ;
+		<type> "person" .
+	entity:455 <forename> "Vicente" ;
+		<type> "person" .
+	entity:456 <forename> "Pedro" ;
+		<type> "person" .
+	entity:457 <forename> "John" ;
+		<type> "person" .
+	entity:458 <forename> "Antonio" ;
+		<type> "person" .
+	entity:459 <forename> "Susannah" ;
+		<type> "person" .
+	entity:460 <forename> "Olivar" ;
+		<type> "person" .
+	entity:461 <forename> "Edith" ;
+		<type> "person" .
+	entity:462 <forename> "Anthony" ;
+		<type> "person" .
+	entity:463 <forename> "Luis" ;
+		<type> "person" .
+	entity:464 <forename> "Francisco" ;
+		<type> "person" .
+	entity:465 <forename> "Matthew" ;
+		<type> "person" .
+	entity:466 <forename> "Francisco" ;
+		<type> "person" .
+	entity:467 <forename> "Joaquim" ;
+		<type> "person" .
+	entity:468 <forename> "Jose" ;
+		<type> "person" .
+	entity:469 <forename> "Joao" ;
+		<type> "person" .
+	entity:470 <forename> "Joaquin" ;
+		<type> "person" .
+	entity:471 <forename> "Francisco" ;
+		<type> "person" .
+	entity:472 <forename> "C H" ;
+		<type> "person" .
+	entity:473 <forename> "Antonio" ;
+		<type> "person" .
+	entity:474 <forename> "Joao" ;
+		<type> "person" .
+	entity:475 <forename> "Jose C" ;
+		<type> "person" .
+	entity:476 <forename> "Enrique" ;
+		<type> "person" .
+	entity:477 <forename> "Julia" ;
+		<type> "person" .
+	entity:478 <forename> "Henry" ;
+		<type> "person" .
+	entity:479 <forename> "Jacob" ;
+		<type> "person" .
+	entity:480 <forename> "Jose" ;
+		<type> "person" .
+	entity:481 <forename> "Louis" ;
+		<type> "person" .
+	entity:482 <forename> "Mary" ;
+		<type> "person" .
+	entity:483 <forename> "Stephen" ;
+		<type> "person" .
+	entity:484 <forename> "Frank" ;
+		<type> "person" .
+	entity:485 <forename> "Miss" ;
+		<type> "person" .
+	entity:486 <forename> "John" ;
+		<type> "person" .
+	entity:487 <forename> "Alice M" ;
+		<type> "person" .
+	entity:488 <forename> "Eustaquio" ;
+		<type> "person" .
+	entity:489 <forename> "Philip" ;
+		<type> "person" .
+	entity:490 <forename> "Pedro" ;
+		<type> "person" .
+	entity:491 <forename> "Rosario" ;
+		<type> "person" .
+	entity:492 <forename> "Antonio" ;
+		<type> "person" .
+	entity:493 <forename> "Daniel" ;
+		<type> "person" .
+	entity:494 <forename> "Jose" ;
+		<type> "person" .
+	entity:495 <forename> "Agustin" ;
+		<type> "person" .
+	entity:496 <forename> "Antonio" ;
+		<type> "person" .
+	entity:497 <forename> "Isidoro" ;
+		<type> "person" .
+	entity:498 <forename> "Jose" ;
+		<type> "person" .
+	entity:499 <forename> "Fernando" ;
+		<type> "person" .
+	entity:500 <forename> "Leon" ;
+		<type> "person" .
+	entity:501 <forename> "Philip" ;
+		<type> "person" .
+	entity:502 <forename> "Miguel" ;
+		<type> "person" .
+	entity:503 <forename> "Philip" ;
+		<type> "person" .
+	entity:504 <forename> "Manuel" ;
+		<type> "person" .
+	entity:505 <forename> "Natalia" ;
+		<type> "person" .
+	entity:506 <forename> "Caroline" ;
+		<type> "person" .
+	entity:507 <forename> "Miguel" ;
+		<type> "person" .
+	entity:508 <forename> "Andres" ;
+		<type> "person" .
+	entity:509 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:510 <forename> "Mercedes" ;
+		<type> "person" .
+	entity:511 <forename> "Ramona" ;
+		<type> "person" .
+	entity:512 <forename> "Domingo" ;
+		<type> "person" .
+	entity:513 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:514 <forename> "Agustin" ;
+		<type> "person" .
+	entity:515 <forename> "Francisco" ;
+		<type> "person" .
+	entity:516 <forename> "Paula" ;
+		<type> "person" .
+	entity:517 <forename> "Aquilino" ;
+		<type> "person" .
+	entity:518 <forename> "Louie" ;
+		<type> "person" .
+	entity:519 <forename> "Juan B" ;
+		<type> "person" .
+	entity:520 <forename> "Emanual" ;
+		<type> "person" .
+	entity:521 <forename> "Ramon" ;
+		<type> "person" .
+	entity:522 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:523 <forename> "Juan" ;
+		<type> "person" .
+	entity:524 <forename> "Angelo" ;
+		<type> "person" .
+	entity:525 <forename> "William" ;
+		<type> "person" .
+	entity:526 <forename> "Samuel" ;
+		<type> "person" .
+	entity:527 <forename> "Archibald" ;
+		<type> "person" .
+	entity:528 <forename> "Mary" ;
+		<type> "person" .
+	entity:529 <forename> "William Francis" ;
+		<type> "person" .
+	entity:530 <forename> "John" ;
+		<type> "person" .
+	entity:531 <forename> "Maria" ;
+		<type> "person" .
+	entity:532 <forename> "John" ;
+		<type> "person" .
+	entity:533 <forename> "Carmen" ;
+		<type> "person" .
+	entity:534 <forename> "Guadelupe" ;
+		<type> "person" .
+	entity:535 <forename> "Pablo" ;
+		<type> "person" .
+	entity:536 <forename> "Julia A" ;
+		<type> "person" .
+	entity:537 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:538 <forename> "Adolphus" ;
+		<type> "person" .
+	entity:539 <forename> "Juan" ;
+		<type> "person" .
+	entity:540 <forename> "Josefa" ;
+		<type> "person" .
+	entity:541 <forename> "Julian G" ;
+		<type> "person" .
+	entity:542 <forename> "Benigna de" ;
+		<type> "person" .
+	entity:543 <forename> "Beatrina" ;
+		<type> "person" .
+	entity:544 <forename> "Ynes A" ;
+		<type> "person" .
+	entity:545 <forename> "Edward" ;
+		<type> "person" .
+	entity:546 <forename> "Fabio" ;
+		<type> "person" .
+	entity:547 <forename> "Dominica" ;
+		<type> "person" .
+	entity:548 <forename> "Martin" ;
+		<type> "person" .
+	entity:549 <forename> "Adelaida" ;
+		<type> "person" .
+	entity:550 <forename> "Buenaventura" ;
+		<type> "person" .
+	entity:551 <forename> "Francisco" ;
+		<type> "person" .
+	entity:552 <forename> "Francisco" ;
+		<type> "person" .
+	entity:553 <forename> "Juana" ;
+		<type> "person" .
+	entity:554 <forename> "Emeterio" ;
+		<type> "person" .
+	entity:555 <forename> "Emma" ;
+		<type> "person" .
+	entity:556 <forename> "Beatrice" ;
+		<type> "person" .
+	entity:557 <forename> "Martin" ;
+		<type> "person" .
+	entity:558 <forename> "John" ;
+		<type> "person" .
+	entity:559 <forename> "Maria" ;
+		<type> "person" .
+	entity:560 <forename> "Veronica" ;
+		<type> "person" .
+	entity:561 <forename> "Jose" ;
+		<type> "person" .
+	entity:562 <forename> "Manuel" ;
+		<type> "person" .
+	entity:563 <forename> "Josefa" ;
+		<type> "person" .
+	entity:564 <forename> "Maria Rosa de" ;
+		<type> "person" .
+	entity:565 <forename> "Angela" ;
+		<type> "person" .
+	entity:566 <forename> "Dominga" ;
+		<type> "person" .
+	entity:567 <forename> "John" ;
+		<type> "person" .
+	entity:568 <forename> "Rabelardo" ;
+		<type> "person" .
+	entity:569 <forename> "George W" ;
+		<type> "person" .
+	entity:570 <forename> "Julianne" ;
+		<type> "person" .
+	entity:571 <forename> "Henry JJ" ;
+		<type> "person" .
+	entity:572 <forename> "Doroteo" ;
+		<type> "person" .
+	entity:573 <forename> "Joseph" ;
+		<type> "person" .
+	entity:574 <forename> "Eleanor" ;
+		<type> "person" .
+	entity:575 <forename> "Fanny" ;
+		<type> "person" .
+	entity:576 <forename> "Henry George" ;
+		<type> "person" .
+	entity:577 <forename> "Jose" ;
+		<type> "person" .
+	entity:578 <forename> "Lupies" ;
+		<type> "person" .
+	entity:579 <forename> "Susan" ;
+		<type> "person" .
+	entity:580 <forename> "Valentine R" ;
+		<type> "person" .
+	entity:581 <forename> "Andres" ;
+		<type> "person" .
+	entity:582 <forename> "Elena" ;
+		<type> "person" .
+	entity:583 <forename> "Manuel" ;
+		<type> "person" .
+	entity:584 <forename> "Domingo" ;
+		<type> "person" .
+	entity:585 <forename> "Anita " ;
+		<type> "person" .
+	entity:586 <forename> "Dolores" ;
+		<type> "person" .
+	entity:587 <forename> "Concha" ;
+		<type> "person" .
+	entity:588 <forename> "Maria" ;
+		<type> "person" .
+	entity:589 <forename> "Pascuala" ;
+		<type> "person" .
+	entity:590 <forename> "Mary" ;
+		<type> "person" .
+	entity:591 <forename> "Teodora" ;
+		<type> "person" .
+	entity:592 <forename> "Joao F" ;
+		<type> "person" .
+	entity:593 <forename> "Antonio" ;
+		<type> "person" .
+	entity:594 <forename> "Monica" ;
+		<type> "person" .
+	entity:595 <forename> "Hermio" ;
+		<type> "person" .
+	entity:596 <forename> "NK" ;
+		<type> "person" .
+	entity:597 <forename> "Evelyn Augusta" ;
+		<type> "person" .
+	entity:598 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:599 <forename> "Dionisio de" ;
+		<type> "person" .
+	entity:600 <forename> "J" ;
+		<type> "person" .
+	entity:601 <forename> "L" ;
+		<type> "person" .
+	entity:602 <forename> "Theodora" ;
+		<type> "person" .
+	entity:603 <forename> "James" ;
+		<type> "person" .
+	entity:604 <forename> "John J" ;
+		<type> "person" .
+	entity:605 <forename> "Cayetan" ;
+		<type> "person" .
+	entity:606 <forename> "Valentine" ;
+		<type> "person" .
+	entity:607 <forename> "Mary" ;
+		<type> "person" .
+	entity:608 <forename> "Fausta" ;
+		<type> "person" .
+	entity:609 <forename> "Fausta" ;
+		<type> "person" .
+	entity:610 <forename> "Joseph L" ;
+		<type> "person" .
+	entity:611 <forename> "Marie" ;
+		<type> "person" .
+	entity:612 <forename> "Manuel" ;
+		<type> "person" .
+	entity:613 <forename> "Domingo" ;
+		<type> "person" .
+	entity:614 <forename> "Antony" ;
+		<type> "person" .
+	entity:615 <forename> "Antonio" ;
+		<type> "person" .
+	entity:616 <forename> "Jose" ;
+		<type> "person" .
+	entity:617 <forename> "Carmen" ;
+		<type> "person" .
+	entity:618 <forename> "Juan B" ;
+		<type> "person" .
+	entity:619 <forename> "Juan B " ;
+		<type> "person" .
+	entity:620 <forename> "Juana" ;
+		<type> "person" .
+	entity:621 <forename> "Antonio" ;
+		<type> "person" .
+	entity:622 <forename> "Francisco" ;
+		<type> "person" .
+	entity:623 <forename> "Jose" ;
+		<type> "person" .
+	entity:624 <forename> "Francisco" ;
+		<type> "person" .
+	entity:625 <forename> "Jose" ;
+		<type> "person" .
+	entity:626 <forename> "Joaquin" ;
+		<type> "person" .
+	entity:627 <forename> "Emilio" ;
+		<type> "person" .
+	entity:628 <forename> "Domingo" ;
+		<type> "person" .
+	entity:629 <forename> "Benito" ;
+		<type> "person" .
+	entity:630 <forename> "Rafael" ;
+		<type> "person" .
+	entity:631 <forename> "Luciana" ;
+		<type> "person" .
+	entity:632 <forename> "Clemente" ;
+		<type> "person" .
+	entity:633 <forename> "Filiberto" ;
+		<type> "person" .
+	entity:634 <forename> "Manuel" ;
+		<type> "person" .
+	entity:635 <forename> "Vincenta" ;
+		<type> "person" .
+	entity:636 <forename> "Bridget" ;
+		<type> "person" .
+	entity:637 <forename> "Jose" ;
+		<type> "person" .
+	entity:638 <forename> "Louis" ;
+		<type> "person" .
+	entity:639 <forename> "Jose" ;
+		<type> "person" .
+	entity:640 <forename> "Consuelo" ;
+		<type> "person" .
+	entity:641 <forename> "Pedro" ;
+		<type> "person" .
+	entity:642 <forename> "Catalina" ;
+		<type> "person" .
+	entity:643 <forename> "Consuelo" ;
+		<type> "person" .
+	entity:644 <forename> "Dolores" ;
+		<type> "person" .
+	entity:645 <forename> "Elvira" ;
+		<type> "person" .
+	entity:646 <forename> "Salvador" ;
+		<type> "person" .
+	entity:647 <forename> "John Francis" ;
+		<type> "person" .
+	entity:648 <forename> "Benientra" ;
+		<type> "person" .
+	entity:649 <forename> "Clara" ;
+		<type> "person" .
+	entity:650 <forename> "Manuela" ;
+		<type> "person" .
+	entity:651 <forename> "Eugenio" ;
+		<type> "person" .
+	entity:652 <forename> "Mary Ann" ;
+		<type> "person" .
+	entity:653 <forename> "Francis" ;
+		<type> "person" .
+	entity:654 <forename> "Adolphus" ;
+		<type> "person" .
+	entity:655 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:656 <forename> "John" ;
+		<type> "person" .
+	entity:657 <forename> "Pedro" ;
+		<type> "person" .
+	entity:658 <forename> "Antonio" ;
+		<type> "person" .
+	entity:659 <forename> "Francisco" ;
+		<type> "person" .
+	entity:660 <forename> "Antonio" ;
+		<type> "person" .
+	entity:661 <forename> "Lucinda" ;
+		<type> "person" .
+	entity:662 <forename> "Peter" ;
+		<type> "person" .
+	entity:663 <forename> "Charles" ;
+		<type> "person" .
+	entity:664 <forename> "Pedro" ;
+		<type> "person" .
+	entity:665 <forename> "Ramon" ;
+		<type> "person" .
+	entity:666 <forename> "Ralph" ;
+		<type> "person" .
+	entity:667 <forename> "Eusebius" ;
+		<type> "person" .
+	entity:668 <forename> "Emiteria" ;
+		<type> "person" .
+	entity:669 <forename> "Rosa" ;
+		<type> "person" .
+	entity:670 <forename> "Seymour" ;
+		<type> "person" .
+	entity:671 <forename> "Pedro" ;
+		<type> "person" .
+	entity:672 <forename> "Narcisa" ;
+		<type> "person" .
+	entity:673 <forename> "Angela" ;
+		<type> "person" .
+	entity:674 <forename> "Feliciana" ;
+		<type> "person" .
+	entity:675 <forename> "Faustina" ;
+		<type> "person" .
+	entity:676 <forename> "Andrew" ;
+		<type> "person" .
+	entity:677 <forename> "John" ;
+		<type> "person" .
+	entity:678 <forename> "William" ;
+		<type> "person" .
+	entity:679 <forename> "Alexander" ;
+		<type> "person" .
+	entity:680 <forename> "Jose" ;
+		<type> "person" .
+	entity:681 <forename> "Asuncion" ;
+		<type> "person" .
+	entity:682 <forename> "Angela" ;
+		<type> "person" .
+	entity:683 <forename> "Domingo" ;
+		<type> "person" .
+	entity:684 <forename> "Jose" ;
+		<type> "person" .
+	entity:685 <forename> "Ana" ;
+		<type> "person" .
+	entity:686 <forename> "Vincente" ;
+		<type> "person" .
+	entity:687 <forename> "Angel" ;
+		<type> "person" .
+	entity:688 <forename> "Jose" ;
+		<type> "person" .
+	entity:689 <forename> "Manuel S" ;
+		<type> "person" .
+	entity:690 <forename> "Liberio" ;
+		<type> "person" .
+	entity:691 <forename> "Agnes" ;
+		<type> "person" .
+	entity:692 <forename> "Dionisio de" ;
+		<type> "person" .
+	entity:693 <forename> "Vicenta" ;
+		<type> "person" .
+	entity:694 <forename> "Victor" ;
+		<type> "person" .
+	entity:695 <forename> "Isabel " ;
+		<type> "person" .
+	entity:696 <forename> "Joseph" ;
+		<type> "person" .
+	entity:697 <forename> "Henry James" ;
+		<type> "person" .
+	entity:698 <forename> "Jose" ;
+		<type> "person" .
+	entity:699 <forename> "Gregorio" ;
+		<type> "person" .
+	entity:700 <forename> "Samuel B" ;
+		<type> "person" .
+	entity:701 <forename> "Santiago" ;
+		<type> "person" .
+	entity:702 <forename> "Jesusa" ;
+		<type> "person" .
+	entity:703 <forename> "Maria Luiza" ;
+		<type> "person" .
+	entity:704 <forename> "John" ;
+		<type> "person" .
+	entity:705 <forename> "Amelia" ;
+		<type> "person" .
+	entity:706 <forename> "Jose" ;
+		<type> "person" .
+	entity:707 <forename> "Nicholas" ;
+		<type> "person" .
+	entity:708 <forename> "Jose" ;
+		<type> "person" .
+	entity:709 <forename> "Tomasa U" ;
+		<type> "person" .
+	entity:710 <forename> "Jesus" ;
+		<type> "person" .
+	entity:711 <forename> "Jose" ;
+		<type> "person" .
+	entity:712 <forename> "Jose" ;
+		<type> "person" .
+	entity:713 <forename> "Estefania" ;
+		<type> "person" .
+	entity:714 <forename> "Ramon" ;
+		<type> "person" .
+	entity:715 <forename> "Jose Maria" ;
+		<type> "person" .
+	entity:716 <forename> "Avelino" ;
+		<type> "person" .
+	entity:717 <forename> "Manuel A" ;
+		<type> "person" .
+	entity:718 <forename> "Jose" ;
+		<type> "person" .
+	entity:719 <forename> "Alejandra" ;
+		<type> "person" .
+	entity:720 <forename> "John" ;
+		<type> "person" .
+	entity:721 <forename> "Mary E" ;
+		<type> "person" .
+	entity:722 <forename> "Euphemia" ;
+		<type> "person" .
+	entity:723 <forename> "Johanna" ;
+		<type> "person" .
+	entity:724 <forename> "Julian" ;
+		<type> "person" .
+	entity:725 <forename> "Peter" ;
+		<type> "person" .
+	entity:726 <forename> "Angel" ;
+		<type> "person" .
+	entity:727 <forename> "Mattie" ;
+		<type> "person" .
+	entity:728 <forename> "Frank" ;
+		<type> "person" .
+	entity:729 <forename> "Juana" ;
+		<type> "person" .
+	entity:730 <forename> "Alphonse" ;
+		<type> "person" .
+	entity:731 <forename> "Charles Clark" ;
+		<type> "person" .
+	entity:732 <forename> "Magdalen" ;
+		<type> "person" .
+	entity:733 <forename> "Ceferina" ;
+		<type> "person" .
+	entity:734 <forename> "Edward de" ;
+		<type> "person" .
+	entity:735 <forename> "Alexander" ;
+		<type> "person" .
+	entity:736 <forename> "Anna" ;
+		<type> "person" .
+	entity:737 <forename> "Adolfo" ;
+		<type> "person" .
+	entity:738 <forename> "James H" ;
+		<type> "person" .
+	entity:739 <forename> "Mercedes M" ;
+		<type> "person" .
+	entity:740 <forename> "Mary C" ;
+		<type> "person" .
+	entity:741 <forename> "Ann" ;
+		<type> "person" .
+	entity:742 <forename> "Jose" ;
+		<type> "person" .
+	entity:743 <forename> "Pedro" ;
+		<type> "person" .
+	entity:744 <forename> "Manuel" ;
+		<type> "person" .
+	entity:745 <forename> "Walter H" ;
+		<type> "person" .
+	entity:746 <forename> "Christobal" ;
+		<type> "person" .
+	entity:747 <forename> "Anita" ;
+		<type> "person" .
+	entity:748 <forename> "Angel" ;
+		<type> "person" .
+	entity:749 <forename> "Rosa" ;
+		<type> "person" .
+	entity:750 <forename> "Placida Zuozo" ;
+		<type> "person" .
+	entity:751 <forename> "Ramon" ;
+		<type> "person" .
+	entity:752 <forename> "Eulalia  " ;
+		<type> "person" .
+	entity:753 <forename> "Antonio" ;
+		<type> "person" .
+	entity:754 <forename> "Maria" ;
+		<type> "person" .
+	entity:755 <forename> "Paula de la Cruz" ;
+		<type> "person" .
+	entity:756 <forename> "Margaret A" ;
+		<type> "person" .
+	entity:757 <forename> "Stephen" ;
+		<type> "person" .
+	entity:758 <forename> "Manuel" ;
+		<type> "person" .
+	entity:759 <forename> "Alejandrina" ;
+		<type> "person" .
+	entity:760 <forename> "Juan E" ;
+		<type> "person" .
+	entity:761 <forename> "Juana" ;
+		<type> "person" .
+	entity:762 <forename> "Dominic" ;
+		<type> "person" .
+	entity:763 <forename> "Juan" ;
+		<type> "person" .
+	entity:764 <forename> "Emilio" ;
+		<type> "person" .
+	entity:765 <forename> "Luis" ;
+		<type> "person" .
+	entity:766 <forename> "Emanual" ;
+		<type> "person" .
+	entity:767 <forename> "Lewis" ;
+		<type> "person" .
+	entity:768 <forename> "Jose" ;
+		<type> "person" .
+	entity:769 <forename> "Juan" ;
+		<type> "person" .
+	entity:770 <forename> "Barnabe" ;
+		<type> "person" .
+	entity:771 <forename> "Isidoro" ;
+		<type> "person" .
+	entity:772 <forename> "Antonia" ;
+		<type> "person" .
+	entity:773 <forename> "Baltasar" ;
+		<type> "person" .
+	entity:774 <forename> "Isabel" ;
+		<type> "person" .
+	entity:775 <forename> "Francisco" ;
+		<type> "person" .
+	entity:776 <forename> "Jose E" ;
+		<type> "person" .
+	entity:777 <forename> "Antonio" ;
+		<type> "person" .
+	entity:778 <forename> "Angel" ;
+		<type> "person" .
+	entity:779 <forename> "Ramon" ;
+		<type> "person" .
+	entity:780 <forename> "Diego" ;
+		<type> "person" .
+	entity:781 <forename> "Antonio" ;
+		<type> "person" .
+	entity:782 <forename> "Jose" ;
+		<type> "person" .
+	entity:783 <forename> "Peter" ;
+		<type> "person" .
+	entity:784 <forename> "Mary" ;
+		<type> "person" .
+	entity:785 <forename> "Magdalena" ;
+		<type> "person" .
+	entity:786 <forename> "Evarista de" ;
+		<type> "person" .
+	entity:787 <forename> "Jose M V" ;
+		<type> "person" .
+	entity:788 <forename> "Julian" ;
+		<type> "person" .
+	entity:789 <forename> "Rosa" ;
+		<type> "person" .
+	entity:790 <forename> "Andrew JP" ;
+		<type> "person" .
+	entity:791 <forename> "Annie" ;
+		<type> "person" .
+	entity:792 <forename> "Arthur" ;
+		<type> "person" .
+	entity:793 <forename> "Venson" ;
+		<type> "person" .
+	entity:794 <forename> "Gabriela" ;
+		<type> "person" .
+	entity:795 <forename> "Rosita" ;
+		<type> "person" .
+	entity:796 <forename> "Walter" ;
+		<type> "person" .
+	entity:797 <forename> "Jose" ;
+		<type> "person" .
+	entity:798 <forename> "Alfred" ;
+		<type> "person" .
+	entity:799 <forename> "Flora" ;
+		<type> "person" .
+	entity:800 <forename> "Dolores" ;
+		<type> "person" .
+	entity:801 <forename> "Dolores" ;
+		<type> "person" .
+	entity:802 <forename> "Emma" ;
+		<type> "person" .
+	entity:803 <forename> "Henry J" ;
+		<type> "person" .
+	entity:804 <forename> "Sophia" ;
+		<type> "person" .
+	entity:805 <forename> "Lavinia" ;
+		<type> "person" .
+	entity:806 <forename> "Ana " ;
+		<type> "person" .
+	entity:807 <forename> "Juliana" ;
+		<type> "person" .
+	entity:808 <forename> "Mario" ;
+		<type> "person" .
+	entity:809 <forename> "Miguel" ;
+		<type> "person" .
+	entity:810 <forename> "Milagro" ;
+		<type> "person" .
+	entity:811 <forename> "Geronimo" ;
+		<type> "person" .
+	entity:812 <forename> "Ferdinando" ;
+		<type> "person" .
+	entity:813 <forename> "Magdalena" ;
+		<type> "person" .
+	entity:814 <forename> "Maria" ;
+		<type> "person" .
+	entity:815 <forename> "Magdalena" ;
+		<type> "person" .
+	entity:816 <forename> "Enrique" ;
+		<type> "person" .
+	entity:817 <forename> "Virginia" ;
+		<type> "person" .
+	entity:818 <forename> "Anna" ;
+		<type> "person" .
+	entity:819 <forename> "Victoriano" ;
+		<type> "person" .
+	entity:820 <forename> "Anita" ;
+		<type> "person" .
+	entity:821 <forename> "Victorino" ;
+		<type> "person" .
+	entity:822 <forename> "Pedro" ;
+		<type> "person" .
+	entity:823 <forename> "Clara" ;
+		<type> "person" .
+	entity:824 <forename> "Frank" ;
+		<type> "person" .
+	entity:825 <forename> "Martin" ;
+		<type> "person" .
+	entity:826 <forename> "Ellen" ;
+		<type> "person" .
+	entity:827 <forename> "Henry" ;
+		<type> "person" .
+	entity:828 <forename> "Thomas B" ;
+		<type> "person" .
+	entity:829 <forename> "Thomas" ;
+		<type> "person" .
+	entity:830 <forename> "Henrietta" ;
+		<type> "person" .
+	entity:831 <forename> "Mary" ;
+		<type> "person" .
+	entity:832 <forename> "Juan" ;
+		<type> "person" .
+	entity:833 <forename> "Juan" ;
+		<type> "person" .
+	entity:834 <forename> "Jose" ;
+		<type> "person" .
+	entity:835 <forename> "Louisa" ;
+		<type> "person" .
+	entity:836 <forename> "George B" ;
+		<type> "person" .
+	entity:837 <forename> "Louisa" ;
+		<type> "person" .
+	entity:838 <forename> "Edith B" ;
+		<type> "person" .
+	entity:839 <forename> "Herbert" ;
+		<type> "person" .
+	entity:840 <forename> "Mary H" ;
+		<type> "person" .
+	entity:841 <forename> "Ann" ;
+		<type> "person" .
+	entity:842 <forename> "John" ;
+		<type> "person" .
+	entity:843 <forename> "Edward" ;
+		<type> "person" .
+	entity:844 <forename> "Catherine" ;
+		<type> "person" .
+	entity:845 <forename> "Jose" ;
+		<type> "person" .
+	entity:846 <forename> "Augusta" ;
+		<type> "person" .
+	entity:847 <forename> "Maria J" ;
+		<type> "person" .
+	entity:848 <forename> "William" ;
+		<type> "person" .
+	entity:849 <forename> "Policarpo" ;
+		<type> "person" .
+	entity:850 <forename> "Antonio" ;
+		<type> "person" .
+	entity:851 <forename> "Dolores" ;
+		<type> "person" .
+	entity:852 <forename> "Manuel" ;
+		<type> "person" .
+	entity:853 <forename> "Henry" ;
+		<type> "person" .
+	entity:854 <forename> "Thomas" ;
+		<type> "person" .
+	entity:855 <forename> "Mary A" ;
+		<type> "person" .
+	entity:856 <forename> "Victoria" ;
+		<type> "person" .
+	entity:857 <forename> "Margaret" ;
+		<type> "person" .
+	entity:858 <forename> "Charlotte" ;
+		<type> "person" .
+	entity:859 <forename> "Eliza" ;
+		<type> "person" .
+	entity:860 <forename> "James" ;
+		<type> "person" .
+	entity:861 <forename> "Lucy" ;
+		<type> "person" .
+	entity:862 <forename> "Charlotte" ;
+		<type> "person" .
+	entity:863 <forename> "Eliza A" ;
+		<type> "person" .
+	entity:864 <forename> "John" ;
+		<type> "person" .
+	entity:865 <forename> "Horatio" ;
+		<type> "person" .
+	entity:866 <forename> "Felnarda" ;
+		<type> "person" .
+	entity:867 <forename> "Minna" ;
+		<type> "person" .
+	entity:868 <forename> "Hidalgo" ;
+		<type> "person" .
+	entity:869 <forename> "Fanny" ;
+		<type> "person" .
+	entity:870 <forename> "Benigno" ;
+		<type> "person" .
+	entity:871 <forename> "Josefa" ;
+		<type> "person" .
+	entity:872 <forename> "Francisca" ;
+		<type> "person" .
+	entity:873 <forename> "Mathew" ;
+		<type> "person" .
+	entity:874 <forename> "Calletto" ;
+		<type> "person" .
+	entity:875 <forename> "Dominica" ;
+		<type> "person" .
+	entity:876 <forename> "Charles  " ;
+		<type> "person" .
+	entity:877 <forename> "William" ;
+		<type> "person" .
+	entity:878 <forename> "Carmen" ;
+		<type> "person" .
+	entity:879 <forename> "Luis" ;
+		<type> "person" .
+	entity:880 <forename> "Manuel" ;
+		<type> "person" .
+	entity:881 <forename> "Maud H" ;
+		<type> "person" .
+	entity:882 <forename> "Grace Adele" ;
+		<type> "person" .
+	entity:883 <forename> "Peter" ;
+		<type> "person" .
+	entity:884 <forename> "Charles" ;
+		<type> "person" .
+	entity:885 <forename> "Grace A" ;
+		<type> "person" .
+	entity:886 <forename> "Walter A" ;
+		<type> "person" .
+	entity:887 <forename> "Amy" ;
+		<type> "person" .
+	entity:888 <forename> "Charlotte M" ;
+		<type> "person" .
+	entity:889 <forename> "John" ;
+		<type> "person" .
+	entity:890 <forename> "Jose" ;
+		<type> "person" .
+	entity:891 <forename> "Vicente" ;
+		<type> "person" .
+	entity:892 <forename> "Dominga" ;
+		<type> "person" .
+	entity:893 <forename> "Manuela" ;
+		<type> "person" .
+	entity:894 <forename> "Anthony" ;
+		<type> "person" .
+	entity:895 <forename> "Lynett" ;
+		<type> "person" .
+	entity:896 <forename> "Norman" ;
+		<type> "person" .
+	entity:897 <forename> "Mary" ;
+		<type> "person" .
+	entity:898 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:899 <forename> "John" ;
+		<type> "person" .
+	entity:900 <forename> "Edward" ;
+		<type> "person" .
+	entity:901 <forename> "Richard" ;
+		<type> "person" .
+	entity:902 <forename> "Mary Ann" ;
+		<type> "person" .
+	entity:903 <forename> "Jane C" ;
+		<type> "person" .
+	entity:904 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:905 <forename> "Ella B" ;
+		<type> "person" .
+	entity:906 <forename> "William" ;
+		<type> "person" .
+	entity:907 <forename> "Maria" ;
+		<type> "person" .
+	entity:908 <forename> "Antonio" ;
+		<type> "person" .
+	entity:909 <forename> "Vincent " ;
+		<type> "person" .
+	entity:910 <forename> "James" ;
+		<type> "person" .
+	entity:911 <forename> "William" ;
+		<type> "person" .
+	entity:912 <forename> "Emilie" ;
+		<type> "person" .
+	entity:913 <forename> "Martha" ;
+		<type> "person" .
+	entity:914 <forename> "Surita" ;
+		<type> "person" .
+	entity:915 <forename> "George" ;
+		<type> "person" .
+	entity:916 <forename> "Ellen" ;
+		<type> "person" .
+	entity:917 <forename> "Porto" ;
+		<type> "person" .
+	entity:918 <forename> "Farini" ;
+		<type> "person" .
+	entity:919 <forename> "Julia A" ;
+		<type> "person" .
+	entity:920 <forename> "Ethel M" ;
+		<type> "person" .
+	entity:921 <forename> "Maria" ;
+		<type> "person" .
+	entity:922 <forename> "AM" ;
+		<type> "person" .
+	entity:923 <forename> "Nicolasa" ;
+		<type> "person" .
+	entity:924 <forename> "Jose" ;
+		<type> "person" .
+	entity:925 <forename> "Albert" ;
+		<type> "person" .
+	entity:926 <forename> "Manuel" ;
+		<type> "person" .
+	entity:927 <forename> "Angela" ;
+		<type> "person" .
+	entity:928 <forename> "Ortrizo" ;
+		<type> "person" .
+	entity:929 <forename> "Manuela" ;
+		<type> "person" .
+	entity:930 <forename> "Asuncion" ;
+		<type> "person" .
+	entity:931 <forename> "Bernhilia" ;
+		<type> "person" .
+	entity:932 <forename> "Elvira" ;
+		<type> "person" .
+	entity:933 <forename> "J" ;
+		<type> "person" .
+	entity:934 <forename> "-" ;
+		<type> "person" .
+	entity:935 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:936 <forename> "Sarah" ;
+		<type> "person" .
+	entity:937 <forename> "Ernest" ;
+		<type> "person" .
+	entity:938 <forename> "John" ;
+		<type> "person" .
+	entity:939 <forename> "Antonia" ;
+		<type> "person" .
+	entity:940 <forename> "Beatrice" ;
+		<type> "person" .
+	entity:941 <forename> "Fermina" ;
+		<type> "person" .
+	entity:942 <forename> "Ramon de" ;
+		<type> "person" .
+	entity:943 <forename> "Anselma" ;
+		<type> "person" .
+	entity:944 <forename> "Maria" ;
+		<type> "person" .
+	entity:945 <forename> "Teodoro" ;
+		<type> "person" .
+	entity:946 <forename> "Athanasio" ;
+		<type> "person" .
+	entity:947 <forename> "Enriqueta" ;
+		<type> "person" .
+	entity:948 <forename> "Margarita" ;
+		<type> "person" .
+	entity:949 <forename> "Tiburcio" ;
+		<type> "person" .
+	entity:950 <forename> "Asuncion" ;
+		<type> "person" .
+	entity:951 <forename> "Anastasia" ;
+		<type> "person" .
+	entity:952 <forename> "Carmen" ;
+		<type> "person" .
+	entity:953 <forename> "Pedro" ;
+		<type> "person" .
+	entity:954 <forename> "Pilar" ;
+		<type> "person" .
+	entity:955 <forename> "Florentino" ;
+		<type> "person" .
+	entity:956 <forename> "Carmen" ;
+		<type> "person" .
+	entity:957 <forename> "Mariquita" ;
+		<type> "person" .
+	entity:958 <forename> "Samuel A E" ;
+		<type> "person" .
+	entity:959 <forename> "Melquiades" ;
+		<type> "person" .
+	entity:960 <forename> "Augusto" ;
+		<type> "person" .
+	entity:961 <forename> "Dominica" ;
+		<type> "person" .
+	entity:962 <forename> "Pedro JMR" ;
+		<type> "person" .
+	entity:963 <forename> "Antonio Segundo" ;
+		<type> "person" .
+	entity:964 <forename> "Francisca" ;
+		<type> "person" .
+	entity:965 <forename> "Macaria" ;
+		<type> "person" .
+	entity:966 <forename> "Jose" ;
+		<type> "person" .
+	entity:967 <forename> "Felix" ;
+		<type> "person" .
+	entity:968 <forename> "Agustas" ;
+		<type> "person" .
+	entity:969 <forename> "Josephine" ;
+		<type> "person" .
+	entity:970 <forename> "Magdalena" ;
+		<type> "person" .
+	entity:971 <forename> "Miguel" ;
+		<type> "person" .
+	entity:972 <forename> "Jose" ;
+		<type> "person" .
+	entity:973 <forename> "Penha" ;
+		<type> "person" .
+	entity:974 <forename> "Antonio" ;
+		<type> "person" .
+	entity:975 <forename> "Camila" ;
+		<type> "person" .
+	entity:976 <forename> "Gabriel" ;
+		<type> "person" .
+	entity:977 <forename> "Francisco" ;
+		<type> "person" .
+	entity:978 <forename> "Jose" ;
+		<type> "person" .
+	entity:979 <forename> "Ann" ;
+		<type> "person" .
+	entity:980 <forename> "Mary Carmen" ;
+		<type> "person" .
+	entity:981 <forename> "Cornelia" ;
+		<type> "person" .
+	entity:982 <forename> "Fermin " ;
+		<type> "person" .
+	entity:983 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:984 <forename> "Lola" ;
+		<type> "person" .
+	entity:985 <forename> "Petra  " ;
+		<type> "person" .
+	entity:986 <forename> "Simon" ;
+		<type> "person" .
+	entity:987 <forename> "Domingo de" ;
+		<type> "person" .
+	entity:988 <forename> "Juan Bautista de" ;
+		<type> "person" .
+	entity:989 <forename> "Leon" ;
+		<type> "person" .
+	entity:990 <forename> "Saturnina" ;
+		<type> "person" .
+	entity:991 <forename> "Trinidad" ;
+		<type> "person" .
+	entity:992 <forename> "Dominga" ;
+		<type> "person" .
+	entity:993 <forename> "Francisca" ;
+		<type> "person" .
+	entity:994 <forename> "Manuel" ;
+		<type> "person" .
+	entity:995 <forename> "Manuel" ;
+		<type> "person" .
+	entity:996 <forename> "Calixto" ;
+		<type> "person" .
+	entity:997 <forename> "Maria" ;
+		<type> "person" .
+	entity:998 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:999 <forename> "Jesus" ;
+		<type> "person" .
+	entity:1000 <forename> "Filomena" ;
+		<type> "person" .
+	entity:1001 <forename> "Felix" ;
+		<type> "person" .
+	entity:1002 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1003 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1004 <forename> "Santiago" ;
+		<type> "person" .
+	entity:1005 <forename> "Vicenta" ;
+		<type> "person" .
+	entity:1006 <forename> "Jose" ;
+		<type> "person" .
+	entity:1007 <forename> "Visconta" ;
+		<type> "person" .
+	entity:1008 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1009 <forename> "Asuncion" ;
+		<type> "person" .
+	entity:1010 <forename> "Rosa M" ;
+		<type> "person" .
+	entity:1011 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1012 <forename> "Bernardo Jose" ;
+		<type> "person" .
+	entity:1013 <forename> "Flora" ;
+		<type> "person" .
+	entity:1014 <forename> "Angel" ;
+		<type> "person" .
+	entity:1015 <forename> "Marcelino" ;
+		<type> "person" .
+	entity:1016 <forename> "Paulina C" ;
+		<type> "person" .
+	entity:1017 <forename> "Henrique" ;
+		<type> "person" .
+	entity:1018 <forename> "Isabella" ;
+		<type> "person" .
+	entity:1019 <forename> "Armenia de" ;
+		<type> "person" .
+	entity:1020 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1021 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1022 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1023 <forename> "Micaela" ;
+		<type> "person" .
+	entity:1024 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1025 <forename> "Philippe" ;
+		<type> "person" .
+	entity:1026 <forename> "Henry" ;
+		<type> "person" .
+	entity:1027 <forename> "Gadis" ;
+		<type> "person" .
+	entity:1028 <forename> "Caroline L" ;
+		<type> "person" .
+	entity:1029 <forename> "Mary" ;
+		<type> "person" .
+	entity:1030 <forename> "Anita Wilk" ;
+		<type> "person" .
+	entity:1031 <forename> "Isabella Anne" ;
+		<type> "person" .
+	entity:1032 <forename> "Louisa Jane" ;
+		<type> "person" .
+	entity:1033 <forename> "Robert" ;
+		<type> "person" .
+	entity:1034 <forename> "Joseph B" ;
+		<type> "person" .
+	entity:1035 <forename> "Rosina" ;
+		<type> "person" .
+	entity:1036 <forename> "Juan" ;
+		<type> "person" .
+	entity:1037 <forename> "John" ;
+		<type> "person" .
+	entity:1038 <forename> "Annie" ;
+		<type> "person" .
+	entity:1039 <forename> "Frank" ;
+		<type> "person" .
+	entity:1040 <forename> "Maria E" ;
+		<type> "person" .
+	entity:1041 <forename> "Marian" ;
+		<type> "person" .
+	entity:1042 <forename> "Mary Jane" ;
+		<type> "person" .
+	entity:1043 <forename> "Jose Agustin" ;
+		<type> "person" .
+	entity:1044 <forename> "Baldomera" ;
+		<type> "person" .
+	entity:1045 <forename> "Eustania" ;
+		<type> "person" .
+	entity:1046 <forename> "Philip " ;
+		<type> "person" .
+	entity:1047 <forename> "Dolores" ;
+		<type> "person" .
+	entity:1048 <forename> "Emily" ;
+		<type> "person" .
+	entity:1049 <forename> "Jose" ;
+		<type> "person" .
+	entity:1050 <forename> "Bautista" ;
+		<type> "person" .
+	entity:1051 <forename> "Ellen" ;
+		<type> "person" .
+	entity:1052 <forename> "Henrietta" ;
+		<type> "person" .
+	entity:1053 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1054 <forename> "Augusta" ;
+		<type> "person" .
+	entity:1055 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1056 <forename> "Grelain" ;
+		<type> "person" .
+	entity:1057 <forename> "Francisca" ;
+		<type> "person" .
+	entity:1058 <forename> "John" ;
+		<type> "person" .
+	entity:1059 <forename> "Joao M" ;
+		<type> "person" .
+	entity:1060 <forename> "Domingo" ;
+		<type> "person" .
+	entity:1061 <forename> "Eusebio" ;
+		<type> "person" .
+	entity:1062 <forename> "Ciriaca" ;
+		<type> "person" .
+	entity:1063 <forename> "Juan" ;
+		<type> "person" .
+	entity:1064 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1065 <forename> "Alexander" ;
+		<type> "person" .
+	entity:1066 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1067 <forename> "John" ;
+		<type> "person" .
+	entity:1068 <forename> "Victoria" ;
+		<type> "person" .
+	entity:1069 <forename> "Mauricia" ;
+		<type> "person" .
+	entity:1070 <forename> "Valentino" ;
+		<type> "person" .
+	entity:1071 <forename> "Bautista" ;
+		<type> "person" .
+	entity:1072 <forename> "Maria J" ;
+		<type> "person" .
+	entity:1073 <forename> "Charles" ;
+		<type> "person" .
+	entity:1074 <forename> "Julia" ;
+		<type> "person" .
+	entity:1075 <forename> "Jose" ;
+		<type> "person" .
+	entity:1076 <forename> "Jose" ;
+		<type> "person" .
+	entity:1077 <forename> "Henry" ;
+		<type> "person" .
+	entity:1078 <forename> "Juana" ;
+		<type> "person" .
+	entity:1079 <forename> "Catalina" ;
+		<type> "person" .
+	entity:1080 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1081 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:1082 <forename> "Elias" ;
+		<type> "person" .
+	entity:1083 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1084 <forename> "Jose" ;
+		<type> "person" .
+	entity:1085 <forename> "Silvester" ;
+		<type> "person" .
+	entity:1086 <forename> "Vicente" ;
+		<type> "person" .
+	entity:1087 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1088 <forename> "Mary" ;
+		<type> "person" .
+	entity:1089 <forename> "John" ;
+		<type> "person" .
+	entity:1090 <forename> "Johanna" ;
+		<type> "person" .
+	entity:1091 <forename> "Zoila" ;
+		<type> "person" .
+	entity:1092 <forename> "Jane" ;
+		<type> "person" .
+	entity:1093 <forename> "George" ;
+		<type> "person" .
+	entity:1094 <forename> "Euphemia" ;
+		<type> "person" .
+	entity:1095 <forename> "Thomas W" ;
+		<type> "person" .
+	entity:1096 <forename> "William" ;
+		<type> "person" .
+	entity:1097 <forename> "Maria" ;
+		<type> "person" .
+	entity:1098 <forename> "Paco" ;
+		<type> "person" .
+	entity:1099 <forename> "Rachel E" ;
+		<type> "person" .
+	entity:1100 <forename> "Helen" ;
+		<type> "person" .
+	entity:1101 <forename> "Mary Ann" ;
+		<type> "person" .
+	entity:1102 <forename> "Mary" ;
+		<type> "person" .
+	entity:1103 <forename> "Carmen" ;
+		<type> "person" .
+	entity:1104 <forename> "Frances" ;
+		<type> "person" .
+	entity:1105 <forename> "Castor" ;
+		<type> "person" .
+	entity:1106 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1107 <forename> "---" ;
+		<type> "person" .
+	entity:1108 <forename> "Jose" ;
+		<type> "person" .
+	entity:1109 <forename> "Jeremias" ;
+		<type> "person" .
+	entity:1110 <forename> "Cate" ;
+		<type> "person" .
+	entity:1111 <forename> "John P" ;
+		<type> "person" .
+	entity:1112 <forename> "Jose" ;
+		<type> "person" .
+	entity:1113 <forename> "William R" ;
+		<type> "person" .
+	entity:1114 <forename> "Antonia" ;
+		<type> "person" .
+	entity:1115 <forename> "Herminia" ;
+		<type> "person" .
+	entity:1116 <forename> "Jose A" ;
+		<type> "person" .
+	entity:1117 <forename> "Lorenza A E" ;
+		<type> "person" .
+	entity:1118 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1119 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1120 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1121 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1122 <forename> "Gregory" ;
+		<type> "person" .
+	entity:1123 <forename> "Eugenio" ;
+		<type> "person" .
+	entity:1124 <forename> "Julian" ;
+		<type> "person" .
+	entity:1125 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1126 <forename> "Sarah C" ;
+		<type> "person" .
+	entity:1127 <forename> "Antonio G de" ;
+		<type> "person" .
+	entity:1128 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1129 <forename> "Florence" ;
+		<type> "person" .
+	entity:1130 <forename> "Juana" ;
+		<type> "person" .
+	entity:1131 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1132 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1133 <forename> "William" ;
+		<type> "person" .
+	entity:1134 <forename> "Miguel" ;
+		<type> "person" .
+	entity:1135 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1136 <forename> "Mary" ;
+		<type> "person" .
+	entity:1137 <forename> "Gregorio" ;
+		<type> "person" .
+	entity:1138 <forename> "William Charles" ;
+		<type> "person" .
+	entity:1139 <forename> "Henry" ;
+		<type> "person" .
+	entity:1140 <forename> "Joseph" ;
+		<type> "person" .
+	entity:1141 <forename> "Charles Craigie" ;
+		<type> "person" .
+	entity:1142 <forename> "John Frobisher" ;
+		<type> "person" .
+	entity:1143 <forename> "Grace" ;
+		<type> "person" .
+	entity:1144 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1145 <forename> "Emilio" ;
+		<type> "person" .
+	entity:1146 <forename> "Petra R" ;
+		<type> "person" .
+	entity:1147 <forename> "Enrique" ;
+		<type> "person" .
+	entity:1148 <forename> "James R" ;
+		<type> "person" .
+	entity:1149 <forename> "William Abraham" ;
+		<type> "person" .
+	entity:1150 <forename> "Mrs" ;
+		<type> "person" .
+	entity:1151 <forename> "Anthony" ;
+		<type> "person" .
+	entity:1152 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1153 <forename> "Miguel" ;
+		<type> "person" .
+	entity:1154 <forename> "Agustin" ;
+		<type> "person" .
+	entity:1155 <forename> "Christina" ;
+		<type> "person" .
+	entity:1156 <forename> "Adelaida" ;
+		<type> "person" .
+	entity:1157 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1158 <forename> "Julius Antoine" ;
+		<type> "person" .
+	entity:1159 <forename> "Emilio G" ;
+		<type> "person" .
+	entity:1160 <forename> "Palmyra" ;
+		<type> "person" .
+	entity:1161 <forename> "Jose" ;
+		<type> "person" .
+	entity:1162 <forename> "Nicholas" ;
+		<type> "person" .
+	entity:1163 <forename> "Jose" ;
+		<type> "person" .
+	entity:1164 <forename> "George" ;
+		<type> "person" .
+	entity:1165 <forename> "Bertha B" ;
+		<type> "person" .
+	entity:1166 <forename> "Elsie" ;
+		<type> "person" .
+	entity:1167 <forename> "Laura" ;
+		<type> "person" .
+	entity:1168 <forename> "Victoria" ;
+		<type> "person" .
+	entity:1169 <forename> "Dominga" ;
+		<type> "person" .
+	entity:1170 <forename> "Concepcion" ;
+		<type> "person" .
+	entity:1171 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:1172 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1173 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1174 <forename> "Frank" ;
+		<type> "person" .
+	entity:1175 <forename> "Giovanni" ;
+		<type> "person" .
+	entity:1176 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1177 <forename> "Josefa" ;
+		<type> "person" .
+	entity:1178 <forename> "Isabel " ;
+		<type> "person" .
+	entity:1179 <forename> "Lorenz" ;
+		<type> "person" .
+	entity:1180 <forename> "Florentino L" ;
+		<type> "person" .
+	entity:1181 <forename> "Jose L M" ;
+		<type> "person" .
+	entity:1182 <forename> "Juan B L" ;
+		<type> "person" .
+	entity:1183 <forename> "Martina" ;
+		<type> "person" .
+	entity:1184 <forename> "J Antonio" ;
+		<type> "person" .
+	entity:1185 <forename> "Hannah" ;
+		<type> "person" .
+	entity:1186 <forename> "Jose Antonio" ;
+		<type> "person" .
+	entity:1187 <forename> "Charlotte" ;
+		<type> "person" .
+	entity:1188 <forename> "Eliza" ;
+		<type> "person" .
+	entity:1189 <forename> "Fedinda" ;
+		<type> "person" .
+	entity:1190 <forename> "Inigo" ;
+		<type> "person" .
+	entity:1191 <forename> "Jose" ;
+		<type> "person" .
+	entity:1192 <forename> "Frederick" ;
+		<type> "person" .
+	entity:1193 <forename> "Sarah Emily" ;
+		<type> "person" .
+	entity:1194 <forename> "Bertha R O" ;
+		<type> "person" .
+	entity:1195 <forename> "Harry" ;
+		<type> "person" .
+	entity:1196 <forename> "Peter" ;
+		<type> "person" .
+	entity:1197 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1198 <forename> "Alberto" ;
+		<type> "person" .
+	entity:1199 <forename> "Carlos" ;
+		<type> "person" .
+	entity:1200 <forename> "Dora" ;
+		<type> "person" .
+	entity:1201 <forename> "Ernesto" ;
+		<type> "person" .
+	entity:1202 <forename> "Juan" ;
+		<type> "person" .
+	entity:1203 <forename> "Juan" ;
+		<type> "person" .
+	entity:1204 <forename> "Otilda Maria" ;
+		<type> "person" .
+	entity:1205 <forename> "Rogelio" ;
+		<type> "person" .
+	entity:1206 <forename> "Peter" ;
+		<type> "person" .
+	entity:1207 <forename> "Eugenio" ;
+		<type> "person" .
+	entity:1208 <forename> "Antonia" ;
+		<type> "person" .
+	entity:1209 <forename> "Maria" ;
+		<type> "person" .
+	entity:1210 <forename> "Thereze" ;
+		<type> "person" .
+	entity:1211 <forename> "Clarence" ;
+		<type> "person" .
+	entity:1212 <forename> "Monio" ;
+		<type> "person" .
+	entity:1213 <forename> "Pastor" ;
+		<type> "person" .
+	entity:1214 <forename> "Jose" ;
+		<type> "person" .
+	entity:1215 <forename> "Frederick" ;
+		<type> "person" .
+	entity:1216 <forename> "Sabino" ;
+		<type> "person" .
+	entity:1217 <forename> "NK" ;
+		<type> "person" .
+	entity:1218 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1219 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1220 <forename> "NK" ;
+		<type> "person" .
+	entity:1221 <forename> "NK" ;
+		<type> "person" .
+	entity:1222 <forename> "Arian" ;
+		<type> "person" .
+	entity:1223 <forename> "William" ;
+		<type> "person" .
+	entity:1224 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1225 <forename> "Josephine" ;
+		<type> "person" .
+	entity:1226 <forename> "Mrs" ;
+		<type> "person" .
+	entity:1227 <forename> "Philaime" ;
+		<type> "person" .
+	entity:1228 <forename> "George Thomas" ;
+		<type> "person" .
+	entity:1229 <forename> "Regardo" ;
+		<type> "person" .
+	entity:1230 <forename> "Dolores" ;
+		<type> "person" .
+	entity:1231 <forename> "Gregorio" ;
+		<type> "person" .
+	entity:1232 <forename> "Isabel" ;
+		<type> "person" .
+	entity:1233 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1234 <forename> "Angela" ;
+		<type> "person" .
+	entity:1235 <forename> "Saturnino" ;
+		<type> "person" .
+	entity:1236 <forename> "Charles" ;
+		<type> "person" .
+	entity:1237 <forename> "Arthur" ;
+		<type> "person" .
+	entity:1238 <forename> "Sophia" ;
+		<type> "person" .
+	entity:1239 <forename> "Luciano" ;
+		<type> "person" .
+	entity:1240 <forename> "Juan Bautista  " ;
+		<type> "person" .
+	entity:1241 <forename> "Louisa" ;
+		<type> "person" .
+	entity:1242 <forename> "Emiliano de" ;
+		<type> "person" .
+	entity:1243 <forename> "Jose Antonio" ;
+		<type> "person" .
+	entity:1244 <forename> "Juliana" ;
+		<type> "person" .
+	entity:1245 <forename> "Anita" ;
+		<type> "person" .
+	entity:1246 <forename> "Juan" ;
+		<type> "person" .
+	entity:1247 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1248 <forename> "Jose" ;
+		<type> "person" .
+	entity:1249 <forename> "Narciso de" ;
+		<type> "person" .
+	entity:1250 <forename> "Roman de" ;
+		<type> "person" .
+	entity:1251 <forename> "Petra O de" ;
+		<type> "person" .
+	entity:1252 <forename> "Artemisio" ;
+		<type> "person" .
+	entity:1253 <forename> "Tiburcio" ;
+		<type> "person" .
+	entity:1254 <forename> "Josefina" ;
+		<type> "person" .
+	entity:1255 <forename> "Candida" ;
+		<type> "person" .
+	entity:1256 <forename> "Sascuola" ;
+		<type> "person" .
+	entity:1257 <forename> "Arturo" ;
+		<type> "person" .
+	entity:1258 <forename> "Ganes" ;
+		<type> "person" .
+	entity:1259 <forename> "Marina" ;
+		<type> "person" .
+	entity:1260 <forename> "William" ;
+		<type> "person" .
+	entity:1261 <forename> "Jon" ;
+		<type> "person" .
+	entity:1262 <forename> "Fidel de" ;
+		<type> "person" .
+	entity:1263 <forename> "Angel" ;
+		<type> "person" .
+	entity:1264 <forename> "Mariano" ;
+		<type> "person" .
+	entity:1265 <forename> "Felipe" ;
+		<type> "person" .
+	entity:1266 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1267 <forename> "Amelia" ;
+		<type> "person" .
+	entity:1268 <forename> "Ricarda" ;
+		<type> "person" .
+	entity:1269 <forename> "Angela" ;
+		<type> "person" .
+	entity:1270 <forename> "Francisca R de" ;
+		<type> "person" .
+	entity:1271 <forename> "Luis Villa de" ;
+		<type> "person" .
+	entity:1272 <forename> "Tiberio" ;
+		<type> "person" .
+	entity:1273 <forename> "Benita" ;
+		<type> "person" .
+	entity:1274 <forename> "Martina" ;
+		<type> "person" .
+	entity:1275 <forename> "Benito" ;
+		<type> "person" .
+	entity:1276 <forename> "Maria Jesus" ;
+		<type> "person" .
+	entity:1277 <forename> "Mancona [?]" ;
+		<type> "person" .
+	entity:1278 <forename> "Felicia" ;
+		<type> "person" .
+	entity:1279 <forename> "Agustin" ;
+		<type> "person" .
+	entity:1280 <forename> "Julian" ;
+		<type> "person" .
+	entity:1281 <forename> "R H" ;
+		<type> "person" .
+	entity:1282 <forename> "Sabina" ;
+		<type> "person" .
+	entity:1283 <forename> "Adela" ;
+		<type> "person" .
+	entity:1284 <forename> "Eugenia" ;
+		<type> "person" .
+	entity:1285 <forename> "Lucas B" ;
+		<type> "person" .
+	entity:1286 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1287 <forename> "Eliza" ;
+		<type> "person" .
+	entity:1288 <forename> "Mary Jane" ;
+		<type> "person" .
+	entity:1289 <forename> "Frank" ;
+		<type> "person" .
+	entity:1290 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1291 <forename> "Jose" ;
+		<type> "person" .
+	entity:1292 <forename> "Nicomedes" ;
+		<type> "person" .
+	entity:1293 <forename> "Emilio" ;
+		<type> "person" .
+	entity:1294 <forename> "Jacinta" ;
+		<type> "person" .
+	entity:1295 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1296 <forename> "Jose A" ;
+		<type> "person" .
+	entity:1297 <forename> "Samuel" ;
+		<type> "person" .
+	entity:1298 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:1299 <forename> "Canado" ;
+		<type> "person" .
+	entity:1300 <forename> "Ciriaco" ;
+		<type> "person" .
+	entity:1301 <forename> "Ciriaco" ;
+		<type> "person" .
+	entity:1302 <forename> "Alberto" ;
+		<type> "person" .
+	entity:1303 <forename> "Jose Maria" ;
+		<type> "person" .
+	entity:1304 <forename> "Eleanor" ;
+		<type> "person" .
+	entity:1305 <forename> "Jaime" ;
+		<type> "person" .
+	entity:1306 <forename> "Jose" ;
+		<type> "person" .
+	entity:1307 <forename> "Nicandro" ;
+		<type> "person" .
+	entity:1308 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1309 <forename> "Jose" ;
+		<type> "person" .
+	entity:1310 <forename> "Mateus" ;
+		<type> "person" .
+	entity:1311 <forename> "Jose" ;
+		<type> "person" .
+	entity:1312 <forename> "Frank G" ;
+		<type> "person" .
+	entity:1313 <forename> "Josefina" ;
+		<type> "person" .
+	entity:1314 <forename> "Benito" ;
+		<type> "person" .
+	entity:1315 <forename> "Jose" ;
+		<type> "person" .
+	entity:1316 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1317 <forename> "Antonia" ;
+		<type> "person" .
+	entity:1318 <forename> "Amancio" ;
+		<type> "person" .
+	entity:1319 <forename> "Marcelo" ;
+		<type> "person" .
+	entity:1320 <forename> "Adelino" ;
+		<type> "person" .
+	entity:1321 <forename> "Juana" ;
+		<type> "person" .
+	entity:1322 <forename> "Luciana" ;
+		<type> "person" .
+	entity:1323 <forename> "Jose" ;
+		<type> "person" .
+	entity:1324 <forename> "Jose" ;
+		<type> "person" .
+	entity:1325 <forename> "Amparo" ;
+		<type> "person" .
+	entity:1326 <forename> "Jose" ;
+		<type> "person" .
+	entity:1327 <forename> "Ismael" ;
+		<type> "person" .
+	entity:1328 <forename> "Rosa" ;
+		<type> "person" .
+	entity:1329 <forename> "Carmen" ;
+		<type> "person" .
+	entity:1330 <forename> "Philip" ;
+		<type> "person" .
+	entity:1331 <forename> "Rosa M" ;
+		<type> "person" .
+	entity:1332 <forename> "Domingo" ;
+		<type> "person" .
+	entity:1333 <forename> "Miguel" ;
+		<type> "person" .
+	entity:1334 <forename> "Charles" ;
+		<type> "person" .
+	entity:1335 <forename> "William" ;
+		<type> "person" .
+	entity:1336 <forename> "Carlos" ;
+		<type> "person" .
+	entity:1337 <forename> "Guillermo" ;
+		<type> "person" .
+	entity:1338 <forename> "Candida" ;
+		<type> "person" .
+	entity:1339 <forename> "Jose" ;
+		<type> "person" .
+	entity:1340 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1341 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1342 <forename> "Frederick " ;
+		<type> "person" .
+	entity:1343 <forename> "Mary Anne" ;
+		<type> "person" .
+	entity:1344 <forename> "Jose" ;
+		<type> "person" .
+	entity:1345 <forename> "Jose" ;
+		<type> "person" .
+	entity:1346 <forename> "Frank" ;
+		<type> "person" .
+	entity:1347 <forename> "Hannah" ;
+		<type> "person" .
+	entity:1348 <forename> "Salvador" ;
+		<type> "person" .
+	entity:1349 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1350 <forename> "Agueda" ;
+		<type> "person" .
+	entity:1351 <forename> "Edmund" ;
+		<type> "person" .
+	entity:1352 <forename> "John" ;
+		<type> "person" .
+	entity:1353 <forename> "Mary E" ;
+		<type> "person" .
+	entity:1354 <forename> "May" ;
+		<type> "person" .
+	entity:1355 <forename> "William" ;
+		<type> "person" .
+	entity:1356 <forename> "Vicente" ;
+		<type> "person" .
+	entity:1357 <forename> "Mercedes" ;
+		<type> "person" .
+	entity:1358 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1359 <forename> "Patricia" ;
+		<type> "person" .
+	entity:1360 <forename> "Susannah" ;
+		<type> "person" .
+	entity:1361 <forename> "Asuncion" ;
+		<type> "person" .
+	entity:1362 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1363 <forename> "Carmen" ;
+		<type> "person" .
+	entity:1364 <forename> "Moises" ;
+		<type> "person" .
+	entity:1365 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1366 <forename> "J" ;
+		<type> "person" .
+	entity:1367 <forename> "Manuel J" ;
+		<type> "person" .
+	entity:1368 <forename> "Jose" ;
+		<type> "person" .
+	entity:1369 <forename> "Richard" ;
+		<type> "person" .
+	entity:1370 <forename> "Mary" ;
+		<type> "person" .
+	entity:1371 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1372 <forename> "Maria" ;
+		<type> "person" .
+	entity:1373 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1374 <forename> "Maria" ;
+		<type> "person" .
+	entity:1375 <forename> "James" ;
+		<type> "person" .
+	entity:1376 <forename> "James" ;
+		<type> "person" .
+	entity:1377 <forename> "Mary Ann" ;
+		<type> "person" .
+	entity:1378 <forename> "John Walker" ;
+		<type> "person" .
+	entity:1379 <forename> "Juan" ;
+		<type> "person" .
+	entity:1380 <forename> "Jose" ;
+		<type> "person" .
+	entity:1381 <forename> "Jose" ;
+		<type> "person" .
+	entity:1382 <forename> "Eduarda" ;
+		<type> "person" .
+	entity:1383 <forename> "Martina" ;
+		<type> "person" .
+	entity:1384 <forename> "Estefania" ;
+		<type> "person" .
+	entity:1385 <forename> "Carlos" ;
+		<type> "person" .
+	entity:1386 <forename> "Jose" ;
+		<type> "person" .
+	entity:1387 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1388 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:1389 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:1390 <forename> "D. Richo." ;
+		<type> "person" .
+	entity:1391 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1392 <forename> "Joaquim" ;
+		<type> "person" .
+	entity:1393 <forename> "Magdalena C" ;
+		<type> "person" .
+	entity:1394 <forename> "Philomena" ;
+		<type> "person" .
+	entity:1395 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1396 <forename> "Caroline  " ;
+		<type> "person" .
+	entity:1397 <forename> "John" ;
+		<type> "person" .
+	entity:1398 <forename> "Patrick" ;
+		<type> "person" .
+	entity:1399 <forename> "William" ;
+		<type> "person" .
+	entity:1400 <forename> "John H" ;
+		<type> "person" .
+	entity:1401 <forename> "John" ;
+		<type> "person" .
+	entity:1402 <forename> "Clara" ;
+		<type> "person" .
+	entity:1403 <forename> "John" ;
+		<type> "person" .
+	entity:1404 <forename> "Jesus" ;
+		<type> "person" .
+	entity:1405 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1406 <forename> "Jose" ;
+		<type> "person" .
+	entity:1407 <forename> "Matilda" ;
+		<type> "person" .
+	entity:1408 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1409 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1410 <forename> "Valentin " ;
+		<type> "person" .
+	entity:1411 <forename> "Asuncion" ;
+		<type> "person" .
+	entity:1412 <forename> "Bernadino E" ;
+		<type> "person" .
+	entity:1413 <forename> "Fernando" ;
+		<type> "person" .
+	entity:1414 <forename> "John E" ;
+		<type> "person" .
+	entity:1415 <forename> "Kate E" ;
+		<type> "person" .
+	entity:1416 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:1417 <forename> "Caroline" ;
+		<type> "person" .
+	entity:1418 <forename> "Claudine F P" ;
+		<type> "person" .
+	entity:1419 <forename> "Edward A" ;
+		<type> "person" .
+	entity:1420 <forename> "Augustin" ;
+		<type> "person" .
+	entity:1421 <forename> "Francis" ;
+		<type> "person" .
+	entity:1422 <forename> "Jon" ;
+		<type> "person" .
+	entity:1423 <forename> "Charles" ;
+		<type> "person" .
+	entity:1424 <forename> "John" ;
+		<type> "person" .
+	entity:1425 <forename> "Laura" ;
+		<type> "person" .
+	entity:1426 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1427 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1428 <forename> "James" ;
+		<type> "person" .
+	entity:1429 <forename> "Jose" ;
+		<type> "person" .
+	entity:1430 <forename> "Luciano" ;
+		<type> "person" .
+	entity:1431 <forename> "Salvador" ;
+		<type> "person" .
+	entity:1432 <forename> "John" ;
+		<type> "person" .
+	entity:1433 <forename> "Onacio" ;
+		<type> "person" .
+	entity:1434 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1435 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1436 <forename> "Generosa" ;
+		<type> "person" .
+	entity:1437 <forename> "Jose" ;
+		<type> "person" .
+	entity:1438 <forename> "Felipa" ;
+		<type> "person" .
+	entity:1439 <forename> "Juanita" ;
+		<type> "person" .
+	entity:1440 <forename> "Maria" ;
+		<type> "person" .
+	entity:1441 <forename> "Pablo" ;
+		<type> "person" .
+	entity:1442 <forename> "Rupuerta" ;
+		<type> "person" .
+	entity:1443 <forename> "Engranisa" ;
+		<type> "person" .
+	entity:1444 <forename> "Emilio" ;
+		<type> "person" .
+	entity:1445 <forename> "Edwin" ;
+		<type> "person" .
+	entity:1446 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1447 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1448 <forename> "Jose" ;
+		<type> "person" .
+	entity:1449 <forename> "Fernando" ;
+		<type> "person" .
+	entity:1450 <forename> "Charles H B" ;
+		<type> "person" .
+	entity:1451 <forename> "C Maria" ;
+		<type> "person" .
+	entity:1452 <forename> "MHW" ;
+		<type> "person" .
+	entity:1453 <forename> "Charles" ;
+		<type> "person" .
+	entity:1454 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1455 <forename> "William" ;
+		<type> "person" .
+	entity:1456 <forename> "Mrs" ;
+		<type> "person" .
+	entity:1457 <forename> "Ricardo" ;
+		<type> "person" .
+	entity:1458 <forename> "Charlotte" ;
+		<type> "person" .
+	entity:1459 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1460 <forename> "Chr?" ;
+		<type> "person" .
+	entity:1461 <forename> "Rosina" ;
+		<type> "person" .
+	entity:1462 <forename> "Norman" ;
+		<type> "person" .
+	entity:1463 <forename> "Felix" ;
+		<type> "person" .
+	entity:1464 <forename> "Henry Villora" ;
+		<type> "person" .
+	entity:1465 <forename> "Angelisa" ;
+		<type> "person" .
+	entity:1466 <forename> "Jose" ;
+		<type> "person" .
+	entity:1467 <forename> "Joaquin" ;
+		<type> "person" .
+	entity:1468 <forename> "Alfred W" ;
+		<type> "person" .
+	entity:1469 <forename> "Isabella" ;
+		<type> "person" .
+	entity:1470 <forename> "John W" ;
+		<type> "person" .
+	entity:1471 <forename> "James" ;
+		<type> "person" .
+	entity:1472 <forename> "John Oldham" ;
+		<type> "person" .
+	entity:1473 <forename> "Maria" ;
+		<type> "person" .
+	entity:1474 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1475 <forename> "Encarnacion" ;
+		<type> "person" .
+	entity:1476 <forename> "Anthony" ;
+		<type> "person" .
+	entity:1477 <forename> "Eduardo" ;
+		<type> "person" .
+	entity:1478 <forename> "Fermin" ;
+		<type> "person" .
+	entity:1479 <forename> "Maria" ;
+		<type> "person" .
+	entity:1480 <forename> "Jose Leon" ;
+		<type> "person" .
+	entity:1481 <forename> "Vincent " ;
+		<type> "person" .
+	entity:1482 <forename> "Ruperto" ;
+		<type> "person" .
+	entity:1483 <forename> "Justa" ;
+		<type> "person" .
+	entity:1484 <forename> "Natividad" ;
+		<type> "person" .
+	entity:1485 <forename> "Avelino" ;
+		<type> "person" .
+	entity:1486 <forename> "Jesus" ;
+		<type> "person" .
+	entity:1487 <forename> "Manuela" ;
+		<type> "person" .
+	entity:1488 <forename> "Josefa" ;
+		<type> "person" .
+	entity:1489 <forename> "Vicente" ;
+		<type> "person" .
+	entity:1490 <forename> "William" ;
+		<type> "person" .
+	entity:1491 <forename> "Fermin" ;
+		<type> "person" .
+	entity:1492 <forename> "Agnes" ;
+		<type> "person" .
+	entity:1493 <forename> "Blanche" ;
+		<type> "person" .
+	entity:1494 <forename> "Emily" ;
+		<type> "person" .
+	entity:1495 <forename> "Georgina" ;
+		<type> "person" .
+	entity:1496 <forename> "Harry" ;
+		<type> "person" .
+	entity:1497 <forename> "Isabel" ;
+		<type> "person" .
+	entity:1498 <forename> "Laura" ;
+		<type> "person" .
+	entity:1499 <forename> "Robert" ;
+		<type> "person" .
+	entity:1500 <forename> "Rufina de" ;
+		<type> "person" .
+	entity:1501 <forename> "Jose" ;
+		<type> "person" .
+	entity:1502 <forename> "Francisca" ;
+		<type> "person" .
+	entity:1503 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1504 <forename> "Jose" ;
+		<type> "person" .
+	entity:1505 <forename> "Rosario" ;
+		<type> "person" .
+	entity:1506 <forename> "Juan" ;
+		<type> "person" .
+	entity:1507 <forename> "Vicente" ;
+		<type> "person" .
+	entity:1508 <forename> "Luis Y de" ;
+		<type> "person" .
+	entity:1509 <forename> "Julian" ;
+		<type> "person" .
+	entity:1510 <forename> "Maximo" ;
+		<type> "person" .
+	entity:1511 <forename> "Marcelino" ;
+		<type> "person" .
+	entity:1512 <forename> "Lenora" ;
+		<type> "person" .
+	entity:1513 <forename> "Hipolito" ;
+		<type> "person" .
+	entity:1514 <forename> "Louis " ;
+		<type> "person" .
+	entity:1515 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1516 <forename> "Silonia de" ;
+		<type> "person" .
+	entity:1517 <forename> "Elidio de" ;
+		<type> "person" .
+	entity:1518 <forename> "Joaquin" ;
+		<type> "person" .
+	entity:1519 <forename> "Santiaga" ;
+		<type> "person" .
+	entity:1520 <forename> "Telesforo" ;
+		<type> "person" .
+	entity:1521 <forename> "Josefa" ;
+		<type> "person" .
+	entity:1522 <forename> "Ygnacio" ;
+		<type> "person" .
+	entity:1523 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1524 <forename> "John" ;
+		<type> "person" .
+	entity:1525 <forename> "Emily" ;
+		<type> "person" .
+	entity:1526 <forename> "Sarah Julia" ;
+		<type> "person" .
+	entity:1527 <forename> "William" ;
+		<type> "person" .
+	entity:1528 <forename> "Maria" ;
+		<type> "person" .
+	entity:1529 <forename> "Charles" ;
+		<type> "person" .
+	entity:1530 <forename> "Alice" ;
+		<type> "person" .
+	entity:1531 <forename> "Hudsay C" ;
+		<type> "person" .
+	entity:1532 <forename> "Jose" ;
+		<type> "person" .
+	entity:1533 <forename> "Dolores" ;
+		<type> "person" .
+	entity:1534 <forename> "Gregorio" ;
+		<type> "person" .
+	entity:1535 <forename> "Adelaide C" ;
+		<type> "person" .
+	entity:1536 <forename> "Johanna M" ;
+		<type> "person" .
+	entity:1537 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1538 <forename> "Juana" ;
+		<type> "person" .
+	entity:1539 <forename> "Jose" ;
+		<type> "person" .
+	entity:1540 <forename> "Mary Jane" ;
+		<type> "person" .
+	entity:1541 <forename> "Carolina" ;
+		<type> "person" .
+	entity:1542 <forename> "Edward" ;
+		<type> "person" .
+	entity:1543 <forename> "Ernest C" ;
+		<type> "person" .
+	entity:1544 <forename> "Maria" ;
+		<type> "person" .
+	entity:1545 <forename> "Wilhelmina" ;
+		<type> "person" .
+	entity:1546 <forename> "Helena" ;
+		<type> "person" .
+	entity:1547 <forename> "Mary I" ;
+		<type> "person" .
+	entity:1548 <forename> "Thomas Alfred" ;
+		<type> "person" .
+	entity:1549 <forename> "Jose" ;
+		<type> "person" .
+	entity:1550 <forename> "Maria" ;
+		<type> "person" .
+	entity:1551 <forename> "John" ;
+		<type> "person" .
+	entity:1552 <forename> "George" ;
+		<type> "person" .
+	entity:1553 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1554 <forename> "Custodio V" ;
+		<type> "person" .
+	entity:1555 <forename> "Maria" ;
+		<type> "person" .
+	entity:1556 <forename> "Emanual da" ;
+		<type> "person" .
+	entity:1557 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1558 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1559 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1560 <forename> "Julian" ;
+		<type> "person" .
+	entity:1561 <forename> "Agnes" ;
+		<type> "person" .
+	entity:1562 <forename> "Alexandre" ;
+		<type> "person" .
+	entity:1563 <forename> "Victorina" ;
+		<type> "person" .
+	entity:1564 <forename> "Julianna" ;
+		<type> "person" .
+	entity:1565 <forename> "Julia P" ;
+		<type> "person" .
+	entity:1566 <forename> "Ida G" ;
+		<type> "person" .
+	entity:1567 <forename> "David V" ;
+		<type> "person" .
+	entity:1568 <forename> "Josephus" ;
+		<type> "person" .
+	entity:1569 <forename> "Arthur" ;
+		<type> "person" .
+	entity:1570 <forename> "Charles Wyatt" ;
+		<type> "person" .
+	entity:1571 <forename> "Agustin" ;
+		<type> "person" .
+	entity:1572 <forename> "Bennett Forbes" ;
+		<type> "person" .
+	entity:1573 <forename> "Mary" ;
+		<type> "person" .
+	entity:1574 <forename> "Frantino" ;
+		<type> "person" .
+	entity:1575 <forename> "Vicente" ;
+		<type> "person" .
+	entity:1576 <forename> "J L" ;
+		<type> "person" .
+	entity:1577 <forename> "Manuela" ;
+		<type> "person" .
+	entity:1578 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1579 <forename> "Jose" ;
+		<type> "person" .
+	entity:1580 <forename> "Eil" ;
+		<type> "person" .
+	entity:1581 <forename> "Lizzi G" ;
+		<type> "person" .
+	entity:1582 <forename> "Frederick " ;
+		<type> "person" .
+	entity:1583 <forename> "Raymond" ;
+		<type> "person" .
+	entity:1584 <forename> "Pablo" ;
+		<type> "person" .
+	entity:1585 <forename> "James" ;
+		<type> "person" .
+	entity:1586 <forename> "Adelina" ;
+		<type> "person" .
+	entity:1587 <forename> "Esther" ;
+		<type> "person" .
+	entity:1588 <forename> "Francis" ;
+		<type> "person" .
+	entity:1589 <forename> "Amelia" ;
+		<type> "person" .
+	entity:1590 <forename> "Caroline" ;
+		<type> "person" .
+	entity:1591 <forename> "James" ;
+		<type> "person" .
+	entity:1592 <forename> "Thomas" ;
+		<type> "person" .
+	entity:1593 <forename> "Dominga" ;
+		<type> "person" .
+	entity:1594 <forename> "Joaquin" ;
+		<type> "person" .
+	entity:1595 <forename> "Roman" ;
+		<type> "person" .
+	entity:1596 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1597 <forename> "Robert" ;
+		<type> "person" .
+	entity:1598 <forename> "Alfred" ;
+		<type> "person" .
+	entity:1599 <forename> "Bernadina" ;
+		<type> "person" .
+	entity:1600 <forename> "Geronimo" ;
+		<type> "person" .
+	entity:1601 <forename> "Almiranda" ;
+		<type> "person" .
+	entity:1602 <forename> "Leopoldina" ;
+		<type> "person" .
+	entity:1603 <forename> "Charles" ;
+		<type> "person" .
+	entity:1604 <forename> "Edward" ;
+		<type> "person" .
+	entity:1605 <forename> "Louisa" ;
+		<type> "person" .
+	entity:1606 <forename> "Anne" ;
+		<type> "person" .
+	entity:1607 <forename> "Lorenza" ;
+		<type> "person" .
+	entity:1608 <forename> "Lorenza" ;
+		<type> "person" .
+	entity:1609 <forename> "John Nan" ;
+		<type> "person" .
+	entity:1610 <forename> "Eloisa" ;
+		<type> "person" .
+	entity:1611 <forename> "Ignacio" ;
+		<type> "person" .
+	entity:1612 <forename> "Sotero" ;
+		<type> "person" .
+	entity:1613 <forename> "Elvira" ;
+		<type> "person" .
+	entity:1614 <forename> "Bautista de" ;
+		<type> "person" .
+	entity:1615 <forename> "Magdalena de" ;
+		<type> "person" .
+	entity:1616 <forename> "Leocadia F" ;
+		<type> "person" .
+	entity:1617 <forename> "Juan" ;
+		<type> "person" .
+	entity:1618 <forename> "Alepio" ;
+		<type> "person" .
+	entity:1619 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1620 <forename> "Edward Clayton" ;
+		<type> "person" .
+	entity:1621 <forename> "George Charles" ;
+		<type> "person" .
+	entity:1622 <forename> "James J" ;
+		<type> "person" .
+	entity:1623 <forename> "Harriet Ellen" ;
+		<type> "person" .
+	entity:1624 <forename> "Lilian E" ;
+		<type> "person" .
+	entity:1625 <forename> "Elsie" ;
+		<type> "person" .
+	entity:1626 <forename> "Winifred" ;
+		<type> "person" .
+	entity:1627 <forename> "Annetta" ;
+		<type> "person" .
+	entity:1628 <forename> "Marguerite" ;
+		<type> "person" .
+	entity:1629 <forename> "Maria" ;
+		<type> "person" .
+	entity:1630 <forename> "Joao S" ;
+		<type> "person" .
+	entity:1631 <forename> "Emily" ;
+		<type> "person" .
+	entity:1632 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1633 <forename> "Teresa" ;
+		<type> "person" .
+	entity:1634 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1635 <forename> "Thomas" ;
+		<type> "person" .
+	entity:1636 <forename> "Faustin" ;
+		<type> "person" .
+	entity:1637 <forename> "William Maria" ;
+		<type> "person" .
+	entity:1638 <forename> "Maurice" ;
+		<type> "person" .
+	entity:1639 <forename> "Avelina" ;
+		<type> "person" .
+	entity:1640 <forename> "Thomas" ;
+		<type> "person" .
+	entity:1641 <forename> "Margaret" ;
+		<type> "person" .
+	entity:1642 <forename> "Monica" ;
+		<type> "person" .
+	entity:1643 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1644 <forename> "Domingo Santos" ;
+		<type> "person" .
+	entity:1645 <forename> "Lorenzo" ;
+		<type> "person" .
+	entity:1646 <forename> "Maurian Zayde" ;
+		<type> "person" .
+	entity:1647 <forename> "Socorro" ;
+		<type> "person" .
+	entity:1648 <forename> "Anna" ;
+		<type> "person" .
+	entity:1649 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1650 <forename> "Ignacio" ;
+		<type> "person" .
+	entity:1651 <forename> "Jose" ;
+		<type> "person" .
+	entity:1652 <forename> "Juan" ;
+		<type> "person" .
+	entity:1653 <forename> "Santiaga" ;
+		<type> "person" .
+	entity:1654 <forename> "Emilia" ;
+		<type> "person" .
+	entity:1655 <forename> "Inocencia" ;
+		<type> "person" .
+	entity:1656 <forename> "Raymond" ;
+		<type> "person" .
+	entity:1657 <forename> "Emanuel" ;
+		<type> "person" .
+	entity:1658 <forename> "Maria" ;
+		<type> "person" .
+	entity:1659 <forename> "Maria" ;
+		<type> "person" .
+	entity:1660 <forename> "Pio" ;
+		<type> "person" .
+	entity:1661 <forename> "Elisa" ;
+		<type> "person" .
+	entity:1662 <forename> "Jose" ;
+		<type> "person" .
+	entity:1663 <forename> "Saturnino" ;
+		<type> "person" .
+	entity:1664 <forename> "Leon" ;
+		<type> "person" .
+	entity:1665 <forename> "Josefa" ;
+		<type> "person" .
+	entity:1666 <forename> "Benito" ;
+		<type> "person" .
+	entity:1667 <forename> "Francisca" ;
+		<type> "person" .
+	entity:1668 <forename> "John" ;
+		<type> "person" .
+	entity:1669 <forename> "Juan" ;
+		<type> "person" .
+	entity:1670 <forename> "Oderlinda" ;
+		<type> "person" .
+	entity:1671 <forename> "Eustagio" ;
+		<type> "person" .
+	entity:1672 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1673 <forename> "Concepcion" ;
+		<type> "person" .
+	entity:1674 <forename> "Jose" ;
+		<type> "person" .
+	entity:1675 <forename> "Eduarda" ;
+		<type> "person" .
+	entity:1676 <forename> "Josefita" ;
+		<type> "person" .
+	entity:1677 <forename> "William H E" ;
+		<type> "person" .
+	entity:1678 <forename> "Gervasio A" ;
+		<type> "person" .
+	entity:1679 <forename> "Justa" ;
+		<type> "person" .
+	entity:1680 <forename> "Nicholas" ;
+		<type> "person" .
+	entity:1681 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1682 <forename> "Elvira" ;
+		<type> "person" .
+	entity:1683 <forename> "F" ;
+		<type> "person" .
+	entity:1684 <forename> "Leocadia" ;
+		<type> "person" .
+	entity:1685 <forename> "Balbina" ;
+		<type> "person" .
+	entity:1686 <forename> "Francisca" ;
+		<type> "person" .
+	entity:1687 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1688 <forename> "Luis" ;
+		<type> "person" .
+	entity:1689 <forename> "Francisco" ;
+		<type> "person" .
+	entity:1690 <forename> "Francisca" ;
+		<type> "person" .
+	entity:1691 <forename> "Francisca" ;
+		<type> "person" .
+	entity:1692 <forename> "Pelacarpo" ;
+		<type> "person" .
+	entity:1693 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1694 <forename> "Jose Alves" ;
+		<type> "person" .
+	entity:1695 <forename> "Carraca" ;
+		<type> "person" .
+	entity:1696 <forename> "Eugenia" ;
+		<type> "person" .
+	entity:1697 <forename> "Isabel " ;
+		<type> "person" .
+	entity:1698 <forename> "Carmen" ;
+		<type> "person" .
+	entity:1699 <forename> "Hilario" ;
+		<type> "person" .
+	entity:1700 <forename> "Laura" ;
+		<type> "person" .
+	entity:1701 <forename> "Isidora" ;
+		<type> "person" .
+	entity:1702 <forename> "Juan" ;
+		<type> "person" .
+	entity:1703 <forename> "Victor" ;
+		<type> "person" .
+	entity:1704 <forename> "Marcelino" ;
+		<type> "person" .
+	entity:1705 <forename> "Jose" ;
+		<type> "person" .
+	entity:1706 <forename> "Manuel" ;
+		<type> "person" .
+	entity:1707 <forename> "Caetano" ;
+		<type> "person" .
+	entity:1708 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1709 <forename> "Ramon" ;
+		<type> "person" .
+	entity:1710 <forename> "Jose B" ;
+		<type> "person" .
+	entity:1711 <forename> "Jose" ;
+		<type> "person" .
+	entity:1712 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1713 <forename> "Maria" ;
+		<type> "person" .
+	entity:1714 <forename> "Joseph A W" ;
+		<type> "person" .
+	entity:1715 <forename> "Jane" ;
+		<type> "person" .
+	entity:1716 <forename> "Julia" ;
+		<type> "person" .
+	entity:1717 <forename> "Lilian" ;
+		<type> "person" .
+	entity:1718 <forename> "Caroline" ;
+		<type> "person" .
+	entity:1719 <forename> "Fishar" ;
+		<type> "person" .
+	entity:1720 <forename> "Santiaga" ;
+		<type> "person" .
+	entity:1721 <forename> "Edward" ;
+		<type> "person" .
+	entity:1722 <forename> "Anna" ;
+		<type> "person" .
+	entity:1723 <forename> "Helen" ;
+		<type> "person" .
+	entity:1724 <forename> "Leonora Catalina" ;
+		<type> "person" .
+	entity:1725 <forename> "Elizabeth Smith Vidal" ;
+		<type> "person" .
+	entity:1726 <forename> "Catherine R" ;
+		<type> "person" .
+	entity:1727 <forename> "Maria A" ;
+		<type> "person" .
+	entity:1728 <forename> "John" ;
+		<type> "person" .
+	entity:1729 <forename> "Harriett" ;
+		<type> "person" .
+	entity:1730 <forename> "Carolina Maria" ;
+		<type> "person" .
+	entity:1731 <forename> "Charles" ;
+		<type> "person" .
+	entity:1732 <forename> "Henry" ;
+		<type> "person" .
+	entity:1733 <forename> "Caroline" ;
+		<type> "person" .
+	entity:1734 <forename> "Anthony" ;
+		<type> "person" .
+	entity:1735 <forename> "Vicente" ;
+		<type> "person" .
+	entity:1736 <forename> "Mary R" ;
+		<type> "person" .
+	entity:1737 <forename> "E " ;
+		<type> "person" .
+	entity:1738 <forename> "Juan" ;
+		<type> "person" .
+	entity:1739 <forename> "Juana" ;
+		<type> "person" .
+	entity:1740 <forename> "Eliza" ;
+		<type> "person" .
+	entity:1741 <forename> "Elizabeth" ;
+		<type> "person" .
+	entity:1742 <forename> "Josefa" ;
+		<type> "person" .
+	entity:1743 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1744 <forename> "Federico" ;
+		<type> "person" .
+	entity:1745 <forename> "Mariana" ;
+		<type> "person" .
+	entity:1746 <forename> "Tomasa" ;
+		<type> "person" .
+	entity:1747 <forename> "Pedro" ;
+		<type> "person" .
+	entity:1748 <forename> "Manuela" ;
+		<type> "person" .
+	entity:1749 <forename> "Jose F" ;
+		<type> "person" .
+	entity:1750 <forename> "Louisa" ;
+		<type> "person" .
+	entity:1751 <forename> "Saturnina" ;
+		<type> "person" .
+	entity:1752 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1753 <forename> "Louisa" ;
+		<type> "person" .
+	entity:1754 <forename> "Antonio" ;
+		<type> "person" .
+	entity:1755 <forename> "Maria" ;
+		<type> "person" .
+	entity:1756 <forename> "Aquilina" ;
+		<type> "person" .
+	entity:1757 <forename> "Victoria" ;
+		<type> "person" .
+	entity:1758 <forename> "Anastasio" ;
+		<type> "person" .
+	entity:1759 <forename> "Felipe" ;
+		<type> "person" .
+	entity:1760 <forename> "Fernan" ;
+		<type> "person" .
+	entity:1761 <forename> "Juan Bautista" ;
+		<type> "person" .
+	entity:1762 <forename> "Jose" ;
+		<type> "person" .
+	entity:1763 <forename> "Dolores" ;
+		<type> "person" .
+	entity:1764 <forename> "Manwell" ;
+		<type> "person" .
+	entity:1765 <forename> "John" ;
+		<type> "person" .
+	entity:1766 <forename> "Ildefons Jose A" ;
+		<type> "person"
+
+}

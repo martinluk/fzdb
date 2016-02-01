@@ -30,7 +30,7 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
     SerialHeader header;
     memset(&header, 0, sizeof(SerialHeader));
     
-    std::vector<Entity*> entList = _manager->entityList();
+    std::vector<std::shared_ptr<Entity>> entList = _manager->entityList();
     
     header.size = 0;                        // Don't know this yet.
     header.entityCount = entList.size();

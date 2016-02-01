@@ -16,6 +16,16 @@
 #include "model/EntityManager.h"
 #include "model/Triple.h"
 
+#include "platform.h"
+
+//windows specific to handle ctrl-c call
+#if PLATFORM == PLATFORM_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+BOOL WINAPI ConsoleHandler(DWORD);
+#endif
+
 boost::asio::io_service* pIOService = NULL;
 
 void shutDownApplication()
@@ -30,7 +40,6 @@ void sigHandler(int s)
     assert(s == 2);
     
     std::cout << "Caught SIGINT, shutting down." << std::endl;
-    
     pIOService->stop();     // This needs to be here before shutting down, or we don't actually stop.
     shutDownApplication();
     exit(0);
@@ -140,11 +149,18 @@ int main(int argc, char* argv[]) {
       std::cout << "Log failed: " << ex.what() << std::endl;
   }
   
+#if PLATFORM != PLATFORM_WINDOWS
   struct sigaction sigIntHandler;
   sigIntHandler.sa_handler = &sigHandler;
   sigemptyset(&sigIntHandler.sa_mask);
   sigIntHandler.sa_flags = 0;
   sigaction(SIGINT, &sigIntHandler, NULL);
+#else
+  if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
+	  fprintf(stderr, "Unable to install handler!\n");
+	  return EXIT_FAILURE;
+  }
+#endif
 
   /*
   *   START THE SERVER
@@ -184,3 +200,21 @@ int main(int argc, char* argv[]) {
   pIOService = NULL;
   return 0;
 }
+
+//windows specific to handle ctrl-c call
+#if PLATFORM == PLATFORM_WINDOWS
+BOOL WINAPI ConsoleHandler(DWORD dwType)
+{
+	switch (dwType) {
+	case CTRL_C_EVENT:
+		sigHandler(2);
+		break;
+	case CTRL_BREAK_EVENT:
+		printf("break\n");
+		break;
+	default:
+		printf("Some other event\n");
+	}
+	return TRUE;
+}
+#endif

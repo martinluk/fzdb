@@ -9,6 +9,7 @@
 
 #include "../QueryResult.h"
 #include "./Triple.h"
+#include "./Parser.h"
 #include "../VariableSet.h"
 #include "../Exceptions.h"
 
@@ -23,13 +24,13 @@ public:
 	~EntityManager();
 
 	// Creates an entity on the heap and returns a pointer to it.
-	Entity* createEntity(const std::string &type);
+	std::shared_ptr<Entity> createEntity(const std::string &type);
 
 	void AddProperty(std::string name, unsigned int val) {
 		_propertyNames[name] = val;
 	}	
 
-	VariableSet BGP(std::vector <model::Triple> conditions);
+	VariableSet BGP(TriplesBlock triplesBlock);
 
 	void Insert(std::vector<model::Triple> triples);
 
@@ -37,7 +38,7 @@ public:
 		return _entities.find(handle) != _entities.cend();
 	}
     
-    std::vector<Entity*> entityList() const;
+    std::vector<std::shared_ptr<Entity>> entityList() const;
     std::size_t entityCount() const;
     
     void clearAll();
@@ -49,12 +50,16 @@ public:
 
 private:
 	unsigned int getTypeID(const std::string &str);
+	void linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
 	// TODO: This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
-	typedef std::map<Entity::EHandle_t, Entity*> EntityMap;
+	typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;
 
 	EntityMap _entities;
+	std::map<Entity::EHandle_t, std::set<Entity::EHandle_t>> _links;
 	Entity::EHandle_t _lastHandle;
 	unsigned int _lastProperty;
 	unsigned int _lastTypeID;
@@ -65,7 +70,7 @@ private:
 	std::map<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
     
-    void insertEntity(Entity* ent);
+    void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
 	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {
@@ -88,11 +93,19 @@ private:
 		return iter->second;
 	}
 
+	unsigned int getPropertyName(std::string str) {
+		auto iter = _propertyNames.find(str);
+		if (iter == _propertyNames.cend()) {
+			return 0;
+		}
+		return iter->second;
+	}
+
 	// Basic Graph Processing - returns a list of the variables in conditions
 	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
 
 	template<typename T>
-	void addToEntity(Entity* currentEntity, unsigned int propertyId, model::Object&& object) {
+	void addToEntity(std::shared_ptr<Entity> currentEntity, unsigned int propertyId, model::Object&& object) {
 		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
 
 		if (currentEntity->hasProperty(propertyId)) {
@@ -105,131 +118,13 @@ private:
 		}
 	}
 
-	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object) {
+	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object);
 
-		//get the property id
-		unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
+	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2);
 
-		//the variable has been used before, we only need to iterate over valid values from before
-		if (variableSet.contains(variableName)) {
-			if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
+	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const std::string variableName3);
 
-				auto entities = variableSet.getValuesFor(variableName);
-
-				entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this] (std::string val) {
-					Entity* currentEntity = _entities[std::stoll(val)];
-					return !currentEntity->meetsCondition(propertyId, std::move(object));
-				}), entities.end());
-
-				variableSet.replaceValuesFor(variableName, entities);
-
-			}
-			else {
-				//TODO: TypeException
-			}
-			return;
-		}
-		
-		//the variable has not been used, add all the values found!
-		for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
-
-			Entity* currentEntity = iter->second;
-			if (currentEntity->meetsCondition(propertyId, std::move(object))) {
-				variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
-			}
-
-		}
-	}
-
-	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2) {
-
-		//get the property id
-		const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
-
-		//TODO: consider the case where variableName2 is already in variableSet
-
-		//the variable has been used before, we only need to iterate over valid values from before
-		if (variableSet.contains(variableName)) {
-			if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
-
-				auto entities = variableSet.getValuesFor(variableName);
-
-				entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this](std::string val) {
-					Entity* currentEntity = _entities[std::stoll(val)];
-					return !currentEntity->hasProperty(propertyId);
-				}), entities.end());
-
-				for (auto entity : entities) {
-					Entity* currentEntity = _entities[std::stoll(entity)];					
-					variableSet.add(std::move(variableName2), 
-						currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
-						std::move(_propertyTypes[propertyId]));
-				}
-
-			}
-			else {
-				//TODO: TypeException
-			}
-			return;
-		}
-
-		//the variable has not been used, add all the values found!
-		for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
-
-			Entity* currentEntity = iter->second;
-			if (currentEntity->hasProperty(propertyId)) {
-				variableSet.add(std::move(variableName), std::to_string(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
-				variableSet.add(std::move(variableName2), 
-					currentEntity->getProperty(propertyId)->baseValues()[0]->toString(),
-					std::move(_propertyTypes[propertyId]));
-			}
-
-		}
-	}
-
-	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const std::string variableName3) {
-
-		//TODO: Check variable types
-
-		//TODO: Cover cases where the variables have been used before :/
-		if (variableSet.contains(variableName) || variableSet.contains(variableName2) || variableSet.contains(variableName3)) {
-			return;
-		}
-		
-		//If no variables have been used so far, get EVERYTHING!
-
-		for (auto entity : _entities) {
-			for (auto prop : entity.second->properties()) {
-
-				variableSet.add(std::move(variableName), std::to_string(entity.first), model::types::Base::Subtype::TypeEntityRef);
-				variableSet.add(std::move(variableName2), std::to_string(prop.first), model::types::Base::Subtype::PropertyReference);
-
-				auto type = _propertyTypes[prop.first];
-				std::string val = entity.second->getProperty(prop.first)->baseValues()[0]->toString();
-				variableSet.add(std::move(variableName3), std::move(val), std::move(type));
-			}
-		}
-	}
-
-	void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) {
-
-		//TODO: Check variable types
-
-		//get the entity handle
-		Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
-
-		//get the property id
-		const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
-
-		if (EntityExists(entityRef)) {
-			Entity* entity = _entities[entityRef];
-			if (entity->hasProperty(propertyId)) {
-				variableSet.add(std::move(variableName),
-					entity->getProperty(propertyId)->baseValues()[0]->toString(),
-					std::move(_propertyTypes[propertyId]));
-			}
-		}		
-	}
+	void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName);
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H
