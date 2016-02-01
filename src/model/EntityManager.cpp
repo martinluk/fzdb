@@ -180,6 +180,9 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 	auto end = triples.cend();
 	for (; iter != end; iter++) {
 		auto triple = *iter;
+		
+		// TODO: Handle setting an entity type.
+		// If the entity already has a type, it shouldn't be allowed to change.
 
 		auto entity_id = std::stoll(triple.subject.value);
 

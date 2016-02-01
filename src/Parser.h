@@ -59,6 +59,13 @@ public:
 		type(ptt), lineNumber(lineNo), charPosition(charPos), data0(dat0) { }
 };
 
+// Jonathan - Reserved property strings.
+// These are for things like entity types, where properties should not be allowed to use this name.
+namespace ReservedProperties
+{
+	static const std::string TYPE("TYPE");
+}
+
 //TODO: this whole file could do with tidying up
 
 using StringMap = std::map<std::string, std::string>;

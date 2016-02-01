@@ -2,14 +2,14 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
-CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session) : Job(session)
+CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session, const std::string &type) : Job(session), _type(type)
 {
 }
 
 QueryResult CreateEntityJob::execute()
 {
 	EntityManager* m = Singletons::entityManager();
-	std::shared_ptr<Entity> e = m->createEntity(std::string());	// TODO: Add type
+	std::shared_ptr<Entity> e = m->createEntity(_type);
 
 	std::string id = std::to_string(e->getHandle());
 

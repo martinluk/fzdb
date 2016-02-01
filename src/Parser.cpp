@@ -7,6 +7,7 @@
 
 #include "./filters/RegexFilter.h"
 #include "./filters/OrderingFilters.h"
+#include "spdlog/spdlog.h"
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
@@ -194,6 +195,8 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 
 	while (iter != end && iter->first.type != ParsedTokenType::CLOSE_CURLBRACE) {
 
+		//spdlog::get("main")->info("Token type: {} Token content: {}", (int)iter->first.type, iter->second);
+		
 		if (((int)iter->first.type & TOKEN_SPLITTER_MASK) == 0) {
 			switch (pos) {
 			case 0:
