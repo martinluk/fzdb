@@ -3,13 +3,12 @@
 #include "../ISession.h"
 #include "../user/Permission.h"
 
-class IAdminJob : public Job {
+class IUserAdminJobs : public Job {
 	public:
-		IAdminJob(ISession* session):Job(session) {
+		IUserAdminJobs(ISession* session):Job(session) {
 			//Asserting user admin permission.
 			UserGroup usergroup = session->getCurrentUserUserGroup();
 			Permission::assertUserOpPermission(usergroup);
 		};
 
-		virtual QueryResult execute() override;
 };
