@@ -162,7 +162,7 @@ private:
 	static TokenItem identifyToken(std::string str, unsigned int line, unsigned int chr);
 
 	static std::string parseConfidenceRating(TokenIterator&& iter, TokenIterator end);
-   static IFilter* parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription);
+    static IFilter* parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription);
 public:
 	static TokenList Tokenize(std::string str);
 	static TriplesBlock ParseTriples(TokenIterator&& iter, TokenIterator end);

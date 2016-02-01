@@ -10,13 +10,13 @@
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
-	boost::regex variableRegex("\\$(.+)");
-	boost::regex stringRegex("\"(.*)\"");
-	boost::regex propertyRegex("<(.*)>");
-	boost::regex entityRefRegex("entity:([0-9]+)");
-	boost::regex intRegex("[0-9]+");
-	boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
-   boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
+	static const boost::regex variableRegex("\\$(.+)");
+	static const boost::regex stringRegex("\"(.*)\"");
+	static const boost::regex propertyRegex("<(.*)>");
+	static const boost::regex entityRefRegex("entity:([0-9]+)");
+	static const boost::regex intRegex("[0-9]+");
+	static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
+	static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
 
    boost::smatch matches;
    std::string data0 = "";
