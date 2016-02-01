@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <cassert>
 #include "../Parser.h"
+#include "spdlog/spdlog.h"
 
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
@@ -223,6 +224,7 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
 {
 	unsigned int typeID = getTypeID(type);
+	spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", id, type, typeID);
 	
 	auto it = _entities.find(id);
 	if (it == _entities.end())
@@ -231,7 +233,7 @@ void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &ty
 	}
 	else
 	{
-		it->second->handle_ = typeID;
+		it->second->_type = typeID;
 	}
 }
 
@@ -374,6 +376,7 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 	std::string uppercase(str.c_str());
 	std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
 	boost::algorithm::trim(uppercase);
+	spdlog::get("main")->info("Getting ID for type string {}", uppercase);
 
 	// "Generic" type is an empty string.
 	// The ID for this is 0.
@@ -383,7 +386,7 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 	unsigned int id = 0;
 	try
 	{
-		id = _entityTypeNames.at(str);
+		id = _entityTypeNames.at(uppercase);
 	}
 	catch (const std::exception&)
 	{

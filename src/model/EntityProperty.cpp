@@ -133,7 +133,7 @@ std::string EntityProperty<T>::logString() const
     return std::string("EntityProperty<")
             //+ std::string(model::types::Base::SubtypeString[(int)_subtype])
             + std::string(model::types::Base::SubtypeString(_subtype))
-            + std::string(">(")
+            + std::string(">(k=")
             + std::to_string(_key)
             + std::string(", [")
             + std::to_string(_values.size())
