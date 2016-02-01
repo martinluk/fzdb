@@ -4,6 +4,8 @@
 
 #include "../Exceptions.h"
 
+using namespace jobs;
+
 Link::Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2) 
 	: Job(session), _entity1(entity1), _entity2(entity2)
 {}
