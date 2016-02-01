@@ -16,3 +16,8 @@ class LoginUnsuccessfulException : public runtime_error {
 		LoginUnsuccessfulException(): runtime_error("Login-name/password combination not correct") {}
 };
 
+class AccessDeniedException : public runtime_error {
+	public:
+		AccessDeniedException(std::string action): runtime_error("Current user group does not clear for action '"+action+"'.") {} 
+};
+
