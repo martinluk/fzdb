@@ -18,7 +18,8 @@
 // We also need mutexes!
 class EntityManager
 {
-    friend class GraphSerialiser;
+	friend class GraphSerialiser;
+	friend class Entity;
 public:
 	EntityManager();
 	~EntityManager();
@@ -49,6 +50,7 @@ public:
     bool loadFromFile(const std::string &filename);
 
 private:
+	void changeEntityType(Entity::EHandle_t id, const std::string &type);
 	unsigned int getTypeID(const std::string &str);
 	void linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);

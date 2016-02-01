@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <cassert>
+#include "../Parser.h"
+
+static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
 EntityManager::EntityManager()
 {
@@ -151,7 +154,8 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
 		else {
 			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
-					//doesn't contain any variables.. is meaningless
+					//doesn't // TODO: Handle setting an entity type.
+					// If the entity already has a type, it shouldn't be allowed to change.contain any variables.. is meaningless
 				}
 				else {
 					//option 5 - entity <prop> $c
@@ -181,16 +185,19 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 	for (; iter != end; iter++) {
 		auto triple = *iter;
 		
-		// TODO: Handle setting an entity type.
-		// If the entity already has a type, it shouldn't be allowed to change.
+		// If we are setting an entity type, do so here.
+		if ( triple.predicate.value == ReservedProperties::TYPE )
+		{
+			changeEntityType(std::stoll(triple.subject.value), triple.object.value);
+			continue;
+		}
 
 		auto entity_id = std::stoll(triple.subject.value);
 
 		//create the entity if it doesn't exist
-		//TODO: are we doing incremental handles or what's in the query or both?
 		if (_entities.find(entity_id) == _entities.end()) {
 			
-			_entities[entity_id] = std::make_shared<Entity>(1, entity_id);
+			_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
 		}
 
 		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
@@ -210,6 +217,21 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 			addToEntity<model::types::Int>(currentEntity, propertyId, std::move(triple.object));
 			break;
 		}
+	}
+}
+
+void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
+{
+	unsigned int typeID = getTypeID(type);
+	
+	auto it = _entities.find(id);
+	if (it == _entities.end())
+	{
+		_entities[id] = std::make_shared<Entity>(typeID, id);
+	}
+	else
+	{
+		it->second->handle_ = typeID;
 	}
 }
 
@@ -356,7 +378,7 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 	// "Generic" type is an empty string.
 	// The ID for this is 0.
 	if ( uppercase.size() < 1 )
-		return 0;
+		return ENTITY_TYPE_GENERIC;
 
 	unsigned int id = 0;
 	try
@@ -375,8 +397,8 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 
 	return id;
 }
-#pragma region linkingandmerging
 
+#pragma region linkingandmerging
 
 void EntityManager::linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
 

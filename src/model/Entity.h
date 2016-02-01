@@ -15,6 +15,7 @@
 class Entity : public ILogString
 {
 	friend class EntitySerialiser;
+	friend class EntityManager;
 public:
 	// Typedef for an entity handle. This should uniquely identify an entity.
 	typedef unsigned long long EHandle_t;

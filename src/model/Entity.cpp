@@ -71,7 +71,7 @@ unsigned int Entity::getType() const
 
 std::string Entity::logString() const
 {
-    return std::string("Entity(")
+	return std::string("Entity(")
             + std::to_string(_type)
             + std::string(", ")
             + std::to_string(handle_)
