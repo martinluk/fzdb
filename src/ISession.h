@@ -6,6 +6,7 @@
 #include <boost/uuid/uuid.hpp>
 
 #include <user/Permission.h>
+#include <user/UserOperation.h>
 class ISession
 {
 public:
@@ -20,6 +21,11 @@ public:
 		_username=username;
 	}
 	void clearCurrentUserName() { _username.clear(); }
+
+	UserGroup getCurrentUserUserGroup() {
+		return UserOperation::getUserGroup(_username);
+	}
+
 protected:
 	virtual void handle_read(const boost::system::error_code& error, size_t bytes_transferred) = 0;
 	virtual void handle_write(const boost::system::error_code& error) = 0;

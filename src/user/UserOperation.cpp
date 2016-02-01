@@ -4,6 +4,13 @@
 #include <user/UserExceptions.h>
 #include <user/Hashing.h>
 
+UserGroup UserOperation::getUserGroup(std::string userName) {
+	if (userName.empty())
+		return UserGroup::GUEST;
+	UserAttributes currUserAttr = getUserAttributes(userName);
+	return currUserAttr.userGroup;
+}
+
 UserGroup UserOperation::login(std::string userName, std::string password) {
 	UserAttributes currUserAttr;
 	//See if user exist
