@@ -55,7 +55,7 @@ std::string outputSerialiserData(const Serialiser &serialiser)
     return log.str();
 }
 
-std::string testSerialise(const model::types::Base* ser)
+std::string testSerialise(const std::shared_ptr<model::types::Base> ser)
 {
         std::stringstream log;
         Serialiser serialiser;
@@ -105,68 +105,64 @@ std::string printEntityProperty(const IEntityProperty* prop)
 
 QueryResult DebugSerialise::execute()
 {
-    using namespace model::types;
+   /* using namespace model::types;
 
     std::stringstream log;
     Serialiser serialiser;
 
-    Base tBase(53);
-    Int tInt(1337, (unsigned char)72);
-    String tString(std::string("Body of Baywatch, face of Crimewatch"), 26);
-    EntityRef tEntRef((EHandle_t)1234, 99);
+    std::shared_ptr<Base> tBase = std::make_shared<Base>(53);
+	std::shared_ptr<Int> tInt = std::make_shared<Int>(1337, (unsigned char)72);
+	std::shared_ptr<String> tString = std::make_shared<String>(std::string("Body of Baywatch, face of Crimewatch"), 26);
+	std::shared_ptr<EntityRef> tEntRef = std::make_shared<EntityRef>((EHandle_t)1234, 99);
 
     log << "Testing serialisation of Base type.\n";
-    log << testSerialise(&tBase) << "\n";
+    log << testSerialise(tBase) << "\n";
 
     {
         serialiser.clear();
-        TypeSerialiser tser(&tBase);
+        TypeSerialiser tser(tBase);
         tser.serialise(serialiser);
-        Base* newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+        std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised Base: " << newBase->logString() << "\n";
-        delete newBase;
     }
 
     log << "\n";
 
     log << "Testing serialisation of Int type.\n";
-    log << testSerialise(&tInt) << "\n";
+    log << testSerialise(tInt) << "\n";
 
     {
         serialiser.clear();
-        TypeSerialiser tser(&tInt);
+        TypeSerialiser tser(tInt);
         tser.serialise(serialiser);
-        Base* newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+		std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised Int: " << newBase->logString() << "\n";
-        delete newBase;
     }
 
     log << "\n";
 
     log << "Testing serialisation of String type.\n";
-    log << testSerialise(&tString) << "\n";
+    log << testSerialise(tString) << "\n";
 
     {
         serialiser.clear();
-        TypeSerialiser tser(&tString);
+        TypeSerialiser tser(tString);
         tser.serialise(serialiser);
-        Base* newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+		std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised String: " << newBase->logString() << "\n";
-        delete newBase;
     }
 
     log << "\n";
 
     log << "Testing serialisation of EntityRef type.\n";
-    log << testSerialise(&tEntRef) << "\n";
+    log << testSerialise(tEntRef) << "\n";
 
     {
         serialiser.clear();
-        TypeSerialiser tser(&tEntRef);
+        TypeSerialiser tser(tEntRef);
         tser.serialise(serialiser);
-        Base* newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+		std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised EntityRef: " << newBase->logString() << "\n";
-        delete newBase;
     }
 
     log << "\n";
@@ -174,20 +170,20 @@ QueryResult DebugSerialise::execute()
 	std::shared_ptr<Entity> ent = std::make_shared<Entity>(12345, 67890);
 
     {
-        std::vector<String*> values;
-        values.push_back(new String("This", 100));
-        values.push_back(new String("Is", 90));
-        values.push_back(new String("A", 80));
-        values.push_back(new String("Test", 72));
+        std::vector<std::shared_ptr<String>> values;
+        values.push_back(std::make_shared<String>("This", 100));
+        values.push_back(std::make_shared<String>("Is", 90));
+        values.push_back(std::make_shared<String>("A", 80));
+        values.push_back(std::make_shared<String>("Test", 72));
         ent->insertProperty<String>(new EntityProperty<String>(1, values));
     }
 
     {
-        std::vector<Int*> values;
-        values.push_back(new Int(1337, 100));
-        values.push_back(new Int(420, 90));
-        values.push_back(new Int(8008, 80));
-        values.push_back(new Int(2112, 72));
+		std::vector<std::shared_ptr<Int>> values;
+        values.push_back(std::make_shared<Int>(1337, 100));
+        values.push_back(std::make_shared<Int>(420, 90));
+        values.push_back(std::make_shared<Int>(8008, 80));
+        values.push_back(std::make_shared<Int>(2112, 72));
         ent->insertProperty<Int>(new EntityProperty<Int>(2, values));
     }
 
@@ -215,9 +211,9 @@ QueryResult DebugSerialise::execute()
 		//With shared_ptr newEnt will be deleted automatically when it falls out of scope
         //delete newEnt;
     }
-
+	*/
     QueryResult result;
     result.setValue("type", "string");
-    result.setValue(std::string("response"), log.str());
+    //result.setValue(std::string("response"), log.str());
     return result;
 }

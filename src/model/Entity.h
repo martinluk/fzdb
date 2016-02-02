@@ -101,8 +101,10 @@ public:
 	// Tests if the entity meets the condition
 	bool meetsCondition(unsigned int propertyId, const model::Object&& obj) {
 		if (!hasProperty(propertyId)) return false;
+		auto val = getProperty(propertyId)->baseValue(0);
+		return val->Equals(obj.value);
 
-		switch (obj.type) {
+		/*switch (obj.type) {
 		case model::Object::Type::STRING: {
 			auto val = getProperty<model::types::String>(propertyId)->values();
 			return val[0]->Equals(obj.value);
@@ -117,7 +119,7 @@ public:
 		}
 		default:
 			return false;
-		}
+		}*/
 	}
 
 	// Clears all properties on the entity.
@@ -136,7 +138,6 @@ private:
 	bool _active;
 
 	std::map<unsigned int, IEntityProperty*> _propertyTable;
-	std::vector<Entity*> _linkedEntities;
 };
 
 #endif	// MODEL_ENTITY_H

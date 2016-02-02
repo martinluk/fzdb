@@ -2,6 +2,7 @@
 #define FUZZY_FILTER_REGEX
 
 #include "./IFilter.h"
+#include "../model/types/String.h"
 
 #include <boost/regex.hpp>
 
@@ -25,9 +26,10 @@ public:
 	   return false;
    }
 
-   bool Test(const std::vector<std::string>&& values, std::map<std::string, std::pair<model::types::Base::Subtype, unsigned char>>&& variables) override {
+   bool Test(const std::vector<std::shared_ptr<model::types::Base>>&& values, std::map<std::string, std::pair<model::types::Base::Subtype, unsigned char>>&& variables) override {
 	   unsigned char aa = variables[_variable].second;
-	   return boost::regex_match(values[aa], _pattern);
+	   std::string str = std::dynamic_pointer_cast<model::types::String, model::types::Base>(values[aa])->value();
+	   return boost::regex_match(str, _pattern);
    }
 
 };

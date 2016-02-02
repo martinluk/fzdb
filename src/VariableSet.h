@@ -28,7 +28,7 @@ public:
 		
 	}
 	
-	unsigned int add(const std::string&& var, std::string&& value, VariableType&& type) {
+	unsigned int add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, VariableType&& type) {
 		if (_metaData.find(var) == _metaData.cend()) {
 			throw new std::runtime_error("Unexpected variable");
 		}
@@ -42,7 +42,7 @@ public:
 				}				
 			}
 			//_data[var].first.push_back(value);
-			std::vector<std::string> newRow(_size);
+			std::vector<std::shared_ptr<model::types::Base>> newRow(_size);
 			newRow[_metaData[var].second] = value;
 			_variablesUsed[_metaData[var].second] = true;
 			_values.push_back(newRow);
@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	void add(const std::string&& var, std::string&& value, VariableType&& type, unsigned int row) {
+	void add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, VariableType&& type, unsigned int row) {
 
 		if (row >= _values.size()) {
 			throw new std::runtime_error("Attempting to add to a non-existent row");
@@ -73,7 +73,7 @@ public:
 		}
 	}
 
-	std::vector<std::vector<std::string>>* getData() {
+	std::vector<std::vector<std::shared_ptr<model::types::Base>>>* getData() {
 		return &_values;
 	}
 
@@ -99,7 +99,7 @@ public:
 
 private:
 	std::map<std::string, std::pair<VariableType, unsigned char>> _metaData;
-	std::vector<std::vector<std::string>> _values;
+	std::vector<std::vector<std::shared_ptr<model::types::Base>>> _values;
 	std::vector<bool> _variablesUsed;
 	unsigned int _size;
 };

@@ -103,12 +103,12 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
 {
     using namespace model::types;
 
-    std::vector<T*> values;
+    std::vector<std::shared_ptr<T>> values;
     for ( int i = 0; i < header->valueCount; i++ )
     {
         // Data is automatically incremented.
         std::size_t advance = 0;
-        T* val = dynamic_cast<T*>(TypeSerialiser::unserialise(data, &advance));
+		std::shared_ptr<T> val = std::dynamic_pointer_cast<T, Base>(TypeSerialiser::unserialise(data, &advance));
         assert(val);
         values.push_back(val);
         data += advance;
@@ -128,7 +128,7 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
 //        assert(val);
 //        append(val);
 //    }
-
+	
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialData);
 
     // Create an entity shell.
@@ -157,6 +157,6 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
             assert(false);
         }
     }
-
+	
     return ent;
 }

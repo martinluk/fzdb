@@ -12,6 +12,7 @@
 #include "./Parser.h"
 #include "../VariableSet.h"
 #include "../Exceptions.h"
+#include "../Util.h"
 
 // TODO: We need smart pointers! We need to have the manager own the entity
 // and entities should not have delete called on them externally.
@@ -106,11 +107,11 @@ private:
 		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
 
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(new T(object.value, confidence));
+			currentEntity->getProperty<T>(propertyId)->append(std::make_shared<T>(object.value, confidence));
 		}
 		else {
-			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T*> {
-				new T(object.value, confidence)
+			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <std::shared_ptr<T>> {
+				std::make_shared<T>(object.value, confidence)
 			}));
 		}
 	}
