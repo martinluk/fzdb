@@ -9,7 +9,7 @@
 
 QueryResult DebugSaveFile::execute()
 {
-    using namespace model::types;
+    /*using namespace model::types;
     std::stringstream log;
     
     // Create an entity manager.
@@ -18,18 +18,18 @@ QueryResult DebugSaveFile::execute()
     // Create some entities.
 	std::shared_ptr<Entity> e1 = manager.createEntity();
     
-    std::vector<String*> values;
-    values.push_back(new String("Arnold", 75));
-    values.push_back(new String("Barry", 43));
-    values.push_back(new String("Clarence", 11));
+    std::vector<std::shared_ptr<String>> values;
+    values.push_back(std::make_shared<String>("Arnold", 75));
+    values.push_back(std::make_shared<String>("Barry", 43));
+    values.push_back(std::make_shared<String>("Clarence", 11));
     e1->insertProperty<String>(new EntityProperty<String>(1, values));
     
 	std::shared_ptr<Entity> e2 = manager.createEntity();
     
     values.clear();
-    values.push_back(new String("Alice", 98));
-    values.push_back(new String("Britney", 61));
-    values.push_back(new String("Catherine", 5));
+    values.push_back(std::make_shared<String>("Alice", 98));
+    values.push_back(std::make_shared<String>("Britney", 61));
+    values.push_back(std::make_shared<String>("Catherine", 5));
     e2->insertProperty<String>(new EntityProperty<String>(2, values));
     
     log << "Data to be serialised:\n\n" << manager.dumpContents() << "\n";
@@ -54,9 +54,9 @@ QueryResult DebugSaveFile::execute()
 	}
     
     log << "File write success: " << success << "\n";
-    
+    */
     QueryResult result;
     result.setValue("type", "string");
-    result.setValue(std::string("response"), log.str());
+    //result.setValue(std::string("response"), log.str());
     return result;
 }

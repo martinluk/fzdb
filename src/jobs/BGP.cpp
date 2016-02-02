@@ -19,7 +19,8 @@ QueryResult BGP::execute()
 
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
-		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), [&, this](std::vector<std::string> row) {
+		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), 
+			  [&, this](std::vector<std::shared_ptr<model::types::Base>> row) {
 			  return !filter->Test(std::move(row), variables.getMetaData());
 		  }), variables.getData()->end());
       }
@@ -38,7 +39,7 @@ QueryResult BGP::execute()
 				auto i = variables.indexOf(*iter2);		
 				
 				rapidjson::Value val3;
-				val3.SetString((*iter)[i].c_str(), result.allocator());
+				val3.SetString((*iter)[i]->toString().c_str(), result.allocator());
 
 				rapidjson::Value varName;
 				varName.SetString((*iter2).c_str(), result.allocator());
