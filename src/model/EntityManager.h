@@ -19,13 +19,14 @@
 // We also need mutexes!
 class EntityManager
 {
-    friend class GraphSerialiser;
+	friend class GraphSerialiser;
+	friend class Entity;
 public:
 	EntityManager();
 	~EntityManager();
 
 	// Creates an entity on the heap and returns a pointer to it.
-	std::shared_ptr<Entity> createEntity();
+	std::shared_ptr<Entity> createEntity(const std::string &type);
 
 	void AddProperty(std::string name, unsigned int val) {
 		_propertyNames[name] = val;
@@ -53,7 +54,9 @@ public:
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
-private:	
+private:
+	void changeEntityType(Entity::EHandle_t id, const std::string &type);
+	unsigned int getTypeID(const std::string &str);
 
 	// TODO: This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
@@ -63,8 +66,11 @@ private:
 	std::map<Entity::EHandle_t, std::set<Entity::EHandle_t>> _links;
 	Entity::EHandle_t _lastHandle;
 	unsigned int _lastProperty;
+	unsigned int _lastTypeID;
 
+	// This maps string type names to entity type IDs.
 	std::map<std::string, unsigned int> _entityTypeNames;
+
 	std::map<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
     

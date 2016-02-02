@@ -5,24 +5,34 @@
 #include "../FileSystem.h"
 #include "GraphSerialiser.h"
 #include "../Util.h"
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <cassert>
+#include "../Parser.h"
+#include "spdlog/spdlog.h"
+
+static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
 EntityManager::EntityManager()
 {
 	_lastHandle = Entity::INVALID_EHANDLE;
 	_lastProperty = 0;
+	_lastTypeID = 0;
 }
 
 EntityManager::~EntityManager()
 {
 }
 
-std::shared_ptr<Entity> EntityManager::createEntity()
+std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type)
 {
+	unsigned int typeID = getTypeID(type);
+
 	_lastHandle++;
 	assert(_lastHandle != Entity::INVALID_EHANDLE);
 
-	auto e = std::make_shared<Entity>(0, _lastHandle);
-	_entities.insert(std::pair<Entity::EHandle_t, std::shared_ptr<Entity>>(_lastHandle, e));
+	std::shared_ptr<Entity> e = std::make_shared<Entity>(typeID, _lastHandle);
+	_entities.insert(std::pair<Entity::EHandle_t, std::shared_ptr<Entity> >(_lastHandle, e));
 
 	return e;
 }
@@ -142,7 +152,8 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
 		else {
 			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
-					//doesn't contain any variables.. is meaningless
+					//doesn't // TODO: Handle setting an entity type.
+					// If the entity already has a type, it shouldn't be allowed to change.contain any variables.. is meaningless
 				}
 				else {
 					//option 5 - entity <prop> $c
@@ -171,13 +182,20 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 	auto end = triples.cend();
 	for (; iter != end; iter++) {
 		auto triple = *iter;
+		
+		// If we are setting an entity type, do so here.
+		if ( triple.predicate.value == ReservedProperties::TYPE )
+		{
+			changeEntityType(std::stoll(triple.subject.value), triple.object.value);
+			continue;
+		}
 
 		auto entity_id = std::stoll(triple.subject.value);
 
 		//create the entity if it doesn't exist
-		//TODO: are we doing incremental handles or what's in the query or both?
-		if (_entities.find(entity_id) == _entities.end()) {
-			_entities[entity_id] = std::make_shared<Entity>(1, entity_id);
+		if (_entities.find(entity_id) == _entities.end())
+		{	
+			_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
 		}
 
 		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
@@ -197,6 +215,22 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 			addToEntity<model::types::Int>(currentEntity, propertyId, std::move(triple.object));
 			break;
 		}
+	}
+}
+
+void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
+{
+	unsigned int typeID = getTypeID(type);
+	spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", id, type, typeID);
+	
+	auto it = _entities.find(id);
+	if (it == _entities.end())
+	{
+		_entities[id] = std::make_shared<Entity>(typeID, id);
+	}
+	else
+	{
+		it->second->_type = typeID;
 	}
 }
 
@@ -229,6 +263,7 @@ void EntityManager::clearAll()
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
     _lastProperty = 0;
+	_lastTypeID = 0;
     _entityTypeNames.clear();
     _propertyNames.clear();
     _propertyTypes.clear();
@@ -327,6 +362,40 @@ bool EntityManager::loadFromFile(const std::string &filename)
     delete[] buffer;
 
     return true;
+}
+
+unsigned int EntityManager::getTypeID(const std::string &str)
+{
+	// Makes the string uppercase.
+	// Because the string could be multi-byte, we cast our
+	// input to an ASCII string first. (This might not be
+	// the most intelligent thing to do though)
+	std::string uppercase(str.c_str());
+	std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
+	boost::algorithm::trim(uppercase);
+	spdlog::get("main")->info("Getting ID for type string {}", uppercase);
+
+	// "Generic" type is an empty string.
+	// The ID for this is 0.
+	if ( uppercase.size() < 1 )
+		return ENTITY_TYPE_GENERIC;
+
+	unsigned int id = 0;
+	try
+	{
+		id = _entityTypeNames.at(uppercase);
+	}
+	catch (const std::exception&)
+	{
+		// The string was not in the table yet.
+		// Assign it a new ID.
+		_lastTypeID++;
+		id = _lastTypeID;
+		assert(id > 0);
+		_entityTypeNames.insert(std::pair<std::string,unsigned int>(uppercase, id));
+	}
+
+	return id;
 }
 
 #pragma region linkingandmerging

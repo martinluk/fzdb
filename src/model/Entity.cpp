@@ -71,9 +71,9 @@ unsigned int Entity::getType() const
 
 std::string Entity::logString() const
 {
-    return std::string("Entity(")
+	return std::string("Entity(t=")
             + std::to_string(_type)
-            + std::string(", ")
+            + std::string(", h=")
             + std::to_string(handle_)
             + std::string(", [")
             + std::to_string(_propertyTable.size())

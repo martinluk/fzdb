@@ -1,14 +1,14 @@
-#ifndef JOBS_DEBUGSERIALISE_H
-#define JOBS_DEBUGSERIALISE_H
+#ifndef JOBS_DEBUGDUMPENTITIES_H
+#define JOBS_DEBUGDUMPENTITIES_H
 
 #include "../session.h"
 #include "../Job.h"
 #include "../QueryResult.h"
 
-class DebugSerialise
+class DebugDumpEntities
 {
 public:
     static QueryResult execute();
 };
 
-#endif	// JOBS_DEBUGSERIALISE_H
+#endif // DEBUGDUMPENTITIES_H

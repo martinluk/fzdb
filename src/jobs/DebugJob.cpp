@@ -4,6 +4,7 @@
 #include "DebugSerialise.h"
 #include "DebugSaveFile.h"
 #include "DebugLoadFile.h"
+#include "DebugDumpEntities.h"
 
 DebugJob::DebugJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session)
 {
@@ -34,6 +35,10 @@ QueryResult DebugJob::execute()
     {
         return DebugLoadFile::execute();
     }
+	else if ( list[0] == "DUMPENTITIES" )
+	{
+		return DebugDumpEntities::execute();
+	}
 
     QueryResult result;
     result.setValue("type", "string");
