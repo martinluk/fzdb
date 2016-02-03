@@ -12,6 +12,7 @@
 #include "jobs/LoadFileJob.h"
 #include "jobs/SaveFileJob.h"
 #include "jobs/Link.h"
+#include "jobs/Flush.h"
 
 #include "Parser.h"
 
@@ -52,6 +53,9 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
 			break;
 		case QueryType::MERGE:
 			JobQueue::AddJob(new jobs::Merge(session, query.entities[0], query.entities[1]));
+			break;
+		case QueryType::FLUSH:
+			JobQueue::AddJob(new Flush(session));
 			break;
 		default:
 			JobQueue::AddJob(new UnknownJob(session, command));

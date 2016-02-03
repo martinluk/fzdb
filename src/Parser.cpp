@@ -84,6 +84,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "LINK") tokenType = ParsedTokenType::KEYWORD_LINK;
 	else if (str == "UNLINK") tokenType = ParsedTokenType::KEYWORD_UNLINK;
 	else if (str == "FINAL") tokenType = ParsedTokenType::KEYWORD_FINAL;
+	else if (str == "FLUSH") tokenType = ParsedTokenType::KEYWORD_FLUSH;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -409,6 +410,17 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 
 			if (iter != tokens.end()) {
 				throw ParseException("PING does not take any arguments");
+			}
+
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_FLUSH) {
+			*iter++;
+			type = QueryType::FLUSH;
+
+			if (iter != tokens.end()) {
+				throw ParseException("Flush does not take any arguments");
 			}
 
 			break;

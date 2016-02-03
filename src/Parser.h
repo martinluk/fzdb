@@ -45,6 +45,7 @@ enum class ParsedTokenType {
 		KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
 		KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
 		KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
+		KEYWORD_FLUSH = TOKEN_KEYWORD_MASK | 0xE,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -138,7 +139,8 @@ enum class QueryType {
 	USER,
 	LINK,
 	UNLINK,
-	MERGE
+	MERGE,
+	FLUSH
 };
 
 //Aggregate query object - this should contain all info required to do a query
