@@ -63,7 +63,7 @@ public:
 // These are for things like entity types, where properties should not be allowed to use this name.
 namespace ReservedProperties
 {
-	static const std::string TYPE("TYPE");
+	static const std::string TYPE("type");
 }
 
 //TODO: this whole file could do with tidying up
