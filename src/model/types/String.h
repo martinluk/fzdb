@@ -12,10 +12,29 @@ namespace model {
 		private:
 			friend class TypeSerialiser;
 			std::string _value;
+			MemberSerialiser::DynamicStringMember _valueWrapper;
+			MemberSerialiser _memberSerialiser;
+			
+			void initMemberSerialiser()
+			{
+				_memberSerialiser.addDynamicMember(&_valueWrapper);
+			}
+			
 		public:
-			String() : _value(), Base(100) {}
-			String(const std::string value) : _value(value), Base(100) {}
-			String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value) {}
+			String() :Base(100), _value(), _valueWrapper(_value)
+			{
+				initMemberSerialiser();
+			}
+			
+			String(const std::string value) : Base(100), _value(value), _valueWrapper(_value)
+			{
+				initMemberSerialiser();
+			}
+			
+			String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value), _valueWrapper(_value)
+			{
+				initMemberSerialiser();
+			}
 
 			std::string value() { return _value; }
 
@@ -51,10 +70,13 @@ namespace model {
 			}
 
 		protected:
-			String(const char* &serialisedData) : Base(serialisedData)
+			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
 			{
-				_value = std::string(serialisedData);
-				serialisedData += _value.size() + 1;
+				//_value = std::string(serialisedData);
+				//serialisedData += _value.size() + 1;
+				
+				initMemberSerialiser();
+				serialisedData += _memberSerialiser.unserialiseDynamicMembers(serialisedData);
 			}
 		};
 	}

@@ -45,7 +45,7 @@ public:
 private:
 	// Vector that holds the actual serialised data.
 	std::vector<char> serialData_;
-        std::size_t lastSerialiseBytes_;
+	std::size_t lastSerialiseBytes_;
 };
 
 #endif	// MODEL_SERIALISER_H

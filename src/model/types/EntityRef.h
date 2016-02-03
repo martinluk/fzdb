@@ -13,11 +13,33 @@ namespace model {
 		private:
 			friend class TypeSerialiser;
 			EHandle_t _value;
+			MemberSerialiser _memberSerialiser;
+			
+			void initMemberSerialiser()
+			{
+				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
+			}
+			
 		public:
-			EntityRef() : _value(0), Base(100) {}
-			EntityRef(const EHandle_t value) : _value(value), Base(100) {}
-			EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value) {}
-			EntityRef(std::string value, unsigned char confidence) : EntityRef(std::atoll(value.c_str()), confidence) {}
+			EntityRef() : _value(0), Base(100)
+			{
+				initMemberSerialiser();
+				
+			}
+			EntityRef(const EHandle_t value) : _value(value), Base(100)
+			{
+				initMemberSerialiser();
+			}
+			
+			EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value)
+			{
+				initMemberSerialiser();
+			}
+			
+			EntityRef(std::string value, unsigned char confidence) : EntityRef(std::atoll(value.c_str()), confidence)
+			{
+				// Already initialised
+			}
 
 			EHandle_t value() { return _value; }
 			
@@ -28,8 +50,10 @@ namespace model {
 
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
-				return Base::serialiseSubclass(serialiser)
-					+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
+				//return Base::serialiseSubclass(serialiser)
+				//	+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
+				
+				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
 			virtual std::string logString() const
@@ -49,8 +73,11 @@ namespace model {
 		protected:
 			EntityRef(const char* &serialisedData) : Base(serialisedData)
 			{
-				_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
-				serialisedData += sizeof(_value);
+				//_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
+				//serialisedData += sizeof(_value);
+				
+				initMemberSerialiser();
+				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
 			}
 		};
 	}
