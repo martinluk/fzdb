@@ -73,6 +73,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 
 	SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
 	pHeader->size = headerChunkSize + bytesSerialised;
+	return pHeader->size;
 }
 
 void StringMapSerialiser::unserialise(const char *serialisedData)
