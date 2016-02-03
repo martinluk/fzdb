@@ -22,8 +22,8 @@ namespace FileSystem
     {
         std::fstream file;
 
-        FileHeader header;
-        memset(&header, 0, sizeof(FileHeader));
+		FileHeader header;
+		Serialiser::zeroBuffer(&header, sizeof(FileHeader));
 
         header.identifier[0] = 'F';
         header.identifier[1] = 'Z';
@@ -76,8 +76,8 @@ namespace FileSystem
             }
 
             // Hopefully reading automatically advances the read point in the file?
-            FileHeader header;
-            memset(&header, 0, sizeof(FileHeader));
+			FileHeader header;
+			Serialiser::zeroBuffer(&header, sizeof(FileHeader));
             file.read(reinterpret_cast<char*>(&header), sizeof(FileHeader));
 
             if ( header.identifier[0] != 'F' ||     // Check identifier.
@@ -144,8 +144,8 @@ namespace FileSystem
         {
             file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 
-            FileHeader header;
-            memset(&header, 0, sizeof(FileHeader));
+			FileHeader header;
+			Serialiser::zeroBuffer(&header, sizeof(FileHeader));
             file.read(reinterpret_cast<char*>(&header), sizeof(FileHeader));
             length = header.size;
         }

@@ -5,10 +5,19 @@ const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 
 Entity::Entity(unsigned int type) : handle_(Entity::INVALID_EHANDLE), _type(type), _active(true)
 {
+	initMemberSerialiser();
 }
 
 Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(type), _active(true)
 {
+	initMemberSerialiser();
+}
+
+void Entity::initMemberSerialiser()
+{
+	_memberSerialiser.addPrimitive(&handle_, sizeof(handle_));
+	_memberSerialiser.addPrimitive(&_type, sizeof(_type));
+	_memberSerialiser.addPrimitive(&_active, sizeof(_active));
 }
 
 Entity::~Entity()

@@ -24,7 +24,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 
 	// Create a header.
 	SerialHeader header;
-	memset(&header, 0, sizeof(SerialHeader));
+	Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
 	header.size = 0;	// We don't know this yet.
 	header.count = _map->size();
 
@@ -33,7 +33,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 
 	// Push back the appropriate amount of dummy entry headers.
 	EntryHeader eHeader;
-	memset(&eHeader, 0, sizeof(EntryHeader));
+	Serialiser::zeroBuffer(&eHeader, sizeof(EntryHeader));
 	for ( int i = 0; i < header.count; i++ )
 	{
 		propList.push_back(Serialiser::SerialProperty(&eHeader, sizeof(EntryHeader)));

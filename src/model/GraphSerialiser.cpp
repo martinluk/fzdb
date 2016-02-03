@@ -27,8 +27,8 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
 {
     std::size_t origSize = serialiser.size();
     
-    SerialHeader header;
-    memset(&header, 0, sizeof(SerialHeader));
+	SerialHeader header;
+	Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
     
     std::vector<std::shared_ptr<Entity>> entList = _manager->entityList();
     
@@ -39,8 +39,8 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
 	header.typeMapLength = 0;
     
 	// Serialise the correct number of dummy entity headers.
-    EntityHeader dummyHeader;
-    memset(&dummyHeader, 0, sizeof(EntityHeader));
+	EntityHeader dummyHeader;
+	Serialiser::zeroBuffer(&dummyHeader, sizeof(EntityHeader));
     
     serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
     for ( int i = 0; i < header.entityCount; i++ )

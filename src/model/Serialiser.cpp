@@ -1,6 +1,12 @@
 #include "./Serialiser.h"
 #include <cstring>
 
+const unsigned char Serialiser::StructPaddingChar = 0x00;
+void Serialiser::zeroBuffer(void *dest, std::size_t size)
+{
+	memset(dest, StructPaddingChar, size);
+}
+
 Serialiser::Serialiser()
 {
     lastSerialiseBytes_ = 0;

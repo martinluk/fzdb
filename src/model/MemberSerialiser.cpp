@@ -52,13 +52,15 @@ void MemberSerialiser::clearDynamicMembers()
 
 std::size_t MemberSerialiser::serialiseDynamicMembers(Serialiser &serialiser) const
 {
+	std::size_t bytesSerialised = 0;
 	for ( auto it = _dynamicMembers.cbegin(); it != _dynamicMembers.cend(); ++it )
 	{
 		const IDynamicMember* d = *it;
 		std::size_t length = d->memberSize();
-		serialiser.serialise(Serialiser::SerialProperty(&length, sizeof(length)));
-		serialiser.serialise(Serialiser::SerialProperty(d->memberLocation(), length));
+		bytesSerialised += serialiser.serialise(Serialiser::SerialProperty(&length, sizeof(length)));
+		bytesSerialised += serialiser.serialise(Serialiser::SerialProperty(d->memberLocation(), length));
 	}
+	return bytesSerialised;
 }
 
 std::size_t MemberSerialiser::unserialiseDynamicMembers(const char *serialisedData)
@@ -70,7 +72,7 @@ std::size_t MemberSerialiser::unserialiseDynamicMembers(const char *serialisedDa
 		const std::size_t* length = reinterpret_cast<const std::size_t*>(serialisedData);
 		serialisedData += sizeof(std::size_t);
 		d->memberUnserialise(serialisedData, *length);
-		unserialised += *length;
+		unserialised += sizeof(std::size_t) + *length;
 		serialisedData += *length;
 	}
 	

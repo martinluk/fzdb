@@ -131,6 +131,7 @@ public:
 
 private:
 	void deleteAllProperties();
+	void initMemberSerialiser();
 
 	EHandle_t	handle_;
 	unsigned int _type;
@@ -138,6 +139,8 @@ private:
 
 	std::map<unsigned int, IEntityProperty*> _propertyTable;
 	std::vector<Entity*> _linkedEntities;
+
+	MemberSerialiser _memberSerialiser;
 };
 
 #endif	// MODEL_ENTITY_H

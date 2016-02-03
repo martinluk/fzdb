@@ -45,13 +45,15 @@ namespace model {
 
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
-				std::size_t stringLength = _value.size();
-				std::unique_ptr<char> buffer(new char[stringLength + 1]);
-				memcpy(buffer.get(), _value.c_str(), stringLength);
-				buffer.get()[stringLength] = '\0';
+//				std::size_t stringLength = _value.size();
+//				std::unique_ptr<char> buffer(new char[stringLength + 1]);
+//				memcpy(buffer.get(), _value.c_str(), stringLength);
+//				buffer.get()[stringLength] = '\0';
 
-				return Base::serialiseSubclass(serialiser)
-					+ serialiser.serialise(Serialiser::SerialProperty(buffer.get(), stringLength + 1));
+//				return Base::serialiseSubclass(serialiser)
+//					+ serialiser.serialise(Serialiser::SerialProperty(buffer.get(), stringLength + 1));
+
+				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseDynamicMembers(serialiser);
 			}
 
 			virtual std::string logString() const
