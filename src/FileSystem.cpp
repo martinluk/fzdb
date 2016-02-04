@@ -12,7 +12,7 @@
 struct FileHeader
 {
     char identifier[4];     // Identifier - should be "FZDB".
-    unsigned int version;   // File version.
+	unsigned short version;   // File version.
     std::size_t size;       // Size of all serialised data after the file headers.
 };
 

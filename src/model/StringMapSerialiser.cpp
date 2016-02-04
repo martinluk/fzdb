@@ -1,6 +1,8 @@
 #include "StringMapSerialiser.h"
 #include <cstring>
 
+#include "spdlog/spdlog.h"
+
 struct SerialHeader
 {
 	std::size_t size;	// Total serialised size in bytes.
@@ -73,6 +75,8 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 
 	SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
 	pHeader->size = headerChunkSize + bytesSerialised;
+
+	return serialiser.size() - origSize;
 }
 
 void StringMapSerialiser::unserialise(const char *serialisedData)

@@ -46,21 +46,21 @@ while True:
 	# If we're sending a command, we listen for data from the user.
         # No timeout is specified.
 	if sending:
-                sRead, sWrite, sError = select.select(sys.stdin, [], [])
+                sRead, sWrite, sError = select.select([sys.stdin], [], [])
 
 	# Otherwise we listen from the database for a response.
         # The timeout is 30 seconds - change this if required.
 	else:
-                sRead, sWrite, sError = select.select(commSocket, [], [], 30)
+                sRead, sWrite, sError = select.select([commSocket], [], [], 30)
 
                 # Check to see whether we received any data. If this happens three times in a row,
                 # assume the database is down and give up.
                 if len(sRead) < 1:
-                        numFailedReads++
+                        numFailedReads += 1
                         if numFailedReads < 3:
-                                printf("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
+                                print("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
                         else:
-                                printf("TIMEOUT: No response. Shutting down.")
+                                print("TIMEOUT: No response. Shutting down.")
                                 commSocket.close()
                                 sys.exit()
 
