@@ -19,13 +19,6 @@ EntityProperty<T>::EntityProperty()
 }
 
 template <typename T>
-EntityProperty<T>::EntityProperty(const unsigned int& key) :
-	_key(key)
-{
-    initSubtype();
-}
-
-template <typename T>
 EntityProperty<T>::EntityProperty(const unsigned int& key,
 	const std::vector<T*> &values) : _key(key)
 {

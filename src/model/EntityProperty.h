@@ -19,7 +19,7 @@ public:
 	virtual std::vector<model::types::Base*> baseValues() const = 0;
 	virtual unsigned int key() const = 0;
 	virtual model::types::Base* baseValue(int index) const = 0;
-        virtual model::types::Base::Subtype subtype() const = 0;
+	virtual model::types::Base::Subtype subtype() const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -46,10 +46,8 @@ class EntityProperty : public IEntityProperty
 		// for example if no property matches a given search.
 		// isNull() will return true.
 		EntityProperty();
-		EntityProperty(const unsigned int &key);
+		EntityProperty(const unsigned int &key, const std::vector<T*> &values = std::vector<T*>());
 		~EntityProperty();
-		EntityProperty(const unsigned int &key,
-			const std::vector<T*> &values);
 
 		// Returns true if this is a null property (ie. default-constructed).
 		// Internally, a property is null if its key is an empty string.
@@ -67,7 +65,8 @@ class EntityProperty : public IEntityProperty
 		const unsigned int& keyRef() const;
 		std::vector<T*> values() const;
 
-		std::vector<model::types::Base*> baseValues() const override {
+		std::vector<model::types::Base*> baseValues() const override
+		{
 			std::vector<model::types::Base*> out;
 			for (auto vals : _values) out.push_back(vals);
 			return out;
@@ -75,14 +74,10 @@ class EntityProperty : public IEntityProperty
 
 		T* value(int index) const;
 
-		//T getValue(unsigned int index);
-
-		//bool containsValue(T value);
-
-                virtual int count() const;
-                virtual model::types::Base* baseValue(int index) const;
-                virtual unsigned int key() const;
-                virtual model::types::Base::Subtype subtype() const { return _subtype; }
+		virtual int count() const;
+		virtual model::types::Base* baseValue(int index) const;
+		virtual unsigned int key() const;
+		virtual model::types::Base::Subtype subtype() const { return _subtype; }
 
 		// Setters:
 
@@ -91,9 +86,6 @@ class EntityProperty : public IEntityProperty
 
 		// Appends a list of values.
 		void append(const std::vector<T*> &list);
-
-		// Makes this property concrete, with the given variant value.
-		//void setConcrete(const Variant &value);
 
 		// Clears this property of any values.
 		void clear();
@@ -106,7 +98,7 @@ class EntityProperty : public IEntityProperty
 
 		unsigned int _key;
 		std::vector<T*> _values;
-                model::types::Base::Subtype _subtype;
+		model::types::Base::Subtype _subtype;
 		//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 
