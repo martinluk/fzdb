@@ -27,7 +27,7 @@ install:
 script:
   - cmake --build .
   - ctest -V -C debug
-  - ./fuzzy-database& 
-  - cd ../ #Back to project root to run npm test
-  - npm install && npm test
+ # - ./fuzzy-database& 
+#  - cd ../ #Back to project root to run npm test
+ # - npm install && npm test
 
