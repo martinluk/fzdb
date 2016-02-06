@@ -42,8 +42,7 @@ void UserOperation::removeUser(UserGroup currentUserGroup, std::string userName)
 	super::removeUser(userName);
 }
 
-void UserOperation::changeUserGroup(UserGroup currentUserGroup,std::string userName, UserGroup newUserGroup) {
-	Permission::assertUserOpPermission(currentUserGroup);
+void UserOperation::changeUserGroup(std::string userName, UserGroup newUserGroup) {
 	UserAttributes a = super::getUserAttributes(userName);
 	a.userGroup=newUserGroup;
 	super::updateUser(a.userName,a);
