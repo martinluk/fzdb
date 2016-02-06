@@ -3,11 +3,11 @@
 
 const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 
-Entity::Entity(unsigned int type) : handle_(Entity::INVALID_EHANDLE), _type(type), _active(true)
+Entity::Entity(unsigned int type) : handle_(Entity::INVALID_EHANDLE), _type(type), _linkStatus(Entity::LinkStatus::None)
 {
 }
 
-Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(type), _active(true)
+Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(type), _linkStatus(Entity::LinkStatus::None)
 {
 }
 

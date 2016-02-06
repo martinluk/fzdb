@@ -131,12 +131,26 @@ public:
 
 	virtual std::string logString() const override;
 
+	enum class LinkStatus {
+		None,
+		Master,
+		Slave
+	};
+
+	LinkStatus linkStatus() const {
+		return _linkStatus;
+	}
+
+	void linkStatus(const LinkStatus linkStatus) {
+		_linkStatus = linkStatus;
+	}
+
 private:
 	void deleteAllProperties();
 
 	EHandle_t	handle_;
 	unsigned int _type;
-	bool _active;
+	LinkStatus _linkStatus;
 
 	std::map<unsigned int, IEntityProperty*> _propertyTable;
 };

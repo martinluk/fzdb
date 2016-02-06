@@ -400,22 +400,46 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 
 #pragma region linkingandmerging
 
-void EntityManager::linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+std::set<Entity::EHandle_t> EntityManager::getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) {
+	if (_links.find(start) == _links.cend()) {
+		//Bad
+	}
+	
+	std::set<Entity::EHandle_t> results;
+	std::set_difference(_links[start].begin(), _links[start].end(), 
+		visited.begin(), visited.end(),
+		std::inserter(results, results.begin()));
 
+	visited.insert(start);
+
+	if (results.size() == 0)return visited;
+
+	for (auto id : results) {
+		this->getLinkGraph(id, std::move(visited));
+	}
+
+	return visited;
+}
+
+void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2) {
+
+	//create link sets if they do not exists
 	if (_links.find(entityId) == _links.end()) _links[entityId] = std::set<Entity::EHandle_t>();
 	if (_links.find(entityId2) == _links.end()) _links[entityId2] = std::set<Entity::EHandle_t>();
 
-	std::set<Entity::EHandle_t> newSet;
+	//add the new link
+	_links[entityId].insert(entityId2);
+	_links[entityId2].insert(entityId);
 
-	std::set_union(_links[entityId].begin(), _links[entityId].end(),
-					_links[entityId2].begin(), _links[entityId2].end(), 
-					std::inserter(newSet, newSet.begin()));
+	//get the full graph of linked entities
+	auto allLinked = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
+	Entity::EHandle_t lowestId = *std::min_element(allLinked.begin(), allLinked.end());
 
-	newSet.insert(entityId2);
-	newSet.insert(entityId);
-
-	_links[entityId] = newSet;
-	_links[entityId2] = newSet;
+	//set and/or reset link status values
+	for (auto id : allLinked) {
+		_entities[id]->linkStatus(Entity::LinkStatus::Slave);
+		if (id == lowestId) _entities[id]->linkStatus(Entity::LinkStatus::Master);
+	}
 }
 
 void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
@@ -426,6 +450,44 @@ void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t
 		_links.find(entityId2)->second.find(entityId) == _links.find(entityId2)->second.end()) {
 		return;
 	}
+
+	//remove the old link
+	_links[entityId].erase(entityId2);
+	_links[entityId2].erase(entityId);
+
+	//get the new link graphs
+	auto allLinked = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
+	auto allLinked2 = getLinkGraph(entityId2, std::set<Entity::EHandle_t>());
+
+	//check if entities are now not linked at all
+	if (allLinked.size() == 1) {
+		_links.erase(entityId);
+		_entities[entityId]->linkStatus(Entity::LinkStatus::None);
+	}
+	else {
+		Entity::EHandle_t lowestId = *std::min_element(allLinked.begin(), allLinked.end());
+
+		//set and/or reset link status values
+		for (auto id : allLinked) {
+			_entities[id]->linkStatus(Entity::LinkStatus::Slave);
+			if (id == lowestId) _entities[id]->linkStatus(Entity::LinkStatus::Master);
+		}
+	}
+
+	if (allLinked2.size() == 1) {
+		_links.erase(entityId2);
+		_entities[entityId2]->linkStatus(Entity::LinkStatus::None);
+	}
+	else {
+		Entity::EHandle_t lowestId = *std::min_element(allLinked2.begin(), allLinked2.end());
+
+		//set and/or reset link status values
+		for (auto id : allLinked2) {
+			_entities[id]->linkStatus(Entity::LinkStatus::Slave);
+			if (id == lowestId) _entities[id]->linkStatus(Entity::LinkStatus::Master);
+		}
+	}
+
 }
 
 // Merges the entities with the given Ids. The entity with the higher Id number is deleted.

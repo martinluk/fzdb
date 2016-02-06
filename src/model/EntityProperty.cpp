@@ -8,7 +8,6 @@ using BasePointer = std::shared_ptr<model::types::Base>;
 template <typename T>
 void EntityProperty<T>::initSubtype()
 {
-    using namespace model::types;
 	BasePointer b = std::make_shared<T>();
     _subtype = b->subtype();
 }

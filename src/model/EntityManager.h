@@ -50,12 +50,15 @@ public:
     bool saveToFile(const std::string &filename);
     bool loadFromFile(const std::string &filename);
 
-	void linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+	void linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2);
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
+	//move to private
+	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited);
 private:
 	void changeEntityType(Entity::EHandle_t id, const std::string &type);
+	
 	unsigned int getTypeID(const std::string &str);
 
 	// TODO: This could be an unordered map, but we may want to utilise the
