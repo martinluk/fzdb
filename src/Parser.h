@@ -23,7 +23,7 @@ enum class ParsedTokenType {
         NOTIMPLEMENTED = 0x3,
         PROPERTY       = 0x4,
         ENTITYREF      = 0x5,
-		CONFIDENCE_RATING = 0x8,
+        CONFIDENCE_RATING = 0x8,
 
 	//structural
         OPEN_CURLBRACE  = 0x6,
@@ -40,8 +40,8 @@ enum class ParsedTokenType {
         KEYWORD_SOURCE = TOKEN_KEYWORD_MASK | 0x6,
         KEYWORD_DATA   = TOKEN_KEYWORD_MASK | 0x7,
         KEYWORD_DEBUG  = TOKEN_KEYWORD_MASK | 0x8,
-		KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
-		KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
+        KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
+        KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -64,6 +64,14 @@ public:
 namespace ReservedProperties
 {
 	static const std::string TYPE("type");
+}
+
+// Jonathan - Semantic property strings.
+// These are for properties which have special functions within the database, eg. specifying
+// ordering between entities.
+namespace SemanticProperties
+{
+	static const std::string GREATER_THAN("greaterThan");
 }
 
 //TODO: this whole file could do with tidying up
