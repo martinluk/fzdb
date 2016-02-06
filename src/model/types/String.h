@@ -36,13 +36,29 @@ namespace model {
 				initMemberSerialiser();
 			}
 
-			std::string value() { return _value; }
+			std::string value() const { return _value; }
 
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeString;
 			}
 
+			virtual std::string logString() const override
+			{
+				return std::string("String(\"") + _value + std::string("\", ")
+					+ std::to_string(confidence()) + std::string(")");
+			}
+
+			virtual std::string toString() const override {
+				return _value;
+			}
+
+			// Inherited via Base
+			virtual bool Equals(const std::string val) const override {
+				return _value == val;
+			}
+
+		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
 //				std::size_t stringLength = _value.size();
@@ -56,22 +72,6 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseDynamicMembers(serialiser);
 			}
 
-			virtual std::string logString() const
-			{
-				return std::string("String(\"") + _value + std::string("\", ")
-					+ std::to_string(confidence()) + std::string(")");
-			}
-
-			virtual std::string toString() override {
-				return _value;
-			}
-
-			// Inherited via Base
-			virtual bool Equals(const std::string val) override {
-				return _value == val;
-			}
-
-		protected:
 			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
 			{
 				//_value = std::string(serialisedData);

@@ -41,13 +41,28 @@ namespace model {
 				// Already initialised
 			}
 
-			EHandle_t value() { return _value; }
+			EHandle_t value() const { return _value; }
 			
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeEntityRef;
 			}
 
+			virtual std::string logString() const override 
+			{
+				return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
+					+ std::to_string(confidence()) + std::string(")");
+			}
+
+			// Inherited via Base
+			virtual bool Equals(const std::string val) const override {
+				return _value == std::stoll(val);
+			}
+
+			virtual std::string toString() const override {
+				return std::to_string(_value);
+			}
+		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
 				//return Base::serialiseSubclass(serialiser)
@@ -56,21 +71,6 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
-			virtual std::string logString() const
-			{
-				return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
-					+ std::to_string(confidence()) + std::string(")");
-			}
-
-			// Inherited via Base
-			virtual bool Equals(const std::string val) override {
-				return _value == std::stoll(val);
-			}
-
-			virtual std::string toString() override {
-				return std::to_string(_value);
-			}
-		protected:
 			EntityRef(const char* &serialisedData) : Base(serialisedData)
 			{
 				//_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));

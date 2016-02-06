@@ -29,6 +29,7 @@ namespace model {
 				TypeInt32,
 				TypeString,
 				TypeEntityRef,
+				TypeDate,
 
 				//Doesn't have an associated type
 				PropertyReference
@@ -52,6 +53,9 @@ namespace model {
                     
                 case Subtype::PropertyReference:
                     return "PropertyReference";
+
+								case Subtype::TypeDate:
+										return "Date";
                     
                 default:
                     return "Undefined";
@@ -66,19 +70,22 @@ namespace model {
 				_confidence = confidence;
 			}
 
-			virtual bool Equals(const std::string val) {
+			virtual bool Equals(const std::string val) const
+			{
 				return false;
 			}
 
-			virtual std::string toString() {
+			virtual std::string toString() const
+			{
 				return "";
 			}
 
-			unsigned char confidence() const {
+			unsigned char confidence() const
+			{
 				return _confidence;
 			}
 
-                        void setConfidence(unsigned char confidence) {
+			void setConfidence(unsigned char confidence) {
 				_confidence = confidence;
 			}
 
@@ -119,7 +126,7 @@ namespace model {
 
 		class ConfidenceCompare {
 		public:
-			bool operator() (Base a, Base b)
+			bool operator() (const Base &a, const Base &b) const
 			{
 				return a.confidence() > b.confidence();
 			}

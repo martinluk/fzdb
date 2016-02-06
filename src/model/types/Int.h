@@ -39,13 +39,29 @@ namespace model {
 				// Already initialised
 			}
 
-			int32_t value() { return _value; }
+			int32_t value() const { return _value; }
 
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeInt32;
 			}
 
+			virtual std::string logString() const override
+			{
+				return std::string("Int(") + std::to_string(_value) + std::string(", ")
+					+ std::to_string(confidence()) + std::string(")");
+			}
+
+			// Inherited via Base
+			virtual bool Equals(const std::string val) const override {
+				return _value == std::stoi(val);
+			}
+
+			virtual std::string toString() const override {
+				return std::to_string(_value);
+			}
+
+		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
 				//return Base::serialiseSubclass(serialiser)
@@ -54,22 +70,6 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
-			virtual std::string logString() const
-			{
-				return std::string("Int(") + std::to_string(_value) + std::string(", ")
-					+ std::to_string(confidence()) + std::string(")");
-			}
-
-			// Inherited via Base
-			virtual bool Equals(const std::string val) override {
-				return _value == std::stoi(val);
-			}
-
-			virtual std::string toString() override {
-				return std::to_string(_value);
-			}
-
-		protected:
 			Int(const char* &serialisedData) : Base(serialisedData)
 			{
 				// Base will have incremented the pointer appropriately.

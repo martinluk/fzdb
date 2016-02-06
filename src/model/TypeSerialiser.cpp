@@ -3,7 +3,9 @@
 #include "types/Int.h"
 #include "types/String.h"
 #include "types/EntityRef.h"
+#include "types/Date.h"
 #include "spdlog/spdlog.h"
+#include <cassert>
 
 namespace model
 {
@@ -63,7 +65,11 @@ namespace model
 				b = new EntityRef(d);
                 break;
 
+						case Base::Subtype::TypeDate:
+						b = new Date(d);
+
             default:
+						    assert(false);
                 b = NULL;
                 break;
             }
