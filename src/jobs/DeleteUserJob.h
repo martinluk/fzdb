@@ -3,7 +3,7 @@
 class DeleteUserJob : public IUserAdminJobs {
 	public:
 		DeleteUserJob(ISession* session, std::string username);
-		virtual QueryResult execute() override;
+        QueryResult adminJobBody() override;
 	private:
 		std::string _username;
 };

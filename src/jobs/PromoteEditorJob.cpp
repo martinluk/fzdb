@@ -7,7 +7,7 @@ PromoteEditorJob::PromoteEditorJob(ISession* session, std::string username):IUse
 	_username = username;
 }
 
-QueryResult PromoteEditorJob::execute() { 
+QueryResult PromoteEditorJob::adminJobBody() {
 	UserOperation::changeUserGroup(_username, UserGroup::ADMIN);
 	QueryResult result; 
 	//TODO respond with some kind of success

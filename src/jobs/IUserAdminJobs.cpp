@@ -1,6 +1,5 @@
 #include "IUserAdminJobs.h"
 
-
 IUserAdminJobs::IUserAdminJobs(ISession* session):Job(session) {
     _session=session;
 }
