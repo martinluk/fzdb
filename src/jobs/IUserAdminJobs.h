@@ -6,15 +6,7 @@
 class IUserAdminJobs : public Job {
 	public:
        IUserAdminJobs(ISession* session);
-		
        QueryResult execute() override ;
-
     protected:
-
-        virtual QueryResult adminJobBody();
-
-private:
-        UserGroup _currentUserGroup;
-
-
+        virtual QueryResult adminJobBody() {}
 };
