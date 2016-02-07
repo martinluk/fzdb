@@ -42,6 +42,10 @@ enum class ParsedTokenType {
         KEYWORD_DEBUG  = TOKEN_KEYWORD_MASK | 0x8,
 		KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
 		KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
+		KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
+		KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
+		KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
+		KEYWORD_FLUSH = TOKEN_KEYWORD_MASK | 0xE,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -58,6 +62,13 @@ public:
 	TokenInfo(ParsedTokenType ptt, unsigned int lineNo, unsigned int charPos, std::string dat0) :
 		type(ptt), lineNumber(lineNo), charPosition(charPos), data0(dat0) { }
 };
+
+// Jonathan - Reserved property strings.
+// These are for things like entity types, where properties should not be allowed to use this name.
+namespace ReservedProperties
+{
+	static const std::string TYPE("type");
+}
 
 //TODO: this whole file could do with tidying up
 
@@ -125,7 +136,11 @@ enum class QueryType {
     DEBUGOTHER,
     LOAD,
     SAVE,
-	USER
+	USER,
+	LINK,
+	UNLINK,
+	MERGE,
+	FLUSH
 };
 
 //Aggregate query object - this should contain all info required to do a query
@@ -138,14 +153,16 @@ public:
 	TriplesBlock whereClause;
 	std::string data0;
 	std::vector<std::string> selectLine;
+	std::vector<long long int> entities;
 
-	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline) {
+	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline, std::vector<long long int> ents) {
 		type = t;
 		sources = s;
 		conditions = cond;
 		whereClause = wh;
 		data0 = dat0;
 		selectLine = selectline;
+		entities = ents;
 	}
 };
 

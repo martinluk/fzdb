@@ -114,7 +114,16 @@ while True:
                             sys.stdout.write(data.decode('utf-8'))
                         else:
                             jsonobj = json.loads(data.decode('utf-8'))
-                            sys.stdout.write(jsonobj["response"])
+                            if "response" in jsonobj:
+                            	sys.stdout.write(jsonobj["response"])
+                            else:
+                            	print("FATAL ERROR: No 'response' received via JSON.");
+                            	print("Raw JSON received:\n")
+                            	sys.stdout.write(data.decode('utf-8'))
+				sys.stdout.write("\n\n");
+				print("Closing connection.");
+                            	commSocket.close()
+                            	sys.exit()
 
                         sys.stdout.write("\n");
 

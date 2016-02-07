@@ -4,14 +4,15 @@
 #include "../Serialiser.h"
 #include <cassert>
 #include <cstring>
+#include <memory>
 #include "../ILogString.h"
 
 namespace model {
 	namespace types {
 		class Base : public ILogString
 		{
-		private:
-			friend class TypeSerialiser;
+		protected:
+			//friend class TypeSerialiser;
 			unsigned char _confidence;
 
 		public:
@@ -26,34 +27,38 @@ namespace model {
 				//Doesn't have an associated type
 				PropertyReference
 			};
-            
-            // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
-            // Until then, we use an ugly workaround.
-            //static const char* SubtypeString[];
-            static const char* SubtypeString(Subtype type)
-            {
-                switch (type)
-                {
-                case Subtype::TypeInt32:
-                    return "Int32";
-                    
-                case Subtype::TypeString:
-                    return "String";
-                    
-                case Subtype::TypeEntityRef:
-                    return "EntityRef";
-                    
-                case Subtype::PropertyReference:
-                    return "PropertyReference";
-                    
-                default:
-                    return "Undefined";
-                }
-            }
 
-                        Base(unsigned char confidence = 100) {
+			// TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
+			// Until then, we use an ugly workaround.
+			//static const char* SubtypeString[];
+			static const char* SubtypeString(Subtype type)
+			{
+				switch (type)
+				{
+				case Subtype::TypeInt32:
+					return "Int32";
+
+				case Subtype::TypeString:
+					return "String";
+
+				case Subtype::TypeEntityRef:
+					return "EntityRef";
+
+				case Subtype::PropertyReference:
+					return "PropertyReference";
+
+				default:
+					return "Undefined";
+				}
+			}
+
+			Base(unsigned char confidence = 100) {
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
+			}
+
+			virtual std::shared_ptr<Base> Clone() {
+				return std::make_shared<Base>(_confidence);
 			}
 
 			virtual bool Equals(const std::string val) {
@@ -68,38 +73,37 @@ namespace model {
 				return _confidence;
 			}
 
-                        void setConfidence(unsigned char confidence) {
+			void setConfidence(unsigned char confidence) {
 				_confidence = confidence;
 			}
 
-                        virtual Subtype subtype() const
-                        {
-                            return Subtype::TypeUndefined;
-                        }
+			virtual Subtype subtype() const
+			{
+				return Subtype::TypeUndefined;
+			}
 
-                        virtual std::string logString() const
-                        {
-                            return std::string("Base(") + std::to_string(_confidence) + std::string(")");
-                        }
+			virtual std::string logString() const
+			{
+				return std::string("Base(") + std::to_string(_confidence) + std::string(")");
+			}
 
-                protected:
-                        // Called when serialising.
-                        virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-                        {
-                            // Serialise the confidence.
-                            return serialiser.serialise(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
-                        }
+			// Called to construct from serialised data.
+			Base(const char* &serialisedData)
+			{
+				// The data should point to our confidence value.
+				_confidence = *(reinterpret_cast<const unsigned char*>(serialisedData));
 
-                        // Called to construct from serialised data.
-                        Base(const char* &serialisedData)
-                        {
-                            // The data should point to our confidence value.
-                            _confidence = *(reinterpret_cast<const unsigned char*>(serialisedData));
+				// We have to increment the pointer (which is actually a reference to a pointer)
+				// so that the next class can get its data.
+				serialisedData += sizeof(unsigned char);
+			}
 
-                            // We have to increment the pointer (which is actually a reference to a pointer)
-                            // so that the next class can get its data.
-                            serialisedData += sizeof(unsigned char);
-                        }
+			// Called when serialising.
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+			{
+				// Serialise the confidence.
+				return serialiser.serialise(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
+			}			
 		};
 
 		class ConfidenceCompare {

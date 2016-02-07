@@ -7,12 +7,12 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
-LoadFileJob::LoadFileJob(ISession *session, const std::string &message) : Job(session)
+LoadFileJob::LoadFileJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session)
 {
 	_message = message;
 }
 
-SaveFileJob::SaveFileJob(ISession *session, const std::string &message) : Job(session)
+SaveFileJob::SaveFileJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session)
 {
 	_message = message;
 }
@@ -27,8 +27,7 @@ QueryResult _result(const std::string &message)
 
 bool _preprocess(std::string &message)
 {
-	boost::algorithm::trim_left(message);
-	boost::algorithm::trim_right(message);
+	boost::algorithm::trim(message);
 	
 	if ( message.size() < 1 )
 	{

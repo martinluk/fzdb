@@ -42,4 +42,8 @@ build
 .vagrant
 *~
 
+# Jonathan - Trying out making a Qt project so that I can use IDE
+# features. This is just on my desktop, so should be excluded.
+exclude/*
+
 node_modules

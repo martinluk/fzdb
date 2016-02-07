@@ -14,7 +14,7 @@ private:
 
 public:
   
-	UnknownJob(ISession* session, std::string name);
+	UnknownJob(std::shared_ptr<ISession> session, std::string name);
 	// Inherited via Job
 	virtual QueryResult execute() override;
 

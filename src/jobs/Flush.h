@@ -1,5 +1,5 @@
-#ifndef FUZZY_JOBS_BGP
-#define FUZZY_JOBS_BGP
+#ifndef FUZZY_JOBS_FLUSH
+#define FUZZY_JOBS_FLUSH
 
 #include "../Job.h"
 #include "../model/Triple.h"
@@ -8,18 +8,15 @@
 
 #include <string>
 
-class BGP : public Job
+class Flush : public Job
 {
 public:
 
-  BGP(std::shared_ptr<ISession> session, Query message);
+  Flush(std::shared_ptr<ISession> session);
 
 
   // Inherited via Job
   virtual QueryResult execute() override;
-
-private:
-  Query _query;
 
 };
 

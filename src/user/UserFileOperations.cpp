@@ -1,4 +1,4 @@
-#include <user/UserLogin.h>
+#include <user/UserFileOperations.h>
 #include <user/Hashing.h>
 
 #include "boost/assign.hpp"
@@ -22,6 +22,8 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
+//Initialise cache map
+std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
@@ -76,42 +78,66 @@ UserAttributes UserFileOperations::getUserAttributes(std::string userName){
 	return userFileCache[userName];
 }
 
-UserGroup UserCommonOperation::login(std::string userName, std::string password) {
-	UserAttributes currUserAttr;
-	//See if user exist
-	try {
-		currUserAttr = getUserAttributes(userName);
-	} catch (UserNotExistException e ){
-		throw new LoginUnsuccessfulException;
-	}
-	std::string actualHash = currUserAttr.passwordHash;
-	std::string currSalt = currUserAttr.salt;
-	std::string ourHash = Hashing::hashPassword(userName, currSalt , password);
-	if (ourHash != actualHash) {
-		throw new LoginUnsuccessfulException;
-	}
-	return currUserAttr.userGroup;
-}
+ 
+void UserFileOperations::loadCacheFromFile() {
+	using namespace rapidjson;
+	//XXX Window system should use rb?
+	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
+	char readBuffer[65536];
+	//Reading file using rapidjson reader
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document jsonDoc;
+	jsonDoc.ParseStream(is);
+	fclose(fp);
 
-void UserAdmin::addUser(UserGroup currentUserGroup, std::string userName, std::string password, UserGroup userGroup) {
-	Permission::assertUserOpPermission(currentUserGroup);
-	UserAttributes a;
-	a.userName=userName;
-	a.salt=Hashing::genSalt();
-	a.passwordHash=Hashing::hashPassword(userName,a.salt,password);
-	a.userGroup=userGroup;
-	super::addUser(a);
-}
-void UserAdmin::removeUser(UserGroup currentUserGroup, std::string userName) {
-	Permission::assertUserOpPermission(currentUserGroup);
-	super::removeUser(userName);
-}
+	//Clearing userfile cache, ready for reloading
+	userFileCache.clear();
 
-void UserAdmin::changeUserGroup(UserGroup currentUserGroup,std::string userName, UserGroup newUserGroup) {
-	Permission::assertUserOpPermission(currentUserGroup);
-	UserAttributes a = super::getUserAttributes(userName);
-	a.userGroup=newUserGroup;
-	super::updateUser(a.userName,a);
+	//Assert json is valid
+	assert(jsonDoc.IsObject());
+
+	//Assert has user array
+	assert(jsonDoc.HasMember(USERCOLLECTION));
+	const Value& userArray=jsonDoc[USERCOLLECTION];
+	assert(userArray.IsArray());
+
+	for (SizeType i=0; i<userArray.Size(); i++) {
+		const Value& userObject=userArray[i];
+		assert(userObject.IsObject());
+		using namespace std;
+		//'FindMember' checks existence of member and obtain member at once
+		//TODO Use pre-compiler for json names
+		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
+		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
+		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);
+		Value::ConstMemberIterator itrGroupI = userObject.FindMember(USERGROUPINT);
+		assert( itrUser != userObject.MemberEnd() &&
+				itrHash != userObject.MemberEnd() &&
+				itrSalt != userObject.MemberEnd() &&
+				itrGroupI != userObject.MemberEnd());
+
+		//Casting user group int to user group
+		UserGroup group;
+		unsigned int groupNumber = itrHash->value.GetInt();
+		if (groupNumber==1) 
+			group=UserGroup::EDITOR;
+		else if (groupNumber==0)
+			group=UserGroup::ADMIN;
+		else
+			assert(false/*Invalid values in groupNumber in json user file*/);
+
+		//Interogating other string values
+		string username = itrUser->value.GetString();
+		string hash = itrHash->value.GetString();
+		string salt = itrSalt->value.GetString();
+		//Add into a user attribute struct
+		UserAttributes attr;
+		attr.userName = username;
+		attr.passwordHash = hash;
+		attr.salt = salt;
+		//Add into cache
+		userFileCache[username]=attr;
+	}
 }
 
 void UserFileOperations::saveCacheToFile() {
@@ -181,67 +207,4 @@ void UserFileOperations::saveCacheToFile() {
 	Writer<FileWriteStream> writer(os);
 	jsonDoc.Accept(writer);
 	fclose(fp);
-}
- 
-void UserFileOperations::loadCacheFromFile() {
-	using namespace rapidjson;
-	//XXX Window system should use rb?
-	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
-	char readBuffer[65536];
-	//Reading file using rapidjson reader
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	rapidjson::Document jsonDoc;
-	jsonDoc.ParseStream(is);
-	fclose(fp);
-
-	//Clearing userfile cache, ready for reloading
-	userFileCache.clear();
-
-	//Assert json is valid
-	assert(jsonDoc.IsObject());
-
-	//Assert has user array
-	assert(jsonDoc.HasMember(USERCOLLECTION));
-	const Value& userArray=jsonDoc[USERCOLLECTION];
-	assert(userArray.IsArray());
-
-	for (SizeType i=0; i<userArray.Size(); i++) {
-		const Value& userObject=userArray[i];
-		assert(userObject.IsObject());
-		using namespace std;
-		//'FindMember' checks existence of member and obtain member at once
-		//TODO Use pre-compiler for json names
-		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
-		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
-		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);
-		Value::ConstMemberIterator itrGroupI = userObject.FindMember(USERGROUPINT);
-		assert( itrUser != userObject.MemberEnd() &&
-				itrHash != userObject.MemberEnd() &&
-				itrSalt != userObject.MemberEnd() &&
-				itrGroupI != userObject.MemberEnd());
-
-		//Casting user group int to user group
-		UserGroup group;
-		unsigned int groupNumber = itrHash->value.GetInt();
-		if (groupNumber==1) 
-			group=UserGroup::EDITOR;
-		else if (groupNumber==0)
-			group=UserGroup::ADMIN;
-		else
-			assert(false/*Invalid values in groupNumber in json user file*/);
-
-		//Interogating other string values
-		string username = itrUser->value.GetString();
-		string hash = itrHash->value.GetString();
-		string salt = itrSalt->value.GetString();
-		//Add into a user attribute struct
-		UserAttributes attr;
-		attr.userName = username;
-		attr.passwordHash = hash;
-		attr.salt = salt;
-		//Add into cache
-		userFileCache[username]=attr;
-
-	}
-
 }

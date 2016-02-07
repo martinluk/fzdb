@@ -3,13 +3,14 @@
 #include <vector>
 #include "TypeSerialiser.h"
 
+using BasePointer = std::shared_ptr<model::types::Base>;
+
 template <typename T>
 void EntityProperty<T>::initSubtype()
 {
     using namespace model::types;
-    Base* b = new T();
+	BasePointer b = std::make_shared<T>();
     _subtype = b->subtype();
-    delete b;
 }
 
 template <typename T>
@@ -27,7 +28,7 @@ EntityProperty<T>::EntityProperty(const unsigned int& key) :
 
 template <typename T>
 EntityProperty<T>::EntityProperty(const unsigned int& key,
-	const std::vector<T*> &values) : _key(key)
+	const std::vector<std::shared_ptr<T>> &values) : _key(key)
 {
     initSubtype();
     append(values);
@@ -67,7 +68,7 @@ unsigned int EntityProperty<T>::key() const
 }
 
 template <typename T>
-std::vector<T*> EntityProperty<T>::values() const
+std::vector<std::shared_ptr<T>> EntityProperty<T>::values() const
 {
 	return _values;
 }
@@ -79,18 +80,15 @@ int EntityProperty<T>::count() const
 }
 
 template <typename T>
-void EntityProperty<T>::append(T* value)
+void EntityProperty<T>::append(std::shared_ptr<T> value)
 {
 	_values.emplace_back(value);
 }
 
 template <typename T>
-void EntityProperty<T>::append(const std::vector<T*> &list)
+void EntityProperty<T>::append(const std::vector<std::shared_ptr<T>> &list)
 {
-	for ( int i = 0; i < list.size(); i++ )
-	{
-		append(list[i]);
-	}
+	_values.insert(_values.begin(), list.cbegin(), list.cend());
 }
 
 template <typename T>
@@ -101,7 +99,7 @@ void EntityProperty<T>::clear()
 }
 
 template <typename T>
-T* EntityProperty<T>::value(int index) const
+std::shared_ptr<T> const& EntityProperty<T>::value(int index) const
 {
 	return _values[index];
 }
@@ -115,16 +113,13 @@ const unsigned int& EntityProperty<T>::keyRef() const
 template <typename T>
 void EntityProperty<T>::deleteAllValues()
 {
-    for ( int i = 0; i < _values.size(); i++ )
-    {
-        delete _values[i];
-    }
+	_values.clear();
 }
 
 template <typename T>
-model::types::Base* EntityProperty<T>::baseValue(int index) const
+BasePointer EntityProperty<T>::baseValue(int index) const
 {
-    return dynamic_cast<model::types::Base*>(value(index));
+	return std::dynamic_pointer_cast<model::types::Base, T>(value(index));
 }
 
 template<typename T>
@@ -133,7 +128,7 @@ std::string EntityProperty<T>::logString() const
     return std::string("EntityProperty<")
             //+ std::string(model::types::Base::SubtypeString[(int)_subtype])
             + std::string(model::types::Base::SubtypeString(_subtype))
-            + std::string(">(")
+            + std::string(">(k=")
             + std::to_string(_key)
             + std::string(", [")
             + std::to_string(_values.size())

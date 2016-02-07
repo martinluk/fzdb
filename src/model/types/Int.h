@@ -9,7 +9,7 @@ namespace model {
 	namespace types {
 		class Int : public Base {
 		private:
-			friend class TypeSerialiser;
+			//friend class TypeSerialiser;
 			int32_t _value;
 
 		public:
@@ -23,6 +23,10 @@ namespace model {
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeInt32;
+			}
+
+			virtual std::shared_ptr<Base> Clone() override {
+				return std::make_shared<Int>(_value, _confidence);
 			}
 
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
@@ -46,7 +50,6 @@ namespace model {
 				return std::to_string(_value);
 			}
 
-		protected:
 			Int(const char* &serialisedData) : Base(serialisedData)
 			{
 				// Base will have incremented the pointer appropriately.

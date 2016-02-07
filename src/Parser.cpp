@@ -7,16 +7,17 @@
 
 #include "./filters/RegexFilter.h"
 #include "./filters/OrderingFilters.h"
+#include "spdlog/spdlog.h"
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
-	boost::regex variableRegex("\\$(.+)");
-	boost::regex stringRegex("\"(.*)\"");
-	boost::regex propertyRegex("<(.*)>");
-	boost::regex entityRefRegex("entity:([0-9]+)");
-	boost::regex intRegex("[0-9]+");
-	boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
-   boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
+	static const boost::regex variableRegex("\\$(.+)");
+	static const boost::regex stringRegex("\"(.*)\"");
+	static const boost::regex propertyRegex("<(.*)>");
+	static const boost::regex entityRefRegex("entity:([0-9]+)");
+	static const boost::regex intRegex("[0-9]+");
+	static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
+	static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
 
    boost::smatch matches;
    std::string data0 = "";
@@ -80,6 +81,10 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
 	else if (str == "LOAD") tokenType = ParsedTokenType::KEYWORD_LOAD;
 	else if (str == "SAVE") tokenType = ParsedTokenType::KEYWORD_SAVE;
+	else if (str == "LINK") tokenType = ParsedTokenType::KEYWORD_LINK;
+	else if (str == "UNLINK") tokenType = ParsedTokenType::KEYWORD_UNLINK;
+	else if (str == "FINAL") tokenType = ParsedTokenType::KEYWORD_FINAL;
+	else if (str == "FLUSH") tokenType = ParsedTokenType::KEYWORD_FLUSH;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -194,6 +199,8 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 
 	while (iter != end && iter->first.type != ParsedTokenType::CLOSE_CURLBRACE) {
 
+		//spdlog::get("main")->info("Token type: {} Token content: {}", (int)iter->first.type, iter->second);
+		
 		if (((int)iter->first.type & TOKEN_SPLITTER_MASK) == 0) {
 			switch (pos) {
 			case 0:
@@ -371,6 +378,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 	TriplesBlock whereClause;
 	std::vector<std::string> selectLine;
 	std::string data0;
+	std::vector<long long int> entities;
 
 	while (iter != tokens.end()) {
 
@@ -402,6 +410,17 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 
 			if (iter != tokens.end()) {
 				throw ParseException("PING does not take any arguments");
+			}
+
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_FLUSH) {
+			*iter++;
+			type = QueryType::FLUSH;
+
+			if (iter != tokens.end()) {
+				throw ParseException("Flush does not take any arguments");
 			}
 
 			break;
@@ -487,8 +506,59 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			break;
 		}
 
+		//linking and merging
+		if (iter->first.type == ParsedTokenType::KEYWORD_LINK) {
+			iter++;
+			if (iter->first.type == ParsedTokenType::KEYWORD_FINAL) {
+				type = QueryType::MERGE;
+				iter++;
+				if(iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				entities.push_back(std::stoll(iter->second));
+				iter++;
+				if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				entities.push_back(std::stoll(iter->second));
+				if (iter != tokens.end()) {
+					throw ParseException("Link only takes 2 arguments");
+				}
+			}
+			else {
+				if (iter->first.type == ParsedTokenType::ENTITYREF) {
+					entities.push_back(std::stoll(iter->second));
+					type = QueryType::LINK;
+					iter++;
+					if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+					entities.push_back(std::stoll(iter->second));
+					if (iter != tokens.end()) {
+						throw ParseException("Link only takes 2 arguments");
+					}
+				}
+				else {
+					throw ParseException("Invalid arguments to link");
+				}
+			}
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_UNLINK) {
+			iter++;			
+			if (iter->first.type == ParsedTokenType::ENTITYREF) {
+				entities.push_back(std::stoll(iter->second));
+				type = QueryType::LINK;
+				iter++;
+				if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				entities.push_back(std::stoll(iter->second));
+				if (iter != tokens.end()) {
+					throw ParseException("Link only takes 2 arguments");
+				}
+			}
+			else {
+				throw ParseException("Invalid arguments to link");
+			}
+			break;
+		}
+
 		throw ParseException("Unknown symbol: " + iter->second);
 	}
 
-	return Query(type, sources, conditions, whereClause, data0, selectLine);
+	return Query(type, sources, conditions, whereClause, data0, selectLine, entities);
 }

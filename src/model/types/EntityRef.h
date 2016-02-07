@@ -11,7 +11,7 @@ namespace model {
 	namespace types {
 		class EntityRef : public Base {
 		private:
-			friend class TypeSerialiser;
+			//friend class TypeSerialiser;
 			EHandle_t _value;
 		public:
 			EntityRef() : _value(0), Base(100) {}
@@ -24,6 +24,10 @@ namespace model {
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeEntityRef;
+			}
+
+			virtual std::shared_ptr<Base> Clone() override {
+				return std::make_shared<EntityRef>(_value, _confidence);
 			}
 
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
@@ -46,7 +50,7 @@ namespace model {
 			virtual std::string toString() override {
 				return std::to_string(_value);
 			}
-		protected:
+
 			EntityRef(const char* &serialisedData) : Base(serialisedData)
 			{
 				_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));

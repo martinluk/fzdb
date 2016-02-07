@@ -3,11 +3,11 @@
 
 const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 
-Entity::Entity(unsigned int type) : handle_(Entity::INVALID_EHANDLE), _type(type)
+Entity::Entity(unsigned int type) : handle_(Entity::INVALID_EHANDLE), _type(type), _active(true)
 {
 }
 
-Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(type)
+Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(type), _active(true)
 {
 }
 
@@ -71,9 +71,9 @@ unsigned int Entity::getType() const
 
 std::string Entity::logString() const
 {
-    return std::string("Entity(")
+	return std::string("Entity(t=")
             + std::to_string(_type)
-            + std::string(", ")
+            + std::string(", h=")
             + std::to_string(handle_)
             + std::string(", [")
             + std::to_string(_propertyTable.size())

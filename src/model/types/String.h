@@ -10,7 +10,7 @@ namespace model {
 	namespace types {
 		class String : public Base {
 		private:
-			friend class TypeSerialiser;
+			//friend class TypeSerialiser;
 			std::string _value;
 		public:
 			String() : _value(), Base(100) {}
@@ -24,10 +24,14 @@ namespace model {
 				return Subtype::TypeString;
 			}
 
+			virtual std::shared_ptr<Base> Clone() override {
+				return std::make_shared<String>(_value, _confidence);
+			}
+
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
 				std::size_t stringLength = _value.size();
-				std::unique_ptr<char> buffer(new char[stringLength + 1]);
+				std::shared_ptr<char> buffer(new char[stringLength + 1]);
 				memcpy(buffer.get(), _value.c_str(), stringLength);
 				buffer.get()[stringLength] = '\0';
 
@@ -50,7 +54,10 @@ namespace model {
 				return _value == val;
 			}
 
-		protected:
+			~String() {
+				bool a = true;
+			}
+
 			String(const char* &serialisedData) : Base(serialisedData)
 			{
 				_value = std::string(serialisedData);

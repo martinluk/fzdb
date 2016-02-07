@@ -10,7 +10,7 @@ class PingJob : public Job
 {
 public:
 
-	PingJob(ISession* session);
+	PingJob(std::shared_ptr<ISession> session);
 
 
 	// Inherited via Job
