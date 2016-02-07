@@ -13,6 +13,7 @@ UserLoginJob::UserLoginJob(ISession* session, std::string username, std::string 
 QueryResult UserLoginJob::execute() {
 	QueryResult result;
 	try {
+        //TODO Verify username and password are not empty
         UserOperation::login(_username,_password);
 	} catch (LoginUnsuccessfulException ex) { 
 		result = QueryResult::generateError(ex.what());

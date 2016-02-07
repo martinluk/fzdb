@@ -12,10 +12,10 @@ AddUserJob::AddUserJob(ISession* session, std::string username, std::string pass
 QueryResult AddUserJob::adminJobBody() {
 	QueryResult result; 
     try {
+        //TODO Need to verify username and password are not empty.
         UserOperation::addUser(_username, _password, UserGroup::EDITOR);
-
-    } catch (UserAlreadyExistException exception) {
-        result.generateError("User already exist");
+    } catch (std::exception ex) {
+        result.generateError(ex.what());
         return result;
     }
     result.setValue("status","0");
