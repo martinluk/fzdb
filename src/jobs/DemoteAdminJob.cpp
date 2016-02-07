@@ -10,11 +10,15 @@ DemoteAdminJob::DemoteAdminJob(ISession* session, std::string username):IUserAdm
 QueryResult DemoteAdminJob::adminJobBody() {
     QueryResult result;
     try {
-        UserOperation::changeUserGroup(_username, UserGroup::EDITOR);
-    } catch (UserNotExistException exception) {
-        result.generateError("User does not exist");
+        UserGroup group = UserOperation::getUserGroup(_username); //Throws user not exist exception
+        if (group != UserGroup::ADMIN) {
+        	throw std::runtime_error("Error: given user is not an admin, cannot promote to admin");
+		}
+    } catch (std::exception exception) {
+        result.generateError(exception.what());
         return result;
     }
+	UserOperation::changeUserGroup(_username, UserGroup::EDITOR);
     result.setValue("status","0");
     return result;
 }
