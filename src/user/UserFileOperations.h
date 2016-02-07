@@ -6,6 +6,12 @@
 #include <user/UserAttributes.h>
 
 class UserFileOperations {
+	public: 
+		/*
+		 * Either load from file, 
+		 * Or (under debugging mode) add admin into cache and then save to file
+		 */
+		static void initialize();	
 	protected: 
 		static void addUser(UserAttributes userAttributes);
 		static void removeUser(std::string userName);

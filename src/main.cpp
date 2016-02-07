@@ -11,6 +11,8 @@
 #include "./server.h"
 #include "./singletons.h"
 
+#include "./user/UserFileOperations.h"
+
 #include "JobQueue.h"
 
 #include "model/EntityManager.h"
@@ -171,6 +173,9 @@ int main(int argc, char* argv[]) {
     std::cout << "--------------------------------------------" << std::endl;
 	std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
 	std::cout << "CTRL-C to stop" << std::endl;
+
+	//Initialize User File Cache
+	UserFileOperations::initialize();
 
     // Create the IO service.
     // This is essentially a link to the OS' IO system.

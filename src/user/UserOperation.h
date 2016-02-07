@@ -7,9 +7,10 @@
 class UserOperation : public UserFileOperations { 
 	public : 
 		static UserGroup login(std::string userName, std::string password);
-		static void addUser(UserGroup currentUserGroup, std::string userName, std::string password, UserGroup userGroup);
-		static void removeUser(UserGroup currentUserGroup,std::string userName);
-		static void changeUserGroup(UserGroup currentUserGroup,std::string userName, UserGroup newUserGroup);
+        static void addUser(std::string userName, std::string password, UserGroup userGroup);
+        static void removeUser(std::string userName);
+        static void changeUserGroup(std::string userName, UserGroup newUserGroup);
+		static UserGroup getUserGroup(std::string userName);
 	private:
 		typedef UserFileOperations super;
 };
