@@ -5,6 +5,7 @@
 #include <vector>
 #include <queue>
 #include <typeinfo>
+#include <algorithm>
 
 #include "./types/String.h"
 #include "./types/EntityRef.h"
