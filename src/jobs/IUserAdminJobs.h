@@ -14,7 +14,7 @@ class IUserAdminJobs : public Job {
         virtual QueryResult adminJobBody();
 
 private:
-        ISession _session;
+        UserGroup _currentUserGroup;
 
 
 };

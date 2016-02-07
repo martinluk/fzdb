@@ -8,8 +8,13 @@ PromoteEditorJob::PromoteEditorJob(ISession* session, std::string username):IUse
 }
 
 QueryResult PromoteEditorJob::adminJobBody() {
-	UserOperation::changeUserGroup(_username, UserGroup::ADMIN);
-	QueryResult result; 
-	//TODO respond with some kind of success
-	return result;
+    QueryResult result;
+    try {
+        UserOperation::changeUserGroup(_username, UserGroup::ADMIN);
+    } catch (UserNotExistException exception) {
+        result.generateError("User does not exist"  );
+        return result;
+    }
+    result.setValue("status","0");
+    return result;
 }

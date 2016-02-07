@@ -6,7 +6,7 @@
 
 UserLogoutJob::UserLogoutJob(ISession* session) : Job(session) {
 	_session=session;
-};
+}
 
 QueryResult UserLogoutJob::execute() {
 	QueryResult result;

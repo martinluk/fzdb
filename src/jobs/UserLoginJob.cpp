@@ -13,10 +13,12 @@ UserLoginJob::UserLoginJob(ISession* session, std::string username, std::string 
 QueryResult UserLoginJob::execute() {
 	QueryResult result;
 	try {
-		UserGroup currentGroup = UserOperation::login(_username,_password);
-		_session->setCurrentUserName(_username);
+        UserOperation::login(_username,_password);
 	} catch (LoginUnsuccessfulException ex) { 
 		result = QueryResult::generateError(ex.what());
+        return result;
 	}
+    _session->setCurrentUserName(_username);
+    result.setValue("status",0);
 	return result;
 }

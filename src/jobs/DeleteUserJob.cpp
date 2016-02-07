@@ -11,9 +11,9 @@ DeleteUserJob::DeleteUserJob(ISession* session, std::string username):IUserAdmin
 QueryResult DeleteUserJob::adminJobBody() {
     QueryResult result;
     try {
-        UserOperation::removeUser(UserGroup::ADMIN, _username);
+        UserOperation::removeUser(_username);
     } catch (UserNotExistException exception) {
-        result.generateError("User does not exist");
+        result.generateError("User does not exist"  );
         return result;
     }
     result.setValue("status","0");

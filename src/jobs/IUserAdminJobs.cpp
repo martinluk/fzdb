@@ -1,15 +1,14 @@
 #include "IUserAdminJobs.h"
 
 IUserAdminJobs::IUserAdminJobs(ISession* session):Job(session) {
-    _session=session;
+    _currentUserGroup = session->getCurrentUserUserGroup();
 }
 
 QueryResult IUserAdminJobs::execute() {
         QueryResult qryResult;
         //Get Current User Group
-        UserGroup usergroup = _session.getCurrentUserUserGroup();
         //Make sure the login is correct
-        if (usergroup!=UserGroup::ADMIN) {
+        if (_currentUserGroup!=UserGroup::ADMIN) {
             return qryResult.generateError("Running an admin job without admin permission.");
         }
         adminJobBody();
