@@ -7,6 +7,8 @@
 #include <map>
 #include <typeinfo>
 #include <stdexcept>
+#include <iterator>
+#include <algorithm>
 
 #include "model/types/Base.h"
 
@@ -65,8 +67,26 @@ public:
 		}
 	}
 
+	std::vector<unsigned int> find(const std::string varName, const std::string value) {
+		auto col = _metaData[varName].second;
+		std::vector<unsigned int> output;
+		for (unsigned int i = 0; i < _values.size(); i++) {
+			if (_values[i][col]->Equals(value)) output.push_back(i);
+		}
+		return output;
+	}
+
 	std::vector<std::vector<std::shared_ptr<model::types::Base>>>* getData() {
 		return &_values;
+	}
+
+	std::vector<std::shared_ptr<model::types::Base>> getData(const std::string varName) {
+		auto col = _metaData[varName].second;
+		std::vector<std::shared_ptr<model::types::Base>> output;
+		std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::vector<std::shared_ptr<model::types::Base>> row) {
+			return row[col];
+		});
+		return output;
 	}
 
 	std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData() {

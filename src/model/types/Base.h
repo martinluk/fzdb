@@ -6,6 +6,7 @@
 #include <cstring>
 #include <memory>
 #include "../ILogString.h"
+#include "../Triple.h"
 
 namespace model {
 	namespace types {
@@ -63,6 +64,14 @@ namespace model {
 
 			virtual bool Equals(const std::string val) {
 				return false;
+			}
+
+			bool Equals(const model::Object object) {
+				if (object.type == model::Object::Type::VARIABLE) return false;
+				if (object.type == model::Object::Type::INT && subtype() != Subtype::TypeInt32) return false;
+				if (object.type == model::Object::Type::STRING && subtype() != Subtype::TypeString) return false;
+				if (object.type == model::Object::Type::ENTITYREF && subtype() != Subtype::TypeEntityRef) return false;
+				return Equals(object.value);
 			}
 
 			virtual std::string toString() {

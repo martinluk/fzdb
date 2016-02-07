@@ -714,12 +714,7 @@ std::vector<unsigned int> EntityManager::Scan6(VariableSet&& variableSet, const 
 		for (auto propertyPair : entity->properties()) {
 			auto vals = propertyPair.second->baseValues();
 			for (auto value : vals) {
-
-				//check type is equal
-				if (object.type == model::Object::Type::INT && value->subtype() != model::types::Base::Subtype::TypeInt32)continue;
-				if (object.type == model::Object::Type::STRING && value->subtype() != model::types::Base::Subtype::TypeString)continue;
-
-				if (value->Equals(object.value)) {
+				if (value->Equals(object)) {
 					rowsAdded.push_back(variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), model::types::Base::Subtype::PropertyReference));
 				}
 			}
@@ -735,12 +730,36 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 
 	if (EntityExists(entityRef)) {
 		auto entity = _entities[entityRef];
+
+		//if variableName is already set
+		std::map<unsigned int, IEntityProperty*> iterableProperties;
+		if (variableSet.used(variableName)) {
+			auto data = variableSet.getData(variableName);
+			std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](BasePointer b) {
+				std::shared_ptr<model::types::Int> prop = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(b);
+				return std::pair<unsigned int, IEntityProperty*>(prop->value(), entity->getProperty(prop->value()));
+			});
+		}
+		else {
+			iterableProperties = entity->properties();
+		}
+
 		//iterate through properties
-		for (auto propertyPair : entity->properties()) {
+		for (auto propertyPair : iterableProperties) {
 			auto vals = propertyPair.second->baseValues();
 			for (auto value : vals) {
-				auto rowId = variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), model::types::Base::Subtype::PropertyReference);
-				variableSet.add(std::move(variableName2), value->Clone(), std::move(_propertyTypes[propertyPair.first]), rowId);
+
+				//if variablename2 is already set
+				if (variableSet.used(variableName2)) {
+					auto rows = variableSet.find(variableName2, value->toString());
+					for (auto rowId : rows) {
+						variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), std::move(_propertyTypes[propertyPair.first]), rowId);
+					}
+				}
+				else {
+					auto rowId = variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), model::types::Base::Subtype::PropertyReference);
+					variableSet.add(std::move(variableName2), value->Clone(), std::move(_propertyTypes[propertyPair.first]), rowId);
+				}				
 			}
 		}
 	}

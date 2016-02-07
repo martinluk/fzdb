@@ -5,6 +5,8 @@
 #include <functional>
 #include <algorithm> 
 
+#include <boost/bimap.hpp>
+
 #include "./Entity.h"
 
 #include "../QueryResult.h"
@@ -29,7 +31,7 @@ public:
 	std::shared_ptr<Entity> createEntity(const std::string &type);
 
 	void AddProperty(std::string name, unsigned int val) {
-		_propertyNames[name] = val;
+		_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(name, val));
 	}	
 
 	VariableSet BGP(TriplesBlock triplesBlock);
@@ -74,17 +76,17 @@ private:
 	// This maps string type names to entity type IDs.
 	std::map<std::string, unsigned int> _entityTypeNames;
 
-	std::map<std::string, unsigned int> _propertyNames;
+	boost::bimap<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
 	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {
-		auto iter = _propertyNames.find(str);
-		if (iter == _propertyNames.cend()) {
+		auto iter = _propertyNames.left.find(str);
+		if (iter == _propertyNames.left.end()) {
 			if (addIfMissing) {
-				_propertyNames[str] = ++_lastProperty;
+				_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
 				_propertyTypes[_lastProperty] = type;
 				return _lastProperty;
 			}
@@ -101,8 +103,8 @@ private:
 	}
 
 	unsigned int getPropertyName(std::string str) {
-		auto iter = _propertyNames.find(str);
-		if (iter == _propertyNames.cend()) {
+		auto iter = _propertyNames.left.find(str);
+		if (iter == _propertyNames.left.end()) {
 			return 0;
 		}
 		return iter->second;
