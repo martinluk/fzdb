@@ -13,6 +13,7 @@ Link::Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity:
 QueryResult Link::execute()
 {
 	QueryResult result;
+	result.setValue("result", "success");
 	Singletons::entityManager()->linkEntities(_entity1, _entity2);
 	return result;
 }

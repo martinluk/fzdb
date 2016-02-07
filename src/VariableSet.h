@@ -60,14 +60,6 @@ public:
 			throw new std::runtime_error("Unexpected variable");
 		}
 		else {
-			if (type != _metaData[var].first) {
-				if (_metaData[var].first == VariableType::TypeUndefined) {
-					_metaData[var].first = type;
-				}
-				else {
-					throw new std::runtime_error("Attempted to mix variable types!");
-				}
-			}
 			_variablesUsed[_metaData[var].second] = true;
 			_values[row][_metaData[var].second] = value;
 		}

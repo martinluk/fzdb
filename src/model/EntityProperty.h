@@ -20,6 +20,7 @@ public:
 	virtual int count() const = 0;
 	virtual unsigned int key() const = 0;
 	virtual BasePointer baseValue(int index) const = 0;
+	virtual std::vector<BasePointer> baseValues() const = 0;
 	virtual model::types::Base::Subtype subtype() const = 0;
 };
 
@@ -72,6 +73,7 @@ public:
 
 	virtual int count() const;
 	virtual BasePointer baseValue(int index) const;
+	virtual std::vector<BasePointer> baseValues() const;
 	virtual unsigned int key() const;
 	virtual model::types::Base::Subtype subtype() const { return _subtype; }
 

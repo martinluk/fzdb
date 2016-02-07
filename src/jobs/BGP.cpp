@@ -38,6 +38,8 @@ QueryResult BGP::execute()
 			for (auto iter2 = _query.selectLine.cbegin(); iter2 != _query.selectLine.cend(); iter2++) {
 				auto i = variables.indexOf(*iter2);		
 				
+				if (!(bool((*iter)[i]))) continue;
+
 				rapidjson::Value val3;
 				val3.SetString((*iter)[i]->toString().c_str(), result.allocator());
 

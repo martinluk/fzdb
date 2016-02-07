@@ -1,6 +1,7 @@
 #include "./EntityProperty.h"
 #include <cstring>
 #include <vector>
+#include <iterator>
 #include "TypeSerialiser.h"
 
 using BasePointer = std::shared_ptr<model::types::Base>;
@@ -118,8 +119,19 @@ void EntityProperty<T>::deleteAllValues()
 template <typename T>
 BasePointer EntityProperty<T>::baseValue(int index) const
 {
-	return std::dynamic_pointer_cast<model::types::Base, T>(value(index));
+	return std::dynamic_pointer_cast<model::types::Base, T>(_values[index]);
 }
+
+template <typename T>
+std::vector<BasePointer> EntityProperty<T>::baseValues() const
+{
+	std::vector<BasePointer> output;
+	std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::shared_ptr<T> input) {
+		return std::static_pointer_cast<model::types::Base, T>(input);
+	});
+	return output;
+}
+
 
 template<typename T>
 std::string EntityProperty<T>::logString() const

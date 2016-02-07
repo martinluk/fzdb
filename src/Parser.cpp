@@ -528,6 +528,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 					iter++;
 					if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
 					entities.push_back(std::stoll(iter->second));
+					iter++;
 					if (iter != tokens.end()) {
 						throw ParseException("Link only takes 2 arguments");
 					}

@@ -132,9 +132,9 @@ int main(int argc, char* argv[]) {
   Singletons::initialise();
 
   //Testing
-  Singletons::entityManager()->linkEntities(0, 1);
+ /* Singletons::entityManager()->linkEntities(0, 1);
   Singletons::entityManager()->linkEntities(1, 2);
-  auto bleh = Singletons::entityManager()->getLinkGraph(0, std::set<Entity::EHandle_t>());
+  auto bleh = Singletons::entityManager()->getLinkGraph(0, std::set<Entity::EHandle_t>());*/
 
   /*
   *   INITIALISE LOGGING

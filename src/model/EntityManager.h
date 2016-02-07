@@ -129,9 +129,15 @@ private:
 
 	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2);
 
-	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const std::string variableName3);
+	void Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const model::Object&& object);
 
-	void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName);
+	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3);
+
+	std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName);
+
+	std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object);
+
+	void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const std::string variableName2);
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H
