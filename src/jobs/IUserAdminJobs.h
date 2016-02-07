@@ -5,10 +5,16 @@
 
 class IUserAdminJobs : public Job {
 	public:
-		IUserAdminJobs(ISession* session):Job(session) {
-			//Asserting user admin permission.
-			UserGroup usergroup = session->getCurrentUserUserGroup();
-			Permission::assertUserOpPermission(usergroup);
-		};
+       IUserAdminJobs(ISession* session);
+		
+       QueryResult execute() override ;
+
+    protected:
+
+        virtual QueryResult adminJobBody();
+
+private:
+        ISession _session;
+
 
 };
