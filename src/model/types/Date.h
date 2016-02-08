@@ -1,7 +1,7 @@
 #ifndef FUZZY_MODEL_TYPES_DATE
 #define FUZZY_MODEL_TYPES_DATE
 
-#include "Base.h"
+#include "./Base.h"
 
 namespace model
 {

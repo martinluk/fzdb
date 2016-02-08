@@ -9,6 +9,7 @@
 #include "./types/String.h"
 #include "./types/EntityRef.h"
 #include "./types/Int.h"
+#include "./types/Date.h"
 #include "ILogString.h"
 
 class IEntityProperty : public ILogString

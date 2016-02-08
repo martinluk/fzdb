@@ -6,6 +6,7 @@
 #include <cassert>
 #include "MemberSerialiser.h"
 #include "spdlog/spdlog.h"
+#include "types/Date.h"
 
 // This should be incremented whenever a change is made to the format!
 #define SERIAL_HEADER_CURRENT_VERSION 1
@@ -189,6 +190,11 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
 
 		case Base::Subtype::TypeEntityRef:
             populate<EntityRef>(ent, p, data);
+						break;
+
+		case Base::Subtype::TypeDate:
+						populate<Date>(ent, p, data);
+						break;
 
         default:
             assert(false);

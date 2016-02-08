@@ -137,3 +137,4 @@ std::string EntityProperty<T>::logString() const
 template class EntityProperty < model::types::String >;
 template class EntityProperty < model::types::EntityRef >;
 template class EntityProperty < model::types::Int >;
+template class EntityProperty < model::types::Date >;
