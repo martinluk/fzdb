@@ -7,81 +7,84 @@
 #include "spdlog/spdlog.h"
 #include <cassert>
 
-namespace model
+using namespace model::types;
+struct SerialHeader
 {
-    namespace types
+    std::size_t size;
+    Base::Subtype subtype;
+};
+
+TypeSerialiser::TypeSerialiser(const std::shared_ptr<Base> type) : baseType_(type)
+{
+}
+
+std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
+{
+	std::size_t initialSize = serialiser.size();
+	SerialHeader header;
+	Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
+	header.size = 0;
+	header.subtype = baseType_->subtype();
+
+    std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+    bytesSerialised += baseType_->serialiseSubclass(serialiser);
+
+    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
+    pHeader->size = bytesSerialised;
+
+    return bytesSerialised;
+}
+
+std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, std::size_t* advance)
+{
+	const char* d = serialisedData;
+
+	const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(d);
+	d += sizeof(SerialHeader);
+	std::shared_ptr<Base> b;
+
+	// Since TypeSerialiser is the friend class of the subtypes,
+	// we need to use the shared_ptr constructor directly instead
+	// of make_shared(). The latter won't work because that would
+	// require the function to be a friend of the classes, which
+	// it's not.
+    switch (pHeader->subtype)
     {
-        struct SerialHeader
-        {
-            std::size_t size;
-            Base::Subtype subtype;
-        };
+    case Base::Subtype::TypeUndefined:
+        //b = std::make_shared<Base>(d);
+        b = std::shared_ptr<Base>(new Base(d));
+				break;
 
-        TypeSerialiser::TypeSerialiser(const Base *type) : baseType_(type)
-        {
-        }
+    case Base::Subtype::TypeInt32:
+        //b = std::make_shared<Int>(d);
+        b = std::shared_ptr<Int>(new Int(d));
+				break;
 
-        std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
-        {
-            std::size_t initialSize = serialiser.size();
-			SerialHeader header;
-			Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
-            header.size = 0;
-            header.subtype = baseType_->subtype();
+    case Base::Subtype::TypeString:
+        //b = std::make_shared<String>(d);
+        b = std::shared_ptr<String>(new String(d));
+				break;
 
-            std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
-            bytesSerialised += baseType_->serialiseSubclass(serialiser);
+    case Base::Subtype::TypeEntityRef:
+        //b = std::make_shared<EntityRef>(d);
+        b = std::shared_ptr<EntityRef>(new EntityRef(d));
+				break;
+		
+	case Base::Subtype::TypeDate:
+		//b = std::make_shared<Date>(d);
+		b = std::shared_ptr<Date>(new Date(d));
+		break;
 
-            SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
-            pHeader->size = bytesSerialised;
-
-            return bytesSerialised;
-        }
-
-        Base* TypeSerialiser::unserialise(const char* serialisedData, std::size_t* advance)
-        {
-			const char* d = serialisedData;
-
-			const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(d);
-			//spdlog::get("main")->info("Size: {} Subtype: {}", pHeader->size, (int)pHeader->subtype);
-			d += sizeof(SerialHeader);
-            Base* b = NULL;
-
-			switch (pHeader->subtype)
-            {
-            case Base::Subtype::TypeUndefined:
-				b = new Base(d);
-                break;
-
-            case Base::Subtype::TypeInt32:
-				b = new Int(d);
-                break;
-
-            case Base::Subtype::TypeString:
-				b = new String(d);
-                break;
-
-            case Base::Subtype::TypeEntityRef:
-				b = new EntityRef(d);
-                break;
-
-						case Base::Subtype::TypeDate:
-						b = new Date(d);
-
-            default:
-						    assert(false);
-                b = NULL;
-                break;
-            }
-
-            if ( advance )
-            {
-				*advance = d - serialisedData;
-				//spdlog::get("main")->info("Base: {} Result: {} Advance: {}", (unsigned long)serialisedData, (unsigned long)d, *advance);
-				assert(*advance == pHeader->size);
-            }
-
-            return b;
-        }
+    default:
+		assert(false);
+        break;
     }
+
+    if ( advance )
+    {
+		*advance = d - serialisedData;
+		assert(*advance == pHeader->size);
+    }
+
+    return b;
 }

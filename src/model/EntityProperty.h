@@ -12,14 +12,15 @@
 #include "./types/Date.h"
 #include "ILogString.h"
 
+using BasePointer = std::shared_ptr<model::types::Base>;
+
 class IEntityProperty : public ILogString
 {
 public:
 	virtual ~IEntityProperty() {}
 	virtual int count() const = 0;
-	virtual std::vector<model::types::Base*> baseValues() const = 0;
 	virtual unsigned int key() const = 0;
-	virtual model::types::Base* baseValue(int index) const = 0;
+	virtual BasePointer baseValue(int index) const = 0;
 	virtual model::types::Base::Subtype subtype() const = 0;
 };
 
@@ -41,66 +42,64 @@ public:
 template <typename T>
 class EntityProperty : public IEntityProperty
 {
-    friend class EntitySerialiser;
-	public:
-		// Constructs a null property. This can be used for returning 'null',
-		// for example if no property matches a given search.
-		// isNull() will return true.
-		EntityProperty();
-		EntityProperty(const unsigned int &key, const std::vector<T*> &values = std::vector<T*>());
-		~EntityProperty();
+	friend class EntitySerialiser;
+public:
+	// Constructs a null property. This can be used for returning 'null',
+	// for example if no property matches a given search.
+	// isNull() will return true.
+	EntityProperty();
+	EntityProperty(const unsigned int &key);
+	~EntityProperty();
+	EntityProperty(const unsigned int &key,
+		const std::vector<std::shared_ptr<T>> &values);
 
-		// Returns true if this is a null property (ie. default-constructed).
-		// Internally, a property is null if its key is an empty string.
-		bool isNull() const;
-		
-		// Returns true if this property is concrete.
-		// A property is concrete if it has one value of confidence 1.
-		bool isConcrete() const;
+	// Returns true if this is a null property (ie. default-constructed).
+	// Internally, a property is null if its key is an empty string.
+	bool isNull() const;
 
-		// Returns true if the property is empty.
-		// A property is empty if it has no values.
-		bool isEmpty() const;
+	// Returns true if this property is concrete.
+	// A property is concrete if it has one value of confidence 1.
+	bool isConcrete() const;
 
-		// Getters
-		const unsigned int& keyRef() const;
-		std::vector<T*> values() const;
+	// Returns true if the property is empty.
+	// A property is empty if it has no values.
+	bool isEmpty() const;
 
-		std::vector<model::types::Base*> baseValues() const override
-		{
-			std::vector<model::types::Base*> out;
-			for (auto vals : _values) out.push_back(vals);
-			return out;
-		}
+	// Getters
+	const unsigned int& keyRef() const;
+	std::vector<std::shared_ptr<T>> values() const;
 
-		T* value(int index) const;
+	std::shared_ptr<T> const& value(int index) const;
 
-		virtual int count() const;
-		virtual model::types::Base* baseValue(int index) const;
-		virtual unsigned int key() const;
-		virtual model::types::Base::Subtype subtype() const { return _subtype; }
+	virtual int count() const;
+	virtual BasePointer baseValue(int index) const;
+	virtual unsigned int key() const;
+	virtual model::types::Base::Subtype subtype() const { return _subtype; }
 
-		// Setters:
+	// Setters:
 
-		// Appends a value to the value list.
-		void append(T* value);
+	// Appends a value to the value list.
+	void append(std::shared_ptr<T> value);
 
-		// Appends a list of values.
-		void append(const std::vector<T*> &list);
+	// Appends a list of values.
+	void append(const std::vector<std::shared_ptr<T>> &list);
 
-		// Clears this property of any values.
-		void clear();
-        
-        virtual std::string logString() const override;
+	// Makes this property concrete, with the given variant value.
+	//void setConcrete(const Variant &value);
 
-	private:
-		void deleteAllValues();
-        void initSubtype();
+	// Clears this property of any values.
+	void clear();
 
-		unsigned int _key;
-		std::vector<T*> _values;
-		model::types::Base::Subtype _subtype;
-		//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
+	virtual std::string logString() const override;
+
+private:
+	void deleteAllValues();
+	void initSubtype();
+
+	unsigned int _key;
+	std::vector<std::shared_ptr<T>> _values;
+	model::types::Base::Subtype _subtype;
+	//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

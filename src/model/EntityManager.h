@@ -12,6 +12,7 @@
 #include "./Parser.h"
 #include "../VariableSet.h"
 #include "../Exceptions.h"
+#include "../Util.h"
 
 // TODO: We need smart pointers! We need to have the manager own the entity
 // and entities should not have delete called on them externally.
@@ -49,12 +50,13 @@ public:
     bool saveToFile(const std::string &filename);
     bool loadFromFile(const std::string &filename);
 
-private:
-	void changeEntityType(Entity::EHandle_t id, const std::string &type);
-	unsigned int getTypeID(const std::string &str);
 	void linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+
+private:
+	void changeEntityType(Entity::EHandle_t id, const std::string &type);
+	unsigned int getTypeID(const std::string &str);
 
 	// TODO: This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
@@ -111,11 +113,11 @@ private:
 		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
 
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(new T(object.value, confidence));
+			currentEntity->getProperty<T>(propertyId)->append(std::make_shared<T>(object.value, confidence));
 		}
 		else {
-			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <T*> {
-				new T(object.value, confidence)
+			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <std::shared_ptr<T>> {
+				std::make_shared<T>(object.value, confidence)
 			}));
 		}
 	}

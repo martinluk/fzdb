@@ -38,12 +38,18 @@ namespace model {
 			{
 				// Already initialised
 			}
+			
+			virtual ~Int() {}
 
 			int32_t value() const { return _value; }
 
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeInt32;
+			}
+
+			virtual std::shared_ptr<Base> Clone() override {
+				return std::make_shared<Int>(_value, _confidence);
 			}
 
 			virtual std::string logString() const override
@@ -64,19 +70,11 @@ namespace model {
 		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
-				//return Base::serialiseSubclass(serialiser)
-				//	+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
-				
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
 			Int(const char* &serialisedData) : Base(serialisedData)
 			{
-				// Base will have incremented the pointer appropriately.
-				// We can now copy in our value.
-				//_value = *(reinterpret_cast<const int32_t*>(serialisedData));
-				//serialisedData += sizeof(int32_t);
-				
 				initMemberSerialiser();
 				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
 			}

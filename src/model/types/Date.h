@@ -35,6 +35,8 @@ namespace model
 			{
 				return _value;
 			}
+			
+			virtual ~Date() {}
 
 			virtual std::string toString() const override
 			{

@@ -35,12 +35,18 @@ namespace model {
 			{
 				initMemberSerialiser();
 			}
+			
+			virtual ~String() {}
 
 			std::string value() const { return _value; }
 
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeString;
+			}
+
+			virtual std::shared_ptr<Base> Clone() override {
+				return std::make_shared<String>(_value, _confidence);
 			}
 
 			virtual std::string logString() const override
@@ -61,22 +67,11 @@ namespace model {
 		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
-//				std::size_t stringLength = _value.size();
-//				std::unique_ptr<char> buffer(new char[stringLength + 1]);
-//				memcpy(buffer.get(), _value.c_str(), stringLength);
-//				buffer.get()[stringLength] = '\0';
-
-//				return Base::serialiseSubclass(serialiser)
-//					+ serialiser.serialise(Serialiser::SerialProperty(buffer.get(), stringLength + 1));
-
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseDynamicMembers(serialiser);
 			}
 
 			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
 			{
-				//_value = std::string(serialisedData);
-				//serialisedData += _value.size() + 1;
-				
 				initMemberSerialiser();
 				serialisedData += _memberSerialiser.unserialiseDynamicMembers(serialisedData);
 			}

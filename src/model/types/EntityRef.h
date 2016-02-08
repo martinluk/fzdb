@@ -40,9 +40,15 @@ namespace model {
 			{
 				// Already initialised
 			}
+			
+			virtual ~EntityRef() {}
 
 			EHandle_t value() const { return _value; }
-			
+
+			virtual std::shared_ptr<Base> Clone() override {
+				return std::make_shared<EntityRef>(_value, _confidence);
+			}
+
 			virtual Subtype subtype() const
 			{
 				return Subtype::TypeEntityRef;
@@ -62,6 +68,7 @@ namespace model {
 			virtual std::string toString() const override {
 				return std::to_string(_value);
 			}
+
 		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{

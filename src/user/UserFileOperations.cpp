@@ -14,6 +14,10 @@
 #include <map>
 #include <cassert>
 
+#define ADD_ADMIN_ON_INIT true
+#define ADMIN_USERNAME "admin"
+#define ADMIN_PASSWORD "password"
+
 #define JSONFILENAME "userFile.json"
 
 #define USERNAME "username"
@@ -22,8 +26,26 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
+
 //Initialise cache map
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
+
+void UserFileOperations::initialize() { //TODO
+	//Empty file cache
+	userFileCache.clear();
+	if (ADD_ADMIN_ON_INIT) {
+		//Add admin into cache
+		UserAttributes admin;
+		admin.userName = ADMIN_USERNAME;
+		admin.salt = Hashing::genSalt();
+		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
+		admin.userGroup = UserGroup::ADMIN;
+		addUser(admin);
+	} else { 
+		//Load from json
+		loadCacheFromFile();
+	}
+}
 
 std::string UserFileOperations::pathToLoginFile() {
 	//XXX Using current path of solution to put login file
@@ -32,11 +54,9 @@ std::string UserFileOperations::pathToLoginFile() {
 	return dir.string();
 }
 void UserFileOperations::addUser(UserAttributes userAttributes) {
-	//load cache from file
-	loadCacheFromFile();
 	//Assert that no such user already exist, otherwise throw exception
 	std::string newUserName=userAttributes.userName;
-	if (userFileCache.count(newUserName)==0) {
+	if (userFileCache.count(newUserName)>0) {
 		throw new UserAlreadyExistException;
 	}
 	//Add into cache

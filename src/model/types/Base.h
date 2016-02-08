@@ -4,6 +4,7 @@
 #include "../Serialiser.h"
 #include <cassert>
 #include <cstring>
+#include <memory>
 #include "../ILogString.h"
 #include "../MemberSerialiser.h"
 
@@ -11,7 +12,7 @@ namespace model {
 	namespace types {
 		class Base : public ILogString
 		{
-		private:
+		protected:
 			friend class TypeSerialiser;
 			unsigned char _confidence;
 			MemberSerialiser _memberSerialiser;
@@ -34,7 +35,7 @@ namespace model {
 				//Doesn't have an associated type
 				PropertyReference
 			};
-            
+			
             // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
             // Until then, we use an ugly workaround.
             //static const char* SubtypeString[];
@@ -54,8 +55,8 @@ namespace model {
                 case Subtype::PropertyReference:
                     return "PropertyReference";
 
-								case Subtype::TypeDate:
-										return "Date";
+				case Subtype::TypeDate:
+					return "Date";
                     
                 default:
                     return "Undefined";
@@ -65,13 +66,17 @@ namespace model {
 			Base(unsigned char confidence = 100)
 			{
 				initMemberSerialiser();
-				
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
 			}
+			
+			virtual ~Base() {}
 
-			virtual bool Equals(const std::string val) const
-			{
+			virtual std::shared_ptr<Base> Clone() {
+				return std::make_shared<Base>(_confidence);
+			}
+
+			virtual bool Equals(const std::string val) const {
 				return false;
 			}
 
@@ -93,32 +98,22 @@ namespace model {
 			{
 				return Subtype::TypeUndefined;
 			}
-			
+
 			virtual std::string logString() const
 			{
 				return std::string("Base(") + std::to_string(_confidence) + std::string(")");
 			}
-			
-			protected:
+
+		protected:
 			// Called when serialising.
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-			{
-				// Serialise the confidence.
-				//return serialiser.serialise(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
-							
+			{		
 				return _memberSerialiser.serialisePrimitives(serialiser);
 			}
-			
+
 			// Called to construct from serialised data.
 			Base(const char* &serialisedData)
 			{
-				// The data should point to our confidence value.
-				//_confidence = *(reinterpret_cast<const unsigned char*>(serialisedData));
-			
-				// We have to increment the pointer (which is actually a reference to a pointer)
-				// so that the next class can get its data.
-				//serialisedData += sizeof(unsigned char);
-				
 				initMemberSerialiser();
 				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
 			}

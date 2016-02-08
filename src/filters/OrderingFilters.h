@@ -2,6 +2,7 @@
 #define FUZZY_FILTER_ORDERINGFILTERS
 
 #include "./IFilter.h"
+#include "../model/types/Int.h"
 
 #include <string>
 #include <boost/regex.hpp>
@@ -27,9 +28,10 @@ public:
 
    GreaterThanFilter(const std::string variable, const int value) : _variable(variable), _value(value) {}
 
-   bool Test(const std::vector<std::string>&& values, std::map<std::string, std::pair<model::types::Base::Subtype, unsigned char>>&& variables) override {
+   bool Test(const std::vector<std::shared_ptr<model::types::Base>>&& values, std::map<std::string, std::pair<model::types::Base::Subtype, unsigned char>>&& variables) override {
 	   unsigned char aa = variables[_variable].second;
-      return std::stoi(values[aa]) > _value;
+	   int val = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(values[aa])->value();
+		return val > _value;
    }
 
 };
