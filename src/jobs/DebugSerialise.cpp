@@ -159,8 +159,8 @@ QueryResult DebugSerialise::execute()
 	std::shared_ptr<String> tString = std::make_shared<String>(std::string("Body of Baywatch, face of Crimewatch"), 26);
 	std::shared_ptr<EntityRef> tEntRef = std::make_shared<EntityRef>((EHandle_t)1234, 99);
 
-	//log << "Testing serialisation of Base type.\n";
-	//log << testSerialise(&tBase) << "\n";
+	log << "Testing serialisation of Base type.\n";
+	log << testSerialise(tBase) << "\n";
 
 	{
         serialiser.clear();
@@ -172,8 +172,8 @@ QueryResult DebugSerialise::execute()
 
 	log << "\n";
 
-	//log << "Testing serialisation of Int type.\n";
-	//log << testSerialise(&tInt) << "\n";
+	log << "Testing serialisation of Int type.\n";
+	log << testSerialise(tInt) << "\n";
 
     {
         serialiser.clear();
@@ -185,8 +185,8 @@ QueryResult DebugSerialise::execute()
 
     log << "\n";
 
-	//log << "Testing serialisation of String type.\n";
-	//log << testSerialise(&tString) << "\n";
+	log << "Testing serialisation of String type.\n";
+	log << testSerialise(tString) << "\n";
 
 	{
         serialiser.clear();
@@ -198,8 +198,8 @@ QueryResult DebugSerialise::execute()
 
     log << "\n";
 
-	//log << "Testing serialisation of EntityRef type.\n";
-	//log << testSerialise(&tEntRef) << "\n";
+	log << "Testing serialisation of EntityRef type.\n";
+	log << testSerialise(tEntRef) << "\n";
 
     {
         serialiser.clear();
@@ -231,8 +231,8 @@ QueryResult DebugSerialise::execute()
         ent->insertProperty<Int>(new EntityProperty<Int>(2, values));
     }
 
-	//log << "Testing serialisation of Entity.\n";
-	//log << testSerialise(ent) << "\n";
+	log << "Testing serialisation of Entity.\n";
+	log << testSerialise(ent) << "\n";
 
 	{
         serialiser.clear();

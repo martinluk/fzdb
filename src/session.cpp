@@ -8,6 +8,9 @@
 
 #include "./CommandInterpreter.h"
 #include "./server.h"
+#include <algorithm>
+
+#define MAX_WRITE_MESSAGE_LENGTH 1024
 
 using boost::asio::ip::tcp;
 
@@ -109,10 +112,36 @@ void TCPSession::handle_write(const boost::system::error_code& error) {
 * @param response A string to send to the client
 */
 void TCPSession::respond(const std::string response) {
-	boost::asio::async_write(_socket,
-		boost::asio::buffer(response.c_str(), response.length()),
-		boost::bind(&TCPSession::handle_write, this,
-			boost::asio::placeholders::error));
+//	boost::asio::async_write(_socket,
+//		boost::asio::buffer(response.c_str(), response.length()),
+//		boost::bind(&TCPSession::handle_write, this,
+//			boost::asio::placeholders::error));
+	
+	// Writing responses:
+	// We write a maximum of 1024 bytes each time.
+	// When the client reads the message, if 1024 bytes
+	// are received then this indicates that the response
+	// is not yet complete and more data should be read.
+	// If less than 1024 bytes are received, the response
+	// is complete. If 1024 bytes are sent, the last byte
+	// is always 0.
+	
+	char buffer[MAX_WRITE_MESSAGE_LENGTH];
+	memset(buffer, 0, MAX_WRITE_MESSAGE_LENGTH);
+	
+	// i advances by 1023 each time, because the 1024th byte is 0.
+	for ( int i = 0; i < response.length(); i += MAX_WRITE_MESSAGE_LENGTH - 1 )
+	{
+		// Find out how many chars to copy.
+		int charsToCopy = std::min<int>(MAX_WRITE_MESSAGE_LENGTH - 1, response.length() - i);
+		
+		// Copy the chars.
+		// The last element of the buffer will remain 0.
+		memcpy(buffer, response.c_str() + i, charsToCopy);
+		
+		// Send over TCP.
+		boost::asio::async_write(_socket, boost::asio::buffer(buffer, charsToCopy), boost::bind(&TCPSession::handle_write, this, boost::asio::placeholders::error));
+	}
 }
 
 //void TCPSession::terminate()
