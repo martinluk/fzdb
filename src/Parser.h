@@ -9,6 +9,7 @@
 
 #include "model/Triple.h"
 #include "filters/IFilter.h"
+#include "model/QuerySettings.h"
 
 // Values that don't collide with masks range from 0x0 to 0xf.
 #define TOKEN_SPLITTER_MASK 0b010000
@@ -45,7 +46,8 @@ enum class ParsedTokenType {
 		KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
 		KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
 		KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
-		KEYWORD_FLUSH = TOKEN_KEYWORD_MASK | 0xE,
+		KEYWORD_FLUSH  = TOKEN_KEYWORD_MASK | 0xE,
+		KEYWORD_CANON  = TOKEN_KEYWORD_MASK | 0xF,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -154,15 +156,17 @@ public:
 	std::string data0;
 	std::vector<std::string> selectLine;
 	std::vector<long long int> entities;
+	QuerySettings settings;
 
-	Query(QueryType t, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline, std::vector<long long int> ents) {
-		type = t;
+	Query(QueryType type_, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline, std::vector<long long int> ents, QuerySettings settings_) {
+		type = type_;
 		sources = s;
 		conditions = cond;
 		whereClause = wh;
 		data0 = dat0;
 		selectLine = selectline;
 		entities = ents;
+		settings = settings_;
 	}
 };
 

@@ -113,7 +113,7 @@ QueryResult EntityManager::SeparateTriples(std::vector<model::Triple> conditions
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
+VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings settings)
 {
 	VariableSet result(triplesBlock.variables);
 	auto conditions = triplesBlock.triples;

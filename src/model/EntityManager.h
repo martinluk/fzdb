@@ -15,6 +15,7 @@
 #include "../VariableSet.h"
 #include "../Exceptions.h"
 #include "../Util.h"
+#include "./QuerySettings.h"
 
 // TODO: We need smart pointers! We need to have the manager own the entity
 // and entities should not have delete called on them externally.
@@ -34,7 +35,7 @@ public:
 		_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(name, val));
 	}	
 
-	VariableSet BGP(TriplesBlock triplesBlock);
+	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings);
 
 	void Insert(std::vector<model::Triple> triples);
 

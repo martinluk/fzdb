@@ -85,6 +85,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "UNLINK") tokenType = ParsedTokenType::KEYWORD_UNLINK;
 	else if (str == "FINAL") tokenType = ParsedTokenType::KEYWORD_FINAL;
 	else if (str == "FLUSH") tokenType = ParsedTokenType::KEYWORD_FLUSH;
+	else if (str == "CANON") tokenType = ParsedTokenType::KEYWORD_CANON;
 
 	return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -379,6 +380,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 	std::vector<std::string> selectLine;
 	std::string data0;
 	std::vector<long long int> entities;
+	QuerySettings canon;
 
 	while (iter != tokens.end()) {
 
@@ -495,14 +497,25 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		if (iter->first.type == ParsedTokenType::KEYWORD_SELECT) {
 			iter++;
 			type = QueryType::SELECT;
-			selectLine = ParseSelectLine(std::move(iter), tokens.end());
-			if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
-				iter++;
-				whereClause = ParseInsert(std::move(iter), tokens.end());
+			if (iter != tokens.end()) {
+				if (iter->first.type == ParsedTokenType::KEYWORD_CANON) {
+					canon.canon = true;
+					iter++;
+				}
+
+				selectLine = ParseSelectLine(std::move(iter), tokens.end());
+				if (iter != tokens.end() && iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+					iter++;
+					whereClause = ParseInsert(std::move(iter), tokens.end());
+				}
+				else {
+					throw ParseException("Expected 'WHERE'");
+				}
 			}
 			else {
-				throw ParseException("Expected 'WHERE'");
+				throw ParseException("Incomplete SELECT statement");
 			}
+			
 			break;
 		}
 
@@ -561,5 +574,5 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		throw ParseException("Unknown symbol: " + iter->second);
 	}
 
-	return Query(type, sources, conditions, whereClause, data0, selectLine, entities);
+	return Query(type, sources, conditions, whereClause, data0, selectLine, entities, canon);
 }
