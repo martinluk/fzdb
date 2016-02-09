@@ -3,10 +3,27 @@
 import socket, select, string, sys, json
 
 def printHelp():
-    print("Commands:")
-    print(":?              Show this help dialogue.")
-    print(":json [on/off]  Switches raw JSON display on or off.")
-    print(":quit           Quits the session.")
+	print("Commands:")
+	print(":?              Show this help dialogue.")
+	print(":json [on/off]  Switches raw JSON display on or off.")
+	print(":quit           Quits the session.")
+	
+def readAllFromSocket(socket):
+	readData = ""
+	
+	while True:
+		# Try to read data.
+		data = socket.recv(1024)
+	
+		# If we got 1024 bytes, this is 1023 data bytes + a padding null.
+		# It indicates that we need to loop again to get the rest.
+		if len(data) == 1024:
+			readData = readData + data[:-1]	# Trim the last null byte.
+		else:
+			readData = readData + data
+			
+			# This is the last chunk of data, so quit here.
+			return readData
 
 # Hard-coded values for now.
 TCP_IP = 'localhost'
@@ -39,45 +56,45 @@ while True:
 		sys.stdout.flush()
 		promptSymbolRequired = False
 
-        sRead = []
-        sWrite = []
-        sError = []
+		sRead = []
+		sWrite = []
+		sError = []
 
 	# If we're sending a command, we listen for data from the user.
-        # No timeout is specified.
+	# No timeout is specified.
 	if sending:
-                sRead, sWrite, sError = select.select([sys.stdin], [], [])
+		sRead, sWrite, sError = select.select([sys.stdin], [], [])
 
 	# Otherwise we listen from the database for a response.
-        # The timeout is 30 seconds - change this if required.
+	# The timeout is 30 seconds - change this if required.
 	else:
-                sRead, sWrite, sError = select.select([commSocket], [], [], 30)
+		sRead, sWrite, sError = select.select([commSocket], [], [], 30)
 
-                # Check to see whether we received any data. If this happens three times in a row,
-                # assume the database is down and give up.
-                if len(sRead) < 1:
-                        numFailedReads += 1
-                        if numFailedReads < 3:
-                                print("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
-                        else:
-                                print("TIMEOUT: No response. Shutting down.")
-                                commSocket.close()
-                                sys.exit()
+		# Check to see whether we received any data. If this happens three times in a row,
+		# assume the database is down and give up.
+		if len(sRead) < 1:
+			numFailedReads += 1
+			if numFailedReads < 3:
+				print("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
+			else:
+				print("TIMEOUT: No response. Shutting down.")
+				commSocket.close()
+				sys.exit()
 
 
-        # If there was no socket to read from:
+	# If there was no socket to read from:
 	if len(sRead) < 1:
-                # This shouldn't happen here!
-                print("WARNING: No data received on socket! This is probably a bug.")
-                continue
+		# This shouldn't happen here!
+		print("WARNING: No data received on socket! This is probably a bug.")
+		continue
 	
 	# A socket has data!
-        numFailedReads = 0;
+	numFailedReads = 0;
 	sock = sRead[0]
 
 	# If the socket is stdin, parse the command.
 	if sock == sys.stdin:
-                msg = sys.stdin.readline().rstrip("\n").strip()
+		msg = sys.stdin.readline().rstrip("\n").strip()
 
 		# If the input was empty, just go round again.
 		if not msg:
@@ -89,26 +106,28 @@ while True:
 			commSocket.close()
 			sys.exit()
 
-                elif msg == ":?":
-                        printHelp()
-                        promptSymbolRequired = True
-                        continue
+		elif msg == ":?":
+			printHelp()
+			promptSymbolRequired = True
+			continue
 
-                # Dumb but quick!
-                elif msg == ":json on":
-                        rawJson = True
-                        print("Raw JSON display turned on.")
-                        promptSymbolRequired = True
-                        continue
+		# Dumb but quick!
+		elif msg == ":json on":
+				rawJson = True
+				print("Raw JSON display turned on.")
+				promptSymbolRequired = True
+				continue
 
-                elif msg == ":json off":
-                        rawJson = False
-                        print("Raw JSON display turned off.")
-                        promptSymbolRequired = True;
-                        continue
+		elif msg == ":json off":
+				rawJson = False
+				print("Raw JSON display turned off.")
+				promptSymbolRequired = True;
+				continue
 
 		# Otherwise, send the command.
 		# Later we'll want to do JSON conversion here.
+		# TODO: We also want to split into 1024-byte chunks in the same way as
+		# the database does on send.
 		else:
 			commSocket.send(msg.encode('utf-8'))
 
@@ -118,7 +137,7 @@ while True:
 	# If the socket is our communications socket, parse the database response.
 	elif sock == commSocket:
 		# Read in the data.
-		data = commSocket.recv(4096)
+		data = readAllFromSocket(sock)
 
 		# If there wasn't actually any:
 		if not data:
@@ -126,27 +145,27 @@ while True:
 			print("Connection to database closed.")
 			commSocket.close()
 			sys.exit()
+		
+		# Write the response to the console.
+		if rawJson == True:
+			sys.stdout.write(data.decode('utf-8'))
 		else:
-			# Write the response to the console.
-                        if rawJson == True:
-                            sys.stdout.write(data.decode('utf-8'))
-                        else:
-                            jsonobj = json.loads(data.decode('utf-8'))
-                            if "response" in jsonobj:
-                            	sys.stdout.write(jsonobj["response"])
-                            else:
-                            	print("FATAL ERROR: No 'response' received via JSON.");
-                            	print("Raw JSON received:\n")
-                            	sys.stdout.write(data.decode('utf-8'))
+			jsonobj = json.loads(data.decode('utf-8'))
+			if "response" in jsonobj:
+				sys.stdout.write(jsonobj["response"])
+			else:
+				print("FATAL ERROR: No 'response' received via JSON.");
+				print("Raw JSON received:\n")
+				sys.stdout.write(data.decode('utf-8'))
 				sys.stdout.write("\n\n");
 				print("Closing connection.");
-                            	commSocket.close()
-                            	sys.exit()
+				commSocket.close()
+				sys.exit()
 
-                        sys.stdout.write("\n");
+		sys.stdout.write("\n");
 
-			# Switch back into sending mode ready for the next command.
-			sending = True
+		# Switch back into sending mode ready for the next command.
+		sending = True
 
-			# Display the prompt symbol next time!
-			promptSymbolRequired = True
+		# Display the prompt symbol next time!
+		promptSymbolRequired = True
