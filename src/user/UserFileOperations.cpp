@@ -14,8 +14,6 @@
 #include <map>
 #include <cassert>
 
-#define ADD_ADMIN_ON_INIT true
-
 #define JSONFILENAME "userFile.json"
 
 #define USERNAME "username"
@@ -31,19 +29,19 @@ std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 void UserFileOperations::initialize() { 
 	//Empty file cache
 	userFileCache.clear();
-	if (ADD_ADMIN_ON_INIT) {
-		//Add admin into cache
-		UserAttributes admin;
-		admin.userName = ADMIN_USERNAME;
-		admin.salt = Hashing::genSalt();
-		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-		admin.userGroup = UserGroup::ADMIN;
-		addUser(admin);
-	} else { 
-		//Load from json
-		////TODO Verify if file exists
-		loadCacheFromFile();
-	}
+#ifdef INIT_ADD_ADMIN
+	//Add admin into cache
+	UserAttributes admin;
+	admin.userName = ADMIN_USERNAME;
+	admin.salt = Hashing::genSalt();
+	admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
+	admin.userGroup = UserGroup::ADMIN;
+	addUser(admin);
+#else
+	//Load from json
+	//TODO Verify if file exists
+	loadCacheFromFile();
+#endif
 }
 
 std::string UserFileOperations::pathToLoginFile() {

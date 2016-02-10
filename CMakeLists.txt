@@ -48,16 +48,21 @@ FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 
 #Admin account set up
-if(DEFINED ENV{FUZZY_DB_INIT_LOAD_USERFILE})
-	message("Env - INIT_LOAD_USERFILE detected")
-	message("Database user json file should be added to correct dirrectory before building project.")
-	message("")
+#TODO(Martin Luk) Refactor Admin setting into some kind of config file?
+if(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+	message("Release Build - Database user json file should be added to correct dirrectory before building project.")
 else()
-	message("Env - INIT_LOAD_USERFILE not detected")
+	message("Debug build - Assuming no user json file ")
+	add_definitions("-DINIT_ADD_ADMIN")
+
+	SET(ADMIN_USERNAME "fzydb_admin")
+	add_definitions("-DADMIN_USERNAME=\"${ADMIN_USERNAME}\"")
 	message("Admin username set")
-	add_definitions("-DADMIN_USERNAME=fzydb_admin")
+
+	SET(ADMIN_PASSWORD "password")
+	add_definitions("-DADMIN_PASSWORD=\"${ADMIN_PASSWORD}\"")
 	message("Admin password set as default")
-	add_definitions("-DADMIN_PASSWORD=password")
+
 endif()
 
 
