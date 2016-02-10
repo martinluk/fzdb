@@ -5,8 +5,9 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
-#include "./ISession.h"
+#include <vector>
 
+#include "./ISession.h"
 
 using boost::asio::ip::tcp;
 
@@ -32,12 +33,16 @@ private:
 
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 	void handle_write(const boost::system::error_code& error);
+	void readChunk();
+	void copyDataToVector(std::size_t count);
 
 	tcp::socket _socket;
-	enum { max_length = 1048576 };
+	enum { max_length = 1024 };
 	char _data[max_length];
 	TCPServer*	_parent;
 	boost::uuids::uuid _uuid;
+	
+	std::vector<char> _dataVec;
 };
 
 #endif

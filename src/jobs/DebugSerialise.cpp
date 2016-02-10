@@ -4,6 +4,7 @@
 #include <string>
 #include <iomanip>
 #include <cassert>
+#include "spdlog/spdlog.h"
 
 #include "../model/TypeSerialiser.h"
 #include "../model/types/Base.h"
@@ -21,13 +22,24 @@ std::string outputSerialiserData(const Serialiser &serialiser)
     std::size_t length = serialiser.size();
 
     log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
-    log << std::hex << std::setfill ('0') << std::setw(2);
 
     // i progresses in multiples of 8.
+	unsigned int total = 0;
+	unsigned int line = 1;
     for (int i = 0; i < length; i += 8)
     {
             if ( i > 0 )
                 log << "\n";
+
+			log.unsetf(std::ios_base::right);
+			log.setf(std::ios_base::left);
+			log << std::setfill (' ') << std::setw(6) << (std::string("[") + std::to_string(line) + std::string("]"));
+
+			log.unsetf(std::ios_base::left);
+			log.setf(std::ios_base::right);
+			log << std::setw(0) << " ";
+
+			log << std::hex << std::setfill ('0') << std::setw(2);
 
             // j selects the characters in each batch of 8.
             for(int j = 0; j < 8 && i+j < length; j++)
@@ -39,6 +51,15 @@ std::string outputSerialiserData(const Serialiser &serialiser)
                     // with a negative sign and spam 'ffffff', which we don't want.
                     int num = static_cast<unsigned char>(buffer[i+j]);
                     log << std::setfill ('0') << std::setw(2) << std::hex << num;
+					total++;
+
+					if ( i+j == length-1 )
+					{
+						for (int space = 0; space < 8 - j - 1; space++)
+						{
+							log << "   ";
+						}
+					}
             }
 
             log << "\t";
@@ -49,7 +70,30 @@ std::string outputSerialiserData(const Serialiser &serialiser)
                             log << '.';
                     else
                             log << buffer[i+j];
+
+					if ( i+j == length-1 )
+					{
+						for (int space = 0; space < 8 - j - 1; space++)
+						{
+							log << " ";
+						}
+					}
             }
+
+			log << " | ";
+
+			log.unsetf(std::ios_base::right);
+			log.setf(std::ios_base::left);
+			log.setf(std::ios_base::showbase);
+
+			log << std::setfill (' ') << std::setw(6) << std::hex << total;
+			log.unsetf(std::ios_base::showbase);
+			log << " (" << std::dec << total << ")";
+
+			log.unsetf(std::ios_base::left);
+			log.setf(std::ios_base::right);
+
+			line++;
     }
 
     return log.str();
@@ -90,7 +134,7 @@ std::string printEntity(const std::shared_ptr<Entity> ent)
             + std::string(")");
 }
 
-std::string printEntityProperty(const IEntityProperty* prop)
+std::string printEntityProperty(const std::shared_ptr<IEntityProperty> prop)
 {
     std::string str = std::string("EntityProperty(") + std::to_string(prop->key());
 
@@ -105,7 +149,7 @@ std::string printEntityProperty(const IEntityProperty* prop)
 
 QueryResult DebugSerialise::execute()
 {
-   /* using namespace model::types;
+    using namespace model::types;
 
     std::stringstream log;
     Serialiser serialiser;
@@ -115,10 +159,10 @@ QueryResult DebugSerialise::execute()
 	std::shared_ptr<String> tString = std::make_shared<String>(std::string("Body of Baywatch, face of Crimewatch"), 26);
 	std::shared_ptr<EntityRef> tEntRef = std::make_shared<EntityRef>((EHandle_t)1234, 99);
 
-    log << "Testing serialisation of Base type.\n";
-    log << testSerialise(tBase) << "\n";
+	log << "Testing serialisation of Base type.\n";
+	log << testSerialise(tBase) << "\n";
 
-    {
+	{
         serialiser.clear();
         TypeSerialiser tser(tBase);
         tser.serialise(serialiser);
@@ -126,10 +170,10 @@ QueryResult DebugSerialise::execute()
         log << "Unserialised Base: " << newBase->logString() << "\n";
     }
 
-    log << "\n";
+	log << "\n";
 
-    log << "Testing serialisation of Int type.\n";
-    log << testSerialise(tInt) << "\n";
+	log << "Testing serialisation of Int type.\n";
+	log << testSerialise(tInt) << "\n";
 
     {
         serialiser.clear();
@@ -141,10 +185,10 @@ QueryResult DebugSerialise::execute()
 
     log << "\n";
 
-    log << "Testing serialisation of String type.\n";
-    log << testSerialise(tString) << "\n";
+	log << "Testing serialisation of String type.\n";
+	log << testSerialise(tString) << "\n";
 
-    {
+	{
         serialiser.clear();
         TypeSerialiser tser(tString);
         tser.serialise(serialiser);
@@ -154,8 +198,8 @@ QueryResult DebugSerialise::execute()
 
     log << "\n";
 
-    log << "Testing serialisation of EntityRef type.\n";
-    log << testSerialise(tEntRef) << "\n";
+	log << "Testing serialisation of EntityRef type.\n";
+	log << testSerialise(tEntRef) << "\n";
 
     {
         serialiser.clear();
@@ -187,17 +231,17 @@ QueryResult DebugSerialise::execute()
         ent->insertProperty<Int>(new EntityProperty<Int>(2, values));
     }
 
-    log << "Testing serialisation of Entity.\n";
-    log << testSerialise(ent) << "\n";
+	log << "Testing serialisation of Entity.\n";
+	log << testSerialise(ent) << "\n";
 
-    {
+	{
         serialiser.clear();
         EntitySerialiser eSer(ent);
         eSer.serialise(serialiser);
 		std::shared_ptr<Entity> newEnt = eSer.unserialise(serialiser.begin());
         log << "Unserialised entity: " << printEntity(newEnt) << "\nProperties:\n";
 
-        const std::map<unsigned int, IEntityProperty*> &propTable = newEnt->properties();
+        const std::map<unsigned int, std::shared_ptr<IEntityProperty>> &propTable = newEnt->properties();
         bool begin = true;
         for ( auto it = propTable.cbegin(); it != propTable.cend(); ++it )
         {
@@ -210,10 +254,10 @@ QueryResult DebugSerialise::execute()
 
 		//With shared_ptr newEnt will be deleted automatically when it falls out of scope
         //delete newEnt;
-    }
-	*/
+	}
+	
     QueryResult result;
     result.setValue("type", "string");
-    //result.setValue(std::string("response"), log.str());
+    result.setValue(std::string("response"), log.str());
     return result;
 }

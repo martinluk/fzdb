@@ -1,5 +1,8 @@
 #include "Util.h"
 #include <sstream>
+#include <boost/algorithm/string.hpp>
+#include <algorithm>
+#include <cctype>
 
 namespace util
 {
@@ -21,4 +24,19 @@ namespace util
         _splitPrivate(s, delim, elems);
         return elems;
     }
+
+		std::string toUppercase(const std::string &str)
+		{
+			std::string uppercase(str.c_str());
+			std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
+			return uppercase;
+		}
+
+		std::string toLowercase(const std::string &str)
+		{
+			std::string lowercase(str.c_str());
+			std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), [](unsigned char c) { return std::tolower(c); });
+			return lowercase;
+		}
+
 }

@@ -7,14 +7,21 @@
 #include <memory>
 #include "../ILogString.h"
 #include "../Triple.h"
+#include "../MemberSerialiser.h"
 
 namespace model {
 	namespace types {
 		class Base : public ILogString
 		{
 		protected:
-			//friend class TypeSerialiser;
+			friend class TypeSerialiser;
 			unsigned char _confidence;
+			MemberSerialiser _memberSerialiser;
+			
+			void initMemberSerialiser()
+			{
+				_memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
+			}
 
 		public:
 
@@ -24,45 +31,53 @@ namespace model {
 				TypeInt32,
 				TypeString,
 				TypeEntityRef,
+				TypeDate,
 
 				//Doesn't have an associated type
 				PropertyReference
 			};
+			
+            // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
+            // Until then, we use an ugly workaround.
+            //static const char* SubtypeString[];
+            static const char* SubtypeString(Subtype type)
+            {
+                switch (type)
+                {
+                case Subtype::TypeInt32:
+                    return "Int32";
+                    
+                case Subtype::TypeString:
+                    return "String";
+                    
+                case Subtype::TypeEntityRef:
+                    return "EntityRef";
+                    
+                case Subtype::PropertyReference:
+                    return "PropertyReference";
 
-			// TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
-			// Until then, we use an ugly workaround.
-			//static const char* SubtypeString[];
-			static const char* SubtypeString(Subtype type)
+				case Subtype::TypeDate:
+					return "Date";
+                    
+                default:
+                    return "Undefined";
+                }
+            }
+
+			Base(unsigned char confidence = 100)
 			{
-				switch (type)
-				{
-				case Subtype::TypeInt32:
-					return "Int32";
-
-				case Subtype::TypeString:
-					return "String";
-
-				case Subtype::TypeEntityRef:
-					return "EntityRef";
-
-				case Subtype::PropertyReference:
-					return "PropertyReference";
-
-				default:
-					return "Undefined";
-				}
-			}
-
-			Base(unsigned char confidence = 100) {
+				initMemberSerialiser();
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
 			}
+			
+			virtual ~Base() {}
 
 			virtual std::shared_ptr<Base> Clone() {
 				return std::make_shared<Base>(_confidence);
 			}
 
-			virtual bool Equals(const std::string val) {
+			virtual bool Equals(const std::string val) const {
 				return false;
 			}
 
@@ -74,11 +89,13 @@ namespace model {
 				return Equals(object.value);
 			}
 
-			virtual std::string toString() {
+			virtual std::string toString() const
+			{
 				return "";
 			}
 
-			unsigned char confidence() const {
+			unsigned char confidence() const
+			{
 				return _confidence;
 			}
 
@@ -96,29 +113,25 @@ namespace model {
 				return std::string("Base(") + std::to_string(_confidence) + std::string(")");
 			}
 
+		protected:
+			// Called when serialising.
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+			{		
+				return _memberSerialiser.serialisePrimitives(serialiser);
+			}
+
 			// Called to construct from serialised data.
 			Base(const char* &serialisedData)
 			{
-				// The data should point to our confidence value.
-				_confidence = *(reinterpret_cast<const unsigned char*>(serialisedData));
-
-				// We have to increment the pointer (which is actually a reference to a pointer)
-				// so that the next class can get its data.
-				serialisedData += sizeof(unsigned char);
+				initMemberSerialiser();
+				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
 			}
-
-			// Called when serialising.
-			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-			{
-				// Serialise the confidence.
-				return serialiser.serialise(Serialiser::SerialProperty(&_confidence, sizeof(unsigned char)));
-			}			
 		};
 
 		template <typename T>
 		class ConfidenceCompare {
 		public:
-			bool operator() (std::shared_ptr<T> a, std::shared_ptr<T> b)
+			bool operator() (const std::shared_ptr<T> a, const std::shared_ptr<T> b) const
 			{
 				return a->confidence() > b->confidence();
 			}

@@ -142,6 +142,9 @@ public:
 		return _linkStatus;
 	}
 
+private:
+	void initMemberSerialiser();
+
 	void linkStatus(const LinkStatus linkStatus) {
 		_linkStatus = linkStatus;
 	}
@@ -151,7 +154,10 @@ private:
 	unsigned int _type;
 	LinkStatus _linkStatus;
 
+
 	std::map<unsigned int, std::shared_ptr<IEntityProperty>> _propertyTable;
+	MemberSerialiser _memberSerialiser;
+
 };
 
 #endif	// MODEL_ENTITY_H

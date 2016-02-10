@@ -9,16 +9,39 @@ namespace model {
 	namespace types {
 		class Int : public Base {
 		private:
-			//friend class TypeSerialiser;
+			friend class TypeSerialiser;
 			int32_t _value;
+			MemberSerialiser _memberSerialiser;
+			
+			void initMemberSerialiser()
+			{
+				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
+			}
 
 		public:
-			Int() : _value(0), Base(100) {}
-			Int(const int32_t value) : _value(value), Base(100) {}
-			Int(int32_t value, unsigned char confidence) : Base(confidence), _value(value) {}
-			Int(std::string value, unsigned char confidence) : Int(std::atoi(value.c_str()), confidence) {}
+			Int() : _value(0), Base(100)
+			{
+				initMemberSerialiser();
+			}
+			
+			Int(const int32_t value) : _value(value), Base(100)
+			{
+				initMemberSerialiser();
+			}
+			
+			Int(int32_t value, unsigned char confidence) : Base(confidence), _value(value)
+			{
+				initMemberSerialiser();
+			}
+			
+			Int(std::string value, unsigned char confidence) : Int(std::atoi(value.c_str()), confidence)
+			{
+				// Already initialised
+			}
+			
+			virtual ~Int() {}
 
-			int32_t value() { return _value; }
+			int32_t value() const { return _value; }
 
 			virtual Subtype subtype() const
 			{
@@ -29,33 +52,31 @@ namespace model {
 				return std::make_shared<Int>(_value, _confidence);
 			}
 
-			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-			{
-				return Base::serialiseSubclass(serialiser)
-					+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(int32_t)));
-			}
-
-			virtual std::string logString() const
+			virtual std::string logString() const override
 			{
 				return std::string("Int(") + std::to_string(_value) + std::string(", ")
 					+ std::to_string(confidence()) + std::string(")");
 			}
 
 			// Inherited via Base
-			virtual bool Equals(const std::string val) override {
+			virtual bool Equals(const std::string val) const override {
 				return _value == std::stoi(val);
 			}
 
-			virtual std::string toString() override {
+			virtual std::string toString() const override {
 				return std::to_string(_value);
+			}
+
+		protected:
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+			{
+				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
 			Int(const char* &serialisedData) : Base(serialisedData)
 			{
-				// Base will have incremented the pointer appropriately.
-				// We can now copy in our value.
-				_value = *(reinterpret_cast<const int32_t*>(serialisedData));
-				serialisedData += sizeof(int32_t);
+				initMemberSerialiser();
+				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
 			}
 		};
 	}

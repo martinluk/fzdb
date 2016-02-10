@@ -3,6 +3,9 @@
 #include "types/Int.h"
 #include "types/String.h"
 #include "types/EntityRef.h"
+#include "types/Date.h"
+#include "spdlog/spdlog.h"
+#include <cassert>
 
 using namespace model::types;
 struct SerialHeader
@@ -17,11 +20,11 @@ TypeSerialiser::TypeSerialiser(const std::shared_ptr<Base> type) : baseType_(typ
 
 std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
 {
-    std::size_t initialSize = serialiser.size();
-    SerialHeader header;
-    memset(&header, 0, sizeof(SerialHeader));
-    header.size = 0;
-    header.subtype = baseType_->subtype();
+	std::size_t initialSize = serialiser.size();
+	SerialHeader header;
+	Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
+	header.size = 0;
+	header.subtype = baseType_->subtype();
 
     std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
     bytesSerialised += baseType_->serialiseSubclass(serialiser);
@@ -30,44 +33,57 @@ std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
     pHeader->size = bytesSerialised;
 
     return bytesSerialised;
-	return 0;
 }
 
 std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, std::size_t* advance)
 {
-			
-    const char* begin = serialisedData;
+	const char* d = serialisedData;
 
-    const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
-    serialisedData += sizeof(SerialHeader);
+	const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(d);
+	d += sizeof(SerialHeader);
 	std::shared_ptr<Base> b;
 
+	// Since TypeSerialiser is the friend class of the subtypes,
+	// we need to use the shared_ptr constructor directly instead
+	// of make_shared(). The latter won't work because that would
+	// require the function to be a friend of the classes, which
+	// it's not.
     switch (pHeader->subtype)
     {
     case Base::Subtype::TypeUndefined:
-        b = std::make_shared<Base>(serialisedData);
-        break;
+        //b = std::make_shared<Base>(d);
+        b = std::shared_ptr<Base>(new Base(d));
+				break;
 
     case Base::Subtype::TypeInt32:
-        b = std::make_shared<Int>(serialisedData);
-        break;
+        //b = std::make_shared<Int>(d);
+        b = std::shared_ptr<Int>(new Int(d));
+				break;
 
     case Base::Subtype::TypeString:
-        b = std::make_shared<String>(serialisedData);
-        break;
+        //b = std::make_shared<String>(d);
+        b = std::shared_ptr<String>(new String(d));
+				break;
 
     case Base::Subtype::TypeEntityRef:
-        b = std::make_shared<EntityRef>(serialisedData);
-        break;
+        //b = std::make_shared<EntityRef>(d);
+        b = std::shared_ptr<EntityRef>(new EntityRef(d));
+				break;
+		
+	case Base::Subtype::TypeDate:
+		//b = std::make_shared<Date>(d);
+		b = std::shared_ptr<Date>(new Date(d));
+		break;
 
     default:
-        b = NULL;
+		assert(false);
         break;
     }
 
     if ( advance )
     {
-        *advance = serialisedData - begin;
+		*advance = d - serialisedData;
+		assert(*advance == pHeader->size);
     }
 
     return b;
