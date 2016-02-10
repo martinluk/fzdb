@@ -133,12 +133,15 @@ public:
 
 private:
 	void deleteAllProperties();
+	void initMemberSerialiser();
 
 	EHandle_t	handle_;
 	unsigned int _type;
 	bool _active;
 
 	std::map<unsigned int, IEntityProperty*> _propertyTable;
+
+	MemberSerialiser _memberSerialiser;
 };
 
 #endif	// MODEL_ENTITY_H

@@ -30,6 +30,7 @@ print("Connected to database on %s:%s. Type ':?' for help, or ':quit' to quit th
 sending = True
 promptSymbolRequired = True
 rawJson = False
+numFailedReads = 0;
 
 # Loop until we're told to stop:
 while True:
@@ -38,23 +39,40 @@ while True:
 		sys.stdout.flush()
 		promptSymbolRequired = False
 
-	socketToRead = []
+        sRead = []
+        sWrite = []
+        sError = []
 
 	# If we're sending a command, we listen for data from the user.
+        # No timeout is specified.
 	if sending:
-		socketToRead = [sys.stdin]
-	# Otherwise we listen from the database for a response.
-	else:
-		socketToRead = [commSocket]
-	
-	# Get any information from our chosen socket.
-	sRead, sWrite, sError = select.select(socketToRead, [], [])
+                sRead, sWrite, sError = select.select([sys.stdin], [], [])
 
-	# If there was no socket to read from, just go round again I guess.
+	# Otherwise we listen from the database for a response.
+        # The timeout is 30 seconds - change this if required.
+	else:
+                sRead, sWrite, sError = select.select([commSocket], [], [], 30)
+
+                # Check to see whether we received any data. If this happens three times in a row,
+                # assume the database is down and give up.
+                if len(sRead) < 1:
+                        numFailedReads += 1
+                        if numFailedReads < 3:
+                                print("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
+                        else:
+                                print("TIMEOUT: No response. Shutting down.")
+                                commSocket.close()
+                                sys.exit()
+
+
+        # If there was no socket to read from:
 	if len(sRead) < 1:
-		continue
+                # This shouldn't happen here!
+                print("WARNING: No data received on socket! This is probably a bug.")
+                continue
 	
 	# A socket has data!
+        numFailedReads = 0;
 	sock = sRead[0]
 
 	# If the socket is stdin, parse the command.

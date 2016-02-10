@@ -11,6 +11,11 @@ public:
 	// Pointer points to the data, size specifies how many bytes.
 	typedef std::pair<const void*,std::size_t> SerialProperty;
 
+	// Useful for debugging. Set to something like 0xFF to see
+	// where structs have padding inserted.
+	static const unsigned char StructPaddingChar;
+	static void zeroBuffer(void* dest, std::size_t size);
+
 	Serialiser();
 
 	// Serialise the given list of properties.
@@ -45,7 +50,7 @@ public:
 private:
 	// Vector that holds the actual serialised data.
 	std::vector<char> serialData_;
-        std::size_t lastSerialiseBytes_;
+	std::size_t lastSerialiseBytes_;
 };
 
 #endif	// MODEL_SERIALISER_H

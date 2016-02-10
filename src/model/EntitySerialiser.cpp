@@ -4,18 +4,29 @@
 #include "TypeSerialiser.h"
 #include "EntityProperty.h"
 #include <cassert>
+#include "MemberSerialiser.h"
+#include "spdlog/spdlog.h"
+#include "types/Date.h"
+
+// This should be incremented whenever a change is made to the format!
+#define SERIAL_HEADER_CURRENT_VERSION 1
 
 struct SerialHeader
 {
-    std::size_t     size;           // Total size of this serialised entity in bytes.
-    EHandle_t       handle;         // Entity handle.
-    unsigned int    type;           // Entity type.
-    std::size_t     propertyCount;  // How many property headers to expect after this header.
+	unsigned short	version;			// Version identifier.
+	std::size_t     size;				// Total size of this serialised entity in bytes.
+	std::size_t     propertyCount;		// How many property headers to expect after this header.
+
+	std::size_t		memberDataOffset;	// Offset from beginning of data that the member data begins.
+	std::size_t		memberDataLength;	// Length of member data in bytes.
+
+	std::size_t		propertyDataOffset;	// Offset from beginning of data that the property data begins.
+	std::size_t		propertyDataLength;	// Length of all property data in bytes.
 };
 
 struct PropertyHeader
 {
-    std::size_t                 offset;     // Offset of property data from beginning of the entire serialisation.
+	std::size_t                 offset;     // Offset of property from beginning of property data chunk.
     std::size_t                 size;       // Size of serialised property data in bytes. This includes all values.
     unsigned int                key;        // Property key.
     model::types::Base::Subtype subtype;    // Type identifier for the values this property contains.
@@ -32,19 +43,25 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
     typedef std::map<unsigned int, IEntityProperty*> PropertyTable;
 
     // Create the initial header.
-    SerialHeader header;
-    memset(&header, 0, sizeof(SerialHeader));
-    std::size_t origSize = serialiser.size();
+	SerialHeader header;
+	Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
+	std::size_t indexBegin = serialiser.size();
 
     // Initialise header values.
-    header.size = 0;    // We don't know this yet.
-    header.handle = _entity->handle_;
-    header.type = _entity->_type;
+	header.version = SERIAL_HEADER_CURRENT_VERSION;
     header.propertyCount = _entity->_propertyTable.size();
 
-    // Create a default PropertyHeader that we'll serialise as many times as needed.
+	// We'll fill these in later.
+	header.size = 0;
+	header.memberDataOffset = 0;
+	header.memberDataLength = 0;
+	header.propertyDataOffset = 0;
+	header.propertyDataLength = 0;
+
+	// Create a default PropertyHeader that we'll serialise as many times as needed.
+	// We set the values individually afterwards.
     PropertyHeader phPlaceholder;
-    memset(&phPlaceholder, 0, sizeof(PropertyHeader));
+	Serialiser::zeroBuffer(&phPlaceholder, sizeof(PropertyHeader));
 
     // Add all the headers to a property list.
     std::vector<Serialiser::SerialProperty> propList;
@@ -57,8 +74,20 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
 
     // Serialise all the headers and record where the actual data starts.
     serialiser.serialise(propList);
-    std::size_t propDataBegin = serialiser.size();
-    std::size_t propHeaderBegin = origSize + sizeof(SerialHeader);
+	std::size_t indexDataBegin = serialiser.size();
+	std::size_t indexPropHeadersBegin = indexBegin + sizeof(SerialHeader);
+
+	// Serialise the data members for this entity.
+	std::size_t membersSerialisedLength = _entity->_memberSerialiser.serialiseAll(serialiser);
+
+	// Update the header for this serialisation.
+	{
+		SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBegin);
+		pHeader->memberDataOffset = indexDataBegin - indexBegin;
+		pHeader->memberDataLength = membersSerialisedLength;
+	}
+
+	std::size_t propertiesOffset = serialiser.size();
 
     // Serialise each property.
     int propNumber = 0;
@@ -79,22 +108,26 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
             propSerialisedSize += typeSerialiser.serialise(serialiser);
         }
 
-        // Record results in the header.
-        PropertyHeader* pPropHeader = serialiser.reinterpretCast<PropertyHeader*>(propHeaderBegin + (propNumber * sizeof(PropertyHeader)));
-        pPropHeader->size = propSerialisedSize;
-        pPropHeader->key = prop->key();
-        pPropHeader->valueCount = prop->count();
-        pPropHeader->offset = (propDataBegin - origSize) + propDataOffset;
-        pPropHeader->subtype = prop->subtype();
+		// Record results in the header.
+		{
+			PropertyHeader* pPropHeader = serialiser.reinterpretCast<PropertyHeader*>(indexPropHeadersBegin + (propNumber * sizeof(PropertyHeader)));
+			pPropHeader->offset = propDataOffset;
+			pPropHeader->size = propSerialisedSize;
+			pPropHeader->key = prop->key();
+			pPropHeader->subtype = prop->subtype();
+			pPropHeader->valueCount = prop->count();
+		}
 
-        // Increment our counters
+		// Increment our counters.
         propDataOffset += propSerialisedSize;
         propNumber++;
     }
 
     // Record the total serialised size.
-    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
-    pHeader->size = serialiser.size() - origSize;
+	SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBegin);
+	pHeader->propertyDataOffset = propertiesOffset - indexBegin;
+	pHeader->propertyDataLength = propDataOffset;
+	pHeader->size = serialiser.size() - indexBegin;
 	return pHeader->size;
 }
 
@@ -106,7 +139,6 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
     std::vector<std::shared_ptr<T>> values;
     for ( int i = 0; i < header->valueCount; i++ )
     {
-        // Data is automatically incremented.
         std::size_t advance = 0;
 		std::shared_ptr<T> val = std::dynamic_pointer_cast<T, Base>(TypeSerialiser::unserialise(data, &advance));
         assert(val);
@@ -121,37 +153,48 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
 {
     using namespace model::types;
 
-//    for ( int i = 0; i < valueCount; i++ )
-//    {
-//        // serialisedData will be incremented.
-//        T* val = dynamic_cast<T*>(TypeSerialiser::unserialise(serialisedData));
-//        assert(val);
-//        append(val);
-//    }
-	
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialData);
 
-    // Create an entity shell.
-	std::shared_ptr<Entity> ent = std::make_shared<Entity>(pHeader->type, pHeader->handle);
+	// Make sure the header version matches our current version.
+	// For now we just throw an assertion error, but we may want to make
+	// this an exception in the future.
+	assert(pHeader->version == SERIAL_HEADER_CURRENT_VERSION);
 
+    // Create an entity shell.
+	std::shared_ptr<Entity> ent = std::make_shared<Entity>(0);
+
+	// Unserialise the members.
+	const char* memberData = serialData + pHeader->memberDataOffset;
+	ent->_memberSerialiser.unserialiseAll(memberData);
+
+	// Unserialise the properties.
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(SerialHeader));
     for ( int i = 0; i < pHeader->propertyCount; i++ )
     {
+		// Get the header for this property.
         const PropertyHeader* p = &(pPropHeaders[i]);
-        const char* data = serialData + p->offset;
 
-        switch (p->subtype)
+		// Calculate the pointer to the actual property data.
+		const char* data = serialData + pHeader->propertyDataOffset + p->offset;
+		//spdlog::get("main")->info("Property data offset: {} P offset: {}", pHeader->propertyDataOffset, p->offset);
+
+		switch (p->subtype)
         {
-        case Base::Subtype::TypeInt32:
+		case Base::Subtype::TypeInt32:
             populate<Int>(ent, p, data);
             break;
 
-        case Base::Subtype::TypeString:
+		case Base::Subtype::TypeString:
             populate<String>(ent, p, data);
             break;
 
-        case Base::Subtype::TypeEntityRef:
+		case Base::Subtype::TypeEntityRef:
             populate<EntityRef>(ent, p, data);
+						break;
+
+		case Base::Subtype::TypeDate:
+						populate<Date>(ent, p, data);
+						break;
 
         default:
             assert(false);

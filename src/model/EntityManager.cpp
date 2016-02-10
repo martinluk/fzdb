@@ -10,6 +10,7 @@
 #include <cassert>
 #include "../Parser.h"
 #include "spdlog/spdlog.h"
+#include "../Util.h"
 
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
@@ -366,14 +367,7 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
 unsigned int EntityManager::getTypeID(const std::string &str)
 {
-	// Makes the string uppercase.
-	// Because the string could be multi-byte, we cast our
-	// input to an ASCII string first. (This might not be
-	// the most intelligent thing to do though)
-	std::string uppercase(str.c_str());
-	std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
-	boost::algorithm::trim(uppercase);
-	spdlog::get("main")->info("Getting ID for type string {}", uppercase);
+	std::string uppercase = util::toUppercase(str);
 
 	// "Generic" type is an empty string.
 	// The ID for this is 0.

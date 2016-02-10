@@ -3,18 +3,31 @@
 #include "EntitySerialiser.h"
 #include "StringMapSerialiser.h"
 
+#include "spdlog/spdlog.h"
+
+// Increment this when the format changes.
+#define SERIAL_HEADER_CURRENT_VERSION 1
+
 struct SerialHeader
 {
+	unsigned short version;			// Version of the serialisation structure.
 	std::size_t size;				// Total serialised size in bytes.
-	std::size_t entityCount;		// How many entities were serialised.
 
 	std::size_t typeMapOffset;		// Offset from beginning of serialisation where the type map data resides.
 	std::size_t	typeMapLength;		// Length of this serialisation in bytes.
+
+	std::size_t entityDataOffset;	// Offset from beginning of serialisation where the entity data resides.
+	std::size_t	entityDataLength;	// Length of this serialisation in bytes.
+};
+
+struct EntityDataHeader
+{
+	std::size_t	entityCount;		// How many entity headers to expect after this header.
 };
 
 struct EntityHeader
 {
-    std::size_t offset; // Offset from beginning of serialisation that this entity resides at.
+	std::size_t offset; // Offset from beginning of the chunk that this entity resides at.
     std::size_t size;   // Size of the serialised entity in bytes.
 };
 
@@ -25,74 +38,93 @@ GraphSerialiser::GraphSerialiser(EntityManager *manager) : _manager(manager)
 
 std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
 {
-    std::size_t origSize = serialiser.size();
+	std::size_t indexBase = serialiser.size();
     
-    SerialHeader header;
-    memset(&header, 0, sizeof(SerialHeader));
+	SerialHeader header;
+	Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
     
-    std::vector<std::shared_ptr<Entity>> entList = _manager->entityList();
-    
-    header.size = 0;                        // Don't know this yet.
-    header.entityCount = entList.size();
+	std::vector<std::shared_ptr<Entity> > entList = _manager->entityList();
 
+	header.version = SERIAL_HEADER_CURRENT_VERSION;
+    
+	// Zero the fields we don't know yet.
+	header.size = 0;
 	header.typeMapOffset = 0;
 	header.typeMapLength = 0;
-    
-	// Serialise the correct number of dummy entity headers.
-    EntityHeader dummyHeader;
-    memset(&dummyHeader, 0, sizeof(EntityHeader));
-    
-    serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
-    for ( int i = 0; i < header.entityCount; i++ )
-    {
-        serialiser.serialise(Serialiser::SerialProperty(&dummyHeader, sizeof(EntityHeader)));
-    }
-    
-    std::size_t entityHeaders = origSize + sizeof(SerialHeader);
-    std::size_t dataBegin = serialiser.size();
+	header.entityDataOffset = 0;
+	header.entityDataLength = 0;
+
+	serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+	std::size_t indexDataBegin = serialiser.size();
 
 	// Firstly serialise the type map.
 	StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
-	std::size_t typeMapBytesSerialised = typeMapSerialiser.serialise(serialiser);
-	std::size_t dataSerialised = typeMapBytesSerialised;
+	header.typeMapOffset = indexDataBegin - indexBase;
+	header.typeMapLength = typeMapSerialiser.serialise(serialiser);
 
-	// Then serialise each entity.
-    for ( int i = 0; i < header.entityCount; i++ )
+	header.entityDataOffset = serialiser.size() - indexBase;
+
+	// Then serialise the entities.
+	EntityDataHeader edHeader;
+	edHeader.entityCount = entList.size();
+	serialiser.serialise(Serialiser::SerialProperty(&edHeader, sizeof(EntityDataHeader)));
+
+	std::size_t indexEntityHeaders = serialiser.size();
+
+	// Serialise the correct number of dummy entity headers.
+	EntityHeader dummyHeader;
+	Serialiser::zeroBuffer(&dummyHeader, sizeof(EntityHeader));
+
+	for ( int i = 0; i < edHeader.entityCount; i++ )
+	{
+		serialiser.serialise(Serialiser::SerialProperty(&dummyHeader, sizeof(EntityHeader)));
+	}
+
+	std::size_t indexEntityRawData = serialiser.size();
+
+	// Serialise each entity.
+	std::size_t rawEntByteCount = 0;
+	for ( int i = 0; i < edHeader.entityCount; i++ )
     {
         // Serialise the entity.
-        EntitySerialiser eSer(entList[i]);
+		EntitySerialiser eSer(entList[i]);
         std::size_t bytes = eSer.serialise(serialiser);
         
         // Update its header.
-        EntityHeader* pHeader = &(serialiser.reinterpretCast<EntityHeader*>(entityHeaders)[i]);
+		EntityHeader* pHeader = &(serialiser.reinterpretCast<EntityHeader*>(indexEntityHeaders)[i]);
         pHeader->size = bytes;
-		pHeader->offset = dataBegin - origSize + dataSerialised;
+		pHeader->offset = (indexEntityRawData - header.entityDataOffset) + rawEntByteCount;
         
-        dataSerialised += bytes;
+		rawEntByteCount += bytes;
     }
+
+	header.entityDataLength = serialiser.size() - header.entityDataOffset;
     
-    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
-    std::size_t totalSerialised = serialiser.size() - origSize;
+	SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBase);
+	std::size_t totalSerialised = serialiser.size() - indexBase;
     pHeader->size = totalSerialised;
-	pHeader->typeMapOffset = dataBegin - origSize;
-	pHeader->typeMapLength = typeMapBytesSerialised;
+	pHeader->typeMapOffset = header.typeMapOffset;
+	pHeader->typeMapLength = header.typeMapLength;
+	pHeader->entityDataOffset = header.entityDataOffset;
+	pHeader->entityDataLength = header.entityDataLength;
     
     return totalSerialised;
 }
 
 void GraphSerialiser::unserialise(const char *serialisedData)
 {
-    const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
-    const EntityHeader* otherHeaders = reinterpret_cast<const EntityHeader*>(serialisedData + sizeof(SerialHeader));
+	const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
 
 	StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
 	typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset);
     
-    for ( int i = 0; i < pHeader->entityCount; i++ )
-    {
-        const EntityHeader* pEntHeader = &(otherHeaders[i]);
-        const char* data = serialisedData + pEntHeader->offset;
+	const EntityDataHeader* pEntData = reinterpret_cast<const EntityDataHeader*>(serialisedData + pHeader->entityDataOffset);
+	const EntityHeader* pEntHeaders = reinterpret_cast<const EntityHeader*>(pEntData + 1);
+	for ( int i = 0; i < pEntData->entityCount; i++ )
+	{
+		const EntityHeader* pEntHeader = &(pEntHeaders[i]);
+		const char* data = reinterpret_cast<const char*>(pEntData) + pEntHeader->offset;
         
-        _manager->insertEntity(EntitySerialiser::unserialise(data));
-    }
+		_manager->insertEntity(EntitySerialiser::unserialise(data));
+	}
 }

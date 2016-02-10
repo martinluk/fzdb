@@ -20,13 +20,6 @@ EntityProperty<T>::EntityProperty()
 }
 
 template <typename T>
-EntityProperty<T>::EntityProperty(const unsigned int& key) :
-	_key(key)
-{
-    initSubtype();
-}
-
-template <typename T>
 EntityProperty<T>::EntityProperty(const unsigned int& key,
 	const std::vector<std::shared_ptr<T>> &values) : _key(key)
 {
@@ -139,3 +132,4 @@ std::string EntityProperty<T>::logString() const
 template class EntityProperty < model::types::String >;
 template class EntityProperty < model::types::EntityRef >;
 template class EntityProperty < model::types::Int >;
+template class EntityProperty < model::types::Date >;

@@ -10,14 +10,35 @@ namespace model {
 	namespace types {
 		class String : public Base {
 		private:
-			//friend class TypeSerialiser;
+			friend class TypeSerialiser;
 			std::string _value;
+			MemberSerialiser::DynamicStringMember _valueWrapper;
+			MemberSerialiser _memberSerialiser;
+			
+			void initMemberSerialiser()
+			{
+				_memberSerialiser.addDynamicMember(&_valueWrapper);
+			}
+			
 		public:
-			String() : _value(), Base(100) {}
-			String(const std::string value) : _value(value), Base(100) {}
-			String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value) {}
+			String() :Base(100), _value(), _valueWrapper(_value)
+			{
+				initMemberSerialiser();
+			}
+			
+			String(const std::string value) : Base(100), _value(value), _valueWrapper(_value)
+			{
+				initMemberSerialiser();
+			}
+			
+			String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value), _valueWrapper(_value)
+			{
+				initMemberSerialiser();
+			}
+			
+			virtual ~String() {}
 
-			std::string value() { return _value; }
+			std::string value() const { return _value; }
 
 			virtual Subtype subtype() const
 			{
@@ -28,40 +49,31 @@ namespace model {
 				return std::make_shared<String>(_value, _confidence);
 			}
 
-			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-			{
-				std::size_t stringLength = _value.size();
-				std::shared_ptr<char> buffer(new char[stringLength + 1]);
-				memcpy(buffer.get(), _value.c_str(), stringLength);
-				buffer.get()[stringLength] = '\0';
-
-				return Base::serialiseSubclass(serialiser)
-					+ serialiser.serialise(Serialiser::SerialProperty(buffer.get(), stringLength + 1));
-			}
-
-			virtual std::string logString() const
+			virtual std::string logString() const override
 			{
 				return std::string("String(\"") + _value + std::string("\", ")
 					+ std::to_string(confidence()) + std::string(")");
 			}
 
-			virtual std::string toString() override {
+			virtual std::string toString() const override {
 				return _value;
 			}
 
 			// Inherited via Base
-			virtual bool Equals(const std::string val) override {
+			virtual bool Equals(const std::string val) const override {
 				return _value == val;
 			}
 
-			~String() {
-				bool a = true;
+		protected:
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+			{
+				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseDynamicMembers(serialiser);
 			}
 
-			String(const char* &serialisedData) : Base(serialisedData)
+			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
 			{
-				_value = std::string(serialisedData);
-				serialisedData += _value.size() + 1;
+				initMemberSerialiser();
+				serialisedData += _memberSerialiser.unserialiseDynamicMembers(serialisedData);
 			}
 		};
 	}
