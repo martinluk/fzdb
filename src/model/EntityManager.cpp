@@ -265,6 +265,7 @@ void EntityManager::clearAll()
     _entityTypeNames.clear();
     _propertyNames.clear();
     _propertyTypes.clear();
+	_links.clear();
 }
 
 std::size_t EntityManager::entityCount() const
@@ -285,10 +286,10 @@ std::string EntityManager::dumpContents() const
         {
             str << "{\n";
             
-            const std::map<unsigned int, IEntityProperty*> &propMap = ent->properties();
+			const std::map<unsigned int, std::shared_ptr<IEntityProperty>> &propMap = ent->properties();
             for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
             {
-                IEntityProperty* prop = it2->second;
+				std::shared_ptr<IEntityProperty> prop = it2->second;
                 str << "  " << prop->logString() << "\n";
                 
                 if ( prop->count() > 0 )
@@ -732,12 +733,12 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 		auto entity = _entities[entityRef];
 
 		//if variableName is already set
-		std::map<unsigned int, IEntityProperty*> iterableProperties;
+		std::map<unsigned int, std::shared_ptr<IEntityProperty>> iterableProperties;
 		if (variableSet.used(variableName)) {
 			auto data = variableSet.getData(variableName);
 			std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](BasePointer b) {
 				std::shared_ptr<model::types::Int> prop = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(b);
-				return std::pair<unsigned int, IEntityProperty*>(prop->value(), entity->getProperty(prop->value()));
+				return std::pair<unsigned int, std::shared_ptr<IEntityProperty>>(prop->value(), entity->getProperty(prop->value()));
 			});
 		}
 		else {

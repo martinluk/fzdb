@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <memory>
 
 #include "./Triple.h"
 #include "./EntityProperty.h"
@@ -38,24 +39,24 @@ public:
 
 	// Returns the property with the given key, or a null property if this is not found.
 	template<typename T>
-	EntityProperty<T>* getProperty(const unsigned int &key) const {
+	std::shared_ptr<EntityProperty<T>> getProperty(const unsigned int &key) const {
 		auto it = _propertyTable.find(key);
 		if (it == _propertyTable.cend()) {
-			return new EntityProperty<T>();
+			return std::shared_ptr<EntityProperty<T>>();;
 		}
 
 		// TODO: Add error messages
 		try {
-			EntityProperty<T>* prop = dynamic_cast<EntityProperty<T>*>(it->second);
+			std::shared_ptr<EntityProperty<T>> prop = std::dynamic_pointer_cast<EntityProperty<T>, IEntityProperty>(it->second);
 			return prop;
 		}
 		catch (std::bad_cast ex) {
-			return new EntityProperty<T>();
+			return std::shared_ptr<EntityProperty<T>>();
 		}
-		return new EntityProperty<T>();
+		return std::shared_ptr<EntityProperty<T>>();
 	}
 
-	IEntityProperty* getProperty(const unsigned int &key) const {
+	std::shared_ptr<IEntityProperty> getProperty(const unsigned int &key) const {
 		auto it = _propertyTable.find(key);
 		return it->second;
 	}
@@ -75,16 +76,16 @@ public:
 		//propertyTable_.erase(prop.key());
 
 		// Insert the new one.
-		auto pair = std::make_pair<unsigned int, IEntityProperty*>(std::move(prop->key()), (IEntityProperty*)prop);
+		auto pair = std::make_pair<unsigned int, std::shared_ptr<IEntityProperty>>(std::move(prop->key()), (std::shared_ptr<IEntityProperty>)prop);
 		_propertyTable.insert(pair);
 	}
 
-	void insertProperty(IEntityProperty* prop) {
+	void insertProperty(std::shared_ptr<IEntityProperty> prop) {
 		// Erase the property if it exists (If not, this will do nothing).
 		//propertyTable_.erase(prop.key());
 
 		// Insert the new one.
-		auto pair = std::make_pair<unsigned int, IEntityProperty*>(std::move(prop->key()), std::move(prop));
+		auto pair = std::make_pair<unsigned int, std::shared_ptr<IEntityProperty>>(std::move(prop->key()), std::move(prop));
 		_propertyTable.insert(pair);
 	}
 
@@ -95,7 +96,7 @@ public:
 	bool hasProperty(const unsigned int &key);
 
 	// Returns read only reference to the property table
-	const std::map<unsigned int, IEntityProperty*>& properties() const {
+	const std::map<unsigned int, std::shared_ptr<IEntityProperty>>& properties() const {
 		return _propertyTable;
 	}
 
@@ -107,19 +108,19 @@ public:
 
 		/*switch (obj.type) {
 		case model::Object::Type::STRING: {
-			auto val = getProperty<model::types::String>(propertyId)->values();
-			return val[0]->Equals(obj.value);
+		auto val = getProperty<model::types::String>(propertyId)->values();
+		return val[0]->Equals(obj.value);
 		}
 		case model::Object::Type::INT: {
-			auto val = getProperty<model::types::Int>(propertyId)->values();
-			return val[0]->Equals(obj.value);
+		auto val = getProperty<model::types::Int>(propertyId)->values();
+		return val[0]->Equals(obj.value);
 		}
 		case model::Object::Type::ENTITYREF: {
-			auto val = getProperty<model::types::EntityRef>(propertyId)->values();
-			return val[0]->Equals(obj.value);
+		auto val = getProperty<model::types::EntityRef>(propertyId)->values();
+		return val[0]->Equals(obj.value);
 		}
 		default:
-			return false;
+		return false;
 		}*/
 	}
 
@@ -146,13 +147,11 @@ public:
 	}
 
 private:
-	void deleteAllProperties();
-
 	EHandle_t	handle_;
 	unsigned int _type;
 	LinkStatus _linkStatus;
 
-	std::map<unsigned int, IEntityProperty*> _propertyTable;
+	std::map<unsigned int, std::shared_ptr<IEntityProperty>> _propertyTable;
 };
 
 #endif	// MODEL_ENTITY_H

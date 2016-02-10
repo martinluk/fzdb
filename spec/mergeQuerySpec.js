@@ -62,8 +62,8 @@ describe("Fuzzy Database", function() {
     });
 
     //test link
-    it("link entity 1 and entity 2", function(done) {
-      sendCmd("LINK entity:1 entity:2")
+    it("merge entity 1 and entity 2", function(done) {
+      sendCmd("LINK FINAL entity:1 entity:2")
       .then(function(data) {
         expect(data.result).toBe("success");
         done();
@@ -89,31 +89,13 @@ describe("Fuzzy Database", function() {
     });
 
     //test link
-    it("unlink entity 1 and entity 2", function(done) {
-      sendCmd("UNLINK entity:1 entity:2")
+    it("getting properties of entity:2", function(done) {
+      sendCmd("SELECT $a $b WHERE { entity:2 $a $b }")
       .then(function(data) {
-        expect(data.result).toBe("success");
+        expect(data.result.length).toBe(0);
         done();
       });     
-    });
-
-    //test retrieve
-    it("getting the forename of entity:1 after unlink", function(done) {
-      sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
-      .then(function(data) {
-        expect(data.result[0].a).toBe("1");
-        done();
-      });          
-    });
-
-    //test retrieve
-    it("getting the surname of entity:2 after unlink", function(done) {  
-      sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
-      .then(function(data) {
-        expect(data.result[0].a).toBe("2");
-        done();
-      });
-    });
+    });   
 
   });
 });
