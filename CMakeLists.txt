@@ -16,7 +16,6 @@ IF(NOT CMAKE_BUILD_TYPE MATCHES "RELEASE")
   message("Assuming debug build, use -DCMAKE_BUILD_TYPE=RELEASE for release build")
   SET(CMAKE_BUILD_TYPE "DEBUG")
 endif()
-
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   message("Starting DEBUG configuration..")
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
@@ -24,6 +23,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 else()
   message( FATAL_ERROR "CMAKE_BUILD_TYPE must be DEBUG or RELEASE - it's currently ${CMAKE_BUILD_TYPE}" )
 endif()
+
 
 message("Using generator ${CMAKE_GENERATOR}")
 
@@ -46,6 +46,20 @@ message("DEBUG: ${RAPIDJSON_INCLUDE_DIRS}")
 
 FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+
+#Admin account set up
+if(DEFINED ENV{FUZZY_DB_INIT_LOAD_USERFILE})
+	message("Env - INIT_LOAD_USERFILE detected")
+	message("Database user json file should be added to correct dirrectory before building project.")
+	message("")
+else()
+	message("Env - INIT_LOAD_USERFILE not detected")
+	message("Admin username set")
+	add_definitions("-DADMIN_USERNAME=fzydb_admin")
+	message("Admin password set as default")
+	add_definitions("-DADMIN_PASSWORD=password")
+endif()
+
 
 macro(GroupSources curdir)
   file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)

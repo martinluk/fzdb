@@ -15,8 +15,6 @@
 #include <cassert>
 
 #define ADD_ADMIN_ON_INIT true
-#define ADMIN_USERNAME "admin"
-#define ADMIN_PASSWORD "password"
 
 #define JSONFILENAME "userFile.json"
 
@@ -30,7 +28,7 @@
 //Initialise cache map
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
-void UserFileOperations::initialize() { //TODO
+void UserFileOperations::initialize() { 
 	//Empty file cache
 	userFileCache.clear();
 	if (ADD_ADMIN_ON_INIT) {
@@ -43,6 +41,7 @@ void UserFileOperations::initialize() { //TODO
 		addUser(admin);
 	} else { 
 		//Load from json
+		////TODO Verify if file exists
 		loadCacheFromFile();
 	}
 }
