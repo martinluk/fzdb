@@ -19,11 +19,12 @@ class IEntityProperty : public ILogString
 {
 public:
 	virtual ~IEntityProperty() {}
-	virtual int count() const = 0;
+	virtual unsigned int count() const = 0;
 	virtual unsigned int key() const = 0;
 	virtual BasePointer baseValue(int index) const = 0;
 	virtual std::vector<BasePointer> baseValues() const = 0;
 	virtual model::types::Base::Subtype subtype() const = 0;
+	virtual BasePointer baseTop() const = 0;
 };
 
 // An entity property is a key-values property that can be aggregated by an entity.
@@ -69,13 +70,18 @@ public:
 
 	// Getters
 	const unsigned int& keyRef() const;
-	std::vector<std::shared_ptr<T>> values() const;
 
+	virtual unsigned int count() const;
+
+	std::vector<std::shared_ptr<T>> values() const;
 	std::shared_ptr<T> const& value(int index) const;
 
-	virtual int count() const;
 	virtual BasePointer baseValue(int index) const;
 	virtual std::vector<BasePointer> baseValues() const;
+
+	virtual std::shared_ptr<T> top() const;
+	virtual BasePointer baseTop() const;
+	
 	virtual unsigned int key() const;
 	virtual model::types::Base::Subtype subtype() const { return _subtype; }
 
@@ -96,11 +102,10 @@ public:
 	virtual std::string logString() const override;
 
 private:
-	void deleteAllValues();
 	void initSubtype();
 
 	unsigned int _key;
-	std::vector<std::shared_ptr<T>> _values;
+	unsigned int _count;
 	model::types::Base::Subtype _subtype;
 
 	std::forward_list<std::shared_ptr<T>> _valuesList;
