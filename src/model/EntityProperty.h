@@ -6,6 +6,7 @@
 #include <queue>
 #include <typeinfo>
 #include <algorithm>
+#include <forward_list>
 
 #include "./types/String.h"
 #include "./types/EntityRef.h"
@@ -101,7 +102,8 @@ private:
 	unsigned int _key;
 	std::vector<std::shared_ptr<T>> _values;
 	model::types::Base::Subtype _subtype;
-	//std::priority_queue<PropertyValue, std::vector<PropertyValue>, PropertyValueCompare> _valuesQueue;
+
+	std::forward_list<std::shared_ptr<T>> _valuesList;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

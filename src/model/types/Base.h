@@ -115,11 +115,12 @@ namespace model {
 			}			
 		};
 
+		template <typename T>
 		class ConfidenceCompare {
 		public:
-			bool operator() (Base a, Base b)
+			bool operator() (std::shared_ptr<T> a, std::shared_ptr<T> b)
 			{
-				return a.confidence() > b.confidence();
+				return a->confidence() > b->confidence();
 			}
 		};
 	}

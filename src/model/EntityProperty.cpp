@@ -6,6 +6,9 @@
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
+//template <typename T>
+//EntityProperty<T>::cmp = [](int left, int right) { return left < right;  };
+
 template <typename T>
 void EntityProperty<T>::initSubtype()
 {
@@ -59,6 +62,7 @@ template <typename T>
 bool EntityProperty<T>::isEmpty() const
 {
 	return _values.size() == 0;
+	//return _valuesList.front() == _valuesList.end();
 }
 
 template <typename T>
