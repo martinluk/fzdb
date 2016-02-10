@@ -15,6 +15,7 @@ notifications:
     on_failure: always # default: always
     on_start: never # default: always
 install:
+  - sudo apt-get install libboost-thread-dev1.59.0 libboost-date-time1.59.0 libboost-filesystem1.59.0 libboost-system1.59.0 libboost-regex1.59.0
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -y
   - sudo apt-get install -y g++-4.9
