@@ -47,7 +47,7 @@ namespace model
 			static void Decode(int g, int &y, int &mm, int &dd)
 			{
 			    y = ((10000*g + 14780)/3652425);
-			    int ddd = g - (365*y + floor(y/4) - (y/100) + (y/400));
+			    int ddd = g - (365*y + (y/4) - (y/100) + (y/400));
 			    if (ddd < 0)
 				{
 			        y = y - 1;
