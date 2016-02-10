@@ -9,8 +9,7 @@
 #include "./CommandInterpreter.h"
 #include "./server.h"
 #include <algorithm>
-
-#define MAX_WRITE_MESSAGE_LENGTH 1024
+#include <cassert>
 
 using boost::asio::ip::tcp;
 
@@ -46,10 +45,11 @@ tcp::socket& TCPSession::socket() {
 * @details Starts the session listening for input from the client
 */
 void TCPSession::start() {
-  _socket.async_read_some(boost::asio::buffer(_data, max_length),
-    boost::bind(&TCPSession::handle_read, shared_from_this(),
-      boost::asio::placeholders::error,
-      boost::asio::placeholders::bytes_transferred));
+//  _socket.async_read_some(boost::asio::buffer(_data, max_length),
+//    boost::bind(&TCPSession::handle_read, shared_from_this(),
+//      boost::asio::placeholders::error,
+//      boost::asio::placeholders::bytes_transferred));
+	readChunk();
 }
 
 /**
@@ -66,28 +66,64 @@ void TCPSession::handle_read(const boost::system::error_code& error,
 	if (_socketDisconnected(error))
 	{
 		// No need to call terminate() since we're already disconnected.
-		//_parent->signalSessionTerminated(shared_from_this());
 		return;
 	}
 
 	if (!error) {
-		std::string _command = std::string(_data).substr(0, bytes_transferred);
-		//Logger::Instance()->Log() << std::setw(37) << _uuid << "Recieved command: " << _command << std::endl;
-		spdlog::get("main")->info("[{:<}] {} {}", _uuid, "Recieved command:", _command);
-
-		CommandInterpreter::ProcessCommand(shared_from_this(), _command);
-
-		_socket.async_read_some(boost::asio::buffer(_data, max_length),
-			boost::bind(&TCPSession::handle_read, shared_from_this(),
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred));
+		
+		// If there's more data to read, do so.:quir
+		if ( bytes_transferred >= max_length )
+		{
+			assert(bytes_transferred == max_length);
+			bytes_transferred = max_length;
+			
+			// Copy the data into the vector.
+			copyDataToVector(bytes_transferred);
+			
+			// Read the next chunk.
+			readChunk();
+		}
+		else
+		{
+			// Make sure there's a terminating null.
+			_data[bytes_transferred] = '\0';
+			
+			// Copy the data into the vector.
+			copyDataToVector(bytes_transferred+1);
+			
+			// Create a command string from the data.
+			std::string command(_dataVec.data());
+			
+			// Execute the command.
+			spdlog::get("main")->info("[{:<}] {} {}", _uuid, "Recieved command:", command);
+			CommandInterpreter::ProcessCommand(shared_from_this(), command);
+			
+			// Clear the string.
+			_dataVec.clear();
+			
+			// Get the next data.
+			readChunk();
+		}
 	}
 	else {
-		// TODO: Handle other errors.
-		// For now, just quit the session.
-		//terminate();
-		//_parent->signalSessionTerminated(shared_from_this());
+		// TODO
 	}
+}
+
+void TCPSession::copyDataToVector(std::size_t count)
+{
+	int oldSize = _dataVec.size();
+	_dataVec.resize(oldSize + count);
+	char* pData = _dataVec.data() + oldSize;
+	memcpy(pData, _data, count);
+}
+
+void TCPSession::readChunk()
+{
+	_socket.async_read_some(boost::asio::buffer(_data, max_length),
+      boost::bind(&TCPSession::handle_read, shared_from_this(),
+        boost::asio::placeholders::error,
+        boost::asio::placeholders::bytes_transferred));
 }
 
 /**
@@ -112,11 +148,6 @@ void TCPSession::handle_write(const boost::system::error_code& error) {
 * @param response A string to send to the client
 */
 void TCPSession::respond(const std::string response) {
-//	boost::asio::async_write(_socket,
-//		boost::asio::buffer(response.c_str(), response.length()),
-//		boost::bind(&TCPSession::handle_write, this,
-//			boost::asio::placeholders::error));
-	
 	// Writing responses:
 	// We write a maximum of 1024 bytes each time.
 	// When the client reads the message, if 1024 bytes
@@ -126,14 +157,14 @@ void TCPSession::respond(const std::string response) {
 	// is complete. If 1024 bytes are sent, the last byte
 	// is always 0.
 	
-	char buffer[MAX_WRITE_MESSAGE_LENGTH];
-	memset(buffer, 0, MAX_WRITE_MESSAGE_LENGTH);
+	char buffer[max_length];
+	memset(buffer, 0, max_length);
 	
 	// i advances by 1023 each time, because the 1024th byte is 0.
-	for ( int i = 0; i < response.length(); i += MAX_WRITE_MESSAGE_LENGTH - 1 )
+	for ( int i = 0; i < response.length(); i += max_length - 1 )
 	{
 		// Find out how many chars to copy.
-		int charsToCopy = std::min<int>(MAX_WRITE_MESSAGE_LENGTH - 1, response.length() - i);
+		int charsToCopy = std::min<int>(max_length - 1, response.length() - i);
 		
 		// Copy the chars.
 		// The last element of the buffer will remain 0.
@@ -143,17 +174,6 @@ void TCPSession::respond(const std::string response) {
 		boost::asio::async_write(_socket, boost::asio::buffer(buffer, charsToCopy), boost::bind(&TCPSession::handle_write, this, boost::asio::placeholders::error));
 	}
 }
-
-//void TCPSession::terminate()
-//{
-//	try {
-//		_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-//		_socket.close();
-//	}
-//	catch (std::exception ex) {
-//		std::cout << ex.what() << std::endl;
-//	}
-//}
 
 boost::uuids::uuid TCPSession::uuid()
 {

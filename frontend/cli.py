@@ -263,7 +263,7 @@ def executeForFileParsing():
 		sys.stdout.write("\n");
 		fileNo = fileNo + 1
 	
-	print("All files processed.")
+	print("All files processed, quitting.")
 	sys.exit()
 		
 # ===============================
