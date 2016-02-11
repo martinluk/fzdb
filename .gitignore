@@ -38,6 +38,7 @@ build
 
 # Vim locks
 *.swp
+*.swo
 
 .vagrant
 *~

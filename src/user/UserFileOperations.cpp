@@ -30,7 +30,7 @@
 //Initialise cache map
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
-void UserFileOperations::initialize() { //TODO
+void UserFileOperations::initialize() {
 	//Empty file cache
 	userFileCache.clear();
 	if (ADD_ADMIN_ON_INIT) {
@@ -66,8 +66,6 @@ void UserFileOperations::addUser(UserAttributes userAttributes) {
 }
 
 void UserFileOperations::removeUser(std::string userName) {
-	//load cache from file
-	loadCacheFromFile();
 	if((userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
@@ -78,8 +76,6 @@ void UserFileOperations::removeUser(std::string userName) {
 }
 
 void UserFileOperations::updateUser(std::string userName, UserAttributes newAttributes) {
-	//load cache from file
-	loadCacheFromFile();
 	if((userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
@@ -90,8 +86,6 @@ void UserFileOperations::updateUser(std::string userName, UserAttributes newAttr
 }
 
 UserAttributes UserFileOperations::getUserAttributes(std::string userName){
-	//load cache from file
-	loadCacheFromFile();
 	if((userFileCache.count(userName))>0) {
 		throw new UserNotExistException;
 	}
