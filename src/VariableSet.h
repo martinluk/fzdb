@@ -30,7 +30,7 @@ public:
 		
 	}
 	
-	unsigned int add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, VariableType&& type) {
+	unsigned int add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, const VariableType&& type) {
 		if (_metaData.find(var) == _metaData.cend()) {
 			throw new std::runtime_error("Unexpected variable");
 		}
@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	void add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, VariableType&& type, unsigned int row) {
+	void add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, const VariableType&& type, unsigned int row) {
 
 		if (row >= _values.size()) {
 			throw new std::runtime_error("Attempting to add to a non-existent row");

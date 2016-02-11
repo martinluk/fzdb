@@ -35,11 +35,11 @@ public:
 		_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(name, val));
 	}	
 
-	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings);
+	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
 	void Insert(std::vector<model::Triple> triples);
 
-	bool EntityExists(Entity::EHandle_t handle) {
+	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
 	}
     
@@ -58,7 +58,7 @@ public:
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
 	//move to private
-	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited);
+	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
 private:
 	void changeEntityType(Entity::EHandle_t id, const std::string &type);
 	
@@ -103,7 +103,20 @@ private:
 		return iter->second;
 	}
 
-	unsigned int getPropertyName(std::string str) {
+	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type) const {
+		auto iter = _propertyNames.left.find(str);
+		if (iter == _propertyNames.left.end()) {			
+		 return 0;
+		}
+
+		if (_propertyTypes.at(iter->second) != type) {
+			throw MismatchedTypeException("mismatched types!");
+		}
+
+		return iter->second;
+	}
+
+	unsigned int getPropertyName(std::string str) const {
 		auto iter = _propertyNames.left.find(str);
 		if (iter == _propertyNames.left.end()) {
 			return 0;
@@ -128,19 +141,19 @@ private:
 		}
 	}
 
-	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object);
+	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object) const;
 
-	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2);
+	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2) const;
 
-	void Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const model::Object&& object);
+	void Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const model::Object&& object) const;
 
-	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3);
+	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3) const;
 
-	std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName);
+	std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) const;
 
-	std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object);
+	std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object) const;
 
-	void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const std::string variableName2);
+	void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const std::string variableName2) const;
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H
