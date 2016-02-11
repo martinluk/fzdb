@@ -21,17 +21,13 @@ namespace model {
 			}
 			
 		public:
-			String() :Base(100), _value(), _valueWrapper(_value)
+			String() :Base(100, std::string()), _value(), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
 			}
 			
-			String(const std::string value) : Base(100), _value(value), _valueWrapper(_value)
-			{
-				initMemberSerialiser();
-			}
-			
-			String(const std::string &value, unsigned char confidence) : Base(confidence), _value(value), _valueWrapper(_value)
+			String(const std::string &value, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(value), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
 			}
@@ -60,20 +56,20 @@ namespace model {
 			}
 
 			// Inherited via Base
-			virtual bool Equals(const std::string val) const override {
+			virtual bool Equals(const std::string &val) const override {
 				return _value == val;
 			}
 
 		protected:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
-				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseDynamicMembers(serialiser);
+				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
 			}
 
 			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialiseDynamicMembers(serialisedData);
+				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
 			}
 		};
 	}

@@ -21,22 +21,19 @@ namespace model {
 			}
 			
 		public:
-			EntityRef() : _value(0), Base(100)
+			EntityRef() : Base(100, std::string()), _value(0)
 			{
 				initMemberSerialiser();
 				
 			}
-			EntityRef(const EHandle_t value) : _value(value), Base(100)
+			EntityRef(EHandle_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(value)
 			{
 				initMemberSerialiser();
 			}
 			
-			EntityRef(EHandle_t value, unsigned char confidence) : Base(confidence), _value(value)
-			{
-				initMemberSerialiser();
-			}
-			
-			EntityRef(std::string value, unsigned char confidence) : EntityRef(std::atoll(value.c_str()), confidence)
+			EntityRef(const std::string &value, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				EntityRef(std::atoll(value.c_str()), confidence, comment)
 			{
 				// Already initialised
 			}
@@ -61,7 +58,7 @@ namespace model {
 			}
 
 			// Inherited via Base
-			virtual bool Equals(const std::string val) const override {
+			virtual bool Equals(const std::string &val) const override {
 				return _value == std::stoll(val);
 			}
 

@@ -154,7 +154,7 @@ QueryResult DebugSerialise::execute()
     std::stringstream log;
     Serialiser serialiser;
 
-    std::shared_ptr<Base> tBase = std::make_shared<Base>(53);
+    std::shared_ptr<Base> tBase = std::make_shared<Base>(53, std::string());
 	std::shared_ptr<Int> tInt = std::make_shared<Int>(1337, (unsigned char)72);
 	std::shared_ptr<String> tString = std::make_shared<String>(std::string("Body of Baywatch, face of Crimewatch"), 26);
 	std::shared_ptr<EntityRef> tEntRef = std::make_shared<EntityRef>((EHandle_t)1234, 99);
