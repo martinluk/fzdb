@@ -4,13 +4,15 @@ describe("Fuzzy Database", function() {
   var client;
 
   //connects to the database
-  beforeEach(function(done) { 
+  beforeAll(function(done) { 
     client = new net.Socket();
     client.connect(1407, '127.0.0.1', function() {
-      done();
+      client.write("FLUSH");
+      client.once('data', function(data) {
+        done();
+      });   
     });
   });
-
   
   describe("sends the command over TCP", function() {
 
@@ -163,7 +165,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a $b \"Marco\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON.response).toBe("Queries of the form $a $b value are not yet implemented");
+        expect(resultJSON.result).toEqual([{a: '1'}, {a: '3'}]);
         done();
       });      
     });
@@ -233,7 +235,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 $a \"Marco\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON.response).toEqual("Queries of the form entity $b value are not yet implemented");
+        expect(resultJSON.result[0].a).toEqual("1");
         done();
       });      
     });
@@ -243,7 +245,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 $b $c}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON.response).toEqual("Queries of the form entity $b $c are not yet implemented");
+        expect(resultJSON.result[0].a).toEqual("1");
         done();
       });      
     });

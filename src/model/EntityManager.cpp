@@ -114,7 +114,7 @@ QueryResult EntityManager::SeparateTriples(std::vector<model::Triple> conditions
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
+VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings settings)
 {
 	VariableSet result(triplesBlock.variables);
 	auto conditions = triplesBlock.triples;
@@ -141,8 +141,7 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
 			else {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
 					//option3 - $a $b value
-					//this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object));
-					throw NotImplementedException("Queries of the form $a $b value are not yet implemented");
+					this->Scan3(std::move(result), conditionsIter->subject.value, conditionsIter->predicate.value, std::move(conditionsIter->object));
 				}
 				else {
 					//option 4 - $a $b $c
@@ -153,8 +152,7 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
 		else {
 			if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
-					//doesn't // TODO: Handle setting an entity type.
-					// If the entity already has a type, it shouldn't be allowed to change.contain any variables.. is meaningless
+					//doesn't contain any variables.. is meaningless
 				}
 				else {
 					//option 5 - entity <prop> $c
@@ -164,11 +162,11 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock)
 	 		else {
 				if (model::Object::IsValue(conditionsIter->object.type)) {
 					//option 7 - entity $b value
-					throw NotImplementedException("Queries of the form entity $b value are not yet implemented");
+					this->Scan6(std::move(result), std::move(conditionsIter->subject), conditionsIter->predicate.value, std::move(conditionsIter->object));
 				}
 				else {
 					//option 8 - entity $b $c
-					throw NotImplementedException("Queries of the form entity $b $c are not yet implemented");
+					this->Scan7(std::move(result), std::move(conditionsIter->subject), conditionsIter->predicate.value, conditionsIter->object.value);
 				}
 			}
 		}
@@ -268,6 +266,7 @@ void EntityManager::clearAll()
     _entityTypeNames.clear();
     _propertyNames.clear();
     _propertyTypes.clear();
+	_links.clear();
 }
 
 std::size_t EntityManager::entityCount() const
@@ -288,10 +287,10 @@ std::string EntityManager::dumpContents() const
         {
             str << "{\n";
             
-            const std::map<unsigned int, IEntityProperty*> &propMap = ent->properties();
+			const std::map<unsigned int, std::shared_ptr<IEntityProperty>> &propMap = ent->properties();
             for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
             {
-                IEntityProperty* prop = it2->second;
+				std::shared_ptr<IEntityProperty> prop = it2->second;
                 str << "  " << prop->logString() << "\n";
                 
                 if ( prop->count() > 0 )
@@ -394,22 +393,46 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 
 #pragma region linkingandmerging
 
-void EntityManager::linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+std::set<Entity::EHandle_t> EntityManager::getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) {
+	if (_links.find(start) == _links.cend()) {
+		//Bad
+	}
+	
+	std::set<Entity::EHandle_t> results;
+	std::set_difference(_links[start].begin(), _links[start].end(), 
+		visited.begin(), visited.end(),
+		std::inserter(results, results.begin()));
 
+	visited.insert(start);
+
+	if (results.size() == 0)return visited;
+
+	for (auto id : results) {
+		this->getLinkGraph(id, std::move(visited));
+	}
+
+	return visited;
+}
+
+void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2) {
+
+	//create link sets if they do not exists
 	if (_links.find(entityId) == _links.end()) _links[entityId] = std::set<Entity::EHandle_t>();
 	if (_links.find(entityId2) == _links.end()) _links[entityId2] = std::set<Entity::EHandle_t>();
 
-	std::set<Entity::EHandle_t> newSet;
+	//add the new link
+	_links[entityId].insert(entityId2);
+	_links[entityId2].insert(entityId);
 
-	std::set_union(_links[entityId].begin(), _links[entityId].end(),
-					_links[entityId2].begin(), _links[entityId2].end(), 
-					std::inserter(newSet, newSet.begin()));
+	//get the full graph of linked entities
+	auto allLinked = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
+	Entity::EHandle_t lowestId = *std::min_element(allLinked.begin(), allLinked.end());
 
-	newSet.insert(entityId2);
-	newSet.insert(entityId);
-
-	_links[entityId] = newSet;
-	_links[entityId2] = newSet;
+	//set and/or reset link status values
+	for (auto id : allLinked) {
+		_entities[id]->linkStatus(Entity::LinkStatus::Slave);
+		if (id == lowestId) _entities[id]->linkStatus(Entity::LinkStatus::Master);
+	}
 }
 
 void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
@@ -420,6 +443,44 @@ void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t
 		_links.find(entityId2)->second.find(entityId) == _links.find(entityId2)->second.end()) {
 		return;
 	}
+
+	//remove the old link
+	_links[entityId].erase(entityId2);
+	_links[entityId2].erase(entityId);
+
+	//get the new link graphs
+	auto allLinked = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
+	auto allLinked2 = getLinkGraph(entityId2, std::set<Entity::EHandle_t>());
+
+	//check if entities are now not linked at all
+	if (allLinked.size() == 1) {
+		_links.erase(entityId);
+		_entities[entityId]->linkStatus(Entity::LinkStatus::None);
+	}
+	else {
+		Entity::EHandle_t lowestId = *std::min_element(allLinked.begin(), allLinked.end());
+
+		//set and/or reset link status values
+		for (auto id : allLinked) {
+			_entities[id]->linkStatus(Entity::LinkStatus::Slave);
+			if (id == lowestId) _entities[id]->linkStatus(Entity::LinkStatus::Master);
+		}
+	}
+
+	if (allLinked2.size() == 1) {
+		_links.erase(entityId2);
+		_entities[entityId2]->linkStatus(Entity::LinkStatus::None);
+	}
+	else {
+		Entity::EHandle_t lowestId = *std::min_element(allLinked2.begin(), allLinked2.end());
+
+		//set and/or reset link status values
+		for (auto id : allLinked2) {
+			_entities[id]->linkStatus(Entity::LinkStatus::Slave);
+			if (id == lowestId) _entities[id]->linkStatus(Entity::LinkStatus::Master);
+		}
+	}
+
 }
 
 // Merges the entities with the given Ids. The entity with the higher Id number is deleted.
@@ -482,10 +543,26 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 
 		auto currentEntity = iter->second;
-		if (currentEntity->meetsCondition(propertyId, std::move(object))) {
-			variableSet.add(std::move(variableName), std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
-		}
+		switch (currentEntity->linkStatus()) {
 
+		case Entity::LinkStatus::None:
+			if (currentEntity->meetsCondition(propertyId, std::move(object))) {
+				variableSet.add(std::move(variableName), std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
+			}
+			break;
+		case Entity::LinkStatus::Slave:
+			continue;
+		case Entity::LinkStatus::Master:
+			auto graph = getLinkGraph(currentEntity->handle_, std::set<Entity::EHandle_t>());
+			for (auto entId : graph) {
+				if (_entities[entId]->meetsCondition(propertyId, std::move(object))) {
+					variableSet.add(std::move(variableName), std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
+					break;
+				}
+			}
+			
+			break;
+		}
 	}
 }
 
@@ -539,12 +616,31 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 	//the variable has not been used, add all the values found!
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 
-		auto currentEntity = iter->second;
-		if (currentEntity->hasProperty(propertyId)) {
-			auto rowId = variableSet.add(std::move(variableName), std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), model::types::Base::Subtype::TypeEntityRef);
-			variableSet.add(std::move(variableName2),
-				currentEntity->getProperty(propertyId)->baseValue(0)->Clone(),
-				std::move(_propertyTypes[propertyId]), rowId);
+		auto rows = Scan5(std::move(variableSet),
+			model::Subject(model::Subject::Type::ENTITYREF, 
+				std::to_string(iter->first)), std::move(predicate), variableName2);
+
+		for (auto row : rows) {
+			variableSet.add(std::move(variableName),
+				std::make_shared<model::types::EntityRef>(iter->second->getHandle()),
+				model::types::Base::Subtype::TypeEntityRef, row);
+		}
+
+	}
+}
+
+void EntityManager::Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object) {
+
+	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
+
+		auto rows = Scan6(std::move(variableSet),
+			model::Subject(model::Subject::Type::ENTITYREF,
+				std::to_string(iter->first)), variableName2, std::move(object));
+
+		for (auto row : rows) {
+			variableSet.add(std::move(variableName),
+				std::make_shared<model::types::EntityRef>(iter->second->getHandle()),
+				model::types::Base::Subtype::TypeEntityRef, row);
 		}
 
 	}
@@ -574,12 +670,14 @@ void EntityManager::Scan4(VariableSet&& variableSet, const std::string variableN
 	}
 }
 
-void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) {
+std::vector<unsigned int> EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) {
 	
 	//TODO: Check variable types
+	//TODO : Linkify
 
 	//get the entity handle
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
+	std::vector<unsigned int> rowsAdded;
 
 	//get the property id
 	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::Base::Subtype::TypeString, false);
@@ -587,11 +685,80 @@ void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subj
 	if (EntityExists(entityRef)) {
 		auto entity = _entities[entityRef];
 		if (entity->hasProperty(propertyId)) {
-			variableSet.add(std::move(variableName),
-				entity->getProperty(propertyId)->baseValue(0)->Clone(),
-				std::move(_propertyTypes[propertyId]));
+			for (auto value : entity->getProperty(propertyId)->baseValues()) {
+				rowsAdded.push_back(variableSet.add(std::move(variableName), value->Clone(), std::move(_propertyTypes[propertyId])));
+			}			
 		}
 	}
+
+	return rowsAdded;
+}
+
+std::vector<unsigned int> EntityManager::Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object) {
+
+	//TODO: Check variable types
+	//TODO : Linkify
+
+	//get the entity handle
+	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
+	std::vector<unsigned int> rowsAdded;
+
+	if (EntityExists(entityRef)) {
+		auto entity = _entities[entityRef];
+		//iterate through properties
+		for (auto propertyPair : entity->properties()) {
+			auto vals = propertyPair.second->baseValues();
+			for (auto value : vals) {
+				if (value->Equals(object)) {
+					rowsAdded.push_back(variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), model::types::Base::Subtype::PropertyReference));
+				}
+			}
+		}
+	}
+
+	return rowsAdded;
+}
+
+void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2) {
+	
+	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
+
+	if (EntityExists(entityRef)) {
+		auto entity = _entities[entityRef];
+
+		//if variableName is already set
+		std::map<unsigned int, std::shared_ptr<IEntityProperty>> iterableProperties;
+		if (variableSet.used(variableName)) {
+			auto data = variableSet.getData(variableName);
+			std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](BasePointer b) {
+				std::shared_ptr<model::types::Int> prop = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(b);
+				return std::pair<unsigned int, std::shared_ptr<IEntityProperty>>(prop->value(), entity->getProperty(prop->value()));
+			});
+		}
+		else {
+			iterableProperties = entity->properties();
+		}
+
+		//iterate through properties
+		for (auto propertyPair : iterableProperties) {
+			auto vals = propertyPair.second->baseValues();
+			for (auto value : vals) {
+
+				//if variablename2 is already set
+				if (variableSet.used(variableName2)) {
+					auto rows = variableSet.find(variableName2, value->toString());
+					for (auto rowId : rows) {
+						variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), std::move(_propertyTypes[propertyPair.first]), rowId);
+					}
+				}
+				else {
+					auto rowId = variableSet.add(std::move(variableName), std::make_shared<model::types::Int>(propertyPair.first), model::types::Base::Subtype::PropertyReference);
+					variableSet.add(std::move(variableName2), value->Clone(), std::move(_propertyTypes[propertyPair.first]), rowId);
+				}				
+			}
+		}
+	}
+
 }
 
 #pragma endregion scan_functions

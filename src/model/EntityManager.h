@@ -5,6 +5,8 @@
 #include <functional>
 #include <algorithm> 
 
+#include <boost/bimap.hpp>
+
 #include "./Entity.h"
 
 #include "../QueryResult.h"
@@ -13,6 +15,7 @@
 #include "../VariableSet.h"
 #include "../Exceptions.h"
 #include "../Util.h"
+#include "./QuerySettings.h"
 
 // TODO: We need smart pointers! We need to have the manager own the entity
 // and entities should not have delete called on them externally.
@@ -29,10 +32,10 @@ public:
 	std::shared_ptr<Entity> createEntity(const std::string &type);
 
 	void AddProperty(std::string name, unsigned int val) {
-		_propertyNames[name] = val;
+		_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(name, val));
 	}	
 
-	VariableSet BGP(TriplesBlock triplesBlock);
+	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings);
 
 	void Insert(std::vector<model::Triple> triples);
 
@@ -50,12 +53,15 @@ public:
     bool saveToFile(const std::string &filename);
     bool loadFromFile(const std::string &filename);
 
-	void linkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+	void linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2);
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
+	//move to private
+	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited);
 private:
 	void changeEntityType(Entity::EHandle_t id, const std::string &type);
+	
 	unsigned int getTypeID(const std::string &str);
 
 	// TODO: This could be an unordered map, but we may want to utilise the
@@ -71,17 +77,17 @@ private:
 	// This maps string type names to entity type IDs.
 	std::map<std::string, unsigned int> _entityTypeNames;
 
-	std::map<std::string, unsigned int> _propertyNames;
+	boost::bimap<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
 	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {
-		auto iter = _propertyNames.find(str);
-		if (iter == _propertyNames.cend()) {
+		auto iter = _propertyNames.left.find(str);
+		if (iter == _propertyNames.left.end()) {
 			if (addIfMissing) {
-				_propertyNames[str] = ++_lastProperty;
+				_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
 				_propertyTypes[_lastProperty] = type;
 				return _lastProperty;
 			}
@@ -98,8 +104,8 @@ private:
 	}
 
 	unsigned int getPropertyName(std::string str) {
-		auto iter = _propertyNames.find(str);
-		if (iter == _propertyNames.cend()) {
+		auto iter = _propertyNames.left.find(str);
+		if (iter == _propertyNames.left.end()) {
 			return 0;
 		}
 		return iter->second;
@@ -126,9 +132,15 @@ private:
 
 	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2);
 
-	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const std::string variableName3);
+	void Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const model::Object&& object);
 
-	void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName);
+	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3);
+
+	std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName);
+
+	std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object);
+
+	void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const std::string variableName2);
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H

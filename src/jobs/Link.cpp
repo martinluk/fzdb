@@ -13,6 +13,7 @@ Link::Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity:
 QueryResult Link::execute()
 {
 	QueryResult result;
+	result.setValue("result", "success");
 	Singletons::entityManager()->linkEntities(_entity1, _entity2);
 	return result;
 }
@@ -24,6 +25,7 @@ Unlink::Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Ent
 QueryResult Unlink::execute()
 {
 	QueryResult result;
+	result.setValue("result", "success");
 	Singletons::entityManager()->unlinkEntities(_entity1, _entity2);
 	return result;
 }
@@ -35,6 +37,7 @@ Merge::Merge(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entit
 QueryResult Merge::execute()
 {
 	QueryResult result;
+	result.setValue("result", "success");
 	Singletons::entityManager()->mergeEntities(_entity1, _entity2);
 	return result;
 }

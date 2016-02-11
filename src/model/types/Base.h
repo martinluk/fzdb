@@ -6,6 +6,7 @@
 #include <cstring>
 #include <memory>
 #include "../ILogString.h"
+#include "../Triple.h"
 #include "../MemberSerialiser.h"
 
 namespace model {
@@ -80,6 +81,14 @@ namespace model {
 				return false;
 			}
 
+			bool Equals(const model::Object object) {
+				if (object.type == model::Object::Type::VARIABLE) return false;
+				if (object.type == model::Object::Type::INT && subtype() != Subtype::TypeInt32) return false;
+				if (object.type == model::Object::Type::STRING && subtype() != Subtype::TypeString) return false;
+				if (object.type == model::Object::Type::ENTITYREF && subtype() != Subtype::TypeEntityRef) return false;
+				return Equals(object.value);
+			}
+
 			virtual std::string toString() const
 			{
 				return "";
@@ -119,11 +128,12 @@ namespace model {
 			}
 		};
 
+		template <typename T>
 		class ConfidenceCompare {
 		public:
-			bool operator() (const Base &a, const Base &b) const
+			bool operator() (const std::shared_ptr<T> a, const std::shared_ptr<T> b) const
 			{
-				return a.confidence() > b.confidence();
+				return a->confidence() > b->confidence();
 			}
 		};
 	}

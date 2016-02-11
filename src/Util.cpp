@@ -2,7 +2,11 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
+<<<<<<< HEAD
 #include <locale>
+=======
+#include <cctype>
+>>>>>>> origin/master
 
 namespace util
 {

@@ -8,7 +8,7 @@ INCLUDE(ExternalProject)
 
 if(UNIX)
   set (CMAKE_CXX_FLAGS "-std=c++11")
-  set (CMAKE_VERBOSE_MAKEFILE true )
+  #set (CMAKE_VERBOSE_MAKEFILE true )
 endif()
 
 #Default is DEBUG build
