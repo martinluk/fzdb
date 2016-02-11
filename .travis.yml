@@ -5,7 +5,6 @@ cache:
   directories:
     - build/external
 compiler:
-  - clang
   - gcc
 notifications:
   webhooks:

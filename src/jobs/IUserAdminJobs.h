@@ -9,5 +9,7 @@ class IUserAdminJobs : public Job {
        IUserAdminJobs(std::shared_ptr<ISession> session);
        QueryResult execute() override ;
     protected:
-		virtual QueryResult adminJobBody() { return QueryResult();  };
+		virtual QueryResult adminJobBody() {
+			return QueryResult();
+		}
 };
