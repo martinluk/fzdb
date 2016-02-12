@@ -1,75 +1,71 @@
-#define BOOST_SPIRIT_UNICODE
-
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
-
-#include <boost/fusion/adapted/struct/adapt_struct.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-
 #include "./CommandInterpreter.h"
 
 #include "Job.h"
-#include "JobFactory.h"
 #include "JobQueue.h"
 
-struct command_struct
-{
-	std::string command;
-	std::string arg1;
-};
+#include "jobs/Ping.h"
+#include "jobs/Echo.h"
+#include "jobs/Unknown.h"
+#include "jobs/Insert.h"
+#include "jobs/BGP.h"
+#include "jobs/DebugJob.h"
+#include "jobs/LoadFileJob.h"
+#include "jobs/SaveFileJob.h"
+#include "jobs/Link.h"
+#include "jobs/Flush.h"
 
-BOOST_FUSION_ADAPT_STRUCT(
-	command_struct,
-	(std::string, command)
-	(std::string, arg1)
-	)
+#include "Parser.h"
 
-namespace client
-{
-	namespace qi = boost::spirit::qi;
+void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::string command) {
 
-	template <typename Iterator>
-	struct command_parser : qi::grammar<Iterator, command_struct(), boost::spirit::unicode::space_type>
-	{
-		command_parser() : command_parser::base_type(start)
-		{
-			using qi::int_;
-			using qi::lit;
-			using qi::double_;
-			using qi::lexeme;
-			using boost::spirit::unicode::char_;
+	auto tokens = FSparqlParser::Tokenize(command);
 
-			string %= lexeme[+(char_ - ' ') | ('"' >> +(char_ - '"') >> '"')];
+	try {
+		Query query = FSparqlParser::ParseAll(tokens);
 
-			start %=
-				string
-				>> -string
-				;
-		}
-
-		qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> string;
-		qi::rule<Iterator, command_struct(), boost::spirit::unicode::space_type> start;
-	};
-}
-
-void CommandInterpreter::ProcessCommand(TCPSession* session, std::string command) {
-
-	client::command_parser<std::string::iterator> g;
-	command_struct cmd;
-	bool r = boost::spirit::qi::phrase_parse(command.begin(), command.end(), g, boost::spirit::unicode::space, cmd);
-	Job* job;
-	if (r) {
-		if (cmd.arg1.length() == 0) {
-			job = JobFactory::createJob(session, cmd.command);
-		}
-		else {
-			job = JobFactory::createJob(session, cmd.command, cmd.arg1);
+		switch (query.type) {
+		case QueryType::PING:
+			JobQueue::AddJob(new PingJob(session));
+			break;
+		case QueryType::DEBUGECHO:
+			JobQueue::AddJob(new EchoJob(session, query.data0));
+			break;
+		case QueryType::INSERT:
+			JobQueue::AddJob(new Insert(session, query));
+			break;
+		case QueryType::SELECT:
+			JobQueue::AddJob(new BGP(session, query));
+			break;
+		case QueryType::DEBUGOTHER:
+			JobQueue::AddJob(new DebugJob(session, query.data0));
+			break;
+		case QueryType::LOAD:
+			JobQueue::AddJob(new LoadFileJob(session, query.data0));
+			break;
+		case QueryType::SAVE:
+			JobQueue::AddJob(new SaveFileJob(session, query.data0));
+			break;
+		case QueryType::LINK:
+			JobQueue::AddJob(new jobs::Link(session, query.entities[0], query.entities[1]));
+			break;
+		case QueryType::UNLINK:
+			JobQueue::AddJob(new jobs::Unlink(session, query.entities[0], query.entities[1]));
+			break;
+		case QueryType::MERGE:
+			JobQueue::AddJob(new jobs::Merge(session, query.entities[0], query.entities[1]));
+			break;
+		case QueryType::FLUSH:
+			JobQueue::AddJob(new Flush(session));
+			break;
+		default:
+			JobQueue::AddJob(new UnknownJob(session, command));
 		}
 	}
-	else {
-		job = JobFactory::createUnknownJob(session, cmd.command);
+	catch (ParseException ex) {
+		session->respond(QueryResult::generateError(std::string("Parse error: ") +  ex.what()).toJSON());
 	}
-  //simple commands
-   
-  JobQueue::AddJob(job);
+	catch (std::exception& ex) {
+		session->respond(QueryResult::generateError(std::string("Unexpected error: ") + ex.what()).toJSON());
+	}
 }
+

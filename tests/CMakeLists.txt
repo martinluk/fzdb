@@ -17,7 +17,10 @@ include_directories(${GMOCK_INCLUDE_DIRS})
 add_executable(fuzzy-database-test ${TEST_SOURCES} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest> $<TARGET_OBJECTS:gmock> $<TARGET_OBJECTS:fuzzy-database-lib>)
 add_dependencies(fuzzy-database-test nowide)
 add_dependencies(fuzzy-database-test gtest)
+
 add_dependencies(fuzzy-database-test fuzzy-database-lib)
+add_dependencies(fuzzy-database-test spdlog)
+add_dependencies(fuzzy-database-test rapidjson)
 
 target_link_libraries(fuzzy-database-test ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(fuzzy-database-test ${Boost_LIBRARIES})

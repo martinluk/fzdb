@@ -8,13 +8,11 @@ addons:
     packages:
       - cmake
       - g++-4.9
-      - clang-3.5
 cache: 
   directories:
     - build/external
   apt: true
 compiler:
-  - clang
   - gcc
 notifications:
   webhooks:
@@ -32,3 +30,7 @@ install:
 script:
   - cmake --build .
   - ctest -V -C debug
+  - ./fuzzy-database& 
+  - cd ../ #Back to project root to run npm test
+  - npm install && npm test
+

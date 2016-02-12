@@ -1,11 +1,14 @@
 #include "Echo.h"
 
-EchoJob::EchoJob(ISession* session, std::string message) : Job(session)
+EchoJob::EchoJob(std::shared_ptr<ISession> session, std::string message) : Job(session)
 {
 	_message = message;
 }
 
-void EchoJob::execute()
+QueryResult EchoJob::execute()
 {
-	_session->respond(_message);
+	QueryResult result;
+	result.setValue("type", "string");
+	result.setValue(std::string("response"), _message);
+	return result;
 }

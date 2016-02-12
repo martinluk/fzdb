@@ -2,20 +2,25 @@
 #define FUZZYDB_JOB
 
 #include "ISession.h"
+#include "QueryResult.h"
 
 class Job 
 {
 public:
-	Job(ISession* session) 
+	Job(std::shared_ptr<ISession> session) 
 	{
 		_session = session;
 	}
 
 	virtual ~Job() {}
 
-	virtual void execute() = 0;
+	virtual QueryResult execute() = 0;
+
+	std::shared_ptr<ISession> Session() {
+		return _session;
+	}
 protected:
-	ISession* _session;
+	std::shared_ptr<ISession> _session;
 };
 
 #endif
