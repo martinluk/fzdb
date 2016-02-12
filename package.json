@@ -5,6 +5,7 @@
     "test": "./node_modules/.bin/jasmine"
   },
   "dependencies": {
-    "jasmine": "^2.4.1"
+    "jasmine": "^2.4.1",
+    "promise": "^7.1.1"
   }
 }
