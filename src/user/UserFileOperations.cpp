@@ -86,7 +86,7 @@ void UserFileOperations::updateUser(std::string userName, UserAttributes newAttr
 }
 
 UserAttributes UserFileOperations::getUserAttributes(std::string userName){
-	if((userFileCache.count(userName))>0) {
+	if((userFileCache.count(userName))==0) {
 		throw new UserNotExistException;
 	}
 	return userFileCache[userName];

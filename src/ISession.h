@@ -23,6 +23,8 @@ public:
 	void clearCurrentUserName() { _username.clear(); }
 
 	UserGroup getCurrentUserUserGroup() {
+		if(_username.empty())
+			return UserGroup::GUEST;
 		return UserOperation::getUserGroup(_username);
 	}
 

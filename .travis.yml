@@ -1,6 +1,7 @@
 language: cpp
 sudo: required
 dist: trusty
+branch: master
 cache:
   directories:
     - build/external

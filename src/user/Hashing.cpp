@@ -1,10 +1,4 @@
-#include <sstream>
-#include <string>
 #include "user/Hashing.h"
-#include <iostream>
-#include <boost/uuid/sha1.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 
 std::string Hashing::sha1hash(std::string password) {
 	boost::uuids::detail::sha1 sha1;

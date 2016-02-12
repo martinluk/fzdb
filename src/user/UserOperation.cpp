@@ -5,8 +5,6 @@
 #include <user/Hashing.h>
 
 UserGroup UserOperation::getUserGroup(std::string userName) {
-	if (userName.empty())
-		return UserGroup::GUEST;
 	UserAttributes currUserAttr = getUserAttributes(userName);
 	return currUserAttr.userGroup;
 }

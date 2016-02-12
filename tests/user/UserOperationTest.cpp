@@ -14,14 +14,6 @@ protected:
 TEST_F(UserOperationTest, addUser) {
 	//Assert there does not exist the specific user
 
-	try {
-		const std::string userName="addUserTest";
-		UserGroup ug = UserOperation::getUserGroup(userName);
-		FAIL();	//Should definitely have exception thrown here.
-	} catch (UserNotExistException ex) {
-		//Do nothing.
-		return;
-	}
 	//Add the user
 
 	//Assert user exists
@@ -50,5 +42,6 @@ TEST_F(UserOperationTest, changeUserGroup) {
 	//Asser the user does not exist anymore
 }
 TEST_F(UserOperationTest, getUserGroup) {
-	//TODO
+	//If Empty string, returns guest.
+	
 }
