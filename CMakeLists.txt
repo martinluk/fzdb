@@ -4,7 +4,8 @@ cmake_policy(VERSION 2.8.7)
 
 enable_testing()
 
-INCLUDE(ExternalProject)
+include(ExternalProject)
+include(ProcessorCount)
 
 if(UNIX)
   set (CMAKE_CXX_FLAGS "-std=c++11")
@@ -69,6 +70,17 @@ macro(GroupSources curdir)
 endmacro()
 
 GroupSources(src)
+
+ProcessorCount(N)
+
+message("Building with " ${N} " cores")
+if(NOT N EQUAL 0)
+  if(WIN32)
+    set(CTEST_BUILD_FLAGS “/MP${N}”)
+  else()
+    set(CTEST_BUILD_FLAGS “-j${N}”)
+  endif()
+endif()
 
 SET(SOURCES_NO_MAIN ${SOURCES})
 LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
