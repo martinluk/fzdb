@@ -5,8 +5,9 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
-#include <user/Permission.h>
-#include <user/UserOperation.h>
+#include "user/Permission.h"
+#include "user/UserOperation.h"
+
 class ISession
 {
 public:
@@ -22,7 +23,7 @@ public:
 	}
 	void clearCurrentUserName() { _username.clear(); }
 
-	UserGroup getCurrentUserUserGroup() {
+	Permission::UserGroup getCurrentUserUserGroup() {
 		return UserOperation::getUserGroup(_username);
 	}
 

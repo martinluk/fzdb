@@ -1,5 +1,6 @@
-#include <user/UserFileOperations.h>
-#include <user/Hashing.h>
+#include "UserFileOperations.h"
+#include "Hashing.h"
+#include "Permission.h"
 
 #include "boost/assign.hpp"
 #include <boost/filesystem.hpp>
@@ -39,7 +40,7 @@ void UserFileOperations::initialize() { //TODO
 		admin.userName = ADMIN_USERNAME;
 		admin.salt = Hashing::genSalt();
 		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-		admin.userGroup = UserGroup::ADMIN;
+		admin.userGroup = Permission::UserGroup::ADMIN;
 		addUser(admin);
 	} else { 
 		//Load from json
@@ -137,12 +138,12 @@ void UserFileOperations::loadCacheFromFile() {
 				itrGroupI != userObject.MemberEnd());
 
 		//Casting user group int to user group
-		UserGroup group;
+		Permission::UserGroup group;
 		unsigned int groupNumber = itrHash->value.GetInt();
 		if (groupNumber==1) 
-			group=UserGroup::EDITOR;
+			group = Permission::UserGroup::EDITOR;
 		else if (groupNumber==0)
-			group=UserGroup::ADMIN;
+			group = Permission::UserGroup::ADMIN;
 		else
 			assert(false/*Invalid values in groupNumber in json user file*/);
 
@@ -200,12 +201,12 @@ void UserFileOperations::saveCacheToFile() {
 		using namespace std;
 		using namespace boost::assign;
 
-		map<UserGroup, unsigned int> groupIntMap; 
-		insert(groupIntMap) (UserGroup::ADMIN,0) (UserGroup::EDITOR,1) ;
+		map<Permission::UserGroup, unsigned int> groupIntMap; 
+		insert(groupIntMap) (Permission::UserGroup::ADMIN,0) (Permission::UserGroup::EDITOR,1);
 
 		//Logins cannot have user group guest.
-		UserGroup group = attr.userGroup;
-		assert(group != UserGroup::GUEST);
+		Permission::UserGroup group = attr.userGroup;
+		assert(group != Permission::UserGroup::GUEST);
 		
 		Value userGroupInt;
 		userGroupInt.SetInt(groupIntMap[group]);

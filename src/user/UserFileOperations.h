@@ -1,4 +1,5 @@
-#pragma once
+#ifndef USER_USERFILEOPERATIONS_H
+#define USER_USERFILEOPERATIONS_H
 
 #include <map>
 #include <user/Permission.h>
@@ -18,11 +19,11 @@ class UserFileOperations {
 		static void updateUser(std::string userName,UserAttributes newAttributes);
 		static UserAttributes getUserAttributes(std::string userName);
 	private:
-		UserFileOperations() {};
+		UserFileOperations() {}
 		static void loadCacheFromFile();
 		static void saveCacheToFile();
 		static std::string pathToLoginFile();
 		static std::map<std::string, UserAttributes> userFileCache;
 };
 
-
+#endif	// USER_USERFILEOPERATIONS_H

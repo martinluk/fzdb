@@ -1,12 +1,14 @@
+#ifndef USER_HASHING_H
+#define USER_HASHING_H
+
 #include <stdexcept>
 #include <string>
 
-class Hashing {
-	public:
-		//Also expecting **password** is a hash and salted client side too
-		static std::string hashPassword(std::string userName, std::string salt, std::string password);
-		static std::string sha1hash(std::string password);
-		static std::string genSalt();
-	private: 
-};
+namespace Hashing
+{
+	std::string hashPassword(const std::string &userName, const std::string &salt, const std::string &password);
+	std::string sha1hash(const std::string &password);
+	std::string genSalt();
+}
 
+#endif	// USER_HASHING_H

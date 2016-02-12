@@ -1,7 +1,14 @@
-#pragma once
+#ifndef USER_USERATTRIBUTES_H
+#define USER_USERATTRIBUTES_H
+
+#include <string>
+#include "Permission.h"
+
 struct UserAttributes {
 	std::string userName;
 	std::string passwordHash;
 	std::string salt;
-	UserGroup userGroup;
+	Permission::UserGroup userGroup;
 };
+
+#endif	// USER_USERATTRIBUTES_H

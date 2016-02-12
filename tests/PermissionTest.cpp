@@ -13,43 +13,40 @@ protected:
 };
 
 TEST_F(PermissionTest, assertViewDBPermission) {
-	Permission p;
-	p.assertViewDBPermission(UserGroup::GUEST);
-	p.assertViewDBPermission(UserGroup::EDITOR);
-	p.assertViewDBPermission(UserGroup::ADMIN);
+	Permission::assertViewDBPermission(Permission::UserGroup::GUEST);
+	Permission::assertViewDBPermission(Permission::UserGroup::EDITOR);
+	Permission::assertViewDBPermission(Permission::UserGroup::ADMIN);
 }
 
 TEST_F(PermissionTest, assertModifyDBPermission) {
-	Permission p;
 	try {
-		p.assertModifyDBPermission(UserGroup::GUEST);
+		Permission::assertModifyDBPermission(Permission::UserGroup::GUEST);
 		FAIL();
-	} catch (UserPermissionException &e) {
+	} catch (Permission::UserPermissionException &e) {
 
 	}
-	p.assertModifyDBPermission(UserGroup::EDITOR);
+	Permission::assertModifyDBPermission(Permission::UserGroup::EDITOR);
 	try {
-		p.assertModifyDBPermission(UserGroup::ADMIN);
+		Permission::assertModifyDBPermission(Permission::UserGroup::ADMIN);
 		FAIL();
-	} catch (UserPermissionException &e) {
+	} catch (Permission::UserPermissionException &e) {
 
 	}
 }
 
 TEST_F(PermissionTest, assertUserOpPermission) {
-	Permission p;
 	try {
-		p.assertUserOpPermission(UserGroup::GUEST);
+		Permission::assertUserOpPermission(Permission::UserGroup::GUEST);
 		FAIL();
-	} catch (UserPermissionException &e) {
+	} catch (Permission::UserPermissionException &e) {
 
 	}
 	try {
-		p.assertUserOpPermission(UserGroup::EDITOR);
+		Permission::assertUserOpPermission(Permission::UserGroup::EDITOR);
 		FAIL();
-	} catch (UserPermissionException &e) {
+	} catch (Permission::UserPermissionException &e) {
 
 	}
-	p.assertUserOpPermission(UserGroup::ADMIN);
+	Permission::assertUserOpPermission(Permission::UserGroup::ADMIN);
 }
 

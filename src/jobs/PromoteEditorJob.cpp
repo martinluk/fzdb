@@ -11,15 +11,15 @@ PromoteEditorJob::PromoteEditorJob(std::shared_ptr<ISession> session, std::strin
 QueryResult PromoteEditorJob::adminJobBody() {
     QueryResult result;
     try {
-        UserGroup group = UserOperation::getUserGroup(_username); //Throws user not exist exception
-        if (group != UserGroup::EDITOR) {
+        Permission::UserGroup group = UserOperation::getUserGroup(_username); //Throws user not exist exception
+        if (group != Permission::UserGroup::EDITOR) {
         	throw std::runtime_error("Error: given user is not an editor, cannot promote to admin");
 		}
     } catch (std::exception exception) {
         result.generateError(exception.what());
         return result;
     }
-	UserOperation::changeUserGroup(_username, UserGroup::ADMIN);
+	UserOperation::changeUserGroup(_username, Permission::UserGroup::ADMIN);
     result.setValue("status","0");
     return result;
 }
