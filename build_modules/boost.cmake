@@ -43,7 +43,6 @@ else()
   endif()
 
   if(UNIX)
-    message("Building boost for UNIX")
     set(Boost_BUILD_TOOLSET gcc)  
     #to make travis do things correctly
     if(CMAKE_CXX_COMPILER STREQUAL "/usr/bin/g++-4.9" OR CMAKE_CXX_COMPILER STREQUAL "/usr/bin/clang++-3.5")

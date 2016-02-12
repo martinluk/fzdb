@@ -10,7 +10,6 @@ addons:
 cache: 
   directories:
     - build/external
-    - build/boost_1_59_0
   apt: true
 compiler:
   - gcc
