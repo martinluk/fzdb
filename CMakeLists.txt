@@ -7,6 +7,8 @@ enable_testing()
 include(ExternalProject)
 include(ProcessorCount)
 
+ProcessorCount(N)
+
 if(UNIX)
   set (CMAKE_CXX_FLAGS "-std=c++11")
   #set (CMAKE_VERBOSE_MAKEFILE true )
@@ -70,8 +72,6 @@ macro(GroupSources curdir)
 endmacro()
 
 GroupSources(src)
-
-ProcessorCount(N)
 
 message("Building with " ${N} " cores")
 if(NOT N EQUAL 0)

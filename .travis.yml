@@ -4,13 +4,13 @@ addons:
     sources:
       - kalakris-cmake
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.5
     packages:
       - cmake
       - g++-4.9
 cache: 
   directories:
     - build/external
+    - build/boost_1_59_0
   apt: true
 compiler:
   - gcc
