@@ -1,10 +1,4 @@
-#include <sstream>
-#include <string>
-#include "Hashing.h"
-#include <iostream>
-#include <boost/uuid/sha1.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
+#include "user/Hashing.h"
 
 namespace Hashing
 {

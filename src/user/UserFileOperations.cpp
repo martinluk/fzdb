@@ -68,8 +68,7 @@ void UserFileOperations::addUser(const UserAttributes &userAttributes)
 	saveCacheToFile();
 }
 
-void UserFileOperations::removeUser(const std::string &userName)
-{
+void UserFileOperations::removeUser(const std::string &userName) {
 	//load cache from file
 	//loadCacheFromFile();
 	
@@ -84,11 +83,7 @@ void UserFileOperations::removeUser(const std::string &userName)
 	saveCacheToFile();
 }
 
-void UserFileOperations::updateUser(const std::string &userName, const UserAttributes &newAttributes)
-{
-	//load cache from file
-	//loadCacheFromFile();
-	
+void UserFileOperations::updateUser(const std::string &userName, const UserAttributes &newAttributes) {
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
 	}
@@ -100,11 +95,7 @@ void UserFileOperations::updateUser(const std::string &userName, const UserAttri
 	saveCacheToFile();
 }
 
-UserAttributes UserFileOperations::getUserAttributes(const std::string &userName) const
-{
-	//load cache from file
-	//loadCacheFromFile();
-	
+UserAttributes UserFileOperations::getUserAttributes(const std::string &userName) const {
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
 	}

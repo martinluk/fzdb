@@ -1,9 +1,11 @@
 #ifndef USER_USEROPERATION_H
 #define USER_USEROPERATION_H
 
-#include "UserFileOperations.h"
-#include "UserExceptions.h"
-#include "UserAttributes.h"
+#include <user/UserFileOperations.h>
+#include <user/UserExceptions.h>
+#include <user/UserAttributes.h>
+#include <user/UserExceptions.h>
+#include <user/Hashing.h>
 
 class UserOperation : public UserFileOperations
 { 
