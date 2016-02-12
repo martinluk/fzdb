@@ -13,8 +13,8 @@ QueryResult AddUserJob::adminJobBody() {
 	QueryResult result; 
     try {
         //TODO Need to verify username and password are not empty.
-        UserOperation::addUser(_username, _password, Permission::UserGroup::EDITOR);
-    } catch (std::exception ex) {
+        Singletons::database()->users().addUser(_username, _password, Permission::UserGroup::EDITOR);
+    } catch (const std::exception &ex) {
         result.generateError(ex.what());
         return result;
     }

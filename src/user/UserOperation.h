@@ -5,15 +5,16 @@
 #include "UserExceptions.h"
 #include "UserAttributes.h"
 
-class UserOperation : public UserFileOperations { 
-	public : 
-		static Permission::UserGroup login(std::string userName, std::string password);
-        static void addUser(std::string userName, std::string password, Permission::UserGroup userGroup);
-        static void removeUser(std::string userName);
-        static void changeUserGroup(std::string userName, Permission::UserGroup newUserGroup);
-		static Permission::UserGroup getUserGroup(std::string userName);
-	private:
-		typedef UserFileOperations super;
+class UserOperation : public UserFileOperations
+{ 
+public: 
+	UserOperation();
+	
+	Permission::UserGroup login(const std::string &userName, const std::string &password);
+	void addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup);
+	void removeUser(const std::string &userName);
+	void changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup);
+	Permission::UserGroup getUserGroup(const std::string &userName) const;
 };
 
 #endif	// USER_USEROPERATION_H

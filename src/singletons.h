@@ -11,6 +11,7 @@ namespace Singletons
     void setDataFilePath(const std::string &path);
 	
 	Database* database();
+	const Database* cDatabase();
 }
 
 #endif	// SINGLETONS_H

@@ -1,6 +1,7 @@
 #include "UserFileOperations.h"
 #include "Hashing.h"
 #include "Permission.h"
+#include "UserAttributes.h"
 
 #include "boost/assign.hpp"
 #include <boost/filesystem.hpp>
@@ -27,13 +28,11 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
+// JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
+// really need them all the time and can't call them from const functions anyway.
 
-//Initialise cache map
-std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
-
-void UserFileOperations::initialize() { //TODO
-	//Empty file cache
-	userFileCache.clear();
+UserFileOperations::UserFileOperations()
+{
 	if (ADD_ADMIN_ON_INIT) {
 		//Add admin into cache
 		UserAttributes admin;
@@ -54,55 +53,71 @@ std::string UserFileOperations::pathToLoginFile() {
 	dir /= JSONFILENAME;
 	return dir.string();
 }
-void UserFileOperations::addUser(UserAttributes userAttributes) {
+void UserFileOperations::addUser(const UserAttributes &userAttributes)
+{
 	//Assert that no such user already exist, otherwise throw exception
-	std::string newUserName=userAttributes.userName;
-	if (userFileCache.count(newUserName)>0) {
-		throw new UserAlreadyExistException;
+	std::string newUserName = userAttributes.userName;
+	if ( _userFileCache.count(newUserName) > 0 ) {
+		throw UserAlreadyExistException();
 	}
+	
 	//Add into cache
-	userFileCache[newUserName]=userAttributes;
+	_userFileCache[newUserName] = userAttributes;
+	
 	//save cache from file
 	saveCacheToFile();
 }
 
-void UserFileOperations::removeUser(std::string userName) {
+void UserFileOperations::removeUser(const std::string &userName)
+{
 	//load cache from file
-	loadCacheFromFile();
-	if((userFileCache.count(userName))>0) {
-		throw new UserNotExistException;
+	//loadCacheFromFile();
+	
+	if( _userFileCache.count(userName) < 1 ) {
+		throw UserNotExistException();
 	}
+	
 	//Remove the entry
-	userFileCache.erase(userName);
+	_userFileCache.erase(userName);
+	
 	//save cache from file
 	saveCacheToFile();
 }
 
-void UserFileOperations::updateUser(std::string userName, UserAttributes newAttributes) {
+void UserFileOperations::updateUser(const std::string &userName, const UserAttributes &newAttributes)
+{
 	//load cache from file
-	loadCacheFromFile();
-	if((userFileCache.count(userName))>0) {
-		throw new UserNotExistException;
+	//loadCacheFromFile();
+	
+	if( _userFileCache.count(userName) < 1 ) {
+		throw UserNotExistException();
 	}
+	
 	//Update user attribute at 
-	userFileCache[userName]=newAttributes;
+	_userFileCache[userName] = newAttributes;
+	
 	//save cache from file
 	saveCacheToFile();
 }
 
-UserAttributes UserFileOperations::getUserAttributes(std::string userName){
+UserAttributes UserFileOperations::getUserAttributes(const std::string &userName) const
+{
 	//load cache from file
-	loadCacheFromFile();
-	if((userFileCache.count(userName))>0) {
-		throw new UserNotExistException;
+	//loadCacheFromFile();
+	
+	if( _userFileCache.count(userName) < 1 ) {
+		throw UserNotExistException();
 	}
-	return userFileCache[userName];
+	return _userFileCache.at(userName);
 }
 
  
-void UserFileOperations::loadCacheFromFile() {
+void UserFileOperations::loadCacheFromFile()
+{
 	using namespace rapidjson;
+	
 	//XXX Window system should use rb?
+	// TODO: Exception checks on file opening!
 	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
 	char readBuffer[65536];
 	//Reading file using rapidjson reader
@@ -112,7 +127,7 @@ void UserFileOperations::loadCacheFromFile() {
 	fclose(fp);
 
 	//Clearing userfile cache, ready for reloading
-	userFileCache.clear();
+	_userFileCache.clear();
 
 	//Assert json is valid
 	assert(jsonDoc.IsObject());
@@ -151,21 +166,26 @@ void UserFileOperations::loadCacheFromFile() {
 		string username = itrUser->value.GetString();
 		string hash = itrHash->value.GetString();
 		string salt = itrSalt->value.GetString();
+		
 		//Add into a user attribute struct
 		UserAttributes attr;
 		attr.userName = username;
 		attr.passwordHash = hash;
 		attr.salt = salt;
+		
 		//Add into cache
-		userFileCache[username]=attr;
+		_userFileCache[username] = attr;
 	}
 }
 
-void UserFileOperations::saveCacheToFile() {
-	//Using iterator to iterate through the elements in cache
-	std::map<std::string, UserAttributes>::iterator iter = userFileCache.begin();
-	std::map<std::string, UserAttributes>::iterator eiter = userFileCache.end();
+void UserFileOperations::saveCacheToFile() const
+{
 	using namespace rapidjson;
+	
+	//Using iterator to iterate through the elements in cache
+	std::map<std::string, UserAttributes>::const_iterator iter = _userFileCache.cbegin();
+	std::map<std::string, UserAttributes>::const_iterator eiter = _userFileCache.cend();
+	
 	//Writing cache to string
 	Document jsonDoc;
 	Document::AllocatorType& allocator = jsonDoc.GetAllocator();
@@ -222,7 +242,9 @@ void UserFileOperations::saveCacheToFile() {
 
 	//Using rapidJson FileWriteStream to write to user file.
 	char writeBuffer[65536];
+	
 	//XXX Window system should use wb?
+	// TODO: Exception check for opening/writing file!
 	FILE* fp = fopen(pathToLoginFile().c_str(),"w");
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	Writer<FileWriteStream> writer(os);

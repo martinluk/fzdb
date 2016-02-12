@@ -11,7 +11,7 @@ PromoteEditorJob::PromoteEditorJob(std::shared_ptr<ISession> session, std::strin
 QueryResult PromoteEditorJob::adminJobBody() {
     QueryResult result;
     try {
-        Permission::UserGroup group = UserOperation::getUserGroup(_username); //Throws user not exist exception
+        Permission::UserGroup group = Singletons::cDatabase()->users().getUserGroup(_username); //Throws user not exist exception
         if (group != Permission::UserGroup::EDITOR) {
         	throw std::runtime_error("Error: given user is not an editor, cannot promote to admin");
 		}
@@ -19,7 +19,8 @@ QueryResult PromoteEditorJob::adminJobBody() {
         result.generateError(exception.what());
         return result;
     }
-	UserOperation::changeUserGroup(_username, Permission::UserGroup::ADMIN);
+	
+	Singletons::database()->users().changeUserGroup(_username, Permission::UserGroup::ADMIN);
     result.setValue("status","0");
     return result;
 }

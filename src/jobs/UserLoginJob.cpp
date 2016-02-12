@@ -14,8 +14,8 @@ QueryResult UserLoginJob::execute() {
 	QueryResult result;
 	try {
         //TODO Verify username and password are not empty
-        UserOperation::login(_username,_password);
-	} catch (LoginUnsuccessfulException ex) { 
+        Singletons::database()->users().login(_username,_password);
+	} catch (const LoginUnsuccessfulException &ex) { 
 		result = QueryResult::generateError(ex.what());
         return result;
 	}

@@ -32,9 +32,14 @@ namespace Singletons
 	{
 		return _database;
 	}
+	
+	const Database* cDatabase()
+	{
+		return _database;
+	}
 
-        void setDataFilePath(const std::string &path)
-        {
-            _dataFilePath = path;
-        }
+	void setDataFilePath(const std::string &path)
+	{
+		_dataFilePath = path;
+	}
 }

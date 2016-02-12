@@ -2,9 +2,9 @@
 #define USER_USERFILEOPERATIONS_H
 
 #include <map>
-#include <user/Permission.h>
-#include <user/UserExceptions.h>
-#include <user/UserAttributes.h>
+#include "Permission.h"
+#include "UserExceptions.h"
+#include "UserAttributes.h"
 
 class UserFileOperations {
 	public: 
@@ -12,18 +12,20 @@ class UserFileOperations {
 		 * Either load from file, 
 		 * Or (under debugging mode) add admin into cache and then save to file
 		 */
-		static void initialize();	
+		UserFileOperations();
+		
 	protected: 
-		static void addUser(UserAttributes userAttributes);
-		static void removeUser(std::string userName);
-		static void updateUser(std::string userName,UserAttributes newAttributes);
-		static UserAttributes getUserAttributes(std::string userName);
+		void addUser(const UserAttributes &userAttributes);
+		void removeUser(const std::string &userName);
+		void updateUser(const std::string &userName, const UserAttributes &newAttributes);
+		UserAttributes getUserAttributes(const std::string &userName) const;
+		
 	private:
-		UserFileOperations() {}
-		static void loadCacheFromFile();
-		static void saveCacheToFile();
+		void loadCacheFromFile();
+		void saveCacheToFile() const;
 		static std::string pathToLoginFile();
-		static std::map<std::string, UserAttributes> userFileCache;
+		
+		std::map<std::string, UserAttributes> _userFileCache;
 };
 
 #endif	// USER_USERFILEOPERATIONS_H

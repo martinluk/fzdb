@@ -7,6 +7,7 @@
 
 #include "user/Permission.h"
 #include "user/UserOperation.h"
+#include "singletons.h"
 
 class ISession
 {
@@ -15,16 +16,17 @@ public:
 	virtual void start() = 0;
 	virtual void respond(const std::string response) = 0;
     virtual boost::uuids::uuid uuid() = 0;
-	virtual ~ISession() {};
+	virtual ~ISession() {}
 
 	//methods for maintaining user state
-	void setCurrentUserName(std::string username) { 
+	void setCurrentUserName(const std::string &username) { 
 		_username=username;
 	}
 	void clearCurrentUserName() { _username.clear(); }
 
-	Permission::UserGroup getCurrentUserUserGroup() {
-		return UserOperation::getUserGroup(_username);
+	Permission::UserGroup getCurrentUserUserGroup() const
+	{
+		return Singletons::cDatabase()->users().getUserGroup(_username);
 	}
 
 protected:
