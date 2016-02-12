@@ -2,16 +2,15 @@
 #define SINGLETONS_H
 
 #include <string>
-
-class EntityManager;
+#include "model/Database.h"
 
 namespace Singletons
 {
 	void initialise();
 	void shutdown();
-
     void setDataFilePath(const std::string &path);
-	EntityManager* entityManager();
+	
+	Database* database();
 }
 
 #endif	// SINGLETONS_H

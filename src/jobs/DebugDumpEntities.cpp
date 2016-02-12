@@ -6,6 +6,6 @@ QueryResult DebugDumpEntities::execute()
 {
 	QueryResult result;
     result.setValue("type", "string");
-    result.setValue(std::string("response"), Singletons::entityManager()->dumpContents());
+    result.setValue(std::string("response"), Singletons::database()->entityManager().dumpContents());
     return result;
 }

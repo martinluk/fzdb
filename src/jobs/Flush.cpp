@@ -10,6 +10,6 @@ Flush::Flush(std::shared_ptr<ISession> session) : Job(session)
 
 QueryResult Flush::execute()
 {
-	Singletons::entityManager()->clearAll();
+	Singletons::database()->entityManager().clearAll();
 	return QueryResult();
 }

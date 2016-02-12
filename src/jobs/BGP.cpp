@@ -15,7 +15,7 @@ QueryResult BGP::execute()
 	QueryResult result;
 	try {
       //run BGP
-		VariableSet variables = Singletons::entityManager()->BGP(_query.whereClause, _query.settings);
+		VariableSet variables = Singletons::database()->entityManager().BGP(_query.whereClause, _query.settings);
 
       //run filters against query
       for(auto filter : _query.whereClause.filters) {

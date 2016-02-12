@@ -14,7 +14,7 @@ QueryResult Link::execute()
 {
 	QueryResult result;
 	result.setValue("result", "success");
-	Singletons::entityManager()->linkEntities(_entity1, _entity2);
+	Singletons::database()->entityManager().linkEntities(_entity1, _entity2);
 	return result;
 }
 
@@ -26,7 +26,7 @@ QueryResult Unlink::execute()
 {
 	QueryResult result;
 	result.setValue("result", "success");
-	Singletons::entityManager()->unlinkEntities(_entity1, _entity2);
+	Singletons::database()->entityManager().unlinkEntities(_entity1, _entity2);
 	return result;
 }
 
@@ -38,6 +38,6 @@ QueryResult Merge::execute()
 {
 	QueryResult result;
 	result.setValue("result", "success");
-	Singletons::entityManager()->mergeEntities(_entity1, _entity2);
+	Singletons::database()->entityManager().mergeEntities(_entity1, _entity2);
 	return result;
 }
