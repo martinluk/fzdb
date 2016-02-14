@@ -14,6 +14,16 @@ protected:
 	}
 };
 
+TEST_F(UserOperationTest, cacheStaticTest) {
+	const std::string userName="testingCacheStaticness";
+	UserOperation uon;
+	EXPECT_THROW(uo.getUserGroup(userName), UserNotExistException);
+	EXPECT_THROW(uon.getUserGroup(userName), UserNotExistException);
+	EXPECT_NO_THROW(uo.addUser(userName,std::string("Some_Common_Password"),Permission::UserGroup::EDITOR));
+	ASSERT_NO_THROW(uo.getUserGroup(userName));
+	ASSERT_NO_THROW(uon.getUserGroup(userName));
+}
+
 TEST_F(UserOperationTest, loginTest) {
 	const std::string userName="testingLogin";
 	const std::string password="mypassword";
