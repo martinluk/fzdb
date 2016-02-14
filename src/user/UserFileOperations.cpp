@@ -29,14 +29,14 @@
 
 UserFileOperations::UserFileOperations(){
 	//Empty file cache
-	userFileCache.clear();
+	_userFileCache.clear();
 #ifdef INIT_ADD_ADMIN
 	//Add admin into cache
 	UserAttributes admin;
 	admin.userName = ADMIN_USERNAME;
 	admin.salt = Hashing::genSalt();
 	admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-	admin.userGroup = UserGroup::ADMIN;
+	admin.userGroup = Permission::UserGroup::ADMIN;
 	addUser(admin);
 #else
 	//Load from json
