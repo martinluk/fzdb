@@ -1,47 +1,87 @@
 #include "gtest/gtest.h"
+#include <string>
+
 #include "user/UserOperation.h"
+#include "user/Permission.h"
+#include "user/UserExceptions.h"
 class UserOperationTest : public ::testing::Test {
+	public:
+		UserOperation uo;
 protected:
 	void setUp() {
-		//UserFileOperations::initialize();
 	}
 	void TearDown() {
-		//Reset the user file TODO
-		//UserFileOperations::initialize();
 	}
 };
 
+TEST_F(UserOperationTest, loginTest) {
+	const std::string userName="testingLogin";
+	const std::string password="mypassword";
+	//Throws can't login if user does not exist
+	ASSERT_THROW(uo.login(userName,password),LoginUnsuccessfulException);
+	//Add a testing account
+	EXPECT_NO_THROW(uo.addUser(userName,password,Permission::UserGroup::EDITOR));
+	//Throws when wrong password
+	ASSERT_THROW(uo.login(userName,std::string("Wr0ngPassword")),LoginUnsuccessfulException);
+	//Logins in ok when password is correct.
+	ASSERT_NO_THROW(uo.login(userName,password));
+}
+
 TEST_F(UserOperationTest, addUser) {
 	//Assert there does not exist the specific user
-
+	const std::string userName="testingAddUserFunction";
+	EXPECT_THROW(uo.getUserGroup(userName), UserNotExistException);
 	//Add the user
+	ASSERT_NO_THROW(uo.addUser(userName,std::string("Some_Common_Password"),Permission::UserGroup::EDITOR));
+	//Expect user exists
+	EXPECT_NO_THROW(uo.getUserGroup(userName));
+	//Check throws UserAlreadyExistedException if user already exist
+	ASSERT_THROW(uo.addUser(userName,std::string("Some_Common_Password"),Permission::UserGroup::EDITOR),UserAlreadyExistException);
+	//Testing getUserGroup
+	ASSERT_EQ(Permission::UserGroup::EDITOR,uo.getUserGroup(userName));
 
-	//Assert user exists
+	//Cannot add user with empty user name.
+	ASSERT_DEATH(uo.addUser(std::string(""),std::string("Some_Common_Password"),Permission::UserGroup::EDITOR),"User name cannot be empty.");
 }
 
 TEST_F(UserOperationTest, removeUser) {
-	//Assert there does not exist the specific user
-
+	//Assert throw exception when does not exist
+	const std::string userName="testingRemoveUserFunction";
+	EXPECT_THROW(uo.removeUser(userName), UserNotExistException);
 	//Add the user
-
-	//Assert user exists
-
+	EXPECT_NO_THROW(uo.addUser(userName,std::string("my_stupid_password"),Permission::UserGroup::EDITOR));
 	//Remove the user
-
+	ASSERT_NO_THROW(uo.removeUser(userName));
 	//Asser the user does not exist anymore
+	ASSERT_THROW(uo.getUserGroup(userName), UserNotExistException);
 }
 TEST_F(UserOperationTest, changeUserGroup) {
 	//Assert there does not exist the specific user
-
+	const std::string userName="testingChangeUserGroupFunction";
+	EXPECT_THROW(uo.removeUser(userName), UserNotExistException);
+	//Assert changing an no existing user throws exception
+	ASSERT_THROW(uo.changeUserGroup(userName,Permission::UserGroup::EDITOR),UserNotExistException);
 	//Add the user
+	EXPECT_NO_THROW(uo.addUser(userName,std::string("my_stupid_password"),Permission::UserGroup::EDITOR));
+	EXPECT_EQ(uo.getUserGroup(userName),Permission::UserGroup::EDITOR);
+	//Change user group
+	ASSERT_NO_THROW(uo.changeUserGroup(userName,Permission::UserGroup::ADMIN));
+	//Assert change has effect
+	ASSERT_EQ(uo.getUserGroup(userName),Permission::UserGroup::ADMIN);
 
-	//Assert user exists
-
-	//Remove the user
-
-	//Asser the user does not exist anymore
+	//Changing user to same group has does not complain.
+	ASSERT_NO_THROW(uo.changeUserGroup(userName,Permission::UserGroup::ADMIN));
+	ASSERT_EQ(uo.getUserGroup(userName),Permission::UserGroup::ADMIN);
+	
+	//Not allowed to change user to guest
+	ASSERT_DEATH(uo.changeUserGroup(userName,Permission::UserGroup::GUEST),"Cannot change usergroup to guest.");
 }
 TEST_F(UserOperationTest, getUserGroup) {
 	//If Empty string, returns guest.
-	
+	const std::string blankUserName="";
+	ASSERT_EQ(Permission::UserGroup::GUEST,uo.getUserGroup(blankUserName));
+	//Querying unknown username throws exception
+	const std::string unknownUserName="testingGetUserGroup";
+	ASSERT_THROW(uo.getUserGroup(unknownUserName), UserNotExistException);
 }
+
