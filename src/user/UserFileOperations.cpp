@@ -30,7 +30,7 @@
 //Initialise cache map
 std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
 
-void UserFileOperations::initialize() { 
+UserFileOperations::UserFileOperations(){
 	//Empty file cache
 	userFileCache.clear();
 #ifdef INIT_ADD_ADMIN
