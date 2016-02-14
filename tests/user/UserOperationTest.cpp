@@ -41,7 +41,7 @@ TEST_F(UserOperationTest, addUser) {
 	ASSERT_EQ(Permission::UserGroup::EDITOR,uo.getUserGroup(userName));
 
 	//Cannot add user with empty user name.
-	ASSERT_DEATH(uo.addUser(std::string(""),std::string("Some_Common_Password"),Permission::UserGroup::EDITOR),"User name cannot be empty.");
+	ASSERT_DEATH(uo.addUser(std::string(""),std::string("Some_Common_Password"),Permission::UserGroup::EDITOR),"");
 }
 
 TEST_F(UserOperationTest, removeUser) {
@@ -74,7 +74,7 @@ TEST_F(UserOperationTest, changeUserGroup) {
 	ASSERT_EQ(uo.getUserGroup(userName),Permission::UserGroup::ADMIN);
 	
 	//Not allowed to change user to guest
-	ASSERT_DEATH(uo.changeUserGroup(userName,Permission::UserGroup::GUEST),"Cannot change usergroup to guest.");
+	ASSERT_DEATH(uo.changeUserGroup(userName,Permission::UserGroup::GUEST),"");
 }
 TEST_F(UserOperationTest, getUserGroup) {
 	//If Empty string, returns guest.
