@@ -16,10 +16,6 @@
 #include <map>
 #include <cassert>
 
-#define ADD_ADMIN_ON_INIT true
-#define ADMIN_USERNAME "admin"
-#define ADMIN_PASSWORD "password"
-
 #define JSONFILENAME "userFile.json"
 
 #define USERNAME "username"
@@ -31,20 +27,25 @@
 // JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
 // really need them all the time and can't call them from const functions anyway.
 
-UserFileOperations::UserFileOperations()
-{
-	if (ADD_ADMIN_ON_INIT) {
-		//Add admin into cache
-		UserAttributes admin;
-		admin.userName = ADMIN_USERNAME;
-		admin.salt = Hashing::genSalt();
-		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-		admin.userGroup = Permission::UserGroup::ADMIN;
-		addUser(admin);
-	} else { 
-		//Load from json
-		loadCacheFromFile();
-	}
+//Initialise cache map
+std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
+
+void UserFileOperations::initialize() { 
+	//Empty file cache
+	userFileCache.clear();
+#ifdef INIT_ADD_ADMIN
+	//Add admin into cache
+	UserAttributes admin;
+	admin.userName = ADMIN_USERNAME;
+	admin.salt = Hashing::genSalt();
+	admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
+	admin.userGroup = UserGroup::ADMIN;
+	addUser(admin);
+#else
+	//Load from json
+	//TODO Verify if file exists
+	loadCacheFromFile();
+#endif
 }
 
 std::string UserFileOperations::pathToLoginFile() {
