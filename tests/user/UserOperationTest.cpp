@@ -14,6 +14,7 @@ protected:
 	}
 };
 
+/* This is no longer valid - Now accessing user operation requires going through model/database, which is declared as singleton 
 TEST_F(UserOperationTest, cacheStaticTest) {
 	const std::string userName="testingCacheStaticness";
 	UserOperation uon;
@@ -23,6 +24,7 @@ TEST_F(UserOperationTest, cacheStaticTest) {
 	ASSERT_NO_THROW(uo.getUserGroup(userName));
 	ASSERT_NO_THROW(uon.getUserGroup(userName));
 }
+*/
 
 TEST_F(UserOperationTest, loginTest) {
 	const std::string userName="testingLogin";
