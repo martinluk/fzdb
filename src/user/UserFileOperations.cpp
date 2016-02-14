@@ -27,9 +27,6 @@
 // JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
 // really need them all the time and can't call them from const functions anyway.
 
-//Initialise cache map
-std::map<std::string, UserAttributes> UserFileOperations::userFileCache;
-
 UserFileOperations::UserFileOperations(){
 	//Empty file cache
 	userFileCache.clear();
