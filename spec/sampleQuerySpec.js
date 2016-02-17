@@ -33,7 +33,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual({});
+        expect(resultJSON).toEqual({ type: 'string', response: 'Database cleared' });
         done();
       });      
     });
@@ -88,7 +88,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual({});
+        expect(resultJSON).toEqual({ type: 'string', response: 'Database cleared' });
         done();
       });      
     });
@@ -255,7 +255,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual({});
+        expect(resultJSON).toEqual({ type: 'string', response: 'Database cleared' });
         done();
       });      
     });
@@ -292,7 +292,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual({});
+        expect(resultJSON).toEqual({ type: 'string', response: 'Database cleared' });
         done();
       });      
     });
