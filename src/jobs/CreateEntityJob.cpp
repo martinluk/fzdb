@@ -6,7 +6,7 @@ CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session, const std::s
 {
 }
 
-QueryResult CreateEntityJob::execute()
+QueryResult CreateEntityJob::executeNonConst()
 {
 	std::shared_ptr<Entity> e = _database->entityManager().createEntity(_type);
 

@@ -10,7 +10,7 @@ BGP::BGP(std::shared_ptr<ISession> session, Query query) : Job(session), _query(
 {
 }
 
-QueryResult BGP::execute()
+QueryResult BGP::executeConst() const
 {
 	QueryResult result;
 	try {

@@ -5,7 +5,7 @@ PingJob::PingJob(std::shared_ptr<ISession> session) : Job(session)
 
 }
 
-QueryResult PingJob::execute()
+QueryResult PingJob::executeConst() const
 {
   QueryResult result;
   result.setValue("type", "string");

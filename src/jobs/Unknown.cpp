@@ -5,7 +5,7 @@ UnknownJob::UnknownJob(std::shared_ptr<ISession> session, std::string name) : Jo
   _name = name;
 }
 
-QueryResult UnknownJob::execute()
+QueryResult UnknownJob::executeConst() const
 {
 	QueryResult result;
 	result.setValue("type", "err");

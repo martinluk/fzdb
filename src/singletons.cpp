@@ -2,9 +2,13 @@
 #include "model/Database.h"
 #include <iostream>
 
+#include <boost/thread/shared_mutex.hpp>
+
 namespace Singletons
 {
 	Database* _database = NULL;
+	boost::shared_mutex _databaseMutex;
+	
 	std::string _dataFilePath;
 
 	void initialise()
@@ -28,6 +32,11 @@ namespace Singletons
 		delete _database;
 	}
 
+	void setDataFilePath(const std::string &path)
+	{
+		_dataFilePath = path;
+	}
+	
 	Database* database()
 	{
 		return _database;
@@ -37,9 +46,9 @@ namespace Singletons
 	{
 		return _database;
 	}
-
-	void setDataFilePath(const std::string &path)
+	
+	boost::shared_mutex& databaseMutex()
 	{
-		_dataFilePath = path;
+		return _databaseMutex;
 	}
 }

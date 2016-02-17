@@ -63,7 +63,7 @@ bool _preprocess(std::string &message)
 	return true;
 }
 
-QueryResult LoadFileJob::execute()
+QueryResult LoadFileJob::executeNonConst()
 {
 	if ( !_preprocess(_message) )
 	{
@@ -81,7 +81,7 @@ QueryResult LoadFileJob::execute()
 	}
 }
 
-QueryResult SaveFileJob::execute()
+QueryResult SaveFileJob::executeConst() const
 {
 	if ( !_preprocess(_message) )
 	{

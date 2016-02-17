@@ -7,9 +7,8 @@
 class IUserAdminJobs : public Job {
 	public:
        IUserAdminJobs(std::shared_ptr<ISession> session);
-       QueryResult execute() override ;
+	   
     protected:
-		virtual QueryResult adminJobBody() {
-			return QueryResult();
-		}
+		bool hasAdminPermissions() const;
+		static QueryResult errorNoAdminPermissions();
 };

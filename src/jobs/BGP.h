@@ -14,9 +14,8 @@ public:
 
   BGP(std::shared_ptr<ISession> session, Query message);
 
-
-  // Inherited via Job
-  virtual QueryResult execute() override;
+  virtual bool constOperation() const override { return true; }
+  virtual QueryResult executeConst() const override;
 
 private:
   Query _query;

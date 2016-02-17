@@ -10,7 +10,7 @@ Link::Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity:
 	: Job(session), _entity1(entity1), _entity2(entity2)
 {}
 
-QueryResult Link::execute()
+QueryResult Link::executeNonConst()
 {
 	QueryResult result;
 	result.setValue("result", "success");
@@ -22,7 +22,7 @@ Unlink::Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Ent
 	: Link(session, entity1, entity2)
 {}
 
-QueryResult Unlink::execute()
+QueryResult Unlink::executeNonConst()
 {
 	QueryResult result;
 	result.setValue("result", "success");
@@ -34,7 +34,7 @@ Merge::Merge(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entit
 	: Link(session, entity1, entity2)
 {}
 
-QueryResult Merge::execute()
+QueryResult Merge::executeNonConst()
 {
 	QueryResult result;
 	result.setValue("result", "success");

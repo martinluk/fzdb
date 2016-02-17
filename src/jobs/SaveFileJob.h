@@ -9,10 +9,11 @@ class SaveFileJob : public Job
 public:
 	SaveFileJob(std::shared_ptr<ISession> session, const std::string &message);
 
-	virtual QueryResult execute() override;
+	virtual bool constOperation() const override { return true; }
+	virtual QueryResult executeConst() const override;
 	
 private:
-	std::string	_message;
+	mutable std::string	_message;
 };
 
 #endif	// JOBS_SAVEFILEJOB_H

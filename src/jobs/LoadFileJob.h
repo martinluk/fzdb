@@ -9,7 +9,8 @@ class LoadFileJob : public Job
 public:
 	LoadFileJob(std::shared_ptr<ISession> session, const std::string &message);
 
-	virtual QueryResult execute() override;
+	virtual bool constOperation() const override { return false; }
+	virtual QueryResult executeNonConst() override;
 	
 private:
 	std::string	_message;

@@ -11,7 +11,7 @@ DebugJob::DebugJob(std::shared_ptr<ISession> session, const std::string &message
     _message = message;
 }
 
-QueryResult DebugJob::execute()
+QueryResult DebugJob::executeConst() const
 {
     // Split the string by spaces.
     std::vector<std::string> list = util::split(_message, ' ');

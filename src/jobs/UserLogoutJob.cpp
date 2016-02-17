@@ -8,9 +8,13 @@ UserLogoutJob::UserLogoutJob(std::shared_ptr<ISession> session) : Job(session) {
 	_session=session;
 }
 
-QueryResult UserLogoutJob::execute() {
-	QueryResult result;
-	//TODO Some kind of exception of user is not already login?
+QueryResult UserLogoutJob::executeConst() const
+{
+	//TODO Some kind of exception of user is not already logged in?
 	_session->clearCurrentUserName();
-	return result;
+	
+	QueryResult result;
+	result.setValue("type", "string");
+    result.setValue(std::string("response"), std::string("Logged out."));
+    return result;
 }

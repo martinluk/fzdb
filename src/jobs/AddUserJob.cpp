@@ -4,20 +4,24 @@
 #include "../user/UserOperation.h"
 #include "../user/UserExceptions.h"
 
-AddUserJob::AddUserJob(std::shared_ptr<ISession> session, std::string username, std::string password):IUserAdminJobs(session) {
+AddUserJob::AddUserJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password):IUserAdminJobs(session) {
 	_username = username;
 	_password = password;
 }
 
-QueryResult AddUserJob::adminJobBody() {
-	QueryResult result; 
+QueryResult AddUserJob::executeNonConst()
+{
+	if ( !hasAdminPermissions() )
+		return errorNoAdminPermissions();
+	
     try {
         //TODO Need to verify username and password are not empty.
         _database->users().addUser(_username, _password, Permission::UserGroup::EDITOR);
     } catch (const std::exception &ex) {
-        result.generateError(ex.what());
-        return result;
+        return QueryResult::generateError(ex.what());
     }
+	
+	QueryResult result;
     result.setValue("status","0");
 	return result;
 }

@@ -14,8 +14,8 @@ class DebugJob : public Job
 public:
         DebugJob(std::shared_ptr<ISession> session, const std::string &message);
 
-        // Inherited via Job
-        virtual QueryResult execute() override;
+		virtual bool constOperation() const override { return true; }
+		virtual QueryResult executeConst() const override;
 
 private:
         std::string _message;

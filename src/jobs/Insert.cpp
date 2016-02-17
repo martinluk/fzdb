@@ -8,7 +8,7 @@ Insert::Insert(std::shared_ptr<ISession> session, Query query) : Job(session), _
 {
 }
 
-QueryResult Insert::execute()
+QueryResult Insert::executeNonConst()
 {
 	QueryResult result;
 	try {

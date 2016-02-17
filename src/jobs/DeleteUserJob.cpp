@@ -4,18 +4,22 @@
 #include "../user/UserOperation.h"
 #include "../user/UserExceptions.h"
 
-DeleteUserJob::DeleteUserJob(std::shared_ptr<ISession> session, std::string username):IUserAdminJobs(session) {
+DeleteUserJob::DeleteUserJob(std::shared_ptr<ISession> session, const std::string &username):IUserAdminJobs(session) {
 	_username = username;
 }
 
-QueryResult DeleteUserJob::adminJobBody() {
-    QueryResult result;
+QueryResult DeleteUserJob::executeNonConst()
+{
+	if ( !hasAdminPermissions() )
+		return errorNoAdminPermissions();
+	
     try {
 		_database->users().removeUser(_username);
     } catch (const UserNotExistException &) {
-        result.generateError("User does not exist");
-        return result;
+        return QueryResult::generateError("User does not exist");
     }
+	
+	QueryResult result;
     result.setValue("status","0");
     return result;
 }
