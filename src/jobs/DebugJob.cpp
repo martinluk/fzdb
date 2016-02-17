@@ -37,7 +37,7 @@ QueryResult DebugJob::execute()
     }
 	else if ( list[0] == "DUMPENTITIES" )
 	{
-		return DebugDumpEntities::execute();
+		return DebugDumpEntities::execute(*this);
 	}
 
     QueryResult result;

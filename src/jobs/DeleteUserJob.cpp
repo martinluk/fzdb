@@ -11,7 +11,7 @@ DeleteUserJob::DeleteUserJob(std::shared_ptr<ISession> session, std::string user
 QueryResult DeleteUserJob::adminJobBody() {
     QueryResult result;
     try {
-		Singletons::database()->users().removeUser(_username);
+		_database->users().removeUser(_username);
     } catch (const UserNotExistException &) {
         result.generateError("User does not exist");
         return result;

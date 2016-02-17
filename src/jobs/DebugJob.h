@@ -10,6 +10,7 @@
 // Depending on the command arguments, we do various debug tasks here.
 class DebugJob : public Job
 {
+	friend class DebugDumpEntities;
 public:
         DebugJob(std::shared_ptr<ISession> session, const std::string &message);
 

@@ -70,7 +70,7 @@ QueryResult LoadFileJob::execute()
 		return _result(std::string("Invalid file name."));
 	}
 	
-	bool success = Singletons::database()->entityManager().loadFromFile(_message);
+	bool success = _database->entityManager().loadFromFile(_message);
 	if ( success )
 	{
 		return _result(std::string("Data successfully loaded from ") + _message);
@@ -88,7 +88,7 @@ QueryResult SaveFileJob::execute()
 		return _result(std::string("Invalid file name."));
 	}
 	
-	bool success = Singletons::database()->entityManager().saveToFile(_message);
+	bool success = _database->entityManager().saveToFile(_message);
 	if ( success )
 	{
 		return _result(std::string("Data successfully saved to ") + _message);

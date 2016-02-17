@@ -23,11 +23,14 @@ public:
 		_username=username;
 	}
 	void clearCurrentUserName() { _username.clear(); }
+	
+	std::string username() const { return _username; }
 
-	Permission::UserGroup getCurrentUserUserGroup() const
-	{
-		return Singletons::cDatabase()->users().getUserGroup(_username);
-	}
+	// JONATHAN: Removing this - database access should now only be through the Job class' member pointer.
+//	Permission::UserGroup getCurrentUserUserGroup() const
+//	{
+//		return Singletons::cDatabase()->users().getUserGroup(_username);
+//	}
 
 protected:
 	virtual void handle_read(const boost::system::error_code& error, size_t bytes_transferred) = 0;

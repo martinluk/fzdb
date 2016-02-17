@@ -4,14 +4,12 @@
 #include "ISession.h"
 #include "QueryResult.h"
 
+class Database;
+
 class Job 
 {
 public:
-	Job(std::shared_ptr<ISession> session) 
-	{
-		_session = session;
-	}
-
+	Job(std::shared_ptr<ISession> session) ;
 	virtual ~Job() {}
 
 	virtual QueryResult execute() = 0;
@@ -21,6 +19,7 @@ public:
 	}
 protected:
 	std::shared_ptr<ISession> _session;
+	Database* _database;
 };
 
 #endif
