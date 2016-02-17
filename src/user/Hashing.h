@@ -3,6 +3,12 @@
 
 #include <stdexcept>
 #include <string>
+#include <sstream>
+#include <string>
+#include <iostream>
+#include <boost/uuid/sha1.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace Hashing
 {

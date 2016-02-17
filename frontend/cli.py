@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import socket, select, string, sys, json
+import socket, select, string, sys, json, platform
 
 # ======================================
 # ========== Global Variables ==========
@@ -180,8 +180,7 @@ def performSendData(data):
 		# Switch into receiving mode to listen for a response back from the database.
 		sending = False
 	
-def performSendStdinData():
-	msg = sys.stdin.readline().strip()
+def performSendStdinData(msg):
 	performSendData(msg);
 
 def performSendFileData():
@@ -245,8 +244,7 @@ def executeForUserInput():
 		# If we're sending a command, we listen for data from the user.
 		# No timeout is specified.
 		if sending:
-			sRead, sWrite, sError = select.select([sys.stdin], [], [])
-			performSendStdinData()
+			performSendStdinData(sys.stdin.readline().strip())
 
 		# Otherwise we listen from the database for a response.
 		# This quits the script if the socket times out too many times.

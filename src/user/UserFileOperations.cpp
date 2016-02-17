@@ -16,10 +16,6 @@
 #include <map>
 #include <cassert>
 
-#define ADD_ADMIN_ON_INIT true
-#define ADMIN_USERNAME "admin"
-#define ADMIN_PASSWORD "password"
-
 #define JSONFILENAME "userFile.json"
 
 #define USERNAME "username"
@@ -31,20 +27,22 @@
 // JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
 // really need them all the time and can't call them from const functions anyway.
 
-UserFileOperations::UserFileOperations()
-{
-	if (ADD_ADMIN_ON_INIT) {
-		//Add admin into cache
-		UserAttributes admin;
-		admin.userName = ADMIN_USERNAME;
-		admin.salt = Hashing::genSalt();
-		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-		admin.userGroup = Permission::UserGroup::ADMIN;
-		addUser(admin);
-	} else { 
-		//Load from json
-		loadCacheFromFile();
-	}
+UserFileOperations::UserFileOperations(){
+	//Empty file cache
+	_userFileCache.clear();
+#ifdef INIT_ADD_ADMIN
+	//Add admin into cache
+	UserAttributes admin;
+	admin.userName = ADMIN_USERNAME;
+	admin.salt = Hashing::genSalt();
+	admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
+	admin.userGroup = Permission::UserGroup::ADMIN;
+	addUser(admin);
+#else
+	//Load from json
+	//TODO Verify if file exists
+	loadCacheFromFile();
+#endif
 }
 
 std::string UserFileOperations::pathToLoginFile() {
@@ -68,8 +66,7 @@ void UserFileOperations::addUser(const UserAttributes &userAttributes)
 	saveCacheToFile();
 }
 
-void UserFileOperations::removeUser(const std::string &userName)
-{
+void UserFileOperations::removeUser(const std::string &userName) {
 	//load cache from file
 	//loadCacheFromFile();
 	
@@ -84,11 +81,7 @@ void UserFileOperations::removeUser(const std::string &userName)
 	saveCacheToFile();
 }
 
-void UserFileOperations::updateUser(const std::string &userName, const UserAttributes &newAttributes)
-{
-	//load cache from file
-	//loadCacheFromFile();
-	
+void UserFileOperations::updateUser(const std::string &userName, const UserAttributes &newAttributes) {
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
 	}
@@ -100,11 +93,7 @@ void UserFileOperations::updateUser(const std::string &userName, const UserAttri
 	saveCacheToFile();
 }
 
-UserAttributes UserFileOperations::getUserAttributes(const std::string &userName) const
-{
-	//load cache from file
-	//loadCacheFromFile();
-	
+UserAttributes UserFileOperations::getUserAttributes(const std::string &userName) const {
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
 	}
