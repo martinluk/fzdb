@@ -8,10 +8,6 @@
 
 class UserFileOperations {
 	public: 
-		/*
-		 * Either load from file, 
-		 * Or (under debugging mode) add admin into cache and then save to file
-		 */
 		UserFileOperations();
 		
 	protected: 
@@ -19,12 +15,10 @@ class UserFileOperations {
 		void removeUser(const std::string &userName);
 		void updateUser(const std::string &userName, const UserAttributes &newAttributes);
 		UserAttributes getUserAttributes(const std::string &userName) const;
-		
-	private:
 		void loadCacheFromFile();
 		void saveCacheToFile() const;
 		static std::string pathToLoginFile();
-		
+	private:
 		std::map<std::string, UserAttributes> _userFileCache;
 };
 
