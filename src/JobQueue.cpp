@@ -8,7 +8,7 @@ boost::thread_group JobQueue::_threads;
 
 void JobQueue::ExecuteJob(Job* job) {
 	QueryResult result = job->execute();
-  job->Session()->respond(result.toJSON());
+  job->Session()->respond(result.toJson());
 	delete job;
 }
 

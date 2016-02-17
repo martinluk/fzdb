@@ -20,8 +20,7 @@ SaveFileJob::SaveFileJob(std::shared_ptr<ISession> session, const std::string &m
 QueryResult _result(const std::string &message)
 {
 	QueryResult result;
-    result.setValue("type", "string");
-    result.setValue(std::string("response"), message);
+    result.setResultDataText(message);
     return result;
 }
 
@@ -67,7 +66,7 @@ QueryResult LoadFileJob::executeNonConst()
 {
 	if ( !_preprocess(_message) )
 	{
-		return _result(std::string("Invalid file name."));
+		return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Invalid file name."));
 	}
 	
 	bool success = _database->entityManager().loadFromFile(_message);
@@ -77,7 +76,7 @@ QueryResult LoadFileJob::executeNonConst()
 	}
 	else
 	{
-		return _result(std::string("Unable to read data from ") + _message);
+		return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Unable to read data from ") + _message);
 	}
 }
 
@@ -85,7 +84,7 @@ QueryResult SaveFileJob::executeConst() const
 {
 	if ( !_preprocess(_message) )
 	{
-		return _result(std::string("Invalid file name."));
+		return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Invalid file name."));
 	}
 	
 	bool success = _database->entityManager().saveToFile(_message);
@@ -95,6 +94,6 @@ QueryResult SaveFileJob::executeConst() const
 	}
 	else
 	{
-		return _result(std::string("Unable to save data to ") + _message);
+		return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Unable to save data to ") + _message);
 	}
 }

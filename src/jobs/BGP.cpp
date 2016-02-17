@@ -50,12 +50,13 @@ QueryResult BGP::executeConst() const
 
 			val.PushBack(val2, result.allocator());
 		}
-		rapidjson::Value varName;
-		varName.SetString("result", result.allocator());
-		result.setValue(std::move(varName), std::move(val));
+//		rapidjson::Value varName;
+//		varName.SetString("result", result.allocator());
+//		result.setValue(std::move(varName), std::move(val));
+		result.setResultDataFsparql(val);
 	}
 	catch (NotImplementedException ex) {
-		result = QueryResult::generateError(ex.what());
+		result = QueryResult::generateError(QueryResult::ErrorCode::NotImplemented, ex.what());
 	}
 	
 

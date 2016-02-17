@@ -14,16 +14,17 @@ QueryResult DemoteAdminJob::executeNonConst()
 	
     try {
         Permission::UserGroup group = _database->users().getUserGroup(_username); //Throws user not exist exception
+
         if (group != Permission::UserGroup::ADMIN) {
-        	throw std::runtime_error("Error: given user is not an admin, cannot promote to admin");
+        	return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, "User to demote is not an admin.");
 		}
-    } catch (std::exception exception) {
-        return QueryResult::generateError(exception.what());
+    } catch (const std::exception &ex) {
+        return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
     }
 	
 	_database->users().changeUserGroup(_username, Permission::UserGroup::EDITOR);
 	
 	QueryResult result;
-    result.setValue("status","0");
+    result.setResultDataText(std::string("User ") + _username + std::string(" demoted to editor."));
     return result;
 }

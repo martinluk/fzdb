@@ -6,7 +6,6 @@
 QueryResult DebugDumpEntities::execute(const DebugJob &j)
 {
 	QueryResult result;
-    result.setValue("type", "string");
-    result.setValue(std::string("response"), j._database->entityManager().dumpContents());
+    result.setResultDataText(j._database->entityManager().dumpContents());
     return result;
 }

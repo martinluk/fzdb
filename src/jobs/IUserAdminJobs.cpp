@@ -10,5 +10,5 @@ bool IUserAdminJobs::hasAdminPermissions() const
 
 QueryResult IUserAdminJobs::errorNoAdminPermissions()
 {
-	return QueryResult::generateError("Running an admin job without admin permission.");
+	return QueryResult::generateError(QueryResult::ErrorCode::InsufficientPermissions, "Running an admin job without admin permission.");
 }

@@ -16,15 +16,15 @@ QueryResult PromoteEditorJob::executeNonConst()
     try {
         Permission::UserGroup group = _database->users().getUserGroup(_username); //Throws user not exist exception
         if (group != Permission::UserGroup::EDITOR) {
-        	throw std::runtime_error("Error: given user is not an editor, cannot promote to admin");
+        	return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, "User to promote is not an editor.");
 		}
-    } catch (std::exception exception) {
-        return QueryResult::generateError(exception.what());
+    } catch (const std::exception &ex) {
+        return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
     }
 	
 	_database->users().changeUserGroup(_username, Permission::UserGroup::ADMIN);
 	
 	QueryResult result;
-    result.setValue("status","0");
+    result.setResultDataText(std::string("User ") + _username + std::string(" promoted to admin."));
     return result;
 }
