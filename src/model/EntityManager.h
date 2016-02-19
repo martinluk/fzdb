@@ -39,6 +39,8 @@ public:
 
 	void Insert(std::vector<model::Triple> triples);
 
+	void Delete(std::vector<model::Triple> triples);
+
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
 	}

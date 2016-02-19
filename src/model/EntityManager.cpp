@@ -217,6 +217,27 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 	}
 }
 
+void EntityManager::Delete(std::vector<model::Triple> triples) {
+	/*
+	 * Given a vector of triples, delete them from entity
+	 */
+	auto iter = triples.cbegin();
+	auto end = triples.cend();
+	//Iterating triples in the vector
+	for (; iter != end; iter++) {
+		auto triple = *iter;
+		auto entity_id = std::stoll(triple.subject.value);
+		auto tripleIter = _entities.find(entity_id);
+		if (tripleIter == _entities.end()){
+			//Skip if triple does not exist in entity
+			continue;
+		} else {
+			//Remove entnty from _entities
+			_entities.erase(entity_id);
+		}
+	}
+}
+
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
 {
 	unsigned int typeID = getTypeID(type);
