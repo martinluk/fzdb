@@ -22,13 +22,15 @@ public:
 	// - When accessing the database, ONLY use the _database protected member, not Singletons!
 	// - If you need to modify one of your member variables in executeConst(), declare it as mutable.
 	
-	virtual QueryResult executeConst() const
+	virtual QueryResult executeConst() const 
 	{
 		assert(false);
+		return QueryResult();
 	}
 	virtual QueryResult executeNonConst()
 	{
 		assert(false);
+		return QueryResult();
 	}
 	virtual bool constOperation() const = 0;
 
