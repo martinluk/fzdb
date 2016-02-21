@@ -21,7 +21,7 @@ class UserFileOperations {
 		void saveCacheToFile() const;
 		static std::string pathToLoginFile();
 
-		rapidjson::Document getUserFile();
+		static rapidjson::Document getUserFile();
 	private:
 		std::map<std::string, UserAttributes> _userFileCache;
 };

@@ -101,16 +101,7 @@ UserAttributes UserFileOperations::getUserAttributes(const std::string &userName
 void UserFileOperations::loadCacheFromFile()
 {
 	using namespace rapidjson;
-	
-	//XXX Window system should use rb?
-	// TODO: Exception checks on file opening!
-	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
-	char readBuffer[65536];
-	//Reading file using rapidjson reader
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	rapidjson::Document jsonDoc;
-	jsonDoc.ParseStream(is);
-	fclose(fp);
+	Document jsonDoc = UserFileOperations::getUserFile();
 
 	//Clearing userfile cache, ready for reloading
 	_userFileCache.clear();
