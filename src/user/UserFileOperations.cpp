@@ -28,9 +28,6 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
-// JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
-// really need them all the time and can't call them from const functions anyway.
-
 UserFileOperations::UserFileOperations()
 {
 	if (ADD_ADMIN_ON_INIT) {
@@ -69,8 +66,6 @@ void UserFileOperations::addUser(const UserAttributes &userAttributes)
 }
 
 void UserFileOperations::removeUser(const std::string &userName) {
-	//load cache from file
-	//loadCacheFromFile();
 	
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
@@ -167,6 +162,21 @@ void UserFileOperations::loadCacheFromFile()
 		//Add into cache
 		_userFileCache[username] = attr;
 	}
+}
+
+rapidjson::Document UserFileOperations::getUserFile(){
+	using namespace rapidjson;
+	//XXX Window system should use rb?
+	// TODO: Exception checks on file opening!
+	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
+	char readBuffer[65536];
+	//Reading file using rapidjson reader
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document jsonDoc;
+	jsonDoc.ParseStream(is);
+	fclose(fp);
+	return jsonDoc;
+
 }
 
 void UserFileOperations::saveCacheToFile() const

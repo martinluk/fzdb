@@ -6,6 +6,7 @@
 #include "user/UserAttributes.h"
 #include "user/UserFileOperations.h"
 #include <string>
+#include "rapidjson/document.h"
 
 /*
  * A wrapper class of user file operations so we can test the protected methods inside it.
@@ -13,11 +14,15 @@
 
 class UserFileOperationsWrapper : public UserFileOperations
 {
+	friend class UserFileOperations;
 	public:
+		typedef UserFileOperations super;
 		void addUser(const UserAttributes &userAttributes);
 		void removeUser(const std::string &userName);
 		void updateUser(const std::string &userName, const UserAttributes &newAttributes);
 		UserAttributes getUserAttributes(const std::string &userName) ;
+		rapidjson::Document getJsonDoc();
+
 };
 
 #endif //USER_USERFILEOPERATIONSWRAPPER_H

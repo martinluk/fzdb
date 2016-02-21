@@ -10,7 +10,7 @@
  */
 class UserFileOperationsTest : public ::testing::Test {
 	public:
-		//UserFileOperationsWrapper uo;
+		UserFileOperationsWrapper uo;
 protected:
 	void setUp() {
 	}

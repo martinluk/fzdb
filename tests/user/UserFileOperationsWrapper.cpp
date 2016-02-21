@@ -1,4 +1,5 @@
 #include "UserFileOperationsWrapper.h"
+#include "rapidjson/filereadstream.h"
 
 void UserFileOperationsWrapper::addUser(const UserAttributes &userAttributes) {
 	UserFileOperations::loadCacheFromFile();
@@ -21,4 +22,10 @@ UserAttributes UserFileOperationsWrapper::getUserAttributes(const std::string &u
 	UserFileOperations::loadCacheFromFile();
 	UserFileOperations::getUserAttributes(userName);
 	UserFileOperations::saveCacheToFile();
+}
+
+rapidjson::Document getJsonDoc() {
+	rapidjson::Document jsonDoc;
+	//TODO(Martin) Get address from super, read the file.
+	return jsonDoc;
 }
