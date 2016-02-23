@@ -23,7 +23,7 @@ describe("Fuzzy Database", function() {
       client.write("PING");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON.result).toEqual({data: 'PONG'});
+        expect(resultJSON.result).toEqual({type: 'text', data: 'PONG'});
         done();
       });      
     });
@@ -33,7 +33,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data: 'Database cleared.'})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
     });
@@ -51,7 +51,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 <forename> $a }");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({ a: 'Fred'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: 'Fred'})]})}));
         done();
       });      
     });
@@ -60,7 +60,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a <forename> \"Fred\" }");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({ a: '1'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '1'})]})}));
         done();
       });      
     });
@@ -78,7 +78,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:2 <surname> $a }");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({ a: 'Flanders'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: 'Flanders'})]})}));
         done();
       });      
     });
@@ -88,7 +88,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data: 'Database cleared.'})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
     });
@@ -122,7 +122,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a <forename> \"Marco\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({ a: '1'}), ({a: '3'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '1'}), ({a: '3'})]})}));
         done();
       });      
     });
@@ -132,7 +132,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a <age> 34}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({ a: '2'}), ({a: '3'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '3'})]})}));
         done();
       });      
     });
@@ -142,7 +142,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a <drinks> $b}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({ a: '1'}), ({a: '2'}), ({a: '3'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '1'}), ({a: '2'}), ({a: '3'})]})}));
         done();
       });      
     });
@@ -152,7 +152,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a <profession> $b}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '2'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'})]})}));
         done();
       });      
     });
@@ -162,7 +162,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { $a $b \"Marco\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'}), ({a: '3'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'}), ({a: '3'})]})}));
         done();
       });      
     });
@@ -172,7 +172,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 <surname> $a}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: 'Reus'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Reus'})]})}));
         done();
       });      
     });
@@ -182,7 +182,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 <drinks> $a}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: 'Water'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Water'})]})}));
         done();
       });      
     });
@@ -192,7 +192,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:2 <surname> $a}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: 'Szyslak'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Szyslak'})]})}));
         done();
       });      
     });
@@ -202,7 +202,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:2 <profession> $a}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: 'Bartender'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Bartender'})]})}));
         done();
       });      
     });
@@ -212,7 +212,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 <profession> $a}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[]})}));
         done();
       });      
     });
@@ -222,7 +222,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 $a \"Marco\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });      
     });
@@ -232,7 +232,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:1 $b $c}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });      
     });
@@ -242,7 +242,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data: 'Database cleared.'})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
     });
@@ -269,7 +269,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:5 <wife> $a}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: 'entity:2'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'entity:2'})]})}));
         done();
       });      
     });
@@ -279,7 +279,7 @@ describe("Fuzzy Database", function() {
       client.write("FLUSH");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({data: 'Database cleared.'})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
     });

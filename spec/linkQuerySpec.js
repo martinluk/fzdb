@@ -47,7 +47,7 @@ describe("Fuzzy Database", function() {
     it("getting the forename of entity:1", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'})]})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });          
     });
@@ -56,7 +56,7 @@ describe("Fuzzy Database", function() {
     it("getting the surname of entity:2", function(done) {  
       sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '2'})]})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'})]})}));
         done();
       });
     });
@@ -65,7 +65,7 @@ describe("Fuzzy Database", function() {
     it("link entity 1 and entity 2", function(done) {
       sendCmd("LINK entity:1 entity:2")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data: 'Entities 1 and 2 linked successfully.'})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities 1 and 2 linked successfully.'})}));
         done();
       });     
     });
@@ -74,7 +74,7 @@ describe("Fuzzy Database", function() {
     it("getting the forename of entity:1 after link", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'})]})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });      
     });
@@ -83,7 +83,7 @@ describe("Fuzzy Database", function() {
     it("getting the surname of entity:2 after link", function(done) {
       sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'})]})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });      
     });
@@ -92,7 +92,7 @@ describe("Fuzzy Database", function() {
     it("unlink entity 1 and entity 2", function(done) {
       sendCmd("UNLINK entity:1 entity:2")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data: 'Entities 1 and 2 unlinked successfully.'})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities 1 and 2 unlinked successfully.'})}));
         done();
       });     
     });
@@ -101,7 +101,7 @@ describe("Fuzzy Database", function() {
     it("getting the forename of entity:1 after unlink", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '1'})]})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });          
     });
@@ -110,7 +110,7 @@ describe("Fuzzy Database", function() {
     it("getting the surname of entity:2 after unlink", function(done) {  
       sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
       .then(function(data) {
-        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({data:[({a: '2'})]})}));
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'})]})}));
         done();
       });
     });
