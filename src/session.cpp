@@ -165,13 +165,19 @@ void TCPSession::respond(const std::string response) {
 	{
 		// Find out how many chars to copy.
 		int charsToCopy = std::min<int>(max_length - 1, response.length() - i);
+
+        // Determine how many characters to actually send.
+        // If response.length() - i > max_length - 1, this means we're not done sending.
+        int charsToSend = (response.length() - i > max_length - 1) ? max_length : charsToCopy;
+
+        //spdlog::get("main")->info("Sending {} bytes from response of length {}, beginning at position {}", charsToSend, response.length(), i);
 		
 		// Copy the chars.
 		// The last element of the buffer will remain 0.
 		memcpy(buffer, response.c_str() + i, charsToCopy);
 		
 		// Send over TCP.
-		boost::asio::async_write(_socket, boost::asio::buffer(buffer, charsToCopy), boost::bind(&TCPSession::handle_write, this, boost::asio::placeholders::error));
+        boost::asio::async_write(_socket, boost::asio::buffer(buffer, charsToSend), boost::bind(&TCPSession::handle_write, this, boost::asio::placeholders::error));
 	}
 }
 

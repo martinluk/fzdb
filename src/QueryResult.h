@@ -26,6 +26,8 @@ public:
   static const std::string PROPERTY_RESULT;
   static const std::string PROPERTY_RESULTTYPE;
   static const std::string PROPERTY_RESULTDATA;
+  static const std::string PROPERTY_VALUE_TEXT;
+  static const std::string PROPERTY_VALUE_FSPARQL;
 
   static QueryResult generateError(ErrorCode code, const std::string &errorString);
   

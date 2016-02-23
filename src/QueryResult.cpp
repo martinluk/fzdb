@@ -6,6 +6,8 @@ const std::string QueryResult::PROPERTY_INFO("info");
 const std::string QueryResult::PROPERTY_RESULT("result");
 const std::string QueryResult::PROPERTY_RESULTTYPE("type");
 const std::string QueryResult::PROPERTY_RESULTDATA("data");
+const std::string QueryResult::PROPERTY_VALUE_TEXT("text");
+const std::string QueryResult::PROPERTY_VALUE_FSPARQL("fsparql");
 
 QueryResult::QueryResult() : BaseQueryResult()
 {
@@ -15,6 +17,9 @@ QueryResult::QueryResult() : BaseQueryResult()
 	
 	rapidjson::Value obj(rapidjson::kObjectType);
 	setValue(PROPERTY_RESULT, obj);
+
+    // This sets the result type to text.
+    setResultDataText("");
 }
 
 bool QueryResult::status() const
@@ -91,6 +96,8 @@ std::string QueryResult::resultDataText() const
 
 void QueryResult::setResultDataText(const std::string &data)
 {
+    setResultType(PROPERTY_VALUE_TEXT);
+
 	rapidjson::Value& resultObj = _document[PROPERTY_RESULT.c_str()];
 	if ( !resultObj.HasMember(PROPERTY_RESULTDATA.c_str()) )
 	{
@@ -106,6 +113,8 @@ void QueryResult::setResultDataText(const std::string &data)
 
 void QueryResult::setResultDataFsparql(rapidjson::Value &data)
 {
+    setResultType(PROPERTY_VALUE_FSPARQL);
+
 	rapidjson::Value& resultObj = _document[PROPERTY_RESULT.c_str()];
 	if ( resultObj.HasMember(PROPERTY_RESULTDATA.c_str()) )
 	{

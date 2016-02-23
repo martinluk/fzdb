@@ -88,6 +88,7 @@ def readAllFromSocket(socket):
 	
 		# If we got 1024 bytes, this is 1023 data bytes + a padding null.
 		# It indicates that we need to loop again to get the rest.
+                #print("Read %s bytes" % (len(data)))
 		if len(data) == CHUNK_SIZE:
 			readData = readData + data[:-1]	# Trim the last null byte.
 		else:
@@ -119,10 +120,10 @@ def sendOnSocket(socket, data):
 		# Increment the base offset
 		base = base + CHUNK_SIZE
 
-def printJsonParseError(data):
+def printJsonParseError(data, missingVal):
 	global commSocket
 
-	print("FATAL ERROR: Invalid JSON response.");
+        print("FATAL ERROR: Invalid JSON response - property '%s' not found." % (missingVal));
 	print("Raw JSON received:\n")
 	sys.stdout.write(data)
 	sys.stdout.write("\n\n");
@@ -132,11 +133,11 @@ def printJsonParseError(data):
 
 def printJsonResponse(data):
 	# Create a json object from the data
-	jsonobj = json.loads(data)
+        jsonobj = json.loads(data)
 
 	# Check the response.
 	if not 'status' in jsonobj:
-		printJsonParseError(data)
+                printJsonParseError(data, 'status')
 	
 	if jsonobj['status'] == False:
 		errResp = ""
@@ -152,15 +153,19 @@ def printJsonResponse(data):
 	
 	# Print the result.
 	if not 'result' in jsonobj:
-		printJsonParseError(data)
-	
-	resultObj = jsonobj['result']
+                printJsonParseError(data, 'result')
 
-	if not 'type' in resultObj or not 'data' in resultObj:
-		printJsonParseError(data)
+        result = jsonobj['result']
+
+        if not 'type' in result:
+            printJsonParseError(data, 'result.type')
+        elif not 'data' in result:
+            printJsonParseError(data, 'result.data')
 	
-	if resultObj['type'] == 'text':
-		sys.stdout.write(resultObj['data'])
+        if result['type'] == 'text':
+                sys.stdout.write(result['data'])
+        elif result['type'] == 'fsparql':
+                sys.stdout.write(json.dumps(result['data']))
 
 def performReceiveData(socket):
 	global sending
