@@ -118,10 +118,54 @@ def sendOnSocket(socket, data):
 		
 		# Increment the base offset
 		base = base + CHUNK_SIZE
-		
+
+def printJsonParseError(data):
+	global commSocket
+
+	print("FATAL ERROR: Invalid JSON response.");
+	print("Raw JSON received:\n")
+	sys.stdout.write(data)
+	sys.stdout.write("\n\n");
+	print("Closing connection.");
+	commSocket.close()
+	sys.exit()
+
+def printJsonResponse(data):
+	# Create a json object from the data
+	jsonobj = json.loads(data)
+
+	# Check the response.
+	if not 'status' in jsonobj:
+		printJsonParseError(data)
+	
+	if jsonobj['status'] == False:
+		errResp = ""
+		errCode = 0
+
+		if 'info' in jsonobj:
+			errResp = jsonobj['info']
+		if 'errorCode' in jsonobj:
+			errCode = jsonobj['errorCode']
+
+		print("Operation failed. Error code: %s Response: %s" % (errCode, errResp))
+		return
+	
+	# Print the result.
+	if not 'result' in jsonobj:
+		printJsonParseError(data)
+	
+	resultObj = jsonobj['result']
+
+	if not 'type' in resultObj or not 'data' in resultObj:
+		printJsonParseError(data)
+	
+	if resultObj['type'] == 'text':
+		sys.stdout.write(resultObj['data'])
+
 def performReceiveData(socket):
 	global sending
 	global promptSymbolRequired
+	global commSocket
 
 	# Read in the data.
 	data = readAllFromSocket(socket)
@@ -137,19 +181,9 @@ def performReceiveData(socket):
 	if rawJson == True:
 		sys.stdout.write(data.decode('utf-8'))
 	else:
-		jsonobj = json.loads(data.decode('utf-8'))
-		if "response" in jsonobj:
-			sys.stdout.write(jsonobj["response"])
-		else:
-			print("FATAL ERROR: No 'response' received via JSON.");
-			print("Raw JSON received:\n")
-			sys.stdout.write(data.decode('utf-8'))
-			sys.stdout.write("\n\n");
-			print("Closing connection.");
-			commSocket.close()
-			sys.exit()
+		printJsonResponse(data.decode('utf-8'))
 
-	sys.stdout.write("\n");
+	sys.stdout.write('\n')
 
 	# Switch back into sending mode ready for the next command.
 	sending = True
