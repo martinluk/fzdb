@@ -13,12 +13,10 @@ protected:
 };
 
 TEST_F(HashingTest, sha1hash) {
-	Hashing e;
-	std::string hash = e.sha1hash("pwsalt");
+	std::string hash = Hashing::sha1hash("pwsalt");
 	EXPECT_STREQ(hash.c_str(),"2bfa821dd4f3af5adfb5734457839bed7b324819");
 }
 
 TEST_F(HashingTest, genSalt) {
-	Hashing e;
-	std::string hash = e.genSalt();
+	std::string hash = Hashing::genSalt();
 }

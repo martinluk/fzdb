@@ -5,8 +5,10 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
-#include <user/Permission.h>
-#include <user/UserOperation.h>
+#include "user/Permission.h"
+#include "user/UserOperation.h"
+#include "singletons.h"
+
 class ISession
 {
 public:
@@ -14,17 +16,21 @@ public:
 	virtual void start() = 0;
 	virtual void respond(const std::string response) = 0;
     virtual boost::uuids::uuid uuid() = 0;
-	virtual ~ISession() {};
+	virtual ~ISession() {}
 
 	//methods for maintaining user state
-	void setCurrentUserName(std::string username) { 
+	void setCurrentUserName(const std::string &username) { 
 		_username=username;
 	}
 	void clearCurrentUserName() { _username.clear(); }
+	
+	std::string username() const { return _username; }
 
-	UserGroup getCurrentUserUserGroup() {
-		return UserOperation::getUserGroup(_username);
-	}
+	// JONATHAN: Removing this - database access should now only be through the Job class' member pointer.
+//	Permission::UserGroup getCurrentUserUserGroup() const
+//	{
+//		return Singletons::cDatabase()->users().getUserGroup(_username);
+//	}
 
 protected:
 	virtual void handle_read(const boost::system::error_code& error, size_t bytes_transferred) = 0;

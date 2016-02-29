@@ -6,15 +6,13 @@ CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session, const std::s
 {
 }
 
-QueryResult CreateEntityJob::execute()
+QueryResult CreateEntityJob::executeNonConst()
 {
-	EntityManager* m = Singletons::entityManager();
-	std::shared_ptr<Entity> e = m->createEntity(_type);
+	std::shared_ptr<Entity> e = _database->entityManager().createEntity(_type);
 
 	std::string id = std::to_string(e->getHandle());
 
   QueryResult result;
-  result.setValue("type", "string");
-  result.setValue(std::string("response"), "Entity created with handle " + id);
+  result.setResultDataText(std::string("Entity created with handle") + id);
   return result;
 }

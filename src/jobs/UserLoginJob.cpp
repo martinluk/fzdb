@@ -4,22 +4,24 @@
 #include "../user/Permission.h"
 #include "../user/UserOperation.h"
 
-UserLoginJob::UserLoginJob(std::shared_ptr<ISession> session, std::string username, std::string password) : Job(session) {
+UserLoginJob::UserLoginJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password) : Job(session) {
 	_username=username;
 	_password=password;
 	_session=session;
 };
 
-QueryResult UserLoginJob::execute() {
-	QueryResult result;
+QueryResult UserLoginJob::executeNonConst()
+{
 	try {
         //TODO Verify username and password are not empty
-        UserOperation::login(_username,_password);
-	} catch (LoginUnsuccessfulException ex) { 
-		result = QueryResult::generateError(ex.what());
-        return result;
+        _database->users().login(_username,_password);
+	} catch (const LoginUnsuccessfulException &ex) { 
+		return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
 	}
+
     _session->setCurrentUserName(_username);
-    result.setValue("status",0);
+	
+	QueryResult result;
+    result.setResultDataText("Logged in successfully.");
 	return result;
 }

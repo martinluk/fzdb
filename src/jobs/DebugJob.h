@@ -10,11 +10,12 @@
 // Depending on the command arguments, we do various debug tasks here.
 class DebugJob : public Job
 {
+	friend class DebugDumpEntities;
 public:
         DebugJob(std::shared_ptr<ISession> session, const std::string &message);
 
-        // Inherited via Job
-        virtual QueryResult execute() override;
+		virtual bool constOperation() const override { return true; }
+		virtual QueryResult executeConst() const override;
 
 private:
         std::string _message;

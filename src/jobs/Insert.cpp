@@ -8,16 +8,16 @@ Insert::Insert(std::shared_ptr<ISession> session, Query query) : Job(session), _
 {
 }
 
-QueryResult Insert::execute()
+QueryResult Insert::executeNonConst()
 {
-	QueryResult result;
 	try {
-		Singletons::entityManager()->Insert(_query.conditions.triples);
-		result.setValue("type", "string");
-		result.setValue("response", std::string("Inserted ") + std::to_string(_query.conditions.triples.size()) + std::string(" triples."));
+		_database->entityManager().Insert(_query.conditions.triples);
 	}
 	catch (MismatchedTypeException ex) {
-		result = QueryResult::generateError(ex.what());
+		return QueryResult::generateError(QueryResult::ErrorCode::TypeMismatch, ex.what());
 	}
+	
+	QueryResult result;
+	result.setResultDataText(std::string("Inserted ") + std::to_string(_query.conditions.triples.size()) + std::string(" triples."));
 	return result;
 }

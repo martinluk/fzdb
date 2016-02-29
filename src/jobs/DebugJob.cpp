@@ -11,15 +11,15 @@ DebugJob::DebugJob(std::shared_ptr<ISession> session, const std::string &message
     _message = message;
 }
 
-QueryResult DebugJob::execute()
+QueryResult DebugJob::executeConst() const
 {
     // Split the string by spaces.
     std::vector<std::string> list = util::split(_message, ' ');
     if ( list.size() < 1 )
     {
-        QueryResult result;
-        result.setValue("type", "string");
-        result.setValue(std::string("response"), "No debug parameter specified.");
+		QueryResult result;
+        result.setErrorCode(QueryResult::ErrorCode::ParseError);
+		result.setInfo("No debug parameter specified.");
         return result;
     }
 
@@ -37,11 +37,11 @@ QueryResult DebugJob::execute()
     }
 	else if ( list[0] == "DUMPENTITIES" )
 	{
-		return DebugDumpEntities::execute();
+		return DebugDumpEntities::execute(*this);
 	}
 
     QueryResult result;
-    result.setValue("type", "string");
-    result.setValue(std::string("response"), std::string("Debug parameter ") + list[0] + std::string(" not recognised."));
+	result.setErrorCode(QueryResult::ErrorCode::ParseError);
+	result.setInfo(std::string("Debug parameter ") + list[0] + std::string(" not recognised."));
     return result;
 }

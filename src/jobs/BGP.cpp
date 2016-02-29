@@ -10,12 +10,12 @@ BGP::BGP(std::shared_ptr<ISession> session, Query query) : Job(session), _query(
 {
 }
 
-QueryResult BGP::execute()
+QueryResult BGP::executeConst() const
 {
 	QueryResult result;
 	try {
       //run BGP
-		VariableSet variables = Singletons::entityManager()->BGP(_query.whereClause, _query.settings);
+		VariableSet variables = _database->entityManager().BGP(_query.whereClause, _query.settings);
 
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
@@ -50,12 +50,13 @@ QueryResult BGP::execute()
 
 			val.PushBack(val2, result.allocator());
 		}
-		rapidjson::Value varName;
-		varName.SetString("result", result.allocator());
-		result.setValue(std::move(varName), std::move(val));
+//		rapidjson::Value varName;
+//		varName.SetString("result", result.allocator());
+//		result.setValue(std::move(varName), std::move(val));
+		result.setResultDataFsparql(val);
 	}
 	catch (NotImplementedException ex) {
-		result = QueryResult::generateError(ex.what());
+		result = QueryResult::generateError(QueryResult::ErrorCode::NotImplemented, ex.what());
 	}
 	
 

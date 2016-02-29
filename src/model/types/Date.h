@@ -21,32 +21,33 @@ namespace model
 			}
 
 		public:
-			/**
-			*   Encodes a date
-			*
-			*   @param int y The year of the date to be encoded
-			*   @param int m The month of the date to be encoded
-			*   @param int d The day of the date to be encoded
-			*   @return int The encoded date
-			*/
-			static int Encode(int y, int m, int d)
+			class StructuredDate
 			{
+			public:
+				explicit StructuredDate(int y, int m, int d) :
+					year(y), month(m), day(d)
+				{
+				}
+				
+				int year;
+				int month;
+				int day;
+			};
+
+			static Date_t encode(const StructuredDate &sd)
+			{
+				int d = sd.day;
+				int m = sd.month;
+				int y = sd.year;
+				
 			    m = (m + 9) % 12;
 			    y = y - (m/10);
 			    return (365 * y) + (y/4) - (y/100) + (y/400) + ((m*306 + 5) / 10) + (d-1);
 			}
 			
-			/**
-			*   Decodes a date
-			*
-			*   @param int g An encoded date
-			*   @param int y Year output
-			*	@param int mm Month output
-			*	@prarm int dd Day output
-			*/
-			static void Decode(int g, int &y, int &mm, int &dd)
+			static StructuredDate decode(Date_t g)
 			{
-			    y = ((10000*g + 14780)/3652425);
+			    int y = ((10000*g + 14780)/3652425);
 			    int ddd = g - (365*y + (y/4) - (y/100) + (y/400));
 			    if (ddd < 0)
 				{
@@ -54,17 +55,26 @@ namespace model
 			        ddd = g - (365*y + (y/4) - (y/100) + (y/400));
 			    }
 			    int mi = ((100*ddd + 52)/3060);
-			    mm = (mi + 2)%12 + 1;
+			    int mm = (mi + 2)%12 + 1;
 			    y = y + ((mi + 2)/12);
-			    dd = ddd - ((mi*306 + 5)/10) + 1;
+			    int dd = ddd - ((mi*306 + 5)/10) + 1;
+				
+				return StructuredDate(y, mm, dd);
 			}
 			
-			Date() : _value(0), Base(100)
+			Date() : _value(0), Base(100, std::string())
 			{
 				initMemberSerialiser();
 			}
 			
-			Date(Date_t value, unsigned char confidence = 100) : Base(confidence), _value(value)
+			Date(Date_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(value)
+			{
+				initMemberSerialiser();
+			}
+			
+			Date(const StructuredDate &sd, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(encode(sd))
 			{
 				initMemberSerialiser();
 			}
@@ -74,6 +84,11 @@ namespace model
 				return _value;
 			}
 			
+			StructuredDate date() const
+			{
+				return decode(_value);
+			}
+			
 			virtual ~Date() {}
 
 			virtual std::string toString() const override
@@ -81,7 +96,7 @@ namespace model
 				return std::to_string(_value);
 			}
 
-			virtual bool Equals(const std::string val) const override
+			virtual bool Equals(const std::string &val) const override
 			{
 				return _value == std::stoul(val);
 			}
@@ -95,13 +110,13 @@ namespace model
 		private:
 			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
-				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
+				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
 			}
 
-			Date(const char* &serialisedData)
+			Date(const char* &serialisedData) : Base(serialisedData)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
+				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
 			}
 		};
 	}

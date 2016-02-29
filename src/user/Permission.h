@@ -1,29 +1,45 @@
-#pragma once
+#ifndef USER_PERMISSION_H
+#define USER_PERMISSION_H
+
 #include <stdexcept>
 /**
  * Permission
  * This class provides methods that given UserGroup enum, asserts whether usergroup has given permission
  */
-enum class UserGroup { GUEST, EDITOR, ADMIN };
-enum class PermissionType {ViewDB, ModifyDB, UserOp};
-class Permission {
+namespace Permission
+{
+	enum class UserGroup
+	{
+		GUEST,
+		EDITOR,
+		ADMIN
+	};
+	
+	enum class PermissionType
+	{
+		ViewDB,
+		ModifyDB,
+		UserOp
+	};
+	void assertViewDBPermission(UserGroup group);
+	void assertModifyDBPermission(UserGroup group);
+	void assertUserOpPermission(UserGroup group);
+
+	bool checkPermission(UserGroup group, PermissionType permType);
+	void assertPermission(UserGroup group, PermissionType permType);
+	
+	//TODO Can be refactored using a struct
+	bool guestPermission(PermissionType permType);
+	bool editorPermission(PermissionType permType);
+	bool adminPermission(PermissionType permType);
+	
+	class UserPermissionException : public std::runtime_error
+	{
 	public:
-		static void assertViewDBPermission(UserGroup group);
-		static void assertModifyDBPermission(UserGroup group);
-		static void assertUserOpPermission(UserGroup group);
+		UserPermissionException(UserGroup group, PermissionType permType) : std::runtime_error( "Permission exception" )
+		{
+		}
+	};
+}
 
-	private: 
-		static bool checkPermission(UserGroup group, PermissionType permType);
-		static void assertPermission(UserGroup group, PermissionType permType);
-		//TODO Can be refactored using a struct
-		static bool guestPermission(PermissionType permType);
-		static bool editorPermission(PermissionType permType);
-		static bool adminPermission(PermissionType permType);
-};
-
-using std::runtime_error;
-
-class UserPermissionException : public runtime_error {
-	public:
-		   UserPermissionException(UserGroup group, PermissionType permType): runtime_error( "Permission exception" ) {}
-};
+#endif

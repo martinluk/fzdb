@@ -19,22 +19,19 @@ namespace model {
 			}
 
 		public:
-			Int() : _value(0), Base(100)
+			Int() : Base(100, std::string()), _value(0)
 			{
 				initMemberSerialiser();
 			}
 			
-			Int(const int32_t value) : _value(value), Base(100)
+			Int(int32_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(value)
 			{
 				initMemberSerialiser();
 			}
 			
-			Int(int32_t value, unsigned char confidence) : Base(confidence), _value(value)
-			{
-				initMemberSerialiser();
-			}
-			
-			Int(std::string value, unsigned char confidence) : Int(std::atoi(value.c_str()), confidence)
+			Int(std::string value, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Int(std::atoi(value.c_str()), confidence, comment)
 			{
 				// Already initialised
 			}
@@ -59,7 +56,7 @@ namespace model {
 			}
 
 			// Inherited via Base
-			virtual bool Equals(const std::string val) const override {
+			virtual bool Equals(const std::string &val) const override {
 				return _value == std::stoi(val);
 			}
 

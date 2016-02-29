@@ -10,11 +10,10 @@ class EchoJob : public Job
 {
 public:
 
-	EchoJob(std::shared_ptr<ISession> session, std::string message);
+	EchoJob(std::shared_ptr<ISession> session, const std::string &message);
 
-
-	// Inherited via Job
-	virtual QueryResult execute() override;
+	virtual bool constOperation() const override { return true; }
+	virtual QueryResult executeConst() const override;
 
 private:
 	std::string _message;

@@ -14,10 +14,8 @@ public:
 
   Flush(std::shared_ptr<ISession> session);
 
-
-  // Inherited via Job
-  virtual QueryResult execute() override;
-
+	virtual bool constOperation() const override { return false; }
+	virtual QueryResult executeNonConst() override;
 };
 
 

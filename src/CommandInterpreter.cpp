@@ -62,10 +62,10 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
 		}
 	}
 	catch (ParseException ex) {
-		session->respond(QueryResult::generateError(std::string("Parse error: ") +  ex.what()).toJSON());
+		session->respond(QueryResult::generateError(QueryResult::ErrorCode::ParseError, std::string("Parse error: ") +  ex.what()).toJson());
 	}
 	catch (std::exception& ex) {
-		session->respond(QueryResult::generateError(std::string("Unexpected error: ") + ex.what()).toJSON());
+		session->respond(QueryResult::generateError(QueryResult::ErrorCode::GenericError, std::string("Unexpected error: ") + ex.what()).toJson());
 	}
 }
 

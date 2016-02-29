@@ -14,10 +14,9 @@ namespace jobs {
 	public:
 
 		Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
-
-
-		// Inherited via Job
-		virtual QueryResult execute() override;
+		
+		virtual bool constOperation() const override { return false; }
+		virtual QueryResult executeNonConst() override;
 
 	protected:
 		Entity::EHandle_t _entity1;
@@ -28,14 +27,14 @@ namespace jobs {
 	{
 	public:
 		Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
-		virtual QueryResult execute() override;
+		virtual QueryResult executeNonConst() override;
 	};
 
 	class Merge : public Link
 	{
 	public:
 		Merge(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
-		virtual QueryResult execute() override;
+		virtual QueryResult executeNonConst() override;
 	};
 }
 

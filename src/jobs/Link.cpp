@@ -10,11 +10,12 @@ Link::Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity:
 	: Job(session), _entity1(entity1), _entity2(entity2)
 {}
 
-QueryResult Link::execute()
+QueryResult Link::executeNonConst()
 {
+	_database->entityManager().linkEntities(_entity1, _entity2);
+	
 	QueryResult result;
-	result.setValue("result", "success");
-	Singletons::entityManager()->linkEntities(_entity1, _entity2);
+	result.setResultDataText(std::string("Entities ") + std::to_string(_entity1) + std::string(" and ") + std::to_string(_entity2) + std::string(" linked successfully."));
 	return result;
 }
 
@@ -22,11 +23,12 @@ Unlink::Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Ent
 	: Link(session, entity1, entity2)
 {}
 
-QueryResult Unlink::execute()
+QueryResult Unlink::executeNonConst()
 {
+	_database->entityManager().unlinkEntities(_entity1, _entity2);
+	
 	QueryResult result;
-	result.setValue("result", "success");
-	Singletons::entityManager()->unlinkEntities(_entity1, _entity2);
+	result.setResultDataText(std::string("Entities ") + std::to_string(_entity1) + std::string(" and ") + std::to_string(_entity2) + std::string(" unlinked successfully."));
 	return result;
 }
 
@@ -34,10 +36,11 @@ Merge::Merge(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entit
 	: Link(session, entity1, entity2)
 {}
 
-QueryResult Merge::execute()
+QueryResult Merge::executeNonConst()
 {
+	_database->entityManager().mergeEntities(_entity1, _entity2);
+	
 	QueryResult result;
-	result.setValue("result", "success");
-	Singletons::entityManager()->mergeEntities(_entity1, _entity2);
+	result.setResultDataText(std::string("Entities ") + std::to_string(_entity1) + std::string(" and ") + std::to_string(_entity2) + std::string(" merged successfully."));
 	return result;
 }

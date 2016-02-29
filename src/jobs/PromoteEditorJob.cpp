@@ -4,22 +4,27 @@
 #include "../user/UserOperation.h"
 #include <stdexcept>
 
-PromoteEditorJob::PromoteEditorJob(std::shared_ptr<ISession> session, std::string username):IUserAdminJobs(session) {
+PromoteEditorJob::PromoteEditorJob(std::shared_ptr<ISession> session, const std::string &username):IUserAdminJobs(session) {
 	_username = username;
 }
 
-QueryResult PromoteEditorJob::adminJobBody() {
-    QueryResult result;
+QueryResult PromoteEditorJob::executeNonConst()
+{
+	if ( !hasAdminPermissions() )
+		return errorNoAdminPermissions();
+	
     try {
-        UserGroup group = UserOperation::getUserGroup(_username); //Throws user not exist exception
-        if (group != UserGroup::EDITOR) {
-        	throw std::runtime_error("Error: given user is not an editor, cannot promote to admin");
+        Permission::UserGroup group = _database->users().getUserGroup(_username); //Throws user not exist exception
+        if (group != Permission::UserGroup::EDITOR) {
+        	return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, "User to promote is not an editor.");
 		}
-    } catch (std::exception exception) {
-        result.generateError(exception.what());
-        return result;
+    } catch (const std::exception &ex) {
+        return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
     }
-	UserOperation::changeUserGroup(_username, UserGroup::ADMIN);
-    result.setValue("status","0");
+	
+	_database->users().changeUserGroup(_username, Permission::UserGroup::ADMIN);
+	
+	QueryResult result;
+    result.setResultDataText(std::string("User ") + _username + std::string(" promoted to admin."));
     return result;
 }

@@ -16,7 +16,6 @@ IF(NOT CMAKE_BUILD_TYPE MATCHES "RELEASE")
   message("Assuming debug build, use -DCMAKE_BUILD_TYPE=RELEASE for release build")
   SET(CMAKE_BUILD_TYPE "DEBUG")
 endif()
-
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   message("Starting DEBUG configuration..")
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
@@ -24,6 +23,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 else()
   message( FATAL_ERROR "CMAKE_BUILD_TYPE must be DEBUG or RELEASE - it's currently ${CMAKE_BUILD_TYPE}" )
 endif()
+
 
 message("Using generator ${CMAKE_GENERATOR}")
 
@@ -48,6 +48,25 @@ message("DEBUG: ${RAPIDJSON_INCLUDE_DIRS}")
 
 FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+
+#Admin account set up
+#TODO(Martin Luk) Refactor Admin setting into some kind of config file?
+if(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+	message("Release Build - Database user json file should be added to correct dirrectory before building project.")
+else()
+	message("Debug build - Assuming no user json file ")
+	add_definitions("-DINIT_ADD_ADMIN")
+
+	SET(ADMIN_USERNAME "fzydb_admin")
+	add_definitions("-DADMIN_USERNAME=\"${ADMIN_USERNAME}\"")
+	message("Admin username set")
+
+	SET(ADMIN_PASSWORD "password")
+	add_definitions("-DADMIN_PASSWORD=\"${ADMIN_PASSWORD}\"")
+	message("Admin password set as default")
+
+endif()
+
 
 macro(GroupSources curdir)
   file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)

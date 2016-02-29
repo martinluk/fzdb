@@ -13,11 +13,10 @@ private:
   std::string _name;
 
 public:
-  
 	UnknownJob(std::shared_ptr<ISession> session, std::string name);
-	// Inherited via Job
-	virtual QueryResult execute() override;
-
+	
+	virtual bool constOperation() const override { return true; }
+	virtual QueryResult executeConst() const;
 };
 
 #endif	// JOBS_UNKNOWNJOB_H

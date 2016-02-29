@@ -19,7 +19,7 @@ class VariableSet {
 
 public:
 
-	VariableSet(std::set<std::string> variableNames) {
+	VariableSet(const std::set<std::string> &variableNames = std::set<std::string>()) {
 		_size = variableNames.size();
 		_variablesUsed = std::vector<bool>(_size);
 		unsigned char count = 0;

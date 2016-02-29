@@ -9,7 +9,7 @@
 
 QueryResult DebugSaveFile::execute()
 {
-    /*using namespace model::types;
+    using namespace model::types;
     std::stringstream log;
     
     // Create an entity manager.
@@ -54,9 +54,8 @@ QueryResult DebugSaveFile::execute()
 	}
     
     log << "File write success: " << success << "\n";
-    */
+    
     QueryResult result;
-    result.setValue("type", "string");
-    //result.setValue(std::string("response"), log.str());
+    result.setResultDataText(log.str());
     return result;
 }

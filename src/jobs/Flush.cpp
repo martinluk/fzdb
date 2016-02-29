@@ -8,8 +8,11 @@ Flush::Flush(std::shared_ptr<ISession> session) : Job(session)
 {
 }
 
-QueryResult Flush::execute()
+QueryResult Flush::executeNonConst()
 {
-	Singletons::entityManager()->clearAll();
-	return QueryResult();
+	_database->entityManager().clearAll();
+	
+	QueryResult result;
+    result.setResultDataText("Database cleared.");
+    return result;
 }

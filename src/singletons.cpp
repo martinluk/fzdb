@@ -1,40 +1,54 @@
 #include "./singletons.h"
-#include "./model/EntityManager.h"
+#include "model/Database.h"
 #include <iostream>
+
+#include <boost/thread/shared_mutex.hpp>
 
 namespace Singletons
 {
-	EntityManager* entityManager_ = NULL;
-        std::string dataFilePath_;
+	Database* _database = NULL;
+	boost::shared_mutex _databaseMutex;
+	
+	std::string _dataFilePath;
 
 	void initialise()
 	{
-		entityManager_ = new EntityManager();
-                if ( dataFilePath_.size() > 0 )
+		_database = new Database();
+                if ( _dataFilePath.size() > 0 )
                 {
-                    if ( !entityManager_->loadFromFile(dataFilePath_))
+                    if ( !_database->entityManager().loadFromFile(_dataFilePath))
                     {
-                        std::cerr << "Could not load file: " << dataFilePath_ << std::endl;
+                        std::cerr << "Could not load file: " << _dataFilePath << std::endl;
                     }
                     else
                     {
-                        std::cout << "Loaded file " << dataFilePath_ << " successfully." << std::endl;
+                        std::cout << "Loaded file " << _dataFilePath << " successfully." << std::endl;
                     }
                 }
 	}
 
 	void shutdown()
 	{
-		delete entityManager_;
+		delete _database;
 	}
 
-	EntityManager* entityManager()
+	void setDataFilePath(const std::string &path)
 	{
-		return entityManager_;
+		_dataFilePath = path;
 	}
-
-        void setDataFilePath(const std::string &path)
-        {
-            dataFilePath_ = path;
-        }
+	
+	Database* database()
+	{
+		return _database;
+	}
+	
+	const Database* cDatabase()
+	{
+		return _database;
+	}
+	
+	boost::shared_mutex& databaseMutex()
+	{
+		return _databaseMutex;
+	}
 }
