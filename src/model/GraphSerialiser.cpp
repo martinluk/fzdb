@@ -116,7 +116,7 @@ void GraphSerialiser::unserialise(const char *serialisedData)
 	const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
 
 	StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
-	typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset);
+	typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset, pHeader->typeMapLength);
     
 	const EntityDataHeader* pEntData = reinterpret_cast<const EntityDataHeader*>(serialisedData + pHeader->entityDataOffset);
 	const EntityHeader* pEntHeaders = reinterpret_cast<const EntityHeader*>(pEntData + 1);
