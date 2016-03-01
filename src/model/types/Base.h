@@ -9,6 +9,8 @@
 #include "../Triple.h"
 #include "../MemberSerialiser.h"
 
+class IEntityProperty;
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace model {
@@ -32,6 +34,9 @@ namespace model {
 
 			// Time record was created
 			const boost::posix_time::ptime _timeCreated;
+
+			// Extra settings against this data
+			std::map<unsigned int, std::shared_ptr<IEntityProperty>> _propertyTable;
 			
 			void initMemberSerialiser()
 			{

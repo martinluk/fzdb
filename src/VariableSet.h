@@ -28,7 +28,7 @@ public:
 	VariableSetValue() :
 		_ptr(), _propertyId(0), _entityId(0) {}
 
-	VariableSetValue& operator=(const VariableSetValue& val) {
+	VariableSetValue& operator=(const VariableSetValue& val) const {
 		return VariableSetValue(val.dataPointer(), val.property(), val.entity());
 	}
 

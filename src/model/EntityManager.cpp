@@ -529,7 +529,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 				entity = _entities.at(std::stoll(object.value));
 				for (auto prop : entity->properties()) {
 					variableSet.add(std::move(variableName), 
-						VariableSetValue(std::make_shared<model::types::Int>(prop.first),0,0),
+						VariableSetValue(std::make_shared<model::types::Int>(prop.first), prop.first, entity->handle_),
 						model::types::Base::Subtype::PropertyReference);
 				}
 				break;
@@ -550,7 +550,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 
 			unsigned int propertyId = _propertyNames.left.at(object.value);
 			variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::Int>(propertyId), 0, 0),
+				VariableSetValue(std::make_shared<model::types::Int>(propertyId), propertyId, entity.second->handle_),
 				model::types::Base::Subtype::PropertyReference);
 		}
 		return;
@@ -589,7 +589,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 		case Entity::LinkStatus::None:
 			if (currentEntity->meetsCondition(propertyId, std::move(object))) {
 				variableSet.add(std::move(variableName), 
-					VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), 0, 0),
+					VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), 0, currentEntity->getHandle()),
 					model::types::Base::Subtype::TypeEntityRef);
 			}
 			break;
@@ -600,7 +600,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 			for (auto entId : graph) {
 				if (_entities.at(entId)->meetsCondition(propertyId, std::move(object))) {
 					variableSet.add(std::move(variableName), 
-						VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), 0, 0),
+						VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle()), 0, entId),
 						model::types::Base::Subtype::TypeEntityRef);
 					break;
 				}
@@ -667,7 +667,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 
 		for (auto row : rows) {
 			variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle()), 0, 0),
+				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle()), propertyId, iter->second->handle_),
 				model::types::Base::Subtype::TypeEntityRef, row);
 		}
 
@@ -684,7 +684,7 @@ void EntityManager::Scan3(VariableSet&& variableSet, const std::string variableN
 
 		for (auto row : rows) {
 			variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle()), 0, 0),
+				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle()), 0, iter->second->handle_),
 				model::types::Base::Subtype::TypeEntityRef, row);
 		}
 
@@ -706,17 +706,17 @@ void EntityManager::Scan4(VariableSet&& variableSet, const std::string variableN
 		for (auto prop : entity.second->properties()) {
 
 			variableSet.add(std::move(variableName), 
-				VariableSetValue(std::make_shared<model::types::EntityRef>(entity.first), 0, 0),
+				VariableSetValue(std::make_shared<model::types::EntityRef>(entity.first), prop.first, entity.first),
 				model::types::Base::Subtype::TypeEntityRef);
 
 			variableSet.add(std::move(variableName2),
-				VariableSetValue(std::make_shared<model::types::Int>(prop.first), 0, 0),
+				VariableSetValue(std::make_shared<model::types::Int>(prop.first), prop.first, entity.first),
 				model::types::Base::Subtype::PropertyReference);
 
 			auto type = _propertyTypes.at(prop.first);
 			std::shared_ptr<model::types::Base> val = entity.second->getProperty(prop.first)->baseValue(0)->Clone();
 			variableSet.add(std::move(variableName3),
-				VariableSetValue(std::move(val), 0, 0),
+				VariableSetValue(std::move(val), prop.first, entity.first),
 				std::move(type));
 		}
 	}
