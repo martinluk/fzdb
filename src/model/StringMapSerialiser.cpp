@@ -84,7 +84,7 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
 	const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
 	if ( pHeader->size != length )
 	{
-	    throw InvalidStringTableException("Internal string table size does not match size of data.");
+	    throw InvalidInputStringTableException("Internal string table size does not match size of data.");
 	}
 
 	const EntryHeader* eHeader = reinterpret_cast<const EntryHeader*>(serialisedData + sizeof(SerialHeader));
@@ -92,17 +92,17 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
 	{
 		const EntryHeader* e = &(eHeader[i]);
 		if ( (const char*)e - serialisedData >= length )
-		    throw InvalidStringTableException("Header start for string " + std::to_string(i) + " exceeds length of data.");
+		    throw InvalidInputStringTableException("Header start for string " + std::to_string(i) + " exceeds length of input data.");
 		
 		const char* data = serialisedData + e->offset;
 		if ( data - serialisedData >= length )
-		    throw InvalidStringTableException("Data start for string " + std::to_string(i) + " exceeds length of data.");
+		    throw InvalidInputStringTableException("Data start for string " + std::to_string(i) + " exceeds length of input data.");
 		
-		if ( (std::size_t)(serialisedData + e->offset + e->stringSize) > length )
-		    throw InvalidStringTableException("Length of string " + std::to_string(i) + " exceeds length of data.");
+		if ( e->offset + e->stringSize > length )
+		    throw InvalidInputStringTableException("Length of string " + std::to_string(i) + " exceeds length of input data.");
 		
 		if ( data + e->stringSize - 1 != '\0' )
-		    throw InvalidStringTableException("String " + std::to_string(i) + " is not null-terminated.");
+		    throw InvalidInputStringTableException("String " + std::to_string(i) + " is not null-terminated.");
 		
 		const unsigned int* id = reinterpret_cast<const unsigned int*>(data);
 		data += sizeof(unsigned int);

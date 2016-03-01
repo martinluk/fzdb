@@ -14,10 +14,10 @@ public:
 	std::size_t serialise(Serialiser &serialiser) const;
 	void unserialise(const char* serialisedData, std::size_t length);
 	
-	class InvalidStringTableException : public std::runtime_error
+	class InvalidInputStringTableException : public std::runtime_error
 	{
 	public:
-	    explicit InvalidStringTableException(const std::string &msg) : std::runtime_error(msg)
+	    explicit InvalidInputStringTableException(const std::string &msg) : std::runtime_error(msg)
 	    {
 	    }
 	};

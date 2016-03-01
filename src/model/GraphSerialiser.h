@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include "Serialiser.h"
+#include <exception>
 
 class EntityManager;
 
@@ -13,9 +14,15 @@ public:
     
     std::size_t serialise(Serialiser &serialiser) const;
     
-    // NOTE: This function does not clear the current list of entities within the manager.
-    // TODO: This is probably unsafe without a length parameter!
-    void unserialise(const char* serialisedData);
+    void unserialise(const char* serialisedData, std::size_t length);
+    
+    class InvalidInputGraphException : public std::runtime_exception
+    {
+    public:
+	explicit InvalidInputGraphException(const std::string &msg) : std::runtime_exception(msg)
+	{
+	}
+    };
     
 private:
     EntityManager* _manager;
