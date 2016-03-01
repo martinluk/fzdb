@@ -14,6 +14,29 @@
 
 using VariableType = model::types::Base::Subtype;
 
+class VariableSetValue {
+private:
+	const std::shared_ptr<model::types::Base> _ptr;
+	const unsigned int _propertyId;
+	const unsigned long long _entityId;
+
+public:
+
+	VariableSetValue(std::shared_ptr<model::types::Base> ptr, unsigned int propertyId, unsigned long long entityId) :
+		_ptr(ptr), _propertyId(propertyId), _entityId(entityId) {}
+
+	VariableSetValue() :
+		_ptr(), _propertyId(0), _entityId(0) {}
+
+	VariableSetValue& operator=(const VariableSetValue& val) {
+		return VariableSetValue(val.dataPointer(), val.property(), val.entity());
+	}
+
+	std::shared_ptr<model::types::Base> dataPointer() const { return _ptr; }
+	unsigned int property() const { return _propertyId; }
+	unsigned long long entity() const { return _entityId; }
+
+};
 
 class VariableSet {
 
@@ -30,7 +53,7 @@ public:
 		
 	}
 	
-	unsigned int add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, const VariableType&& type) {
+	unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
 		if (_metaData.find(var) == _metaData.cend()) {
 			throw new std::runtime_error("Unexpected variable");
 		}
@@ -44,15 +67,19 @@ public:
 				}				
 			}
 			//_data[var].first.push_back(value);
-			std::vector<std::shared_ptr<model::types::Base>> newRow(_size);
-			newRow[_metaData[var].second] = value;
+			std::vector<VariableSetValue> newRow(_size);
+
+			//replace without copying
+			newRow.erase(newRow.begin() + _metaData[var].second);
+			newRow.emplace(newRow.begin() + _metaData[var].second, value);
+
 			_variablesUsed[_metaData[var].second] = true;
 			_values.push_back(newRow);
 			return _values.size() - 1;
 		}
 	}
 
-	void add(const std::string&& var, std::shared_ptr<model::types::Base>&& value, const VariableType&& type, unsigned int row) {
+	void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, unsigned int row) {
 
 		if (row >= _values.size()) {
 			throw new std::runtime_error("Attempting to add to a non-existent row");
@@ -62,8 +89,11 @@ public:
 			throw new std::runtime_error("Unexpected variable");
 		}
 		else {
-			_variablesUsed[_metaData[var].second] = true;
-			_values[row][_metaData[var].second] = value;
+			unsigned char offset = _metaData[var].second;
+			_variablesUsed[offset] = true;
+			//_values[row][_metaData[var].second] = value;
+			_values[row].erase(_values[row].begin() + offset);
+			_values[row].emplace(_values[row].begin() + offset, value);
 		}
 	}
 
@@ -71,19 +101,19 @@ public:
 		auto col = _metaData[varName].second;
 		std::vector<unsigned int> output;
 		for (unsigned int i = 0; i < _values.size(); i++) {
-			if (_values[i][col]->Equals(value)) output.push_back(i);
+			if (_values[i][col].dataPointer()->Equals(value)) output.push_back(i);
 		}
 		return output;
 	}
 
-	std::vector<std::vector<std::shared_ptr<model::types::Base>>>* getData() {
+	std::vector<std::vector<VariableSetValue>>* getData() {
 		return &_values;
 	}
 
-	std::vector<std::shared_ptr<model::types::Base>> getData(const std::string varName) {
+	std::vector<VariableSetValue> getData(const std::string varName) {
 		auto col = _metaData[varName].second;
-		std::vector<std::shared_ptr<model::types::Base>> output;
-		std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::vector<std::shared_ptr<model::types::Base>> row) {
+		std::vector<VariableSetValue> output;
+		std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::vector<VariableSetValue> row) {
 			return row[col];
 		});
 		return output;
@@ -111,7 +141,7 @@ public:
 
 private:
 	std::map<std::string, std::pair<VariableType, unsigned char>> _metaData;
-	std::vector<std::vector<std::shared_ptr<model::types::Base>>> _values;
+	std::vector<std::vector<VariableSetValue>> _values;
 	std::vector<bool> _variablesUsed;
 	unsigned int _size;
 };

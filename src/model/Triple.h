@@ -29,9 +29,6 @@ namespace model {
 
 		Subject(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != Type::ENTITYREF && type != Type::VARIABLE) {
-				//is bad, but be one of those
-			}
 		}
 	};
 
@@ -50,9 +47,6 @@ namespace model {
 
 		Predicate(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != Type::PROPERTY && type != Type::VARIABLE) {
-				//is bad, but be one of those
-			}
 		}
 	};
 

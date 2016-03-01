@@ -20,7 +20,7 @@ QueryResult BGP::executeConst() const
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
 		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), 
-			  [&, this](std::vector<std::shared_ptr<model::types::Base>> row) {
+			  [&, this](std::vector<VariableSetValue> row) {
 			  return !filter->Test(std::move(row), variables.getMetaData());
 		  }), variables.getData()->end());
       }
@@ -36,12 +36,14 @@ QueryResult BGP::executeConst() const
 			val2.SetObject();
 
 			for (auto iter2 = _query.selectLine.cbegin(); iter2 != _query.selectLine.cend(); iter2++) {
-				auto i = variables.indexOf(*iter2);		
+				auto i = variables.indexOf(*iter2);
+
+				std::shared_ptr<model::types::Base> basePtr = (*iter)[i].dataPointer();
 				
-				if (!(bool((*iter)[i]))) continue;
+				if (!(bool(basePtr))) continue;
 
 				rapidjson::Value val3;
-				val3.SetString((*iter)[i]->toString().c_str(), result.allocator());
+				val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());
 
 				rapidjson::Value varName;
 				varName.SetString((*iter2).c_str(), result.allocator());

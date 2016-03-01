@@ -9,6 +9,8 @@
 #include "../Triple.h"
 #include "../MemberSerialiser.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 namespace model {
 	namespace types {
 		class Base : public ILogString
@@ -21,6 +23,15 @@ namespace model {
 			MemberSerialiser::DynamicStringMember _commentWrapper;
 			
 			MemberSerialiser _memberSerialiser;
+
+			// Entity id of source entity
+			const unsigned long long _sourceEntityId;
+
+			// User who created the record
+			const unsigned int _originalAuthorId;
+
+			// Time record was created
+			const boost::posix_time::ptime _timeCreated;
 			
 			void initMemberSerialiser()
 			{
@@ -70,7 +81,12 @@ namespace model {
                 }
             }
 
-			Base(unsigned char confidence, const std::string &cmnt) : _comment(cmnt), _commentWrapper(_comment)
+			Base(unsigned char confidence, const std::string &cmnt) :
+				_comment(cmnt),
+				_commentWrapper(_comment),
+				_timeCreated(boost::posix_time::second_clock::universal_time()),
+				_sourceEntityId(0),
+				_originalAuthorId(0)
 			{
 				initMemberSerialiser();
 				if (confidence > 100) confidence = 100;
@@ -138,9 +154,8 @@ namespace model {
 			}
 
 			// Called to construct from serialised data.
-			Base(const char* &serialisedData) : _confidence(0), _comment(), _commentWrapper(_comment)
+			Base(const char* &serialisedData) : Base(0, "")
 			{
-				initMemberSerialiser();
 				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
 			}
 		};
