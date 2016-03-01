@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include "Serialiser.h"
-#include <exception>
+#include <stdexcept>
 
 class StringMapSerialiser
 {

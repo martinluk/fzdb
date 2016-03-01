@@ -89,9 +89,9 @@ namespace FileSystem
                 throw FileFormatError();
             }
 	    
-	    if ( flen - sizeof(FileHeader) < header.size )
+	    if ( flen - sizeof(FileHeader) != header.size )
 	    {
-		throw std::length_error("Specified internal data size exceeds physical size of file.");
+		throw std::length_error("Specified internal data size does not equal physical size of file.");
 	    }
 			
 	    if ( length < header.size )

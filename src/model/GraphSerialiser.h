@@ -3,7 +3,8 @@
 
 #include <cstring>
 #include "Serialiser.h"
-#include <exception>
+#include <stdexcept>
+#include <string>
 
 class EntityManager;
 
@@ -16,10 +17,10 @@ public:
     
     void unserialise(const char* serialisedData, std::size_t length);
     
-    class InvalidInputGraphException : public std::runtime_exception
+    class InvalidInputGraphException : public std::runtime_error
     {
     public:
-	explicit InvalidInputGraphException(const std::string &msg) : std::runtime_exception(msg)
+	explicit InvalidInputGraphException(const std::string &msg) : std::runtime_error(msg)
 	{
 	}
     };

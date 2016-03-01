@@ -358,7 +358,7 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
     clearAll();
     GraphSerialiser gSer(this);
-    gSer.unserialise(buffer);
+    gSer.unserialise(buffer, size);
     delete[] buffer;
 
     return true;
