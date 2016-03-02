@@ -6,6 +6,7 @@
 
 UserOperation::UserOperation() : UserFileOperations()
 {
+	_idGen = IdGenerator(0);
 }
 
 Permission::UserGroup UserOperation::getUserGroup(const std::string &userName) const
@@ -42,17 +43,20 @@ void UserOperation::addUser(const std::string &userName, const std::string &pass
 	a.salt=Hashing::genSalt();
 	a.passwordHash=Hashing::hashPassword(userName,a.salt,password);
 	a.userGroup=userGroup;
+	a.id = _idGen.getId();
     UserFileOperations::addUser(a); //Super will throw UserAlreadyExistedException if user already exist
 }
 
 void UserOperation::changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup)
 {
 	UserAttributes a = getUserAttributes(userName);
-	a.userGroup=newUserGroup;
+	a.userGroup = newUserGroup;
     updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
 }
 
 void UserOperation::removeUser(const std::string &userName)
 {
+	unsigned int oldUserId = _userFileCache[userName].id;
+	_idGen.addDeleted(oldUserId);
 	UserFileOperations::removeUser(userName);
 }

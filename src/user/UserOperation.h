@@ -1,6 +1,8 @@
 #ifndef USER_USEROPERATION_H
 #define USER_USEROPERATION_H
 
+#include "../util/IdGenerator.h"
+
 #include <user/UserFileOperations.h>
 #include <user/UserExceptions.h>
 #include <user/UserAttributes.h>
@@ -17,6 +19,10 @@ public:
 	void removeUser(const std::string &userName);
 	void changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup);
 	Permission::UserGroup getUserGroup(const std::string &userName) const;
+
+private:
+	IdGenerator _idGen;
+
 };
 
 #endif	// USER_USEROPERATION_H

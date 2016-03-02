@@ -21,6 +21,7 @@
 #define USERNAME "username"
 #define HASH "passwordHash"
 #define SALT "salt"
+#define ID "id"
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
@@ -51,6 +52,7 @@ std::string UserFileOperations::pathToLoginFile() {
 	dir /= JSONFILENAME;
 	return dir.string();
 }
+
 void UserFileOperations::addUser(const UserAttributes &userAttributes)
 {
 	//Assert that no such user already exist, otherwise throw exception
@@ -135,10 +137,12 @@ void UserFileOperations::loadCacheFromFile()
 		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
 		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
 		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);
+		Value::ConstMemberIterator itrId = userObject.FindMember(ID);
 		Value::ConstMemberIterator itrGroupI = userObject.FindMember(USERGROUPINT);
 		assert( itrUser != userObject.MemberEnd() &&
 				itrHash != userObject.MemberEnd() &&
 				itrSalt != userObject.MemberEnd() &&
+				itrId != userObject.MemberEnd() &&
 				itrGroupI != userObject.MemberEnd());
 
 		//Casting user group int to user group
@@ -155,12 +159,14 @@ void UserFileOperations::loadCacheFromFile()
 		string username = itrUser->value.GetString();
 		string hash = itrHash->value.GetString();
 		string salt = itrSalt->value.GetString();
+		unsigned int id = itrId->value.GetUint();
 		
 		//Add into a user attribute struct
 		UserAttributes attr;
 		attr.userName = username;
 		attr.passwordHash = hash;
 		attr.salt = salt;
+		attr.id = id;
 		
 		//Add into cache
 		_userFileCache[username] = attr;
@@ -196,15 +202,19 @@ void UserFileOperations::saveCacheToFile() const
 		//Adding attributes has time of string
 		Value usernameVal;
 		usernameVal.SetString(StringRef(attr.userName.c_str(),attr.userName.length()));
-		userOV.AddMember(USERNAME,usernameVal,jsonDoc.GetAllocator());
+		userOV.AddMember(USERNAME, usernameVal, jsonDoc.GetAllocator());
 
 		Value passwordHashVal;
 		passwordHashVal.SetString(StringRef(attr.passwordHash.c_str(),attr.passwordHash.length()));
-		userOV.AddMember(HASH,passwordHashVal,jsonDoc.GetAllocator());
+		userOV.AddMember(HASH, passwordHashVal, jsonDoc.GetAllocator());
 
 		Value saltVal;
 		saltVal.SetString(StringRef(attr.salt.c_str(),attr.salt.length()));
-		userOV.AddMember(SALT,saltVal,jsonDoc.GetAllocator());
+		userOV.AddMember(SALT, saltVal, jsonDoc.GetAllocator());
+
+		Value idVal;
+		idVal.SetUint(attr.id);
+		userOV.AddMember(ID, idVal, jsonDoc.GetAllocator());
 
 		//Casting usergroup to char
 		using namespace std;
