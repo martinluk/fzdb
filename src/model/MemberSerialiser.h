@@ -4,10 +4,19 @@
 #include <vector>
 #include "Serialiser.h"
 #include <string>
+#include <stdexcept>
 
 class MemberSerialiser
 {
 public:
+    class InvalidInputMemberException : public std::runtime_error
+    {
+    public:
+        explicit InvalidInputMemberException(const std::string &msg) : std::runtime_error(msg)
+        {
+        }
+    };
+
 	// Interface implemented by dynamic members.
 	class IDynamicMember
 	{
@@ -62,16 +71,19 @@ public:
 	void addPrimitive(void* location, std::size_t size);
 	void clearPrimitives();
 	std::size_t serialisePrimitives(Serialiser &serialiser) const;
-	std::size_t unserialisePrimitives(const char* serialisedData);
+    std::size_t unserialisePrimitives(const char* serialisedData, std::size_t length);
 	
 	// Dynamic members' sizes are not known until runtime.
 	void addDynamicMember(IDynamicMember* idm);
 	void clearDynamicMembers();
 	std::size_t serialiseDynamicMembers(Serialiser &serialiser) const;
-	std::size_t unserialiseDynamicMembers(const char* serialisedData);
+    std::size_t unserialiseDynamicMembers(const char* serialisedData, std::size_t length);
 	
 	std::size_t serialiseAll(Serialiser &serialiser) const;
-	std::size_t unserialiseAll(const char* serialisedData);
+
+    // TODO: Handle the length better here? We don't know the individual lengths of the
+    // primitive and dynamic member chunks.
+    std::size_t unserialiseAll(const char* serialisedData, std::size_t length);
 	
 private:
 	typedef std::pair<void*, std::size_t> PrimitivePair;

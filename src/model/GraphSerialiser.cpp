@@ -136,7 +136,7 @@ void GraphSerialiser::unserialise(const char *serialisedData, std::size_t length
 		    if ( pEntHeader->offset + pEntHeader->size > length )
 			throw InvalidInputGraphException("Length of entity " + std::to_string(i) + " exceeds length of input data.");
 	    
-		    _manager->insertEntity(EntitySerialiser::unserialise(data));
+            _manager->insertEntity(EntitySerialiser::unserialise(data, pEntHeader->size));
 	    }
 	}
 	catch (const std::exception &ex)

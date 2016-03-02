@@ -108,15 +108,15 @@ namespace model
 			}
 
 		private:
-			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
 			{
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
 			}
 
-			Date(const char* &serialisedData) : Base(serialisedData)
+            Date(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 			}
 		};
 	}

@@ -138,10 +138,10 @@ namespace model {
 			}
 
 			// Called to construct from serialised data.
-			Base(const char* &serialisedData) : _confidence(0), _comment(), _commentWrapper(_comment)
+            Base(const char* &serialisedData, std::size_t length) : _confidence(0), _comment(), _commentWrapper(_comment)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 			}
 		};
 

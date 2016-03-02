@@ -76,7 +76,7 @@ namespace FileSystem
             }
 
 	    // Hopefully reading automatically advances the read point in the file?
-      	    FileHeader header;
+        FileHeader header;
 	    Serialiser::zeroBuffer(&header, sizeof(FileHeader));
             file.read(reinterpret_cast<char*>(&header), sizeof(FileHeader));
 

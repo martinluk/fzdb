@@ -75,13 +75,13 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
-			EntityRef(const char* &serialisedData) : Base(serialisedData)
+            EntityRef(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
 			{
 				//_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
 				//serialisedData += sizeof(_value);
 				
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
+                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
 			}
 		};
 	}

@@ -66,10 +66,10 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
 			}
 
-			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
+            String(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _value(), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 			}
 		};
 	}

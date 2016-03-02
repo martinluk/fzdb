@@ -149,23 +149,40 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
     ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
 }
 
-std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
+std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, std::size_t length)
 {
     using namespace model::types;
 
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialData);
 
 	// Make sure the header version matches our current version.
-	// For now we just throw an assertion error, but we may want to make
-	// this an exception in the future.
-	assert(pHeader->version == SERIAL_HEADER_CURRENT_VERSION);
+    if ( pHeader->version != SERIAL_HEADER_CURRENT_VERSION )
+        throw InvalidInputEntityException("Entity serial version does not match expected version.");
+
+    if ( pHeader->size != length )
+        throw InvalidInputEntityException("Specified internal data size does not equal actual size of data.");
+
+    if ( pHeader->memberDataOffset >= length )
+        throw InvalidInputEntityException("Member data offset exceeds length of input data.");
+
+    if ( pHeader->memberDataOffset + pHeader->memberDataLength > length )
+        throw InvalidInputEntityException("Length of member data exceeds length of input data.");
+
+    if ( pHeader->propertyDataOffset >= length )
+        throw InvalidInputEntityException("Property data offset exceeds length of input data.");
+
+    if ( pHeader->propertyDataOffset + pHeader->propertyDataLength > length )
+        throw InvalidInputEntityException("Length of property data exceeds length of input data.");
+
+    if ( pHeader->propertyDataOffset < pHeader->memberDataOffset + pHeader->memberDataLength )
+        throw InvalidInputEntityException("Member data and property data cannot overlap.");
 
     // Create an entity shell.
 	std::shared_ptr<Entity> ent = std::make_shared<Entity>(0);
 
 	// Unserialise the members.
 	const char* memberData = serialData + pHeader->memberDataOffset;
-	ent->_memberSerialiser.unserialiseAll(memberData);
+    ent->_memberSerialiser.unserialiseAll(memberData, pHeader->memberDataLength);
 
 	// Unserialise the properties.
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(SerialHeader));
@@ -173,6 +190,12 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
     {
 		// Get the header for this property.
         const PropertyHeader* p = &(pPropHeaders[i]);
+
+        if ( pHeader->propertyDataOffset + p->offset >= length )
+            throw InvalidInputEntityException("Offset for entity property exceeds length of input data.");
+
+        if ( pHeader->propertyDataOffset + p->offset + p->size > length )
+            throw InvalidInputEntityException("Length of entity property exceeds length of input data.");
 
 		// Calculate the pointer to the actual property data.
 		const char* data = serialData + pHeader->propertyDataOffset + p->offset;

@@ -70,10 +70,10 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
-			Int(const char* &serialisedData) : Base(serialisedData)
+            Int(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
+                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
 			}
 		};
 	}

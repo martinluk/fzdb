@@ -52,27 +52,27 @@ std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, st
     {
     case Base::Subtype::TypeUndefined:
         //b = std::make_shared<Base>(d);
-        b = std::shared_ptr<Base>(new Base(d));
+        b = std::shared_ptr<Base>(new Base(d, pHeader->size));
 				break;
 
     case Base::Subtype::TypeInt32:
         //b = std::make_shared<Int>(d);
-        b = std::shared_ptr<Int>(new Int(d));
+        b = std::shared_ptr<Int>(new Int(d, pHeader->size));
 				break;
 
     case Base::Subtype::TypeString:
         //b = std::make_shared<String>(d);
-        b = std::shared_ptr<String>(new String(d));
+        b = std::shared_ptr<String>(new String(d, pHeader->size));
 				break;
 
     case Base::Subtype::TypeEntityRef:
         //b = std::make_shared<EntityRef>(d);
-        b = std::shared_ptr<EntityRef>(new EntityRef(d));
+        b = std::shared_ptr<EntityRef>(new EntityRef(d, pHeader->size));
 				break;
 		
 	case Base::Subtype::TypeDate:
 		//b = std::make_shared<Date>(d);
-		b = std::shared_ptr<Date>(new Date(d));
+        b = std::shared_ptr<Date>(new Date(d, pHeader->size));
 		break;
 
     default:
