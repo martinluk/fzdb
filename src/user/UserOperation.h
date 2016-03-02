@@ -9,12 +9,14 @@
 #include <user/UserExceptions.h>
 #include <user/Hashing.h>
 
+#include "../ISession.h"
+
 class UserOperation : public UserFileOperations
 { 
 public: 
 	UserOperation();
 	
-	Permission::UserGroup login(const std::string &userName, const std::string &password);
+	Permission::UserGroup login(std::shared_ptr<ISession>&& session, const std::string &userName, const std::string &password);
 	void addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup);
 	void removeUser(const std::string &userName);
 	void changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup);

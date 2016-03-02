@@ -1,6 +1,5 @@
 #pragma once
 #include "../Job.h"
-#include "../ISession.h"
 #include "../user/Permission.h"
 #include "../QueryResult.h"
 

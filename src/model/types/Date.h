@@ -62,19 +62,19 @@ namespace model
 				return StructuredDate(y, mm, dd);
 			}
 			
-			Date() : _value(0), Base(100, std::string())
+			Date() : _value(0), Base(100, 0, std::string())
 			{
 				initMemberSerialiser();
 			}
 			
-			Date(Date_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(value)
+			Date(Date_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, author, comment), _value(value)
 			{
 				initMemberSerialiser();
 			}
 			
-			Date(const StructuredDate &sd, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(encode(sd))
+			Date(const StructuredDate &sd, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, author, comment), _value(encode(sd))
 			{
 				initMemberSerialiser();
 			}

@@ -18,7 +18,7 @@ Permission::UserGroup UserOperation::getUserGroup(const std::string &userName) c
 }
 
 //Throws LoginUnsuccessfulException if unsuccessfull.
-Permission::UserGroup UserOperation::login(const std::string &userName, const std::string &password)
+Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, const std::string &userName, const std::string &password)
 {
 	UserAttributes currUserAttr;
 	//See if user exist
@@ -33,6 +33,10 @@ Permission::UserGroup UserOperation::login(const std::string &userName, const st
 	if (ourHash != actualHash) {
 		throw LoginUnsuccessfulException();
 	}
+
+	session->userId(_userFileCache[userName].id);
+	session->setCurrentUserName(userName);
+
 	return currUserAttr.userGroup;
 }
 

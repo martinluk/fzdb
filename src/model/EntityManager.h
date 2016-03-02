@@ -132,11 +132,11 @@ private:
 		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
 
 		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(std::make_shared<T>(object.value, confidence));
+			currentEntity->getProperty<T>(propertyId)->append(std::make_shared<T>(object.value, 0, confidence));
 		}
 		else {
 			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <std::shared_ptr<T>> {
-				std::make_shared<T>(object.value, confidence)
+				std::make_shared<T>(object.value, 0, confidence)
 			}));
 		}
 	}

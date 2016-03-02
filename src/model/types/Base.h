@@ -86,12 +86,12 @@ namespace model {
                 }
             }
 
-			Base(unsigned char confidence, const std::string &cmnt) :
+			Base(unsigned char confidence, unsigned int author, const std::string &cmnt) :
 				_comment(cmnt),
 				_commentWrapper(_comment),
 				_timeCreated(boost::posix_time::second_clock::universal_time()),
 				_sourceEntityId(0),
-				_originalAuthorId(0)
+				_originalAuthorId(author)
 			{
 				initMemberSerialiser();
 				if (confidence > 100) confidence = 100;
@@ -101,7 +101,7 @@ namespace model {
 			virtual ~Base() {}
 
 			virtual std::shared_ptr<Base> Clone() {
-				return std::make_shared<Base>(_confidence, _comment);
+				return std::make_shared<Base>(_confidence, _originalAuthorId, _comment);
 			}
 
 			virtual bool Equals(const std::string &val) const {
@@ -159,7 +159,7 @@ namespace model {
 			}
 
 			// Called to construct from serialised data.
-			Base(const char* &serialisedData) : Base(0, "")
+			Base(const char* &serialisedData) : Base(0, 0, "")
 			{
 				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
 			}
