@@ -21,16 +21,17 @@ TEST_F(UserFileOperationsTest, addUser) {
 	typedef UserAttributes UserAttr;
 	typedef UserFileOperationsWrapper Wrapper;
 
-	Wrapper* wrap = new Wrapper;
+	Wrapper wrap;
 	UserAttr ua; 
-	ua.userName = "username";
+	const std::string username = "username";
+	ASSERT_THROW(wrap.getUserAttributes(username), UserNotExistException);
+	ua.userName = username;
 	ua.passwordHash = "passwordhash";
 	ua.salt = "salt";
 	ua.userGroup = Permission::UserGroup::ADMIN;
-	wrap->addUser(ua);
-	delete wrap;
+	wrap.addUser(ua);
+	ASSERT_NO_THROW(wrap.getUserAttributes(username));
 
-	//wrap->getUserAttributes("username");
 }
 
 TEST_F(UserFileOperationsTest, removeUser) {
