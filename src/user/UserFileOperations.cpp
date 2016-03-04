@@ -30,7 +30,6 @@
 
 UserFileOperations::UserFileOperations()
 {
-	/*
 	if (ADD_ADMIN_ON_INIT) {
 		//Add admin into cache
 		UserAttributes admin;
@@ -43,8 +42,6 @@ UserFileOperations::UserFileOperations()
 		//Load from json
 		loadCacheFromFile();
 	}
-	*/
-	loadCacheFromFile();
 }
 
 std::string UserFileOperations::pathToLoginFile() {

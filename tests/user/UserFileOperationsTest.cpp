@@ -17,20 +17,18 @@ protected:
 };
 
 
-/* The main method of testing is to carry out the operation, and then  */
 TEST_F(UserFileOperationsTest, addUser) {
 	typedef UserAttributes UserAttr;
-	/*
 	typedef UserFileOperationsWrapper Wrapper;
+
 	Wrapper* wrap = new Wrapper;
-	wrap->addUser(ua);
-	delete wrap;
-	*/
 	UserAttr ua; 
 	ua.userName = "username";
 	ua.passwordHash = "passwordhash";
 	ua.salt = "salt";
 	ua.userGroup = Permission::UserGroup::ADMIN;
+	wrap->addUser(ua);
+	delete wrap;
 
 	//wrap->getUserAttributes("username");
 }

@@ -6,7 +6,6 @@
 #include "user/UserAttributes.h"
 #include "user/UserFileOperations.h"
 #include <string>
-#include "rapidjson/document.h"
 
 /*
  * A wrapper class of user file operations so we can test the protected methods inside it.
