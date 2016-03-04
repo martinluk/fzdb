@@ -24,8 +24,3 @@ UserAttributes UserFileOperationsWrapper::getUserAttributes(const std::string &u
 	UserFileOperations::saveCacheToFile();
 }
 
-rapidjson::Document getJsonDoc() {
-	rapidjson::Document jsonDoc = UserFileOperations::getUserFile();
-	//TODO(Martin) Get address from super, read the file.
-	return jsonDoc;
-}

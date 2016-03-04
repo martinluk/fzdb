@@ -30,6 +30,7 @@
 
 UserFileOperations::UserFileOperations()
 {
+	/*
 	if (ADD_ADMIN_ON_INIT) {
 		//Add admin into cache
 		UserAttributes admin;
@@ -42,6 +43,8 @@ UserFileOperations::UserFileOperations()
 		//Load from json
 		loadCacheFromFile();
 	}
+	*/
+	loadCacheFromFile();
 }
 
 std::string UserFileOperations::pathToLoginFile() {
@@ -101,7 +104,15 @@ UserAttributes UserFileOperations::getUserAttributes(const std::string &userName
 void UserFileOperations::loadCacheFromFile()
 {
 	using namespace rapidjson;
-	Document jsonDoc = UserFileOperations::getUserFile();
+	//XXX Window system should use rb?
+	// TODO: Exception checks on file opening!
+	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
+	char readBuffer[65536];
+	//Reading file using rapidjson reader
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document jsonDoc;
+	jsonDoc.ParseStream(is);
+	fclose(fp);
 
 	//Clearing userfile cache, ready for reloading
 	_userFileCache.clear();
@@ -119,7 +130,7 @@ void UserFileOperations::loadCacheFromFile()
 		assert(userObject.IsObject());
 		using namespace std;
 		//'FindMember' checks existence of member and obtain member at once
-		//TODO Use pre-compiler for json names
+		//Use pre-compiler for json names
 		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
 		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
 		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);
@@ -153,21 +164,6 @@ void UserFileOperations::loadCacheFromFile()
 		//Add into cache
 		_userFileCache[username] = attr;
 	}
-}
-
-rapidjson::Document UserFileOperations::getUserFile(){
-	using namespace rapidjson;
-	//XXX Window system should use rb?
-	// TODO: Exception checks on file opening!
-	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
-	char readBuffer[65536];
-	//Reading file using rapidjson reader
-	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	rapidjson::Document jsonDoc;
-	jsonDoc.ParseStream(is);
-	fclose(fp);
-	return jsonDoc;
-
 }
 
 void UserFileOperations::saveCacheToFile() const

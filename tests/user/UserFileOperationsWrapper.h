@@ -17,13 +17,10 @@ class UserFileOperationsWrapper : public UserFileOperations
 	friend class UserFileOperations;
 	public:
 		UserFileOperationsWrapper() : UserFileOperations() { };
-		typedef UserFileOperations super;
 		void addUser(const UserAttributes &userAttributes);
 		void removeUser(const std::string &userName);
 		void updateUser(const std::string &userName, const UserAttributes &newAttributes);
 		UserAttributes getUserAttributes(const std::string &userName) ;
-		static rapidjson::Document getJsonDoc();
-
 };
 
 #endif //USER_USERFILEOPERATIONSWRAPPER_H
