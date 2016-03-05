@@ -2,9 +2,13 @@
   "name": "fuzzy_database",
   "version": "0.5.0",
   "scripts": {
-    "test": "./node_modules/.bin/jasmine"
+    "test": "./node_modules/.bin/jasmine",
+    "start": "node ./frontend/server.js"
   },
   "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "httpdispatcher": "^1.0.0",
     "jasmine": "^2.4.1"
   }
 }
