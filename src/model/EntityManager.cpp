@@ -217,8 +217,7 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 	}
 }
 
-//XXX Probably wrong
-void EntityManager::Delete(std::vector<model::Triple> triples) {
+void EntityManager::Delete(std::vector<model::Triple> triples) { //XXX I currently can't think of any use case to break this, but please break it if you can
 	/*
 	 * Given a vector of triples, delete them from entity
 	 */

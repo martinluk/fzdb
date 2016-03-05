@@ -400,12 +400,12 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			continue;
 		}
 
-		//TODO(Martin Luk) Need double check.
 		if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
 			*iter++;
 			if (iter->first.type == ParsedTokenType::KEYWORD_DATA) {
 				iter++;
 				type = QueryType::DELETE;
+				//XXX Using ParseInsert - since it is same with Insert construct - will this break anything?
 				conditions = ParseInsert(std::move(iter), tokens.end());
 			}
 			continue;
