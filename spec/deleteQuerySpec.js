@@ -1,7 +1,7 @@
 var net = require('net');
 var Promise = require("es6-promise").Promise
 
-describe("Fuzzy Database", function() {
+describe("fzdb:delete queries", function() {
   var client;
 
   //connects to the database
@@ -30,7 +30,6 @@ describe("Fuzzy Database", function() {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
 			expect(Object.keys(data.result).length).toBe(0);
-
         done();
       });          
     });

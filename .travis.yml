@@ -31,7 +31,6 @@ script:
   - ctest -V -C debug
   - ./fuzzy-database& 
   - cd ../ #Back to project root to run npm test
-  - npm install es6-promise
   - npm install 
   - npm test
 
