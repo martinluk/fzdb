@@ -29,7 +29,7 @@ describe("fzdb:delete queries", function() {
     it("Asserting there was no one called Fred in the DB", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-			expect(Object.keys(data.result).length).toBe(0);
+			expect((data.result.data).length).toBe(0);
         done();
       });          
     });
@@ -42,8 +42,7 @@ describe("fzdb:delete queries", function() {
     it("Asserting Fred now lives in DB", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-			expect(Object.keys(data.result).length).toBe(1);
-			expect(data.result[0].a).toBe("1");
+			expect((data.result.data).length).toBe(1);
         done();
       });          
     });
@@ -57,7 +56,7 @@ describe("fzdb:delete queries", function() {
     it("Asserting Fred no longer in DB", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-			expect(Object.keys(data.result).length).toBe(0);
+			expect((data.result.data).length).toBe(0);
         done();
       });          
     });
