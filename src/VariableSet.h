@@ -16,9 +16,9 @@ using VariableType = model::types::Base::Subtype;
 
 class VariableSetValue {
 private:
-	const std::shared_ptr<model::types::Base> _ptr;
-	const unsigned int _propertyId;
-	const unsigned long long _entityId;
+	std::shared_ptr<model::types::Base> _ptr;
+	unsigned int _propertyId;
+	unsigned long long _entityId;
 
 public:
 
@@ -28,9 +28,9 @@ public:
 	VariableSetValue() :
 		_ptr(), _propertyId(0), _entityId(0) {}
 
-	VariableSetValue& operator=(const VariableSetValue& val) const {
-		return VariableSetValue(val.dataPointer(), val.property(), val.entity());
-	}
+	//VariableSetValue& operator=(const VariableSetValue& val) const {
+	//	return VariableSetValue(val.dataPointer(), val.property(), val.entity());
+	//}
 
 	std::shared_ptr<model::types::Base> dataPointer() const { return _ptr; }
 	unsigned int property() const { return _propertyId; }
