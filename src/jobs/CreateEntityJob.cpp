@@ -13,7 +13,6 @@ QueryResult CreateEntityJob::executeNonConst()
 	std::string id = std::to_string(e->getHandle());
 
   QueryResult result;
-  result.setValue("type", "string");
-  result.setValue(std::string("response"), "Entity created with handle " + id);
+  result.setResultDataText(std::string("Entity created with handle") + id);
   return result;
 }

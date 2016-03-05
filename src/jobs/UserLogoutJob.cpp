@@ -14,7 +14,6 @@ QueryResult UserLogoutJob::executeConst() const
 	_session->clearCurrentUserName();
 	
 	QueryResult result;
-	result.setValue("type", "string");
-    result.setValue(std::string("response"), std::string("Logged out."));
+	result.setResultDataText("Logged out successfully.");
     return result;
 }

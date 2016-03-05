@@ -48,7 +48,7 @@ describe("Fuzzy Database", function() {
     it("getting the forename of entity:1", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-        expect(data.result[0].a).toBe("1");
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });          
     });
@@ -57,7 +57,7 @@ describe("Fuzzy Database", function() {
     it("getting the surname of entity:2", function(done) {  
       sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
       .then(function(data) {
-        expect(data.result[0].a).toBe("2");
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'})]})}));
         done();
       });
     });
@@ -66,7 +66,7 @@ describe("Fuzzy Database", function() {
     it("merge entity 1 and entity 2", function(done) {
       sendCmd("LINK FINAL entity:1 entity:2")
       .then(function(data) {
-        expect(data.result).toBe("success");
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities 1 and 2 merged successfully.'})}));
         done();
       });     
     });
@@ -75,7 +75,7 @@ describe("Fuzzy Database", function() {
     it("getting the forename of entity:1 after link", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
-        expect(data.result[0].a).toBe("1");
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });      
     });
@@ -84,7 +84,7 @@ describe("Fuzzy Database", function() {
     it("getting the surname of entity:2 after link", function(done) {
       sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
       .then(function(data) {
-        expect(data.result[0].a).toBe("1");
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
         done();
       });      
     });
@@ -93,7 +93,7 @@ describe("Fuzzy Database", function() {
     it("getting properties of entity:2", function(done) {
       sendCmd("SELECT $a $b WHERE { entity:2 $a $b }")
       .then(function(data) {
-        expect(data.result.length).toBe(0);
+        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[]})}));
         done();
       });     
     });   

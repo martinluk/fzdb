@@ -13,7 +13,6 @@ QueryResult Flush::executeNonConst()
 	_database->entityManager().clearAll();
 	
 	QueryResult result;
-    result.setValue("type", "string");
-    result.setValue(std::string("response"), std::string("Database cleared"));
+    result.setResultDataText("Database cleared.");
     return result;
 }

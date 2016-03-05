@@ -41,7 +41,7 @@ TEST_F(MockTest, ping_command) {
 
   QueryResult result = ping->execute();
 
-  EXPECT_EQ(result.getValue("response"), "PONG");
+  EXPECT_EQ(result.resultDataText(), "PONG");
 }
 
 TEST_F(MockTest, echo_command) {
@@ -51,7 +51,7 @@ TEST_F(MockTest, echo_command) {
   
   QueryResult result = echo->execute();
 
-  EXPECT_EQ(result.getValue("response"), "Hello World");
+  EXPECT_EQ(result.resultDataText(), "Hello World");
 }
 
 TEST_F(MockTest, echo_command_unicode) {
@@ -62,5 +62,5 @@ TEST_F(MockTest, echo_command_unicode) {
 
 	QueryResult result = echo->execute();
 
-  EXPECT_EQ(result.getValue("response"), "Testing «ταБЬℓσ»: 1<2 & 4+1>3, now 20% off!");
+  EXPECT_EQ(result.resultDataText(), "Testing «ταБЬℓσ»: 1<2 & 4+1>3, now 20% off!");
 }

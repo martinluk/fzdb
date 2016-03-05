@@ -46,7 +46,6 @@ QueryResult DebugLoadFile::execute()
     }
     
     QueryResult result;
-    result.setValue("type", "string");
-    result.setValue(std::string("response"), log.str());
+    result.setResultDataText(log.str());
     return result;
 }

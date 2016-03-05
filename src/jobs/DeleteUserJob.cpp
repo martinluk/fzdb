@@ -15,11 +15,11 @@ QueryResult DeleteUserJob::executeNonConst()
 	
     try {
 		_database->users().removeUser(_username);
-    } catch (const UserNotExistException &) {
-        return QueryResult::generateError("User does not exist");
+    } catch (const std::exception &ex) {
+        return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
     }
 	
 	QueryResult result;
-    result.setValue("status","0");
+    result.setResultDataText(std::string("User ") + _username + std::string("Deleted successfully."));
     return result;
 }
