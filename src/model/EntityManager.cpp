@@ -217,6 +217,7 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 	}
 }
 
+//XXX Probably wrong
 void EntityManager::Delete(std::vector<model::Triple> triples) {
 	/*
 	 * Given a vector of triples, delete them from entity

@@ -400,6 +400,17 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			continue;
 		}
 
+		//TODO(Martin Luk) Need double check.
+		if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
+			*iter++;
+			if (iter->first.type == ParsedTokenType::KEYWORD_DATA) {
+				iter++;
+				type = QueryType::DELETE;
+				conditions = ParseInsert(std::move(iter), tokens.end());
+			}
+			continue;
+		}
+
 		if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
 			*iter++;
 			whereClause = ParseInsert(std::move(iter), tokens.end());

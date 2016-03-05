@@ -140,6 +140,7 @@ public:
 enum class QueryType {
 	SELECT,
 	INSERT,
+	DELETE,
 	DEL,
 	PING,
     DEBUGECHO,
