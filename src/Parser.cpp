@@ -300,7 +300,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 					o = model::Object(objType, iter->second, std::stoul(confidence));
 				}
 				
-				if (inMetaBlock) {
+				if (!inMetaBlock) {
 					model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o);
 					tripleBlock.Add(std::move(trip));
 				}
