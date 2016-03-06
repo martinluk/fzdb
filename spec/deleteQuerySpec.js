@@ -25,6 +25,9 @@ describe("fzdb", function() {
 	}
 
 	describe("delete queries:", function() {
+		beforeEach(function(done){
+
+		});
 		describe("DB with one entity", function() {
 			it("no one used to call Fred", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
