@@ -16,6 +16,8 @@ using VariableType = model::types::Base::Subtype;
 
 class VariableSetValue {
 private:
+
+	//these should really be const, but setting them to const causes all kinds of strange issues
 	std::shared_ptr<model::types::Base> _ptr;
 	unsigned int _propertyId;
 	unsigned long long _entityId;
@@ -27,10 +29,6 @@ public:
 
 	VariableSetValue() :
 		_ptr(), _propertyId(0), _entityId(0) {}
-
-	//VariableSetValue& operator=(const VariableSetValue& val) const {
-	//	return VariableSetValue(val.dataPointer(), val.property(), val.entity());
-	//}
 
 	std::shared_ptr<model::types::Base> dataPointer() const { return _ptr; }
 	unsigned int property() const { return _propertyId; }

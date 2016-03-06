@@ -38,16 +38,16 @@ enum class ParsedTokenType {
         KEYWORD_DELETE = TOKEN_KEYWORD_MASK | 0x3,
         KEYWORD_PING   = TOKEN_KEYWORD_MASK | 0x4,
         KEYWORD_ECHO   = TOKEN_KEYWORD_MASK | 0x5,
-        KEYWORD_SOURCE = TOKEN_KEYWORD_MASK | 0x6,
+        KEYWORD_META   = TOKEN_KEYWORD_MASK | 0x6,
         KEYWORD_DATA   = TOKEN_KEYWORD_MASK | 0x7,
         KEYWORD_DEBUG  = TOKEN_KEYWORD_MASK | 0x8,
-		    KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
-		    KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
-		    KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
-		    KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
-		    KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
-		    KEYWORD_FLUSH  = TOKEN_KEYWORD_MASK | 0xE,
-		    KEYWORD_CANON  = TOKEN_KEYWORD_MASK | 0xF,
+        KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
+	    KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
+        KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
+        KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
+        KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
+        KEYWORD_FLUSH  = TOKEN_KEYWORD_MASK | 0xE,
+        KEYWORD_CANON  = TOKEN_KEYWORD_MASK | 0xF,
 	
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -111,14 +111,8 @@ public:
 struct TriplesBlock {
 public:
 	std::vector<model::Triple> triples;
-	std::string name;
 	std::vector<IFilter*> filters;
 	std::set<std::string> variables;
-
-	TriplesBlock(std::vector<model::Triple> trip, std::string n) {
-		triples = trip;
-		name = n;
-	}
 
 	TriplesBlock(std::vector<model::Triple> trip) {
 		triples = trip;
