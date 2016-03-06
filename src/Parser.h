@@ -113,6 +113,7 @@ public:
 	std::vector<model::Triple> triples;
 	std::vector<IFilter*> filters;
 	std::set<std::string> variables;
+	std::set<std::string> metaVariables;
 
 	TriplesBlock(std::vector<model::Triple> trip) {
 		triples = trip;
@@ -126,6 +127,18 @@ public:
 
    void Add(IFilter* filter) {
       filters.push_back(filter);   
+   }
+
+   void Sort() {
+	   std::sort(triples.begin(), triples.end(), [this](model::Triple t1, model::Triple t2) { 
+		   if (t1.subject.type == model::Subject::Type::VARIABLE && metaVariables.find(t1.subject.value) != metaVariables.cend()) {
+			   return true;
+		   }
+		   if (t2.subject.type == model::Subject::Type::VARIABLE && metaVariables.find(t2.subject.value) != metaVariables.cend()) {
+			   return false;
+		   }
+		   return t1.Entropy() < t2.Entropy();
+	   });
    }
 };
 

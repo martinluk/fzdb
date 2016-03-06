@@ -19,7 +19,8 @@ namespace model {
 
 		enum class Type {
 			ENTITYREF,
-			VARIABLE
+			VARIABLE,
+			METAVARIABLE
 		};
 
 		Type type;

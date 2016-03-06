@@ -246,6 +246,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 						throw ParseException("META blocks must have a variable");
 					}
 					currentMetaVar = iter->second;
+					tripleBlock.metaVariables.insert(iter->second);
 					iter++;
 					if (iter->first.type != ParsedTokenType::OPEN_CURLBRACE) {
 						throw ParseException("Expected { found " + iter->second);
