@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 #include "./Triple.h"
 #include "./EntityProperty.h"
@@ -101,27 +102,11 @@ public:
 	}
 
 	// Tests if the entity meets the condition
-	bool meetsCondition(unsigned int propertyId, const model::Object&& obj) {
-		if (!hasProperty(propertyId)) return false;
-		auto val = getProperty(propertyId)->baseValue(0);
-		return val->Equals(obj.value);
-
-		/*switch (obj.type) {
-		case model::Object::Type::STRING: {
-		auto val = getProperty<model::types::String>(propertyId)->values();
-		return val[0]->Equals(obj.value);
-		}
-		case model::Object::Type::INT: {
-		auto val = getProperty<model::types::Int>(propertyId)->values();
-		return val[0]->Equals(obj.value);
-		}
-		case model::Object::Type::ENTITYREF: {
-		auto val = getProperty<model::types::EntityRef>(propertyId)->values();
-		return val[0]->Equals(obj.value);
-		}
-		default:
-		return false;
-		}*/
+	std::vector<BasePointer> meetsCondition(unsigned int propertyId, const model::Object&& obj) {
+		if (!hasProperty(propertyId)) return std::vector<BasePointer>();
+		std::vector<BasePointer> values = getProperty(propertyId)->baseValues();
+		values.erase(std::remove_if(values.begin(), values.end(), [obj](BasePointer ptr) { return !ptr->Equals(obj); }));
+		return values;
 	}
 
 	// Clears all properties on the entity.

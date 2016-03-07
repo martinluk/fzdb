@@ -141,19 +141,19 @@ private:
 		}
 	}
 
-	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object) const;
+	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const;
 
-	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2) const;
+	void Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const;
 
-	void Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const model::Object&& object) const;
+	void Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const model::Object&& object, const std::string&& metaVar) const;
 
-	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3) const;
+	void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3, const std::string&& metaVar) const;
 
-	std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName) const;
+	std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const;
 
-	std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object) const;
+	std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object, const std::string&& metaVar) const;
 
-	void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const std::string variableName2) const;
+	void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const std::string variableName2, const std::string&& metaVar) const;
 };
 
 #endif	// MODEL_ENTITY_MANAGER_H

@@ -1,0 +1,6 @@
+SELECT $a WHERE {
+  META $b {
+    $a <forename> "Fred"
+  } .
+  $b <testProp> "test"
+}

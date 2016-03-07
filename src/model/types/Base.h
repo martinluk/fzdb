@@ -35,12 +35,16 @@ namespace model {
 			// Time record was created
 			const boost::posix_time::ptime _timeCreated;
 
+			// id for this record - unique for entity/property/id - related to ordering
+			unsigned int _orderingId;
+
 			// Extra settings against this data
 			std::map<unsigned int, std::shared_ptr<IEntityProperty>> _propertyTable;
 			
 			void initMemberSerialiser()
 			{
 				_memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
+				_memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
 				_memberSerialiser.addDynamicMember(&_commentWrapper);
 			}
 
@@ -54,8 +58,9 @@ namespace model {
 				TypeEntityRef,
 				TypeDate,
 
-				//Doesn't have an associated type
-				PropertyReference
+				//Used in query processing but cannot be stored
+				PropertyReference,
+				ValueReference
 			};
 			
             // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
@@ -149,6 +154,14 @@ namespace model {
 			virtual std::string logString() const
 			{
 				return std::string("Base(") + std::to_string(_confidence) + std::string(")");
+			}
+
+			void OrderingId(unsigned int id) {
+				_orderingId = id;
+			}
+
+			unsigned int OrderingId() {
+				return _orderingId;
 			}
 
 		protected:

@@ -99,6 +99,10 @@ void EntityProperty<T>::append(std::shared_ptr<T> value)
 	_count += 1;
 	_valuesList.emplace_front(value);
 	_valuesList.sort(model::types::ConfidenceCompare<T>());
+	unsigned int count = 0;
+	for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
+		(*iter)->OrderingId(count);
+	}
 }
 
 template <typename T>
@@ -107,6 +111,10 @@ void EntityProperty<T>::append(const std::vector<std::shared_ptr<T>> &list)
 	_count += list.size();
 	_valuesList.insert_after(_valuesList.cbefore_begin(), list.begin(), list.end());
 	_valuesList.sort(model::types::ConfidenceCompare<T>());
+	unsigned int count = 0;
+	for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
+		(*iter)->OrderingId(count);
+	}
 }
 
 template <typename T>

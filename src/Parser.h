@@ -132,10 +132,10 @@ public:
    void Sort() {
 	   std::sort(triples.begin(), triples.end(), [this](model::Triple t1, model::Triple t2) { 
 		   if (t1.subject.type == model::Subject::Type::VARIABLE && metaVariables.find(t1.subject.value) != metaVariables.cend()) {
-			   return true;
+			   return false;
 		   }
 		   if (t2.subject.type == model::Subject::Type::VARIABLE && metaVariables.find(t2.subject.value) != metaVariables.cend()) {
-			   return false;
+			   return true;
 		   }
 		   return t1.Entropy() < t2.Entropy();
 	   });

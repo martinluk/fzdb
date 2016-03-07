@@ -11,49 +11,26 @@ namespace model {
 	namespace types {
 		class ValueRef : public Base {
 		private:
-			friend class TypeSerialiser;
+
 			EHandle_t _entity;
 			unsigned int _property;
 			unsigned int _value;
-
-			MemberSerialiser _memberSerialiser;
-			
-			void initMemberSerialiser()
-			{
-				_memberSerialiser.addPrimitive(&_entity, sizeof(_entity));
-				_memberSerialiser.addPrimitive(&_property, sizeof(_property));
-				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
-			}
 			
 		public:
-			ValueRef() : Base(100, 0, std::string()), _value(0)
-			{
-				initMemberSerialiser();				
-			}
-
-			ValueRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, author, comment), _value(value)
-			{
-				initMemberSerialiser();
-			}
-			
-			ValueRef(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				ValueRef(std::atoll(value.c_str()), author, confidence, comment)
-			{
-				// Already initialised
-			}
-			
+			ValueRef(unsigned long long entity, unsigned int prop, unsigned int value) : Base(100, 0, std::string()), 
+				_value(0), _entity(entity), _property(prop) {}
+	
 			virtual ~ValueRef() {}
 
 			EHandle_t value() const { return _value; }
 
 			virtual std::shared_ptr<Base> Clone() override {
-				return std::make_shared<ValueRef>(_value, _confidence);
+				return std::make_shared<ValueRef>(_entity, _property, _value);
 			}
 
 			virtual Subtype subtype() const
 			{
-				return Subtype::TypeEntityRef;
+				return Subtype::ValueReference;
 			}
 
 			virtual std::string logString() const override 
@@ -69,24 +46,6 @@ namespace model {
 
 			virtual std::string toString() const override {
 				return std::to_string(_value);
-			}
-
-		protected:
-			virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
-			{
-				//return Base::serialiseSubclass(serialiser)
-				//	+ serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
-				
-				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
-			}
-
-			ValueRef(const char* &serialisedData) : Base(serialisedData)
-			{
-				//_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
-				//serialisedData += sizeof(_value);
-				
-				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
 			}
 		};
 	}
