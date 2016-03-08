@@ -235,6 +235,11 @@ void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &ty
 	}
 }
 
+std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const
+{
+	return _entities.at(entity)->getProperty(prop)->baseValue(val);
+}
+
 std::vector<std::shared_ptr<Entity>> EntityManager::entityList() const
 {
     std::vector<std::shared_ptr<Entity>> list;
@@ -524,21 +529,42 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 
 	//the variable has been used before, we only need to iterate over valid values from before
 	if (variableSet.used(variableName)) {
-		if (variableSet.typeOf(variableName) == model::types::Base::Subtype::TypeEntityRef) {
 
-			unsigned char varIndex = variableSet.indexOf(variableName);
+		unsigned char varIndex = variableSet.indexOf(variableName);
 
-			variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-				[&, this, varIndex](std::vector<VariableSetValue> row) {
+		//in this scan we can only remove variables from variableset
+		switch (variableSet.typeOf(variableName)) {
+			case model::types::Base::Subtype::TypeEntityRef: {				
+
+				variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
+					[&, this, varIndex](std::vector<VariableSetValue> row) {
 					Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
 					auto currentEntity = _entities.at(entityHandle);
 					auto matches = currentEntity->meetsCondition(propertyId, std::move(object));
 					return matches.size() == 0;
-			}), variableSet.getData()->end());
+				}), variableSet.getData()->end());
 
-		}
-		else {
-			//TODO: TypeException
+				break;
+			}
+			
+			case model::types::Base::Subtype::ValueReference: {
+				
+				for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+					if (!(*iter)[varIndex].dataPointer()) continue;
+					auto vsv = (*iter)[varIndex];
+					std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
+					auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+					//check if val meets the property
+
+					//if not remove val from list AND all things that referenced it
+				}
+				
+				break;
+			}
+
+			default: {
+				throw std::runtime_error("The first element in a triple MUST be an entity or a meta variable!");
+			}
 		}
 		return;
 	}
@@ -554,18 +580,24 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 		case Entity::LinkStatus::None:
 			matches = currentEntity->meetsCondition(propertyId, std::move(object));
 			if (matches.size() > 0) {
-				variableSet.add(std::move(variableName), 
-					VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle(), 0), 0, currentEntity->getHandle()),
-					model::types::Base::Subtype::TypeEntityRef);
-
+				VariableSetValue vsv = VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle(), 0), 0, currentEntity->getHandle());
+				
 				if (metaVar != "") {
+
+					unsigned int metaRef = variableSet.getMetaRef();
+					vsv.metaRef(metaRef);
+
 					for (auto match : matches) {
-						//TODO: might not be 0
+						//TODO:
 						//is it necessery to repeat the entity and property handles?
 						auto valueRef = std::make_shared<model::types::ValueRef>(currentEntity->getHandle(), propertyId, match->OrderingId());
-						variableSet.add(std::move(metaVar), VariableSetValue(valueRef, propertyId, currentEntity->getHandle()), model::types::Base::Subtype::ValueReference);
+						auto vsv2 = VariableSetValue(valueRef, propertyId, currentEntity->getHandle());
+						vsv2.metaRef(metaRef);
+						variableSet.add(std::move(metaVar), std::move(vsv2), model::types::Base::Subtype::ValueReference);
 					}					
 				}
+
+				variableSet.add(std::move(variableName), std::move(vsv), model::types::Base::Subtype::TypeEntityRef);
 			}
 			break;
 		case Entity::LinkStatus::Slave:

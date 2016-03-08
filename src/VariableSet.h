@@ -22,6 +22,8 @@ private:
 	unsigned int _propertyId;
 	unsigned long long _entityId;
 
+	unsigned int _metaRef;
+
 public:
 
 	VariableSetValue(std::shared_ptr<model::types::Base> ptr, unsigned int propertyId, unsigned long long entityId) :
@@ -34,6 +36,13 @@ public:
 	unsigned int property() const { return _propertyId; }
 	unsigned long long entity() const { return _entityId; }
 
+	void metaRef(unsigned int metaRef) {
+		_metaRef = metaRef;
+	}
+
+	unsigned int metaRef() {
+		return _metaRef;
+	}
 };
 
 class VariableSet {
@@ -42,6 +51,7 @@ public:
 
 	VariableSet(const std::set<std::string> &variableNames = std::set<std::string>()) {
 		_size = variableNames.size();
+		_nextMetaRef = 0;
 		_variablesUsed = std::vector<bool>(_size);
 		unsigned char count = 0;
 		for (auto variableName : variableNames) {
@@ -137,10 +147,15 @@ public:
 		return _metaData[name].second;
 	}
 
+	const unsigned int getMetaRef() {
+		return _nextMetaRef++;
+	}
+
 private:
 	std::map<std::string, std::pair<VariableType, unsigned char>> _metaData;
 	std::vector<std::vector<VariableSetValue>> _values;
 	std::vector<bool> _variablesUsed;
 	unsigned int _size;
+	unsigned int _nextMetaRef;
 };
 #endif // !FUZZY_VARIABLESET

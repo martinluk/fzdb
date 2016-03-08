@@ -18,11 +18,13 @@ namespace model {
 			
 		public:
 			ValueRef(unsigned long long entity, unsigned int prop, unsigned int value) : Base(100, 0, std::string()), 
-				_value(0), _entity(entity), _property(prop) {}
+				_value(value), _entity(entity), _property(prop) {}
 	
 			virtual ~ValueRef() {}
 
-			EHandle_t value() const { return _value; }
+			EHandle_t entity() const { return _entity; }
+			unsigned int prop() const { return _property; }
+			unsigned int value() const { return _value; }
 
 			virtual std::shared_ptr<Base> Clone() override {
 				return std::make_shared<ValueRef>(_entity, _property, _value);

@@ -42,6 +42,8 @@ public:
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
 	}
+
+	std::shared_ptr<model::types::Base> dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const;
     
     std::vector<std::shared_ptr<Entity>> entityList() const;
     std::size_t entityCount() const;
