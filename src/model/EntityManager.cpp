@@ -554,14 +554,17 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 			}
 			
 			case model::types::SubType::ValueReference: {
-				
-				for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+
+				for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
 					if (!(*iter)[varIndex].dataPointer()) continue;
 					auto vsv = (*iter)[varIndex];
 					std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
 					auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
 					//check if val meets the property
-
+					auto matches = val->meetsCondition(propertyId, std::move(object));
+					if (matches.size() > 0) {
+						//delete associated answers
+					}
 					//if not remove val from list AND all things that referenced it
 				}
 				
