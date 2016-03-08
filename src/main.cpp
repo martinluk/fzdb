@@ -59,40 +59,6 @@ void sigHandler(int s)
  */
 int main(int argc, char* argv[]) {
 
-	vedis *pStore;            /* Vedis handle */
-	vedis_value *pResult;     /* Return value of the last executed command */
-	int rc;
-
-	/* Create our datastore */
-	rc = vedis_open(&pStore, ":mem:");
-	if (rc != VEDIS_OK) {
-		throw std::runtime_error("Out of memory");
-	}
-
-	/* Execute the simplest command */
-	rc = vedis_exec(pStore, "SET test 'Hello World'", -1);
-	if (rc != VEDIS_OK) {
-		/* Seriously? */
-		throw std::runtime_error("SET test 'Hello World' FAILED");
-	}
-
-	vedis_exec(pStore, "GET test", -1);
-	/* Extract the return value of the last executed command (i.e. GET test) " */
-	rc = vedis_exec_result(pStore, &pResult);
-	if (rc != VEDIS_OK) {
-		/* Seriously? */
-		throw std::runtime_error("SET test 'Hello World' FAILED");
-	}
-	else {
-		const char *zResponse;
-		/* Cast the vedis object to a string */
-		zResponse = vedis_value_to_string(pResult, 0);
-		/* Output */
-		printf(" test ==> %s\n", zResponse); /* test ==> 'Hello world' */
-	}
-
-	vedis_close(pStore);
-
 	/*
 	*   DEFAULT SETTINGS
 	*/
