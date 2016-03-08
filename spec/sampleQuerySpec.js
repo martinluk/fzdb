@@ -128,14 +128,14 @@ describe("Fuzzy Database", function() {
     });
 	
 	//test select - Option 1  $a <prop> value
-    it("getting entities with age 34", function(done) {
-      client.write("SELECT $a WHERE { $a <age> 34}");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '3'})]})}));
-        done();
-      });      
-    });
+  //   it("getting entities with age 34", function(done) {
+  //     client.write("SELECT $a WHERE { $a <age> 34}");
+  //     client.once('data', function(data) {
+		// var resultJSON = JSON.parse(data);
+  //       expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '3'})]})}));
+  //       done();
+  //     });      
+  //   });
 	
 	//test select - Option 2 $a <prop> $b
     it("In this case, select option 2, should retrieve all three entities, as all three have the drinks property set", function(done) {
