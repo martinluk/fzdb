@@ -7,16 +7,11 @@
 #include <typeinfo>
 #include <algorithm>
 #include <forward_list>
+#include <memory>
 
 #include "ILogString.h"
-#include "./types/Base.h"
-
-//namespace model {
-//	namespace types {
-//		class Base;
-//
-//	}
-//}
+#include "./types/SubType.h"
+//#include "./types/Base.h"
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
@@ -100,7 +95,7 @@ public:
 
 	// Clears this property of any values.
 	void clear();
-
+	
 	virtual std::string logString() const override;
 
 private:

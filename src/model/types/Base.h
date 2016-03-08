@@ -8,27 +8,15 @@
 #include "../ILogString.h"
 #include "../Triple.h"
 #include "../MemberSerialiser.h"
-//#include "../PropertyOwner.h"
+#include "../PropertyOwner.h"
+#include "./SubType.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace model {
 	namespace types {
 
-		enum class SubType
-		{
-			TypeUndefined = 0,
-			TypeInt32,
-			TypeString,
-			TypeEntityRef,
-			TypeDate,
-
-			//Used in query processing but cannot be stored
-			PropertyReference,
-			ValueReference
-		};
-
-		class Base : public ILogString//, public PropertyOwner
+		class Base : public ILogString, public PropertyOwner
 		{
 		protected:
 			friend class TypeSerialiser;
@@ -59,19 +47,6 @@ namespace model {
 			}
 
 		public:
-
-			//enum class Subtype
-			//{
-			//	TypeUndefined = 0,
-			//	TypeInt32,
-			//	TypeString,
-			//	TypeEntityRef,
-			//	TypeDate,
-
-			//	//Used in query processing but cannot be stored
-			//	PropertyReference,
-			//	ValueReference
-			//};
 			
             // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
             // Until then, we use an ugly workaround.

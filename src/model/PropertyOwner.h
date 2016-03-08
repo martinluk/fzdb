@@ -8,6 +8,7 @@
 
 #include "./Triple.h"
 #include "./EntityProperty.h"
+#include "./types/SubType.h"
 
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.

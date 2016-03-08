@@ -1,5 +1,7 @@
 #include "./PropertyOwner.h"
 
+#include "./types/Base.h"
+
 PropertyOwner::~PropertyOwner() {}
 
 // Getters:
