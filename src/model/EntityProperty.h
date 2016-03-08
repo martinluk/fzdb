@@ -15,18 +15,6 @@
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
-//class EntityProperty : public ILogString
-//{
-//public:
-//	virtual ~EntityProperty() {}
-//	virtual unsigned int count() const = 0;
-//	virtual unsigned int key() const = 0;
-//	virtual BasePointer baseValue(int index) const = 0;
-//	virtual std::vector<BasePointer> baseValues() const = 0;
-//	virtual model::types::SubType subtype() const = 0;
-//	virtual BasePointer baseTop() const = 0;
-//};
-
 // An entity property is a key-values property that can be aggregated by an entity.
 // Each property has a string key which acts as its identifier.
 // Multiple values can be added, each with a confidence quantifier between 0 and 100,
