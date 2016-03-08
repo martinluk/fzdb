@@ -151,6 +151,7 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         data += advance;
     }
 
+	//TODO: UPDATE THIS
     //ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
 }
 
