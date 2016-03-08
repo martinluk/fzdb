@@ -45,7 +45,7 @@ EntitySerialiser::EntitySerialiser(const std::shared_ptr<Entity> ent) : _entity(
 
 std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
 {
-    typedef std::map<unsigned int, std::shared_ptr<IEntityProperty>> PropertyTable;
+    typedef std::map<unsigned int, std::shared_ptr<EntityProperty>> PropertyTable;
 
     // Create the initial header.
 	SerialHeader header;
@@ -104,7 +104,7 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
         // Keep track of how many bytes all of the values occupy.
         std::size_t propSerialisedSize = 0;
 
-        std::shared_ptr<IEntityProperty> prop = it->second;
+        std::shared_ptr<EntityProperty> prop = it->second;
 
         // Serialise each value.
         for ( int i = 0; i < prop->count(); i++ )
@@ -151,7 +151,7 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         data += advance;
     }
 
-    ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
+    //ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
 }
 
 std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)

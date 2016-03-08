@@ -17,6 +17,8 @@ QueryResult BGP::executeConst() const
       //run BGP
 		VariableSet variables = _database->entityManager().BGP(_query.whereClause, _query.settings);
 
+		variables.trimEmptyRows();
+
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
 		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), 

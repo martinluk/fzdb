@@ -23,41 +23,55 @@ public:
 	// Getters:
 
 	// Returns the property with the given key, or a null property if this is not found.
-	template<typename T>
-	std::shared_ptr<EntityProperty<T>> getProperty(const unsigned int &key) const {
+	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const {
 		auto it = _propertyTable.find(key);
 		if (it == _propertyTable.cend()) {
-			return std::shared_ptr<EntityProperty<T>>();
+			return std::shared_ptr<EntityProperty>();
 		}
 
 		// TODO: Add error messages
 		try {
-			std::shared_ptr<EntityProperty<T>> prop = std::dynamic_pointer_cast<EntityProperty<T>, IEntityProperty>(it->second);
+			std::shared_ptr<EntityProperty> prop = std::dynamic_pointer_cast<EntityProperty, EntityProperty>(it->second);
 			return prop;
 		}
 		catch (std::bad_cast ex) {
-			return std::shared_ptr<EntityProperty<T>>();
+			return std::shared_ptr<EntityProperty>();
 		}
-		return std::shared_ptr<EntityProperty<T>>();
+		return std::shared_ptr<EntityProperty>();
 	}
 
-	std::shared_ptr<IEntityProperty> getProperty(const unsigned int &key) const;
+	//std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const;
 
 	// Setters:
 
 	// Inserts the given property into this entity.
-	// If a property with this key already exists, it is replaced.
-	template<typename T>
-	void insertProperty(EntityProperty<T>* prop) {
-		// Erase the property if it exists (If not, this will do nothing).
-		//propertyTable_.erase(prop.key());
 
-		// Insert the new one.
-		auto pair = std::make_pair<unsigned int, std::shared_ptr<IEntityProperty>>(std::move(prop->key()), (std::shared_ptr<IEntityProperty>)prop);
-		_propertyTable.insert(pair);
+	void insertProperty(std::shared_ptr<EntityProperty> prop) {
+		if (hasProperty(prop->key())) {
+			auto existingProp = getProperty(prop->key());
+			for (auto value : prop->baseValues()) {
+				existingProp->append(value);
+			}
+		}
+		else {
+			auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(prop->key()), std::move(prop));
+			_propertyTable.insert(pair);
+		}
 	}
 
-	void insertProperty(std::shared_ptr<IEntityProperty> prop);
+	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object) {
+		// Erase the property if it exists (If not, this will do nothing).
+		//propertyTable_.erase(prop.key());
+		if (!hasProperty(key)) {
+			auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key));
+			pair.second->append(object);
+			_propertyTable.insert(pair);
+		}
+		else {
+			auto prop = getProperty(key);
+			prop->append(object);
+		}
+	}
 
 	// Removes the property with the given key.
 	void removeProperty(const unsigned int &key);
@@ -66,7 +80,7 @@ public:
 	bool hasProperty(const unsigned int &key);
 
 	// Returns read only reference to the property table
-	const std::map<unsigned int, std::shared_ptr<IEntityProperty>>& properties() const;
+	const std::map<unsigned int, std::shared_ptr<EntityProperty>>& properties() const;
 
 	// Tests if the entity meets the condition
 	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
@@ -79,7 +93,7 @@ public:
 
 protected:
 
-	std::map<unsigned int, std::shared_ptr<IEntityProperty>> _propertyTable;
+	std::map<unsigned int, std::shared_ptr<EntityProperty>> _propertyTable;
 };
 
 #endif	// MODEL_PROPERTY_OWNER_H

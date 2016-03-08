@@ -37,7 +37,7 @@ public:
 
 	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
-	void Insert(std::vector<model::Triple> triples);
+	void Insert(const TriplesBlock&& triples);
 
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
@@ -127,21 +127,6 @@ private:
 	}
 
 	// Basic Graph Processing - returns a list of the variables in conditions
-	QueryResult SeparateTriples(std::vector<model::Triple> conditions);
-
-	template<typename T>
-	void addToEntity(std::shared_ptr<Entity> currentEntity, unsigned int propertyId, model::Object&& object) {
-		unsigned char confidence = object.hasCertainty ? object.certainty : 100;
-
-		if (currentEntity->hasProperty(propertyId)) {
-			currentEntity->getProperty<T>(propertyId)->append(std::make_shared<T>(object.value, 0, confidence));
-		}
-		else {
-			currentEntity->insertProperty<T>(new EntityProperty<T>(propertyId, std::vector <std::shared_ptr<T>> {
-				std::make_shared<T>(object.value, 0, confidence)
-			}));
-		}
-	}
 
 	void Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const;
 

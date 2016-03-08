@@ -43,6 +43,10 @@ public:
 	unsigned int metaRef() {
 		return _metaRef;
 	}
+
+	bool empty() {
+		return _ptr ==  nullptr;
+	}
 };
 
 class VariableSet {
@@ -149,6 +153,30 @@ public:
 
 	const unsigned int getMetaRef() {
 		return _nextMetaRef++;
+	}
+
+	void removeMetaRefs(unsigned int metaRef) {
+		for(int i = 0; i < _values.size(); i++) {
+			for (int j = 0; j < _values[i].size(); j++) {
+				if (_values[i][j].metaRef() == metaRef) {
+					_values[i][j] = VariableSetValue();
+				}
+			}
+		}
+	}
+
+	//this doesn't seem to work
+	void trimEmptyRows() {
+		_values.erase(std::remove_if(_values.begin(), _values.end(), [](std::vector<VariableSetValue> row) {
+			bool allEmpty = true;
+			for (auto val : row) {
+				if (!val.empty()) {
+					allEmpty = false;
+					break;
+				}
+			}
+			return allEmpty;
+		}), _values.end());
 	}
 
 private:

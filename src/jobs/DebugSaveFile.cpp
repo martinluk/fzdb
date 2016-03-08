@@ -22,7 +22,7 @@ QueryResult DebugSaveFile::execute()
     values.push_back(std::make_shared<String>("Arnold", 75));
     values.push_back(std::make_shared<String>("Barry", 43));
     values.push_back(std::make_shared<String>("Clarence", 11));
-    e1->insertProperty<String>(new EntityProperty<String>(1, values));
+   // e1->insertProperty<String>(new EntityProperty<String>(1, values));
     
 	std::shared_ptr<Entity> e2 = manager.createEntity(std::string());
     
@@ -30,7 +30,7 @@ QueryResult DebugSaveFile::execute()
     values.push_back(std::make_shared<String>("Alice", 98));
     values.push_back(std::make_shared<String>("Britney", 61));
     values.push_back(std::make_shared<String>("Catherine", 5));
-    e2->insertProperty<String>(new EntityProperty<String>(2, values));
+  //  e2->insertProperty<String>(new EntityProperty<String>(2, values));
     
     log << "Data to be serialised:\n\n" << manager.dumpContents() << "\n";
     

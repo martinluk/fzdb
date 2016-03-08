@@ -247,6 +247,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 					}
 					currentMetaVar = iter->second;
 					tripleBlock.metaVariables.insert(iter->second);
+					tripleBlock.variables.insert(iter->second);
 					iter++;
 					if (iter->first.type != ParsedTokenType::OPEN_CURLBRACE) {
 						throw ParseException("Expected { found " + iter->second);

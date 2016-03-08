@@ -45,80 +45,6 @@ std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type)
 	return e;
 }
 
-QueryResult EntityManager::SeparateTriples(std::vector<model::Triple> conditions)
-{
-	std::map<std::string, std::vector<std::string>> variables;
-
-	for (int i = 0; i < conditions.size(); i++) {
-		auto vars = conditions[i].variables();
-
-		switch (vars.size()) {
-		case 0: 
-			//if the triple doesn't have any variables, then it doesn't affect the output
-			break;
-		case 1:
-			if (variables.find(vars[0]) == variables.end()) {
-				variables[vars[0]] = vars;
-			}
-			break;
-		case 2:
-
-			if (variables.find(vars[0]) == variables.end()) {
-				variables[vars[0]] = vars;
-			}
-			else {
-				variables[vars[0]].push_back(vars[1]);
-			}
-
-			if (variables.find(vars[1]) == variables.end()) {
-				variables[vars[1]] = vars;
-			}
-			else {
-				variables[vars[0]].push_back(vars[0]);
-			}
-
-			break;
-		case 3:
-
-			if (variables.find(vars[0]) == variables.end()) {
-				variables[vars[0]] = vars;
-			}
-			else {
-				variables[vars[0]].push_back(vars[1]);
-				variables[vars[0]].push_back(vars[2]);
-			}
-
-			if (variables.find(vars[1]) == variables.end()) {
-				variables[vars[1]] = vars;
-			}
-			else {
-				variables[vars[0]].push_back(vars[0]);
-				variables[vars[0]].push_back(vars[2]);
-			}
-
-	 		if (variables.find(vars[2]) == variables.end()) {
-				variables[vars[2]] = vars;
-			}
-			else {
-				variables[vars[0]].push_back(vars[0]);
-				variables[vars[0]].push_back(vars[1]);
-			}
-
-			break;
-		}
-	}
-
-	std::vector<std::set<std::string>> buckets;
-	std::set<std::string> visited;
-
-	for (auto iter = variables.begin(); iter != variables.end(); iter++) {
-
-	}
-
-
-	return QueryResult();
-}
-
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
 VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings settings) const
@@ -184,9 +110,11 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 }
 
 //Inserts new data into the data store
-void EntityManager::Insert(std::vector<model::Triple> triples) {
-	auto iter = triples.cbegin();
-	auto end = triples.cend();
+void EntityManager::Insert(const TriplesBlock&& block) {
+	auto iter = block.triples.cbegin();
+	auto end = block.triples.cend();
+	VariableSet variableSet;
+
 	for (; iter != end; iter++) {
 		auto triple = *iter;
 		
@@ -208,20 +136,27 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
 		unsigned int propertyId;
 
+		unsigned char confidence = triple.object.hasCertainty ? triple.object.certainty : 100;
+		std::shared_ptr<model::types::Base> newRecord;
+		model::types::SubType newRecordType;
+
 		switch (triple.object.type) {
 			case model::Object::Type::STRING:
-				propertyId = this->getPropertyName(triple.predicate.value, model::types::SubType::TypeString, true);
-				addToEntity<model::types::String>(currentEntity, propertyId, std::move(triple.object));
+				newRecordType = model::types::SubType::TypeString;
+				newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
 				break;
 			case model::Object::Type::ENTITYREF:
-				propertyId = this->getPropertyName(triple.predicate.value, model::types::SubType::TypeEntityRef, true);
-				addToEntity<model::types::EntityRef>(currentEntity, propertyId, std::move(triple.object));
+				newRecordType = model::types::SubType::TypeEntityRef;
+				newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
 				break;
 			case model::Object::Type::INT:
-				propertyId = this->getPropertyName(triple.predicate.value, model::types::SubType::TypeInt32, true);
-				addToEntity<model::types::Int>(currentEntity, propertyId, std::move(triple.object));
+				newRecordType = model::types::SubType::TypeInt32;
+				newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
 				break;
 		}
+
+		propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
+		currentEntity->insertProperty(propertyId, newRecord);
 	}
 }
 
@@ -300,10 +235,10 @@ std::string EntityManager::dumpContents() const
         {
             str << "{\n";
             
-			const std::map<unsigned int, std::shared_ptr<IEntityProperty>> &propMap = ent->properties();
+			const std::map<unsigned int, std::shared_ptr<EntityProperty>> &propMap = ent->properties();
             for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
             {
-				std::shared_ptr<IEntityProperty> prop = it2->second;
+				std::shared_ptr<EntityProperty> prop = it2->second;
                 str << "  " << prop->logString() << "\n";
                 
                 if ( prop->count() > 0 )
@@ -562,10 +497,10 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 					auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
 					//check if val meets the property
 					auto matches = val->meetsCondition(propertyId, std::move(object));
-					if (matches.size() > 0) {
+					if (matches.size() == 0) {
 						//delete associated answers
+						variableSet.removeMetaRefs(vsv.metaRef());
 					}
-					//if not remove val from list AND all things that referenced it
 				}
 				
 				break;
@@ -802,12 +737,12 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 		auto entity = _entities.at(entityRef);
 
 		//if variableName is already set
-		std::map<unsigned int, std::shared_ptr<IEntityProperty>> iterableProperties;
+		std::map<unsigned int, std::shared_ptr<EntityProperty>> iterableProperties;
 		if (variableSet.used(variableName)) {
 			auto data = variableSet.getData(variableName);
 			std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](VariableSetValue b) {
 				std::shared_ptr<model::types::Int> prop = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(b.dataPointer());
-				return std::pair<unsigned int, std::shared_ptr<IEntityProperty>>(prop->value(), entity->getProperty(prop->value()));
+				return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), entity->getProperty(prop->value()));
 			});
 		}
 		else {

@@ -87,6 +87,8 @@ namespace model {
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
 			}
+
+			Base() : Base(100, 0, std::string()) {}
 			
 			virtual ~Base() {}
 

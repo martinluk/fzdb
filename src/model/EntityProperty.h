@@ -15,17 +15,17 @@
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
-class IEntityProperty : public ILogString
-{
-public:
-	virtual ~IEntityProperty() {}
-	virtual unsigned int count() const = 0;
-	virtual unsigned int key() const = 0;
-	virtual BasePointer baseValue(int index) const = 0;
-	virtual std::vector<BasePointer> baseValues() const = 0;
-	virtual model::types::SubType subtype() const = 0;
-	virtual BasePointer baseTop() const = 0;
-};
+//class EntityProperty : public ILogString
+//{
+//public:
+//	virtual ~EntityProperty() {}
+//	virtual unsigned int count() const = 0;
+//	virtual unsigned int key() const = 0;
+//	virtual BasePointer baseValue(int index) const = 0;
+//	virtual std::vector<BasePointer> baseValues() const = 0;
+//	virtual model::types::SubType subtype() const = 0;
+//	virtual BasePointer baseTop() const = 0;
+//};
 
 // An entity property is a key-values property that can be aggregated by an entity.
 // Each property has a string key which acts as its identifier.
@@ -42,8 +42,8 @@ public:
 
 // TODO: We may want this class to be implicitly shared, so that we can return
 // properties without having to perform deep copies.
-template <typename T>
-class EntityProperty : public IEntityProperty
+
+class EntityProperty : public ILogString
 {
 	friend class EntitySerialiser;
 public:
@@ -54,7 +54,7 @@ public:
 	EntityProperty(const unsigned int &key);
 	~EntityProperty();
 	EntityProperty(const unsigned int &key,
-		const std::vector<std::shared_ptr<T>> &values);
+		const std::vector<BasePointer> &values);
 
 	// Returns true if this is a null property (ie. default-constructed).
 	// Internally, a property is null if its key is an empty string.
@@ -73,13 +73,13 @@ public:
 
 	virtual unsigned int count() const;
 
-	std::vector<std::shared_ptr<T>> values() const;
-	std::shared_ptr<T> const& value(int index) const;
+	//std::vector<std::shared_ptr<T>> values() const;
+	//std::shared_ptr<T> const& value(int index) const;
 
 	virtual BasePointer baseValue(int index) const;
 	virtual std::vector<BasePointer> baseValues() const;
 
-	virtual std::shared_ptr<T> top() const;
+	//virtual std::shared_ptr<T> top() const;
 	virtual BasePointer baseTop() const;
 	
 	virtual unsigned int key() const;
@@ -88,10 +88,10 @@ public:
 	// Setters:
 
 	// Appends a value to the value list.
-	void append(std::shared_ptr<T> value);
+	void append(BasePointer value);
 
 	// Appends a list of values.
-	void append(const std::vector<std::shared_ptr<T>> &list);
+	void append(const std::vector<BasePointer> &list);
 
 	// Clears this property of any values.
 	void clear();
@@ -105,7 +105,7 @@ private:
 	unsigned int _count;
 	model::types::SubType _subtype;
 
-	std::forward_list<std::shared_ptr<T>> _valuesList;
+	std::forward_list<BasePointer> _valuesList;
 };
 
 #endif	// MODEL_ENTITYPROPERTY_H

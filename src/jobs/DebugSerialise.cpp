@@ -134,7 +134,7 @@ std::string printEntity(const std::shared_ptr<Entity> ent)
             + std::string(")");
 }
 
-std::string printEntityProperty(const std::shared_ptr<IEntityProperty> prop)
+std::string printEntityProperty(const std::shared_ptr<EntityProperty> prop)
 {
     std::string str = std::string("EntityProperty(") + std::to_string(prop->key());
 
@@ -219,7 +219,7 @@ QueryResult DebugSerialise::execute()
         values.push_back(std::make_shared<String>("Is", 90));
         values.push_back(std::make_shared<String>("A", 80));
         values.push_back(std::make_shared<String>("Test", 72));
-        ent->insertProperty<String>(new EntityProperty<String>(1, values));
+        //ent->insertProperty<String>(new EntityProperty<String>(1, values));
     }
 
     {
@@ -228,7 +228,7 @@ QueryResult DebugSerialise::execute()
         values.push_back(std::make_shared<Int>(420, 90));
         values.push_back(std::make_shared<Int>(8008, 80));
         values.push_back(std::make_shared<Int>(2112, 72));
-        ent->insertProperty<Int>(new EntityProperty<Int>(2, values));
+        //ent->insertProperty<Int>(new EntityProperty<Int>(2, values));
     }
 
 	log << "Testing serialisation of Entity.\n";
@@ -241,7 +241,7 @@ QueryResult DebugSerialise::execute()
 		std::shared_ptr<Entity> newEnt = eSer.unserialise(serialiser.begin());
         log << "Unserialised entity: " << printEntity(newEnt) << "\nProperties:\n";
 
-        const std::map<unsigned int, std::shared_ptr<IEntityProperty>> &propTable = newEnt->properties();
+        const std::map<unsigned int, std::shared_ptr<EntityProperty>> &propTable = newEnt->properties();
         bool begin = true;
         for ( auto it = propTable.cbegin(); it != propTable.cend(); ++it )
         {
