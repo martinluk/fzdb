@@ -36,9 +36,9 @@ namespace model {
 
 			std::string value() const { return _value; }
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeString;
+				return SubType::TypeString;
 			}
 
 			virtual std::shared_ptr<Base> Clone() override {

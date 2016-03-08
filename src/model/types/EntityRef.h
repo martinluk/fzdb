@@ -46,9 +46,9 @@ namespace model {
 				return std::make_shared<EntityRef>(_value, _confidence);
 			}
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeEntityRef;
+				return SubType::TypeEntityRef;
 			}
 
 			virtual std::string logString() const override 

@@ -8,7 +8,6 @@
 
 #include "./Triple.h"
 #include "./EntityProperty.h"
-#include "ILogString.h"
 
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.
@@ -27,7 +26,7 @@ public:
 	std::shared_ptr<EntityProperty<T>> getProperty(const unsigned int &key) const {
 		auto it = _propertyTable.find(key);
 		if (it == _propertyTable.cend()) {
-			return std::shared_ptr<EntityProperty<T>>();;
+			return std::shared_ptr<EntityProperty<T>>();
 		}
 
 		// TODO: Add error messages
@@ -69,7 +68,7 @@ public:
 	const std::map<unsigned int, std::shared_ptr<IEntityProperty>>& properties() const;
 
 	// Tests if the entity meets the condition
-	std::vector<BasePointer> meetsCondition(unsigned int propertyId, const model::Object&& obj);
+	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
 
 	// Clears all properties on the entity.
 	void clearProperties();

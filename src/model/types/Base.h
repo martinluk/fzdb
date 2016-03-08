@@ -8,14 +8,27 @@
 #include "../ILogString.h"
 #include "../Triple.h"
 #include "../MemberSerialiser.h"
-
-class IEntityProperty;
+//#include "../PropertyOwner.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace model {
 	namespace types {
-		class Base : public ILogString
+
+		enum class SubType
+		{
+			TypeUndefined = 0,
+			TypeInt32,
+			TypeString,
+			TypeEntityRef,
+			TypeDate,
+
+			//Used in query processing but cannot be stored
+			PropertyReference,
+			ValueReference
+		};
+
+		class Base : public ILogString//, public PropertyOwner
 		{
 		protected:
 			friend class TypeSerialiser;
@@ -37,10 +50,7 @@ namespace model {
 
 			// id for this record - unique for entity/property/id - related to ordering
 			unsigned int _orderingId;
-
-			// Extra settings against this data
-			std::map<unsigned int, std::shared_ptr<IEntityProperty>> _propertyTable;
-			
+		
 			void initMemberSerialiser()
 			{
 				_memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
@@ -50,40 +60,40 @@ namespace model {
 
 		public:
 
-			enum class Subtype
-			{
-				TypeUndefined = 0,
-				TypeInt32,
-				TypeString,
-				TypeEntityRef,
-				TypeDate,
+			//enum class Subtype
+			//{
+			//	TypeUndefined = 0,
+			//	TypeInt32,
+			//	TypeString,
+			//	TypeEntityRef,
+			//	TypeDate,
 
-				//Used in query processing but cannot be stored
-				PropertyReference,
-				ValueReference
-			};
+			//	//Used in query processing but cannot be stored
+			//	PropertyReference,
+			//	ValueReference
+			//};
 			
             // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
             // Until then, we use an ugly workaround.
             //static const char* SubtypeString[];
 			
-            static const char* SubtypeString(Subtype type)
+            static const char* SubtypeString(SubType type)
             {
                 switch (type)
                 {
-                case Subtype::TypeInt32:
+                case SubType::TypeInt32:
                     return "Int32";
                     
-                case Subtype::TypeString:
+                case SubType::TypeString:
                     return "String";
                     
-                case Subtype::TypeEntityRef:
+                case SubType::TypeEntityRef:
                     return "EntityRef";
                     
-                case Subtype::PropertyReference:
+                case SubType::PropertyReference:
                     return "PropertyReference";
 
-				case Subtype::TypeDate:
+				case SubType::TypeDate:
 					return "Date";
                     
                 default:
@@ -116,9 +126,9 @@ namespace model {
 			// TODO: Shouldn't this be virtual?
 			bool Equals(const model::Object &object) {
 				if (object.type == model::Object::Type::VARIABLE) return false;
-				if (object.type == model::Object::Type::INT && subtype() != Subtype::TypeInt32) return false;
-				if (object.type == model::Object::Type::STRING && subtype() != Subtype::TypeString) return false;
-				if (object.type == model::Object::Type::ENTITYREF && subtype() != Subtype::TypeEntityRef) return false;
+				if (object.type == model::Object::Type::INT && subtype() != SubType::TypeInt32) return false;
+				if (object.type == model::Object::Type::STRING && subtype() != SubType::TypeString) return false;
+				if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::TypeEntityRef) return false;
 				return Equals(object.value);
 			}
 
@@ -146,9 +156,9 @@ namespace model {
 				_comment = comment;
 			}
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeUndefined;
+				return SubType::TypeUndefined;
 			}
 
 			virtual std::string logString() const

@@ -12,7 +12,7 @@
 
 #include "model/types/Base.h"
 
-using VariableType = model::types::Base::Subtype;
+using VariableType = model::types::SubType;
 
 class VariableSetValue {
 private:

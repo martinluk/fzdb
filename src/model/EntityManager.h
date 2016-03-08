@@ -80,12 +80,12 @@ private:
 	std::map<std::string, unsigned int> _entityTypeNames;
 
 	boost::bimap<std::string, unsigned int> _propertyNames;
-	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
+	std::map<unsigned int, model::types::SubType> _propertyTypes;
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
-	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {
+	unsigned int getPropertyName(std::string str, model::types::SubType type, bool addIfMissing) {
 		auto iter = _propertyNames.left.find(str);
 		if (iter == _propertyNames.left.end()) {
 			if (addIfMissing) {
@@ -105,7 +105,7 @@ private:
 		return iter->second;
 	}
 
-	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type) const {
+	unsigned int getPropertyName(std::string str, model::types::SubType type) const {
 		auto iter = _propertyNames.left.find(str);
 		if (iter == _propertyNames.left.end()) {			
 		 return 0;

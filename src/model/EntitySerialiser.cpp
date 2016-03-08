@@ -6,7 +6,12 @@
 #include <cassert>
 #include "MemberSerialiser.h"
 #include "spdlog/spdlog.h"
-#include "types/Date.h"
+
+#include "./types/ValueRef.h"
+#include "./types/String.h"
+#include "./types/EntityRef.h"
+#include "./types/Int.h"
+#include "./types/Date.h"
 
 // This should be incremented whenever a change is made to the format!
 #define SERIAL_HEADER_CURRENT_VERSION 1
@@ -29,7 +34,7 @@ struct PropertyHeader
 	std::size_t                 offset;     // Offset of property from beginning of property data chunk.
     std::size_t                 size;       // Size of serialised property data in bytes. This includes all values.
     unsigned int                key;        // Property key.
-    model::types::Base::Subtype subtype;    // Type identifier for the values this property contains.
+    model::types::SubType subtype;    // Type identifier for the values this property contains.
     std::size_t                 valueCount; // How many values this property contains.
 };
 
@@ -180,19 +185,19 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
 
 		switch (p->subtype)
         {
-		case Base::Subtype::TypeInt32:
+		case SubType::TypeInt32:
             populate<Int>(ent, p, data);
             break;
 
-		case Base::Subtype::TypeString:
+		case SubType::TypeString:
             populate<String>(ent, p, data);
             break;
 
-		case Base::Subtype::TypeEntityRef:
+		case SubType::TypeEntityRef:
             populate<EntityRef>(ent, p, data);
 						break;
 
-		case Base::Subtype::TypeDate:
+		case SubType::TypeDate:
 						populate<Date>(ent, p, data);
 						break;
 

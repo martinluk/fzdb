@@ -4,6 +4,12 @@
 #include <iterator>
 #include "TypeSerialiser.h"
 
+#include "./types/Base.h"
+#include "./types/String.h"
+#include "./types/EntityRef.h"
+#include "./types/Int.h"
+#include "./types/Date.h"
+
 using BasePointer = std::shared_ptr<model::types::Base>;
 
 //template <typename T>
@@ -167,8 +173,9 @@ template<typename T>
 std::string EntityProperty<T>::logString() const
 {
     return std::string("EntityProperty<")
-            //+ std::string(model::types::Base::SubtypeString[(int)_subtype])
-            + std::string(model::types::Base::SubtypeString(_subtype))
+            //+ std::string(model::types::SubTypeString[(int)_subtype])
+		//TODO: WHAT SHOULD THIS BE??
+           // + std::string(model::types::String[(int)_subtype]))
             + std::string(">(k=")
             + std::to_string(_key)
             + std::string(", [")

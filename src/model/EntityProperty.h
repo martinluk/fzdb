@@ -8,11 +8,15 @@
 #include <algorithm>
 #include <forward_list>
 
-#include "./types/String.h"
-#include "./types/EntityRef.h"
-#include "./types/Int.h"
-#include "./types/Date.h"
 #include "ILogString.h"
+#include "./types/Base.h"
+
+//namespace model {
+//	namespace types {
+//		class Base;
+//
+//	}
+//}
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
@@ -24,7 +28,7 @@ public:
 	virtual unsigned int key() const = 0;
 	virtual BasePointer baseValue(int index) const = 0;
 	virtual std::vector<BasePointer> baseValues() const = 0;
-	virtual model::types::Base::Subtype subtype() const = 0;
+	virtual model::types::SubType subtype() const = 0;
 	virtual BasePointer baseTop() const = 0;
 };
 
@@ -84,7 +88,7 @@ public:
 	virtual BasePointer baseTop() const;
 	
 	virtual unsigned int key() const;
-	virtual model::types::Base::Subtype subtype() const { return _subtype; }
+	virtual model::types::SubType subtype() const { return _subtype; }
 
 	// Setters:
 
@@ -93,9 +97,6 @@ public:
 
 	// Appends a list of values.
 	void append(const std::vector<std::shared_ptr<T>> &list);
-
-	// Makes this property concrete, with the given variant value.
-	//void setConcrete(const Variant &value);
 
 	// Clears this property of any values.
 	void clear();
@@ -107,7 +108,7 @@ private:
 
 	unsigned int _key;
 	unsigned int _count;
-	model::types::Base::Subtype _subtype;
+	model::types::SubType _subtype;
 
 	std::forward_list<std::shared_ptr<T>> _valuesList;
 };

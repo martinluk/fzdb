@@ -40,9 +40,9 @@ namespace model {
 
 			int32_t value() const { return _value; }
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeInt32;
+				return SubType::TypeInt32;
 			}
 
 			virtual std::shared_ptr<Base> Clone() override {

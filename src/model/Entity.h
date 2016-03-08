@@ -7,8 +7,8 @@
 #include <algorithm>
 
 #include "./Triple.h"
-#include "./EntityProperty.h"
 #include "./PropertyOwner.h"
+#include "./MemberSerialiser.h"
 #include "ILogString.h"
 
 // Represents an entity in the graph database.
