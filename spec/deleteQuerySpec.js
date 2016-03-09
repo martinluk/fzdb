@@ -25,10 +25,12 @@ describe("fzdb", function() {
 	}
 
 	describe("delete queries:", function() {
-		beforeEach(function(done){
-
-		});
 		describe("DB with one entity", function() {
+			it("Flush db", function(done) {
+				sendCmd("FLUSH").then(function(data) {
+					done(); 
+				});    
+			});
 			it("no one used to call Fred", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
 					expect((data.result.data).length).toBe(0); done();
@@ -56,6 +58,69 @@ describe("fzdb", function() {
 					done();
 				});          
 			});
+		});
+
+		describe("DB with linked entity:", function() {
+			/* XXX Need double checking behaviour
+			 * Having entity 1 and entity 2 linked together
+			 * Deleting entity 1
+			 * Removes entity 1
+			 * and does not remove entity 2
+			 */
+			it("Starting new db state", function(done) {
+				sendCmd("FLUSH").then(function(data) {
+					done(); 
+				});    
+			});
+			it("'Entity 1 contains no data", function(done) {
+				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+					expect((data.result.data).length).toBe(0);
+					done();
+				});          
+			});    
+			it("'Entity 2 contains no data", function(done) {
+				sendCmd("SELECT $a WHERE { $a <forename> \"Smith\" }").then(function(data) {
+					expect((data.result.data).length).toBe(0);
+					done();
+				});          
+			});    
+			it("Having entity 1 and entity 2", function(done) {
+				sendCmd("INSERT DATA { entity:1 <forename> \"Fred\" }") .then(function(data) { done(); });    
+				sendCmd("INSERT DATA { entity:2 <surname> \"Smith\" }") .then(function(data) { done(); });       
+			});    
+			it("and entity 1 and entity 2 linked together", function(done) {
+				sendCmd("LINK entity:1 entity:2").then(function(data) {
+					expect(data).toEqual(jasmine.objectContaining({
+						status:true,
+						errorCode: 0
+					}));
+					done();
+				});     
+			});
+			it("Deleting entity 1", function(done) {
+				sendCmd("DELETE DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
+					expect(data).toEqual(jasmine.objectContaining({
+						status:true,
+						errorCode: 0
+					}));
+				done();
+				});
+			});
+			xit("'Removes entity 1 from db", function(done) {
+				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+					console.log(data);
+					expect((data.result.data).length).toBe(0);
+					done();
+				});          
+			});    
+			xit("And does not remove entity 2 from db", function(done) {
+				sendCmd("SELECT $a WHERE { $a <forename> \"Smith\" }").then(function(data) {
+					console.log(data);
+					expect((data.result.data).length).toBe(0);
+					done();
+				});          
+			});    
+
 		});
 	});
 });
