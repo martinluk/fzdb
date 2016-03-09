@@ -36,6 +36,7 @@ QueryResult BGP::executeConst() const
 
 			rapidjson::Value val2;
 			val2.SetObject();
+			bool hasValues = false;
 
 			for (auto iter2 = _query.selectLine.cbegin(); iter2 != _query.selectLine.cend(); iter2++) {
 				auto i = variables.indexOf(*iter2);
@@ -50,9 +51,9 @@ QueryResult BGP::executeConst() const
 				rapidjson::Value varName;
 				varName.SetString((*iter2).c_str(), result.allocator());
 				val2.AddMember(varName, val3, result.allocator());
+				hasValues = true;
 			}
-
-			val.PushBack(val2, result.allocator());
+			if(hasValues)val.PushBack(val2, result.allocator());
 		}
 //		rapidjson::Value varName;
 //		varName.SetString("result", result.allocator());

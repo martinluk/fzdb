@@ -165,6 +165,20 @@ public:
 		}
 	}
 
+	void addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
+		bool found = false;
+		for (int i = 0; i < _values.size(); i++) {
+			for (int j = 0; j < _values[i].size(); j++) {
+				if (_values[i][j].metaRef() == metaRef) {
+					_values[i][position] = val;
+					found = true;
+					break;
+				}
+			}
+			if (found)break;
+		}
+	}
+
 	//this doesn't seem to work
 	void trimEmptyRows() {
 		_values.erase(std::remove_if(_values.begin(), _values.end(), [](std::vector<VariableSetValue> row) {

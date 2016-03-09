@@ -18,6 +18,9 @@
 
 void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::string command) {
 
+	command.erase(std::remove(command.begin(), command.end(), '\n'), command.end());
+	command.erase(std::remove(command.begin(), command.end(), '\r'), command.end());
+
 	auto tokens = FSparqlParser::Tokenize(command);
 
 	try {
