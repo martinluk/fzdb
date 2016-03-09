@@ -4,6 +4,7 @@
 #include <map>
 #include <functional>
 #include <algorithm> 
+#include <set>
 
 #include <boost/bimap.hpp>
 
@@ -84,6 +85,8 @@ private:
 	std::map<unsigned int, model::types::Base::Subtype> _propertyTypes;
 	
 	bool handleSpecialInsertOperations(Entity* entity, const model::Triple &triple);
+	static void enforceTypeHasBeenSet(const Entity* entity);
+	static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);
     
     void insertEntity(std::shared_ptr<Entity> ent);
 

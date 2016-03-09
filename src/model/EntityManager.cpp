@@ -184,6 +184,8 @@ bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::T
 	    return true;
     }
     
+    enforceTypeHasBeenSet(entity);
+    
     // If we're setting a superset or subset, we need to make sure the target (value) exists.
     // The object will have been created earlier.
     if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
@@ -208,10 +210,30 @@ bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::T
     return false;
 }
 
+void EntityManager::enforceTypeHasBeenSet(const Entity *entity)
+{
+    if ( entity->getType() == ENTITY_TYPE_GENERIC )
+	throw std::runtime_error("Attempted operation on entity " + std::to_string(entity->getHandle())
+                                 + " before assigning it a type!");
+}
+
+void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
+{
+    for ( const Entity* e : ents )
+    {
+	if ( e->getType() == ENTITY_TYPE_GENERIC )
+	    throw std::runtime_error("Entity " + std::to_string(e->getHandle())
+				     + " was not assigned a type!");
+    }
+}
+
 //Inserts new data into the data store
 void EntityManager::Insert(std::vector<model::Triple> triples) {
 	auto iter = triples.cbegin();
 	auto end = triples.cend();
+	
+	std::set<const Entity*> modifiedEntities;
+	
 	for (; iter != end; iter++) {
 		auto triple = *iter;
 
@@ -224,10 +246,13 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 		}
 
 		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
+		modifiedEntities.insert(currentEntity.get());
 		
 		// If we performed any special operations, skip to the next triple.
 		if ( handleSpecialInsertOperations(currentEntity.get(), triple) )
 		    continue;
+		
+		enforceTypeHasBeenSet(currentEntity.get());
 		
 		unsigned int propertyId;
 
@@ -246,6 +271,9 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 			break;
 		}
 	}
+	
+	// Ensure all the entities we processed have a type.
+	enforceTypeHasBeenSet(modifiedEntities);
 }
 
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)

@@ -29,14 +29,14 @@ namespace util
 		std::string toUppercase(const std::string &str)
 		{
 			std::string uppercase(str.c_str());
-			std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c, std::locale("en_US.utf8")); });
+			std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
 			return uppercase;
 		}
 
 		std::string toLowercase(const std::string &str)
 		{
 			std::string lowercase(str.c_str());
-			std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), [](unsigned char c) { return std::tolower(c, std::locale("en_US.utf8")); });
+			std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), [](unsigned char c) { return std::tolower(c); });
 			return lowercase;
 		}
 
