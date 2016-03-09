@@ -37,7 +37,7 @@ public:
 
 	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
-	void Insert(const TriplesBlock&& triples);
+	void Insert(TriplesBlock&& triples);
 
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();

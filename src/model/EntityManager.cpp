@@ -110,53 +110,88 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 }
 
 //Inserts new data into the data store
-void EntityManager::Insert(const TriplesBlock&& block) {
+void EntityManager::Insert(TriplesBlock&& block) {
+
+	//sort by entropy
+	block.Sort();
+
 	auto iter = block.triples.cbegin();
 	auto end = block.triples.cend();
-	VariableSet variableSet;
+	VariableSet variableSet(block.metaVariables);
 
 	for (; iter != end; iter++) {
 		auto triple = *iter;
-		
-		// If we are setting an entity type, do so here.
-		if ( triple.predicate.value == ReservedProperties::TYPE )
-		{
-			changeEntityType(std::stoll(triple.subject.value), triple.object.value);
-			continue;
-		}
-
-		auto entity_id = std::stoll(triple.subject.value);
-
-		//create the entity if it doesn't exist
-		if (_entities.find(entity_id) == _entities.end())
-		{	
-			_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
-		}
-
-		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
-		unsigned int propertyId;
 
 		unsigned char confidence = triple.object.hasCertainty ? triple.object.certainty : 100;
 		std::shared_ptr<model::types::Base> newRecord;
 		model::types::SubType newRecordType;
 
 		switch (triple.object.type) {
-			case model::Object::Type::STRING:
-				newRecordType = model::types::SubType::TypeString;
-				newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
-				break;
-			case model::Object::Type::ENTITYREF:
-				newRecordType = model::types::SubType::TypeEntityRef;
-				newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
-				break;
-			case model::Object::Type::INT:
-				newRecordType = model::types::SubType::TypeInt32;
-				newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
-				break;
+		case model::Object::Type::STRING:
+			newRecordType = model::types::SubType::TypeString;
+			newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			break;
+		case model::Object::Type::ENTITYREF:
+			newRecordType = model::types::SubType::TypeEntityRef;
+			newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			break;
+		case model::Object::Type::INT:
+			newRecordType = model::types::SubType::TypeInt32;
+			newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			break;
 		}
 
-		propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
-		currentEntity->insertProperty(propertyId, newRecord);
+		unsigned int propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
+		
+		switch (triple.subject.type) {
+
+			case model::Subject::Type::ENTITYREF: {
+
+				// If we are setting an entity type, do so here.
+				if (triple.predicate.value == ReservedProperties::TYPE)
+				{
+					changeEntityType(std::stoll(triple.subject.value), triple.object.value);
+					continue;
+				}
+
+				auto entity_id = std::stoll(triple.subject.value);
+
+				//create the entity if it doesn't exist
+				if (_entities.find(entity_id) == _entities.end())
+				{
+					_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
+				}
+
+				std::shared_ptr<Entity> currentEntity = _entities[entity_id];
+
+				//note that the OrderingId attribute of a record is assigned as part of insertion
+				currentEntity->insertProperty(propertyId, newRecord);
+				if (triple.meta_variable != "") {
+					variableSet.add(std::move(triple.meta_variable),
+						VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
+						model::types::SubType::ValueReference);
+				}
+				break;
+			} // END: case model::Subject::Type::ENTITYREF
+
+			case model::Subject::Type::VARIABLE: {
+				if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end()) {
+					throw std::runtime_error("Only meta-variables are allowed in INSERT statements at this time");
+				}
+
+				auto values = variableSet.getData(triple.subject.value);
+
+				for (auto val : values) {
+					std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
+					auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+					record->insertProperty(propertyId, newRecord);
+				}
+				break;
+			}
+		
+		}
+
+		
 	}
 }
 
