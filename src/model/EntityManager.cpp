@@ -175,19 +175,45 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 	return result;
 }
 
+bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::Triple &triple)
+{
+    // If we're setting the type
+    if ( triple.predicate.value == ReservedProperties::TYPE )
+    {
+	    changeEntityType(std::stoll(triple.subject.value), triple.object.value);
+	    return true;
+    }
+    
+    // If we're setting a superset or subset, we need to make sure the target (value) exists.
+    // The object will have been created earlier.
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
+    {
+	long long target = std::stoll(triple.object.value);
+	if ( _entities.find(target) == _entities.end() )
+	    throw std::runtime_error("'supersetOf' target with ID " + triple.object.value + " does not exist");
+	
+	createHierarchy(entity->getHandle(), target);
+	return true;
+    }
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF )
+    {
+	long long target = std::stoll(triple.subject.value);
+	if ( _entities.find(target) == _entities.end() )
+	    throw std::runtime_error("'subsetOf' target with ID " + triple.subject.value + " does not exist");
+	
+	createHierarchy(target, entity->getHandle());
+	return true;
+    }
+    
+    return false;
+}
+
 //Inserts new data into the data store
 void EntityManager::Insert(std::vector<model::Triple> triples) {
 	auto iter = triples.cbegin();
 	auto end = triples.cend();
 	for (; iter != end; iter++) {
 		auto triple = *iter;
-		
-		// If we are setting an entity type, do so here.
-		if ( triple.predicate.value == ReservedProperties::TYPE )
-		{
-			changeEntityType(std::stoll(triple.subject.value), triple.object.value);
-			continue;
-		}
 
 		auto entity_id = std::stoll(triple.subject.value);
 
@@ -198,6 +224,11 @@ void EntityManager::Insert(std::vector<model::Triple> triples) {
 		}
 
 		std::shared_ptr<Entity> currentEntity = _entities[entity_id];
+		
+		// If we performed any special operations, skip to the next triple.
+		if ( handleSpecialInsertOperations(currentEntity.get(), triple) )
+		    continue;
+		
 		unsigned int propertyId;
 
 		switch (triple.object.type) {
@@ -526,8 +557,8 @@ void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_
     EntPtr pSuper = _entities[superset];
     EntPtr pSub = _entities[subset];
     
-    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET, Base::Subtype::TypeEntityRef, true);
-    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET, Base::Subtype::TypeEntityRef, true);
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, Base::Subtype::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, Base::Subtype::TypeEntityRef, true);
     
     // The superset entity holds the subset property pointing to the subset entity, and vice versa.
     
@@ -570,8 +601,8 @@ void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_
     EntPtr pSuper = _entities[superset];
     EntPtr pSub = _entities[subset];
     
-    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET, Base::Subtype::TypeEntityRef, true);
-    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET, Base::Subtype::TypeEntityRef, true);
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, Base::Subtype::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, Base::Subtype::TypeEntityRef, true);
     
     // Remove the entity references from the properties if they exist.
     if ( pSuper->hasProperty(subProperty) )

@@ -70,8 +70,8 @@ public:
 namespace ReservedProperties
 {
 	static const std::string TYPE("type");
-	static const std::string ORDER_SUPERSET("supersetOf");
-	static const std::string ORDER_SUBSET("subsetOf");
+	static const std::string ORDER_SUPERSET_OF("supersetOf");
+	static const std::string ORDER_SUBSET_OF("subsetOf");
 }
 
 //TODO: this whole file could do with tidying up
