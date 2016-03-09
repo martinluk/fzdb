@@ -42,7 +42,7 @@ public:
 	std::shared_ptr<EntityProperty<T>> getProperty(const unsigned int &key) const {
 		auto it = _propertyTable.find(key);
 		if (it == _propertyTable.cend()) {
-			return std::shared_ptr<EntityProperty<T>>();;
+			return std::shared_ptr<EntityProperty<T>>();
 		}
 
 		// TODO: Add error messages

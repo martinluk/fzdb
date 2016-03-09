@@ -32,6 +32,18 @@ namespace model {
 				initMemberSerialiser();
 			}
 			
+			virtual bool equalsIgnoreConfidence(const Base *other) const
+			{
+			    const String* s = dynamic_cast<const String*>(other);
+			    assert(s);
+			    
+			    // If the subtypes are not the same then the base implementation
+			    // will return false and the statement will short-circuit, meaning
+			    // we should avoid dereferencing the pointer if it's null!
+			    return Base::equalsIgnoreConfidence(other)
+			            && _value == s->_value;
+			}
+			
 			virtual ~String() {}
 
 			std::string value() const { return _value; }

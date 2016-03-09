@@ -498,7 +498,7 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
 	//check we are merging entities of the same type
 	if (keepEntity->getType() != loseEntity->getType()) {
-		throw new std::runtime_error("Attempted to merge entities of different types");
+		throw std::runtime_error("Attempted to merge entities of different types");
 	}
 
 	//copy the properties of loseEntity to keepEntity
@@ -511,6 +511,81 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 }
 
 #pragma endregion linkingandmerging
+
+void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset)
+{
+    using namespace model::types;
+    typedef std::shared_ptr<EntityRef> EntRefPtr;
+    typedef EntityProperty<EntityRef> EntRefProperty;
+    typedef std::shared_ptr<EntRefProperty> EntRefPropertyPtr;
+    typedef std::shared_ptr<Entity> EntPtr;
+    
+    // Assuming entity handles are valid - do we need to check?
+    
+    // This is like what the Victorians called fog in London.
+    EntPtr pSuper = _entities[superset];
+    EntPtr pSub = _entities[subset];
+    
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET, Base::Subtype::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET, Base::Subtype::TypeEntityRef, true);
+    
+    // The superset entity holds the subset property pointing to the subset entity, and vice versa.
+    
+    auto propNotPresent = [] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
+    {
+	std::vector<EntRefPtr> vals;
+	vals.push_back(EntRefPtr(new EntityRef(h)));
+	EntRefPropertyPtr p(new EntRefProperty(prop, vals));
+	e->insertProperty(p);
+    };
+    
+    auto propPresent = [] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
+    {
+	EntRefPropertyPtr p = e->getProperty<EntityRef>(prop);
+	p->append(EntRefPtr(new EntityRef(h)));
+    };
+    
+    if ( !pSuper->hasProperty(subProperty) )
+	propNotPresent(pSuper, subset, subProperty);
+    else
+	propPresent(pSuper, subset, subProperty);
+    
+    if ( !pSub->hasProperty(superProperty) )
+	propNotPresent(pSub, superset, superProperty);
+    else
+	propPresent(pSub, superset, superProperty);
+}
+
+void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset)
+{
+    using namespace model::types;
+    typedef std::shared_ptr<EntityRef> EntRefPtr;
+    typedef EntityProperty<EntityRef> EntRefProperty;
+    typedef std::shared_ptr<EntRefProperty> EntRefPropertyPtr;
+    typedef std::shared_ptr<Entity> EntPtr;
+    
+    // Assuming entity handles are valid - do we need to check?
+    
+    // This is like what the Victorians called fog in London.
+    EntPtr pSuper = _entities[superset];
+    EntPtr pSub = _entities[subset];
+    
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET, Base::Subtype::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET, Base::Subtype::TypeEntityRef, true);
+    
+    // Remove the entity references from the properties if they exist.
+    if ( pSuper->hasProperty(subProperty) )
+    {
+	EntRefPropertyPtr p = pSuper->getProperty<EntityRef>(subProperty);
+	p->remove(EntityRef(subset));
+    }
+    
+    if ( pSub->hasProperty(superProperty) )
+    {
+	EntRefPropertyPtr p = pSub->getProperty<EntityRef>(superProperty);
+	p->remove(EntityRef(superset));
+    }
+}
 
 #pragma region scan_functions
 

@@ -56,6 +56,9 @@ public:
 	void linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2);
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+	
+	void createHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset);
+	void removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset);
 
 	//move to private
 	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;

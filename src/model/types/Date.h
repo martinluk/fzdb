@@ -11,16 +11,14 @@ namespace model
 		{
 			friend class TypeSerialiser;
 			typedef unsigned long Date_t;
-			
-			Date_t _value;
-			MemberSerialiser _memberSerialiser;
-
-			void initMemberSerialiser()
-			{
-				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
-			}
-
 		public:
+			enum class Ordering
+			{
+			    Before = -1,
+			    EqualTo = 0,
+			    After = 1
+			};
+			
 			class StructuredDate
 			{
 			public:
@@ -62,21 +60,33 @@ namespace model
 				return StructuredDate(y, mm, dd);
 			}
 			
-			Date() : _value(0), Base(100, std::string())
+			Date() : Base(100, std::string()), _value(0), _order(Ordering::EqualTo)
 			{
 				initMemberSerialiser();
 			}
 			
-			Date(Date_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(value)
+			Date(Date_t value, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(value), _order(order)
 			{
 				initMemberSerialiser();
 			}
 			
-			Date(const StructuredDate &sd, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(encode(sd))
+			Date(const StructuredDate &sd, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, comment), _value(encode(sd)), _order(order)
 			{
 				initMemberSerialiser();
+			}
+			
+			virtual bool equalsIgnoreConfidence(const Base *other) const
+			{
+			    const Date* d = dynamic_cast<const Date*>(other);
+			    assert(d);
+			    
+			    // If the subtypes are not the same then the base implementation
+			    // will return false and the statement will short-circuit, meaning
+			    // we should avoid dereferencing the pointer if it's null!
+			    return Base::equalsIgnoreConfidence(other)
+			            && _value == d->_value && _order == d->_order;
 			}
 
 			Date_t rawValue() const
@@ -87,6 +97,11 @@ namespace model
 			StructuredDate date() const
 			{
 				return decode(_value);
+			}
+			
+			Ordering ordering() const
+			{
+			    return _order;
 			}
 			
 			virtual ~Date() {}
@@ -118,6 +133,16 @@ namespace model
 				initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 			}
+
+	    Date_t _value;
+	    Ordering _order;
+	    MemberSerialiser _memberSerialiser;
+
+	    void initMemberSerialiser()
+	    {
+		    _memberSerialiser.addPrimitive(&_value, sizeof(_value));
+		    _memberSerialiser.addPrimitive(&_order, sizeof(_order));
+	    }
 		};
 	}
 }

@@ -101,6 +101,13 @@ void EntityProperty<T>::append(std::shared_ptr<T> value)
 	_valuesList.sort(model::types::ConfidenceCompare<T>());
 }
 
+template<typename T>
+void EntityProperty<T>::remove(const T &value)
+{
+    _valuesList.remove_if(model::types::EqualsIgnoreConfidence<T>(&value));
+    _count = std::distance(_valuesList.cbegin(), _valuesList.cend());
+}
+
 template <typename T>
 void EntityProperty<T>::append(const std::vector<std::shared_ptr<T>> &list)
 {

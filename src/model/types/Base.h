@@ -86,6 +86,11 @@ namespace model {
 			virtual bool Equals(const std::string &val) const {
 				return false;
 			}
+			
+			virtual bool equalsIgnoreConfidence(const Base *other) const
+			{
+			    return subtype() == other->subtype();
+			}
 
 			// TODO: Shouldn't this be virtual?
 			bool Equals(const model::Object &object) {
@@ -152,6 +157,21 @@ namespace model {
 			{
 				return a->confidence() > b->confidence();
 			}
+		};
+		
+		template<typename T>
+		class EqualsIgnoreConfidence
+		{
+		    const T* _ptr;
+		public:
+		    explicit EqualsIgnoreConfidence(const T* ptr) : _ptr(ptr)
+		    {
+		    }
+		    
+		    bool operator () (const std::shared_ptr<T> &a) const
+		    {
+			return a->equalsIgnoreConfidence(_ptr);
+		    }
 		};
 	}
 }

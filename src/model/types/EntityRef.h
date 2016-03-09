@@ -38,6 +38,18 @@ namespace model {
 				// Already initialised
 			}
 			
+			virtual bool equalsIgnoreConfidence(const Base *other) const
+			{
+			    const EntityRef* r = dynamic_cast<const EntityRef*>(other);
+			    assert(r);
+			    
+			    // If the subtypes are not the same then the base implementation
+			    // will return false and the statement will short-circuit, meaning
+			    // we should avoid dereferencing the pointer if it's null!
+			    return Base::equalsIgnoreConfidence(other)
+			            && _value == r->_value;
+			}
+			
 			virtual ~EntityRef() {}
 
 			EHandle_t value() const { return _value; }

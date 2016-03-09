@@ -55,7 +55,7 @@ public:
 	EntityProperty(const unsigned int &key);
 	~EntityProperty();
 	EntityProperty(const unsigned int &key,
-		const std::vector<std::shared_ptr<T>> &values);
+		const std::vector<std::shared_ptr<T> > &values);
 
 	// Returns true if this is a null property (ie. default-constructed).
 	// Internally, a property is null if its key is an empty string.
@@ -99,6 +99,10 @@ public:
 
 	// Clears this property of any values.
 	void clear();
+	
+	// Removes any entries whose value matches.
+	// This ignores the confidence of the value.
+	void remove(const T &value);
 
 	virtual std::string logString() const override;
 
