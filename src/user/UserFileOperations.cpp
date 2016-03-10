@@ -17,6 +17,7 @@
 #include <cassert>
 
 #define JSONFILENAME "userFile.json"
+#define ADD_ADMIN_ON_INIT true
 
 #define USERNAME "username"
 #define HASH "passwordHash"
@@ -25,25 +26,20 @@
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
-// JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
-// really need them all the time and can't call them from const functions anyway.
-
-UserFileOperations::UserFileOperations(){
-	//Empty file cache
-	_userFileCache.clear();
-#ifdef INIT_ADD_ADMIN
-	//Add admin into cache
-	UserAttributes admin;
-	admin.userName = ADMIN_USERNAME;
-	admin.salt = Hashing::genSalt();
-	admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-	admin.userGroup = Permission::UserGroup::ADMIN;
-	addUser(admin);
-#else
-	//Load from json
-	//TODO Verify if file exists
-	loadCacheFromFile();
-#endif
+UserFileOperations::UserFileOperations()
+{
+	if (ADD_ADMIN_ON_INIT) {
+		//Add admin into cache
+		UserAttributes admin;
+		admin.userName = ADMIN_USERNAME;
+		admin.salt = Hashing::genSalt();
+		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
+		admin.userGroup = Permission::UserGroup::ADMIN;
+		addUser(admin);
+	} else { 
+		//Load from json
+		loadCacheFromFile();
+	}
 }
 
 std::string UserFileOperations::pathToLoginFile() {
@@ -69,8 +65,6 @@ void UserFileOperations::addUser(const UserAttributes &userAttributes)
 }
 
 void UserFileOperations::removeUser(const std::string &userName) {
-	//load cache from file
-	//loadCacheFromFile();
 	
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
@@ -106,7 +100,6 @@ UserAttributes UserFileOperations::getUserAttributes(const std::string &userName
 void UserFileOperations::loadCacheFromFile()
 {
 	using namespace rapidjson;
-	
 	//XXX Window system should use rb?
 	// TODO: Exception checks on file opening!
 	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
@@ -133,7 +126,7 @@ void UserFileOperations::loadCacheFromFile()
 		assert(userObject.IsObject());
 		using namespace std;
 		//'FindMember' checks existence of member and obtain member at once
-		//TODO Use pre-compiler for json names
+		//Use pre-compiler for json names
 		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
 		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
 		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);

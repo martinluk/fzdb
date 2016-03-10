@@ -42,6 +42,7 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
 
 void UserOperation::addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup)
 {
+	assert(!userName.empty());
 	UserAttributes a;
 	a.userName=userName;
 	a.salt=Hashing::genSalt();
@@ -53,6 +54,7 @@ void UserOperation::addUser(const std::string &userName, const std::string &pass
 
 void UserOperation::changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup)
 {
+	assert(newUserGroup!=Permission::UserGroup::GUEST);
 	UserAttributes a = getUserAttributes(userName);
 	a.userGroup = newUserGroup;
     updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist

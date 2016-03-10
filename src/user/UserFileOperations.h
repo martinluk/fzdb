@@ -6,12 +6,10 @@
 #include "UserExceptions.h"
 #include "UserAttributes.h"
 
+#include "rapidjson/document.h"
+
 class UserFileOperations {
 	public: 
-		/*
-		 * Either load from file, 
-		 * Or (under debugging mode) add admin into cache and then save to file
-		 */
 		UserFileOperations();
 		
 	protected: 
