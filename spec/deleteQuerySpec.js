@@ -60,7 +60,7 @@ describe("fzdb", function() {
 			});
 		});
 
-		describe("DB with linked entity:", function() {
+		describe("DB with linked entities:", function() {
 			/* XXX Need double checking behaviour
 			 * Having entity 1 and entity 2 linked together
 			 * Deleting entity 1
@@ -120,6 +120,58 @@ describe("fzdb", function() {
 					done();
 				});          
 			});    
+			it("Final clean up", function(done) {
+				sendCmd("FLUSH").then(function(data) { done(); });    
+			});
+
+		});
+		describe("Entities with properties:", function() {
+			/* XXX Need double checking behaviour
+			 * Add with two properties
+			 * Delete one of the property
+			 * Left with undeleted property
+			 * Delete remaining property
+			 * No property left
+			 */
+			it("Starting new db state", function(done) {
+				sendCmd("FLUSH").then(function(data) { done(); });    
+			});
+
+			it("setting entity:2's forename to 'Ned' and surname to 'Flanders'", function(done) {
+				client.write("INSERT DATA { entity:2 <forename> \"Ned\"; <surname> \"Flanders\" }");
+					client.once('data', function(data) {
+					done();
+				});      
+			});
+
+			//TODO 
+			
+			it("Final clean up", function(done) {
+				sendCmd("FLUSH").then(function(data) { done(); });    
+			});
+
+		});
+		xdescribe("Delete all using ?x ?y ?z:", function() {
+			/* XXX Need double checking behaviour
+			 * Add some entities
+			 * Delete $x $y $z
+			 * Nothing left.
+			 */
+			it("Starting new db state", function(done) {
+				sendCmd("FLUSH").then(function(data) { done(); });    
+			});
+			it("Adding some entities", function(done) {
+				done(); //TODO
+			});
+			it("Delete $x $y $z", function(done) {
+				done(); //TODO
+			});
+			it("Assert there is nothing left", function(done) {
+				done(); //TODO
+			});
+			it("Final clean up", function(done) {
+				sendCmd("FLUSH").then(function(data) { done(); });    
+			});
 
 		});
 	});
