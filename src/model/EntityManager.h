@@ -91,34 +91,27 @@ private:
     void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
-	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type, bool addIfMissing) {
-		auto iter = _propertyNames.left.find(str);
-		if (iter == _propertyNames.left.end()) {
-			if (addIfMissing) {
+	unsigned int getPropertyName(const std::string &str, model::types::Base::Subtype type, bool addIfMissing) {
+		if ( addIfMissing && _propertyNames.left.find(str) == _propertyNames.left.end() )
+		{
 				_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
 				_propertyTypes[_lastProperty] = type;
-				return _lastProperty;
-			}
-			else {
-				return 0;
-			}
 		}
 
-		if (_propertyTypes[iter->second] != type) {
-			throw MismatchedTypeException("mismatched types!");
-		}
-
-		return iter->second;
+		return getPropertyName(str, type);
 	}
 
-	unsigned int getPropertyName(std::string str, model::types::Base::Subtype type) const {
+	unsigned int getPropertyName(const std::string &str, model::types::Base::Subtype type) const
+	{
 		auto iter = _propertyNames.left.find(str);
-		if (iter == _propertyNames.left.end()) {			
-		 return 0;
+		if (iter == _propertyNames.left.end()) {
+				return 0;
 		}
 
 		if (_propertyTypes.at(iter->second) != type) {
-			throw MismatchedTypeException("mismatched types!");
+			throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
+				+ "'. Specified type should be '" + model::types::Base::SubtypeString(type) + "' but got '"
+				+ model::types::Base::SubtypeString(_propertyTypes.at(iter->second)) + "'.").c_str());
 		}
 
 		return iter->second;

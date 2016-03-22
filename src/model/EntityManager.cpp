@@ -722,7 +722,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 					if (currentEntityIter != _entities.end()) {
 						currentEntity = _entities.at(entityHandle);
 					} else {
-						throw new std::runtime_error("Attempted to lookup a non-existent entity");
+						throw new std::runtime_error("Attempted to look up a non-existent entity");
 					}					
 					return !currentEntity->hasProperty(propertyId);
 			}), variableSet.getData()->end());
@@ -736,7 +736,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 					currentEntity = _entities.at(entityHandle);
 				}
 				else {
-					throw new std::runtime_error("Attempted to lookup a non-existent entity");
+					throw new std::runtime_error("Attempted to look up a non-existent entity");
 				}
 				(*iter)[varIndex2] = currentEntity->getProperty(propertyId)->baseValue(0)->Clone();
 			}
