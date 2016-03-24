@@ -85,34 +85,6 @@ namespace model {
 			}
 
 		public:
-			
-            // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
-            // Until then, we use an ugly workaround.
-            //static const char* SubtypeString[];
-			
-            static const char* SubtypeString(SubType type)
-            {
-                switch (type)
-                {
-                case SubType::TypeInt32:
-                    return "Int32";
-                    
-                case SubType::TypeString:
-                    return "String";
-                    
-                case SubType::TypeEntityRef:
-                    return "EntityRef";
-                    
-                case SubType::PropertyReference:
-                    return "PropertyReference";
-
-				case SubType::TypeDate:
-					return "Date";
-                    
-                default:
-                    return "Undefined";
-                }
-            }
 
 			Base(unsigned char confidence, unsigned int author, const std::string &cmnt) :
 				_comment(cmnt),
@@ -120,9 +92,9 @@ namespace model {
 				_timeCreated(boost::posix_time::second_clock::universal_time()),
 				_sourceEntityId(0),
 				_originalAuthorId(author),
-				_cYearCreated(0),
-				_cMonthCreated(0),
-				_cDayCreated(0),
+				_cYearCreated(1400),
+				_cMonthCreated(1),
+				_cDayCreated(1),
 				_cHourCreated(0),
 				_cMinCreated(0),
 				_cSecCreated(0),

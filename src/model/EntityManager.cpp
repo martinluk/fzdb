@@ -633,7 +633,9 @@ void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_
 void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 	
 	//get the property id
-	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeString);
+	// Jonathan: Changed this to pass an undefined type, which skips type checking.
+	// We don't know what the type is in advance!
+	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
 	//the variable has been used before, we only need to iterate over valid values from before
 	if (variableSet.used(variableName)) {
@@ -884,7 +886,9 @@ std::vector<unsigned int> EntityManager::Scan5(VariableSet&& variableSet, const 
 	std::vector<unsigned int> rowsAdded;
 
 	//get the property id
-	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeString);
+	// Jonathat: Passing TypeUndefined to ckip type checking, since we don't know
+	// what the type is yet.
+	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
 	if (EntityExists(entityRef)) {
 		auto entity = _entities.at(entityRef);

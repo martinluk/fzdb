@@ -104,6 +104,7 @@ private:
 		return getPropertyName(str, type);
 	}
 
+	// Pass TypeUndefined to skip type checking.
 	unsigned int getPropertyName(const std::string &str, model::types::SubType type) const
 	{
 		auto iter = _propertyNames.left.find(str);
@@ -111,10 +112,11 @@ private:
 				return 0;
 		}
 
-		if (_propertyTypes.at(iter->second) != type) {
+		model::types::SubType retrievedType = _propertyTypes.at(iter->second);
+		if (type != model::types::SubType::TypeUndefined && retrievedType != type) {
 			throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
-				+ "'. Specified type should be '" + model::types::Base::SubtypeString(type) + "' but got '"
-				+ model::types::Base::SubtypeString(_propertyTypes.at(iter->second)) + "'.").c_str());
+				+ "'. Requested type '" + model::types::getSubTypeString(type) + "' but got '"
+				+ model::types::getSubTypeString(retrievedType) + "'.").c_str());
 		}
 
 		return iter->second;

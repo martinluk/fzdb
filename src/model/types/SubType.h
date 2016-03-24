@@ -14,8 +14,29 @@ namespace model {
 
 			//Used in query processing but cannot be stored
 			PropertyReference,
-			ValueReference
+			ValueReference,
+
+			SUBTYPE_COUNT
 		};
+
+		static const char* SubTypeString[] =
+		{
+			"TypeUndefined",
+			"TypeInt32",
+			"TypeString",
+			"TypeEntityRef",
+			"TypeDate",
+
+			"PropertyReference",
+			"ValueReference"
+		};
+
+		static const char* getSubTypeString(SubType t)
+		{
+			return ( t < SubType::TypeUndefined || t >= SubType::SUBTYPE_COUNT )
+				? SubTypeString[(int)SubType::TypeUndefined]
+				: SubTypeString[(int)t];
+		}
 
 		class Base;
 	}
