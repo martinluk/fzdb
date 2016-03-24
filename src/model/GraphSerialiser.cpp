@@ -111,20 +111,37 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
     return totalSerialised;
 }
 
-void GraphSerialiser::unserialise(const char *serialisedData)
+void GraphSerialiser::unserialise(const char *serialisedData, std::size_t length)
 {
 	const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
-
-	StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
-	typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset);
-    
-	const EntityDataHeader* pEntData = reinterpret_cast<const EntityDataHeader*>(serialisedData + pHeader->entityDataOffset);
-	const EntityHeader* pEntHeaders = reinterpret_cast<const EntityHeader*>(pEntData + 1);
-	for ( int i = 0; i < pEntData->entityCount; i++ )
+	_manager->clearAll();
+	
+	try
 	{
-		const EntityHeader* pEntHeader = &(pEntHeaders[i]);
-		const char* data = reinterpret_cast<const char*>(pEntData) + pEntHeader->offset;
-        
-		_manager->insertEntity(EntitySerialiser::unserialise(data));
+	    StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
+	    typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset, pHeader->typeMapLength);
+	
+	    const EntityDataHeader* pEntData = reinterpret_cast<const EntityDataHeader*>(serialisedData + pHeader->entityDataOffset);
+	    const EntityHeader* pEntHeaders = reinterpret_cast<const EntityHeader*>(pEntData + 1);
+	    for ( int i = 0; i < pEntData->entityCount; i++ )
+	    {
+		    const EntityHeader* pEntHeader = &(pEntHeaders[i]);
+		    if ( (const char*)pEntHeader - serialisedData >= length )
+			throw InvalidInputGraphException("Header start for entity " + std::to_string(i) + " exceeds length of input data.");
+		    
+		    const char* data = reinterpret_cast<const char*>(pEntData) + pEntHeader->offset;
+		    if ( data - serialisedData >= length )
+			throw InvalidInputGraphException("Data start for entity " + std::to_string(i) + " exceeds length of input data.");
+		    
+		    if ( pEntHeader->offset + pEntHeader->size > length )
+			throw InvalidInputGraphException("Length of entity " + std::to_string(i) + " exceeds length of input data.");
+	    
+            _manager->insertEntity(EntitySerialiser::unserialise(data, pEntHeader->size));
+	    }
+	}
+	catch (const std::exception &ex)
+	{
+	    _manager->clearAll();
+	    throw ex;
 	}
 }

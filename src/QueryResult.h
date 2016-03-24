@@ -18,6 +18,8 @@ public:
 	  FileSystemError,
 	  InsufficientPermissions,
 	  UserDataError,
+
+	  UnhandledError    // Implies something happened while processing that we didn't account for.
   };
   
   static const std::string PROPERTY_STATUS;

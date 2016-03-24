@@ -140,3 +140,9 @@ std::string EntityProperty::logString() const
             + std::to_string(_count)
             + std::string("])");
 }
+
+void EntityProperty::remove(const model::types::Base &value)
+{
+	_valuesList.remove_if(model::types::ValuesEqualOnly(&value));
+	_count = std::distance(_valuesList.cbegin(), _valuesList.cend());
+}

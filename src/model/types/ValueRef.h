@@ -46,6 +46,15 @@ namespace model {
 				return _value == std::stoll(val);
 			}
 
+			virtual bool valuesEqualOnly(const Base* other) const
+			{
+				const ValueRef* r = dynamic_cast<const ValueRef*>(other);
+				assert(r);
+
+				return Base::valuesEqualOnly(other) && _entity == r->_entity &&
+					_property == r->_property && _value == r->_value;
+			}
+
 			virtual std::string toString() const override {
 				return std::to_string(_value);
 			}

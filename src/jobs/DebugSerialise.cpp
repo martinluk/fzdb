@@ -238,7 +238,7 @@ QueryResult DebugSerialise::execute()
         serialiser.clear();
         EntitySerialiser eSer(ent);
         eSer.serialise(serialiser);
-		std::shared_ptr<Entity> newEnt = eSer.unserialise(serialiser.begin());
+        std::shared_ptr<Entity> newEnt = eSer.unserialise(serialiser.begin(), serialiser.size());
         log << "Unserialised entity: " << printEntity(newEnt) << "\nProperties:\n";
 
         const std::map<unsigned int, std::shared_ptr<EntityProperty>> &propTable = newEnt->properties();

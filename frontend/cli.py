@@ -256,14 +256,17 @@ def waitForDataOn(socket, timeout):
 
 	# Check to see whether we received any data. If this happens three times in a row,
 	# assume the database is down and give up.
-	if len(sRead) < 1:
-		numFailedReads += 1
-		if numFailedReads < 3:
-			print("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
+	while (True):
+		if len(sRead) < 1:
+			numFailedReads += 1
+			if numFailedReads < 3:
+				print("TIMEOUT: No response received from attempt %s of 3. Retrying..." % (numFailedReads))
+			else:
+				print("TIMEOUT: No response. Shutting down.")
+				commSocket.close()
+				sys.exit()
 		else:
-			print("TIMEOUT: No response. Shutting down.")
-			commSocket.close()
-			sys.exit()
+			break
 	
 	return sRead[0]
 

@@ -36,6 +36,18 @@ namespace model {
 				// Already initialised
 			}
 			
+			virtual bool valuesEqualOnly(const Base *other) const
+			{
+			    const Int* i = dynamic_cast<const Int*>(other);
+			    assert(i);
+			    
+			    // If the subtypes are not the same then the base implementation
+			    // will return false and the statement will short-circuit, meaning
+			    // we should avoid dereferencing the pointer if it's null!
+			    return Base::valuesEqualOnly(other)
+			            && _value == i->_value;
+			}
+			
 			virtual ~Int() {}
 
 			int32_t value() const { return _value; }
@@ -70,10 +82,10 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
-			Int(const char* &serialisedData) : Base(serialisedData)
+            Int(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
+                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
 			}
 		};
 	}

@@ -41,8 +41,7 @@ public:
 	EntityProperty();
 	EntityProperty(const unsigned int &key);
 	~EntityProperty();
-	EntityProperty(const unsigned int &key,
-		const std::vector<BasePointer> &values);
+	EntityProperty(const unsigned int &key, const std::vector<BasePointer> &values);
 
 	// Returns true if this is a null property (ie. default-constructed).
 	// Internally, a property is null if its key is an empty string.
@@ -83,6 +82,10 @@ public:
 
 	// Clears this property of any values.
 	void clear();
+
+	// Removes any entries whose value matches.
+	// This ignores the confidence of the value.
+	void remove(const model::types::Base &value);
 	
 	virtual std::string logString() const override;
 

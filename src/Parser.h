@@ -70,14 +70,8 @@ public:
 namespace ReservedProperties
 {
 	static const std::string TYPE("type");
-}
-
-// Jonathan - Semantic property strings.
-// These are for properties which have special functions within the database, eg. specifying
-// ordering between entities.
-namespace SemanticProperties
-{
-	static const std::string GREATER_THAN("greaterThan");
+	static const std::string ORDER_SUPERSET_OF("supersetOf");
+	static const std::string ORDER_SUBSET_OF("subsetOf");
 }
 
 //TODO: this whole file could do with tidying up

@@ -1,7 +1,7 @@
 #ifndef FUZZY_JOBQUEUE
 #define FUZZY_JOBQUEUE
 
-#define THREAD_COUNT 2
+#define THREAD_COUNT 1
 
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>

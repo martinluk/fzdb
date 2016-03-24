@@ -39,7 +39,7 @@ QueryResult DebugLoadFile::execute()
         log << "Number of bytes read: " << buffer.size() << "\n";
         
         GraphSerialiser gSer(&manager);
-        gSer.unserialise(buffer.data());
+        gSer.unserialise(buffer.data(), buffer.size());
         
         log << "Data dump from EntityManager:\n\n";
         log << manager.dumpContents();

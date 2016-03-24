@@ -12,7 +12,7 @@
 struct FileHeader
 {
     char identifier[4];     // Identifier - should be "FZDB".
-	unsigned short version;   // File version.
+    unsigned short version;   // File version.
     std::size_t size;       // Size of all serialised data after the file headers.
 };
 
@@ -75,9 +75,9 @@ namespace FileSystem
 				throw std::length_error("File too small to contain valid data");
             }
 
-            // Hopefully reading automatically advances the read point in the file?
-			FileHeader header;
-			Serialiser::zeroBuffer(&header, sizeof(FileHeader));
+	    // Hopefully reading automatically advances the read point in the file?
+        FileHeader header;
+	    Serialiser::zeroBuffer(&header, sizeof(FileHeader));
             file.read(reinterpret_cast<char*>(&header), sizeof(FileHeader));
 
             if ( header.identifier[0] != 'F' ||     // Check identifier.
@@ -88,11 +88,16 @@ namespace FileSystem
             {
                 throw FileFormatError();
             }
+	    
+	    if ( flen - sizeof(FileHeader) != header.size )
+	    {
+		throw std::length_error("Specified internal data size does not equal physical size of file.");
+	    }
 			
-			if ( length < header.size )
-			{
-				throw std::length_error("Buffer provided was too small to store the file data");
-			}
+	    if ( length < header.size )
+	    {
+		throw std::length_error("Buffer provided was too small to store the file data.");
+	    }
             
             file.read(buffer, header.size);
         }

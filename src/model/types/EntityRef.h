@@ -38,6 +38,18 @@ namespace model {
 				// Already initialised
 			}
 			
+			virtual bool valuesEqualOnly(const Base *other) const
+			{
+			    const EntityRef* r = dynamic_cast<const EntityRef*>(other);
+			    assert(r);
+			    
+			    // If the subtypes are not the same then the base implementation
+			    // will return false and the statement will short-circuit, meaning
+			    // we should avoid dereferencing the pointer if it's null!
+			    return Base::valuesEqualOnly(other)
+			            && _value == r->_value;
+			}
+			
 			virtual ~EntityRef() {}
 
 			EHandle_t value() const { return _value; }
@@ -75,13 +87,13 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
 			}
 
-			EntityRef(const char* &serialisedData) : Base(serialisedData)
+            EntityRef(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
 			{
 				//_value = *(reinterpret_cast<const EHandle_t*>(serialisedData));
 				//serialisedData += sizeof(_value);
 				
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData);
+                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
 			}
 		};
 	}

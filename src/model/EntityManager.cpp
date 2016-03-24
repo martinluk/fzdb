@@ -109,15 +109,71 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 	return result;
 }
 
-//Inserts new data into the data store
-void EntityManager::Insert(TriplesBlock&& block) {
+bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::Triple &triple, unsigned int author, const std::string &comment)
+{
+    // If we're setting the type
+    if ( triple.predicate.value == ReservedProperties::TYPE )
+    {
+	    changeEntityType(std::stoll(triple.subject.value), triple.object.value);
+	    return true;
+    }
+    
+    enforceTypeHasBeenSet(entity);
+    
+    // If we're setting a superset or subset, we need to make sure the target (value) exists.
+    // The object will have been created earlier.
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
+    {
+	long long target = std::stoll(triple.object.value);
+	if ( _entities.find(target) == _entities.end() )
+	    throw std::runtime_error("'supersetOf' target with ID " + triple.object.value + " does not exist");
+	
+	createHierarchy(entity->getHandle(), target, author, comment);
+	return true;
+    }
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF )
+    {
+	long long target = std::stoll(triple.subject.value);
+	if ( _entities.find(target) == _entities.end() )
+	    throw std::runtime_error("'subsetOf' target with ID " + triple.subject.value + " does not exist");
+	
+	createHierarchy(target, entity->getHandle(), author, comment);
+	return true;
+    }
+    
+    return false;
+}
 
+void EntityManager::enforceTypeHasBeenSet(const Entity *entity)
+{
+    if ( entity->getType() == ENTITY_TYPE_GENERIC )
+	throw std::runtime_error("Attempted operation on entity " + std::to_string(entity->getHandle())
+                                 + " before assigning it a type!");
+}
+
+void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
+{
+    for ( const Entity* e : ents )
+    {
+	if ( e->getType() == ENTITY_TYPE_GENERIC )
+	    throw std::runtime_error("Entity " + std::to_string(e->getHandle())
+				     + " was not assigned a type!");
+    }
+}
+
+//Inserts new data into the data store
+void EntityManager::Insert(TriplesBlock&& block)
+{
 	//sort by entropy
 	block.Sort();
 
 	auto iter = block.triples.cbegin();
 	auto end = block.triples.cend();
 	VariableSet variableSet(block.metaVariables);
+
+	// Keep track of any entity we've modified.
+	// We use this later to make sure all entities have a type.
+	std::set<const Entity *> modifiedEntities;
 
 	for (; iter != end; iter++) {
 		auto triple = *iter;
@@ -147,13 +203,6 @@ void EntityManager::Insert(TriplesBlock&& block) {
 
 			case model::Subject::Type::ENTITYREF: {
 
-				// If we are setting an entity type, do so here.
-				if (triple.predicate.value == ReservedProperties::TYPE)
-				{
-					changeEntityType(std::stoll(triple.subject.value), triple.object.value);
-					continue;
-				}
-
 				auto entity_id = std::stoll(triple.subject.value);
 
 				//create the entity if it doesn't exist
@@ -163,6 +212,14 @@ void EntityManager::Insert(TriplesBlock&& block) {
 				}
 
 				std::shared_ptr<Entity> currentEntity = _entities[entity_id];
+				modifiedEntities.insert(currentEntity.get());
+
+				// If we performed any special operations, skip to the next.
+				// TODO: We haven't handled the author or comment at all here!
+				if (handleSpecialInsertOperations(currentEntity.get(), triple, 0, std::string()))
+					continue;
+
+				enforceTypeHasBeenSet(currentEntity.get());
 
 				//note that the OrderingId attribute of a record is assigned as part of insertion
 				currentEntity->insertProperty(propertyId, newRecord);
@@ -193,6 +250,9 @@ void EntityManager::Insert(TriplesBlock&& block) {
 
 		
 	}
+	
+	// Ensure all the entities we processed have a type.
+	enforceTypeHasBeenSet(modifiedEntities);
 }
 
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
@@ -341,7 +401,7 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
     clearAll();
     GraphSerialiser gSer(this);
-    gSer.unserialise(buffer);
+    gSer.unserialise(buffer, size);
     delete[] buffer;
 
     return true;
@@ -481,7 +541,7 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
 	//check we are merging entities of the same type
 	if (keepEntity->getType() != loseEntity->getType()) {
-		throw new std::runtime_error("Attempted to merge entities of different types");
+		throw std::runtime_error("Attempted to merge entities of different types");
 	}
 
 	//copy the properties of loseEntity to keepEntity
@@ -494,6 +554,78 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 }
 
 #pragma endregion linkingandmerging
+
+void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset, unsigned int author, const std::string &comment)
+{
+    using namespace model::types;
+    typedef std::shared_ptr<EntityRef> EntRefPtr;
+    typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
+    typedef std::shared_ptr<Entity> EntPtr;
+    
+    // Assuming entity handles are valid - do we need to check?
+    
+    // "This fog is a real pSuper."
+    EntPtr pSuper = _entities[superset];
+    EntPtr pSub = _entities[subset];
+    
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
+    
+    // The superset entity holds the subset property pointing to the subset entity, and vice versa.
+    // Lambdas are wonderful for convenience.
+    auto propNotPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
+    {
+		std::vector<BasePointer> vals;
+		vals.push_back(EntRefPtr(new EntityRef(h, author, 100, comment)));
+		EntPropertyPtr p(new EntityProperty(prop, vals));
+		e->insertProperty(p);
+    };
+    
+    auto propPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
+    {
+		EntPropertyPtr p = e->getProperty(prop);
+		p->append(BasePointer(new EntityRef(h, author, 100, comment)));
+    };
+    
+    if ( !pSuper->hasProperty(subProperty) )
+	propNotPresent(pSuper, subset, subProperty);
+    else
+	propPresent(pSuper, subset, subProperty);
+    
+    if ( !pSub->hasProperty(superProperty) )
+	propNotPresent(pSub, superset, superProperty);
+    else
+	propPresent(pSub, superset, superProperty);
+}
+
+void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset)
+{
+    using namespace model::types;
+    typedef std::shared_ptr<EntityRef> EntRefPtr;
+    typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
+    typedef std::shared_ptr<Entity> EntPtr;
+    
+    // Assuming entity handles are valid - do we need to check?
+    
+    EntPtr pSuper = _entities[superset];
+    EntPtr pSub = _entities[subset];
+    
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
+    
+    // Remove the entity references from the properties if they exist.
+    if ( pSuper->hasProperty(subProperty) )
+    {
+		EntPropertyPtr p = pSuper->getProperty(subProperty);
+		p->remove(EntityRef(subset, 0));
+    }
+    
+    if ( pSub->hasProperty(superProperty) )
+    {
+		EntPropertyPtr p = pSub->getProperty(superProperty);
+		p->remove(EntityRef(superset, 0));
+    }
+}
 
 #pragma region scan_functions
 
@@ -624,10 +756,9 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 					std::shared_ptr<Entity> currentEntity;
 					if (currentEntityIter != _entities.end()) {
 						currentEntity = _entities.at(entityHandle);
-					}
-					else {
-						throw new std::runtime_error("Attempted to lookup a non-existent entity");
-					}
+					} else {
+						throw std::runtime_error("Attempted to look up a non-existent entity");
+					}					
 					return !currentEntity->hasProperty(propertyId);
 				}), variableSet.getData()->end());
 
@@ -640,7 +771,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 						currentEntity = _entities.at(entityHandle);
 					}
 					else {
-						throw new std::runtime_error("Attempted to lookup a non-existent entity");
+						throw std::runtime_error("Attempted to look up a non-existent entity");
 					}
 					(*iter).emplace(iter->begin() + varIndex2, VariableSetValue(currentEntity->getProperty(propertyId)->baseValue(0)->Clone(), 0, 0));
 				}

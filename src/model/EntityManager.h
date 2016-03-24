@@ -4,6 +4,7 @@
 #include <map>
 #include <functional>
 #include <algorithm> 
+#include <set>
 
 #include <boost/bimap.hpp>
 
@@ -58,6 +59,9 @@ public:
 	void linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2);
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+	
+	void createHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset, unsigned int author, const std::string &comment);
+	void removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset);
 
 	//move to private
 	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
@@ -81,38 +85,36 @@ private:
 
 	boost::bimap<std::string, unsigned int> _propertyNames;
 	std::map<unsigned int, model::types::SubType> _propertyTypes;
+	
+	bool handleSpecialInsertOperations(Entity* entity, const model::Triple &triple, unsigned int author, const std::string &comment);
+	static void enforceTypeHasBeenSet(const Entity* entity);
+	static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
 	//TODO: Add more type checking
-	unsigned int getPropertyName(std::string str, model::types::SubType type, bool addIfMissing) {
-		auto iter = _propertyNames.left.find(str);
-		if (iter == _propertyNames.left.end()) {
-			if (addIfMissing) {
+	unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing)
+	{
+		if ( addIfMissing && _propertyNames.left.find(str) == _propertyNames.left.end() )
+		{
 				_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
 				_propertyTypes[_lastProperty] = type;
-				return _lastProperty;
-			}
-			else {
-				return 0;
-			}
 		}
 
-		if (_propertyTypes[iter->second] != type) {
-			throw MismatchedTypeException("mismatched types!");
-		}
-
-		return iter->second;
+		return getPropertyName(str, type);
 	}
 
-	unsigned int getPropertyName(std::string str, model::types::SubType type) const {
+	unsigned int getPropertyName(const std::string &str, model::types::SubType type) const
+	{
 		auto iter = _propertyNames.left.find(str);
-		if (iter == _propertyNames.left.end()) {			
-		 return 0;
+		if (iter == _propertyNames.left.end()) {
+				return 0;
 		}
 
 		if (_propertyTypes.at(iter->second) != type) {
-			throw MismatchedTypeException("mismatched types!");
+			throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
+				+ "'. Specified type should be '" + model::types::Base::SubtypeString(type) + "' but got '"
+				+ model::types::Base::SubtypeString(_propertyTypes.at(iter->second)) + "'.").c_str());
 		}
 
 		return iter->second;
