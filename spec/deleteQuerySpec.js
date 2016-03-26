@@ -85,8 +85,16 @@ describe("fzdb", function() {
 				});          
 			});    
 			it("Having entity 1 and entity 2", function(done) {
-				sendCmd("INSERT DATA { entity:1 <forename> \"Fred\" }") .then(function(data) { done(); });    
+				sendCmd("INSERT DATA { entity:1 <forename> \"Fred\" }") .then(function(data) {done(); });    
 				sendCmd("INSERT DATA { entity:2 <surname> \"Smith\" }") .then(function(data) { done(); });       
+			});    
+			it("'Entity 2 contains data", function(done) {
+				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\"}").then(function(data) {
+					//console.log(data);
+					expect(data.result.data).not.toBe("Inserted 1 triples."); //Should not be the status code of last status?
+					//TODO Assert contains entity 2
+					done();
+				});          
 			});    
 			it("and entity 1 and entity 2 linked together", function(done) {
 				sendCmd("LINK entity:1 entity:2").then(function(data) {
@@ -106,16 +114,14 @@ describe("fzdb", function() {
 				done();
 				});
 			});
-			xit("'Removes entity 1 from db", function(done) {
+			it("'Removes entity 1 from db", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					console.log(data);
-					expect((data.result.data).length).toBe(0);
+					expect(data.errorCode).toBe(0);
 					done();
 				});          
 			});    
-			xit("And does not remove entity 2 from db", function(done) {
+			it("And does not remove entity 2 from db", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Smith\" }").then(function(data) {
-					console.log(data);
 					expect((data.result.data).length).toBe(0);
 					done();
 				});          
