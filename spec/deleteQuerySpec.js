@@ -47,7 +47,7 @@ describe("fzdb", function() {
 					done();
 				});          
 			});
-			xit("Running the delete query", function(done) {
+			it("Running the delete query", function(done) {
 				sendCmd("DELETE DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
 					done();
 				});    
@@ -131,7 +131,7 @@ describe("fzdb", function() {
 			});
 
 		});
-		describe("Entities with properties:", function() {
+		xdescribe("Entities with properties:", function() {
 			/* XXX Need double checking behaviour
 			 * Add with two properties
 			 * Delete one of the property
