@@ -20,6 +20,8 @@
 #include "./types/Date.h"
 #include "singletons.h"
 
+//#define ENFORCE_ENTITIES_HAVE_TYPES
+
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
 EntityManager::EntityManager()
@@ -149,19 +151,23 @@ bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::T
 
 void EntityManager::enforceTypeHasBeenSet(const Entity *entity)
 {
+#ifdef ENFORCE_ENTITIES_HAVE_TYPES
     if ( entity->getType() == ENTITY_TYPE_GENERIC )
 	throw std::runtime_error("Attempted operation on entity " + std::to_string(entity->getHandle())
                                  + " before assigning it a type!");
+#endif
 }
 
 void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
 {
+#ifdef ENFORCE_ENTITIES_HAVE_TYPES
     for ( const Entity* e : ents )
     {
 	if ( e->getType() == ENTITY_TYPE_GENERIC )
 	    throw std::runtime_error("Entity " + std::to_string(e->getHandle())
 				     + " was not assigned a type!");
     }
+#endif
 }
 
 //Inserts new data into the data store
