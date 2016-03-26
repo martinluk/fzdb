@@ -29,9 +29,6 @@ namespace model {
 
 		Subject(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != Type::ENTITYREF && type != Type::VARIABLE) {
-				//is bad, but be one of those
-			}
 		}
 	};
 
@@ -50,9 +47,6 @@ namespace model {
 
 		Predicate(Type t, std::string val) : value(val) {
 			type = t;
-			if (type != Type::PROPERTY && type != Type::VARIABLE) {
-				//is bad, but be one of those
-			}
 		}
 	};
 
@@ -97,8 +91,12 @@ namespace model {
 		Predicate predicate;
 		Object object;
 
-		Triple(Subject sub, Predicate pred, Object obj) : subject(sub), predicate(pred), object(obj) {}
+		std::string meta_variable;
+
 		std::vector<std::string> variables();
+
+		Triple(Subject sub, Predicate pred, Object obj) : subject(sub), predicate(pred), object(obj) {}
+		Triple(Subject sub, Predicate pred, Object obj, std::string meta_var) : subject(sub), predicate(pred), object(obj), meta_variable(meta_var) {}
 
 		unsigned char Entropy() {
 			unsigned char entropy = 0;

@@ -21,19 +21,19 @@ namespace model {
 			}
 			
 		public:
-			EntityRef() : Base(100, std::string()), _value(0)
+			EntityRef() : Base(100, 0, std::string()), _value(0)
 			{
-				initMemberSerialiser();
-				
+				initMemberSerialiser();				
 			}
-			EntityRef(EHandle_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(value)
+
+			EntityRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, author, comment), _value(value)
 			{
 				initMemberSerialiser();
 			}
 			
-			EntityRef(const std::string &value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				EntityRef(std::atoll(value.c_str()), confidence, comment)
+			EntityRef(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				EntityRef(std::atoll(value.c_str()), author, confidence, comment)
 			{
 				// Already initialised
 			}
@@ -46,9 +46,9 @@ namespace model {
 				return std::make_shared<EntityRef>(_value, _confidence);
 			}
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeEntityRef;
+				return SubType::TypeEntityRef;
 			}
 
 			virtual std::string logString() const override 

@@ -1,0 +1,103 @@
+<html>
+<head>
+  <style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        top: 0;
+        right: 70%;
+        bottom: 50;
+        left: 0;
+    }
+    .results { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 30%;
+    }
+    #buttons {
+      position: absolute;
+      right: 70%;
+      bottom: 0;
+      left: 0;
+      height: 50;
+      background-color: gray;
+    }
+    .terminal {
+      position: absolute !important;
+      height: initial !important;
+    }
+  </style>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+  <script src="jquery.js"></script>
+  <script src="terminal.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="terminal.css">
+  
+</head>
+
+<body>
+  <h1>Sup</h1>
+  <div id="editor">function foo(items) {
+    var x = "All this is syntax highlighted";
+    return x;
+  }</div>
+
+<!--   <pre id="results" class="prettyprint lang-js">
+    {"status":true,"errorCode":0,"info":"","result":{"type":"text","data":"Inserted 1 triples."}}
+  </pre> -->
+
+  <div id="term_demo" class="results"></div>
+
+  <div id="buttons">
+    <button>Run</button>
+  </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ace.js"></script>
+  <script>
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.getSession().setMode("ace/mode/javascript");
+
+      var connected = false;
+
+    jQuery(function($, undefined) {
+        $('#term_demo').terminal(function(command, term) {
+            if(command === "CONNECT") {
+              if(!connected) connected = true;
+              term.echo("Connected");
+              return;
+            }
+            if(command === "DISCONNECT") {
+              if(connected) connected = false;
+              term.echo("Disconnected");
+              return;
+            }
+            if (command !== '') {
+                if (!connected) {
+                  term.echo("Please type CONNECT to request a connection");
+                  return;
+                }
+                $.ajax({
+                  url:"/",
+                  type:"POST",
+                  data: "{ \"query\": \"" + escape(command) + "\" }",
+                  contentType:"application/json; charset=utf-8",
+                  dataType:"json",
+                  success: function(result){
+                    term.echo(JSON.stringify(result, null, 4));
+                  }
+                });
+
+            } else {
+               
+            }
+        }, {
+            greetings: 'FZDB Database Connected',
+            name: 'js_demo',
+            height: 200,
+            prompt: 'fuz> '});
+    });
+  </script>
+</body>
+</html>

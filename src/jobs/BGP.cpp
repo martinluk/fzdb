@@ -17,10 +17,12 @@ QueryResult BGP::executeConst() const
       //run BGP
 		VariableSet variables = _database->entityManager().BGP(_query.whereClause, _query.settings);
 
+		variables.trimEmptyRows();
+
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
 		  variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), 
-			  [&, this](std::vector<std::shared_ptr<model::types::Base>> row) {
+			  [&, this](std::vector<VariableSetValue> row) {
 			  return !filter->Test(std::move(row), variables.getMetaData());
 		  }), variables.getData()->end());
       }
@@ -34,21 +36,24 @@ QueryResult BGP::executeConst() const
 
 			rapidjson::Value val2;
 			val2.SetObject();
+			bool hasValues = false;
 
 			for (auto iter2 = _query.selectLine.cbegin(); iter2 != _query.selectLine.cend(); iter2++) {
-				auto i = variables.indexOf(*iter2);		
+				auto i = variables.indexOf(*iter2);
+
+				std::shared_ptr<model::types::Base> basePtr = (*iter)[i].dataPointer();
 				
-				if (!(bool((*iter)[i]))) continue;
+				if (!(bool(basePtr))) continue;
 
 				rapidjson::Value val3;
-				val3.SetString((*iter)[i]->toString().c_str(), result.allocator());
+				val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());
 
 				rapidjson::Value varName;
 				varName.SetString((*iter2).c_str(), result.allocator());
 				val2.AddMember(varName, val3, result.allocator());
+				hasValues = true;
 			}
-
-			val.PushBack(val2, result.allocator());
+			if(hasValues)val.PushBack(val2, result.allocator());
 		}
 //		rapidjson::Value varName;
 //		varName.SetString("result", result.allocator());

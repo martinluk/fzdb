@@ -30,34 +30,6 @@ bool Entity::isNull() const
 	return handle_ == INVALID_EHANDLE;
 }
 
-int Entity::propertyCount() const
-{
-	return _propertyTable.size();
-}
-
-void Entity::removeProperty(const unsigned int &key)
-{
-	try
-	{
-		//delete _propertyTable.at(key);
-		_propertyTable.erase(key);
-	}
-	catch (const std::out_of_range &ex)
-	{
-
-	}
-}
-
-bool Entity::hasProperty(const unsigned int& key)
-{
-	return _propertyTable.find(key) != _propertyTable.cend();
-}
-
-void Entity::clearProperties()
-{
-	_propertyTable.clear();
-}
-
 Entity::EHandle_t Entity::getHandle() const
 {
 	return handle_;

@@ -47,7 +47,7 @@ describe("fzdb", function() {
 					done();
 				});          
 			});
-			it("Running the delete query", function(done) {
+			xit("Running the delete query", function(done) {
 				sendCmd("DELETE DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
 					done();
 				});    
@@ -60,7 +60,7 @@ describe("fzdb", function() {
 			});
 		});
 
-		describe("DB with linked entities:", function() {
+		xdescribe("DB with linked entities:", function() {
 			/* XXX Need double checking behaviour
 			 * Having entity 1 and entity 2 linked together
 			 * Deleting entity 1
@@ -105,7 +105,7 @@ describe("fzdb", function() {
 					done();
 				});     
 			});
-			it("Deleting entity 1", function(done) {
+			xit("Deleting entity 1", function(done) {
 				sendCmd("DELETE DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
 					expect(data).toEqual(jasmine.objectContaining({
 						status:true,

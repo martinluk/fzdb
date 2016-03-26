@@ -2,7 +2,6 @@
 
 PingJob::PingJob(std::shared_ptr<ISession> session) : Job(session)
 {
-
 }
 
 QueryResult PingJob::executeConst() const

@@ -11,7 +11,7 @@ using namespace model::types;
 struct SerialHeader
 {
     std::size_t size;
-    Base::Subtype subtype;
+    SubType subtype;
 };
 
 TypeSerialiser::TypeSerialiser(const std::shared_ptr<Base> type) : baseType_(type)
@@ -50,27 +50,27 @@ std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, st
 	// it's not.
     switch (pHeader->subtype)
     {
-    case Base::Subtype::TypeUndefined:
+    case SubType::TypeUndefined:
         //b = std::make_shared<Base>(d);
         b = std::shared_ptr<Base>(new Base(d));
 				break;
 
-    case Base::Subtype::TypeInt32:
+    case SubType::TypeInt32:
         //b = std::make_shared<Int>(d);
         b = std::shared_ptr<Int>(new Int(d));
 				break;
 
-    case Base::Subtype::TypeString:
+    case SubType::TypeString:
         //b = std::make_shared<String>(d);
         b = std::shared_ptr<String>(new String(d));
 				break;
 
-    case Base::Subtype::TypeEntityRef:
+    case SubType::TypeEntityRef:
         //b = std::make_shared<EntityRef>(d);
         b = std::shared_ptr<EntityRef>(new EntityRef(d));
 				break;
 		
-	case Base::Subtype::TypeDate:
+	case SubType::TypeDate:
 		//b = std::make_shared<Date>(d);
 		b = std::shared_ptr<Date>(new Date(d));
 		break;

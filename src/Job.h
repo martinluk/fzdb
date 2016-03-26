@@ -5,7 +5,9 @@
 #include "QueryResult.h"
 #include <cassert>
 
-class Database;
+//class Database;
+#include "./model/Database.h"
+
 
 class Job 
 {

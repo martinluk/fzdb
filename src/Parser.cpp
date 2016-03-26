@@ -76,7 +76,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
 	else if (str == "WHERE") tokenType = ParsedTokenType::KEYWORD_WHERE;
 	else if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
 	else if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
-	else if (str == "SOURCE") tokenType = ParsedTokenType::KEYWORD_SOURCE;
+	else if (str == "META") tokenType = ParsedTokenType::KEYWORD_META;
 	else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
 	else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
 	else if (str == "LOAD") tokenType = ParsedTokenType::KEYWORD_LOAD;
@@ -197,10 +197,27 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 	model::Subject::Type subType;
 	model::Predicate::Type predType;
 	int pos = 0;
+	bool inMetaBlock = false;
+	std::string currentMetaVar = "";
 
-	while (iter != end && iter->first.type != ParsedTokenType::CLOSE_CURLBRACE) {
+	while (iter != end) {
 
 		//spdlog::get("main")->info("Token type: {} Token content: {}", (int)iter->first.type, iter->second);
+		if (iter->first.type == ParsedTokenType::CLOSE_CURLBRACE) {
+			
+			if (pos != 2) {
+				throw ParseException("Incomplete triple!");
+			}
+
+			if (inMetaBlock) {
+				inMetaBlock = false;
+				iter++;
+				continue;
+			}
+			else {
+				break;
+			}
+		}
 		
 		if (((int)iter->first.type & TOKEN_SPLITTER_MASK) == 0) {
 			switch (pos) {
@@ -209,18 +226,35 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 				switch (iter->first.type) {
 				case ParsedTokenType::ENTITYREF:
 					subType = model::Subject::Type::ENTITYREF;
-               pos = 1;
+                    pos = 1;
 					break;
 				case ParsedTokenType::VARIABLE:
 					subType = model::Subject::Type::VARIABLE;
-					tripleBlock.variables.insert(iter->second);
-               pos = 1;
+				 	tripleBlock.variables.insert(iter->second);
+                    pos = 1;
 					break;
-            case ParsedTokenType::FILTER:
-               tripleBlock.Add(parseFilter(std::move(iter->first), std::move(iter->second)));
-			   pos = 0;
-               break;
-               
+                case ParsedTokenType::FILTER:
+                    tripleBlock.Add(parseFilter(std::move(iter->first), std::move(iter->second)));
+			        pos = 0;
+                    break;
+				case ParsedTokenType::KEYWORD_META:
+					if (inMetaBlock) {
+						throw ParseException("META blocks cannot be nested");
+					}
+					iter++;
+					if (iter->first.type != ParsedTokenType::VARIABLE) {
+						throw ParseException("META blocks must have a variable");
+					}
+					currentMetaVar = iter->second;
+					tripleBlock.metaVariables.insert(iter->second);
+					tripleBlock.variables.insert(iter->second);
+					iter++;
+					if (iter->first.type != ParsedTokenType::OPEN_CURLBRACE) {
+						throw ParseException("Expected { found " + iter->second);
+					}
+					inMetaBlock = true;
+					pos = 0;
+					break;
 				default:
 					throw ParseException("Unknown symbol: " + iter->second);
 				}				
@@ -267,8 +301,15 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
 				else {
 					o = model::Object(objType, iter->second, std::stoul(confidence));
 				}
-				model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o);
-            tripleBlock.Add(std::move(trip));
+				
+				if (!inMetaBlock) {
+					model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o);
+					tripleBlock.Add(std::move(trip));
+				}
+				else {
+					model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o, currentMetaVar);
+					tripleBlock.Add(std::move(trip));
+				}
 				break;
 			}
 		}
@@ -320,34 +361,6 @@ TriplesBlock FSparqlParser::ParseInsert(TokenIterator&& iter, TokenIterator end)
 	return output;
 }
 
-/* TODO: uncomment and fix
-//parses prolouge
-StringMap FSparqlParser::ParseSources(TokenIterator&& iter, TokenIterator end) {
-
-	StringMap sources;
-
-	while (iter != end && iter->second != "INSERT" &&  iter->second != "SELECT" && iter->second != "DELETE") {
-
-		std::string name;
-
-		name = iter->second;
-		iter++;
-
-		if (iter != end) {
-			if (iter->second == ":") {
-				iter++;
-				if (iter != end) {
-					sources[name] = iter->second;
-					iter++;
-				}
-			}
-		}
-	}
-
-	return sources;
-}
-*/
-
 IFilter* FSparqlParser::parseFilter(const TokenInfo&& filterInfo, const std::string&& filterDescription) {
    IFilter* output = nullptr;
    if (filterInfo.data0.length() > 0) {
@@ -382,14 +395,8 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 	std::vector<long long int> entities;
 	QuerySettings canon;
 
-	while (iter != tokens.end()) {
-
-		/*if (iter->first.type == ParsedTokenType::KEYWORD_SOURCE) {
-			*iter++;
-			sources = ParseSources(std::move(iter), tokens.end());
-			continue;
-		}*/
-
+	//while (iter != tokens.end()) {
+	do {
 		if (iter->first.type == ParsedTokenType::KEYWORD_INSERT) {
 			*iter++;
 			if (iter->first.type == ParsedTokenType::KEYWORD_DATA) {
@@ -397,7 +404,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 				type = QueryType::INSERT;
 				conditions = ParseInsert(std::move(iter), tokens.end());
 			}
-			continue;
+			break;
 		}
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
@@ -414,7 +421,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
 			*iter++;
 			whereClause = ParseInsert(std::move(iter), tokens.end());
-			continue;
+			break;
 		}
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_PING) {
@@ -470,7 +477,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			}
 			break;
 		}
-		
+
 		if (iter->first.type == ParsedTokenType::KEYWORD_LOAD)
 		{
 			*iter++;
@@ -487,7 +494,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			}
 			break;
 		}
-		
+
 		if (iter->first.type == ParsedTokenType::KEYWORD_SAVE)
 		{
 			*iter++;
@@ -526,7 +533,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			else {
 				throw ParseException("Incomplete SELECT statement");
 			}
-			
+
 			break;
 		}
 
@@ -536,7 +543,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 			if (iter->first.type == ParsedTokenType::KEYWORD_FINAL) {
 				type = QueryType::MERGE;
 				iter++;
-				if(iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
+				if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
 				entities.push_back(std::stoll(iter->second));
 				iter++;
 				if (iter->first.type != ParsedTokenType::ENTITYREF) throw ParseException("Invalid arguments to link");
@@ -566,7 +573,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		}
 
 		if (iter->first.type == ParsedTokenType::KEYWORD_UNLINK) {
-			iter++;			
+			iter++;
 			if (iter->first.type == ParsedTokenType::ENTITYREF) {
 				entities.push_back(std::stoll(iter->second));
 				type = QueryType::UNLINK;
@@ -585,6 +592,11 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		}
 
 		throw ParseException("Unknown symbol: " + iter->second);
+		//}
+	} while(true);
+
+	if (iter != tokens.end()) {
+		throw ParseException("Unexpected symbol: " + iter->second);
 	}
 
 	return Query(type, sources, conditions, whereClause, data0, selectLine, entities, canon);

@@ -6,12 +6,10 @@
 #include "UserExceptions.h"
 #include "UserAttributes.h"
 
+#include "rapidjson/document.h"
+
 class UserFileOperations {
 	public: 
-		/*
-		 * Either load from file, 
-		 * Or (under debugging mode) add admin into cache and then save to file
-		 */
 		UserFileOperations();
 		
 	protected: 
@@ -20,12 +18,13 @@ class UserFileOperations {
 		void updateUser(const std::string &userName, const UserAttributes &newAttributes);
 		UserAttributes getUserAttributes(const std::string &userName) const;
 		
+		std::map<std::string, UserAttributes> _userFileCache;
+
 	private:
 		void loadCacheFromFile();
 		void saveCacheToFile() const;
-		static std::string pathToLoginFile();
-		
-		std::map<std::string, UserAttributes> _userFileCache;
+		static std::string pathToLoginFile();	
+
 };
 
 #endif	// USER_USERFILEOPERATIONS_H

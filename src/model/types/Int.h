@@ -19,19 +19,19 @@ namespace model {
 			}
 
 		public:
-			Int() : Base(100, std::string()), _value(0)
+			Int() : Base(100, 0, std::string()), _value(0)
 			{
 				initMemberSerialiser();
 			}
 			
-			Int(int32_t value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(value)
+			Int(int32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, author, comment), _value(value)
 			{
 				initMemberSerialiser();
 			}
 			
-			Int(std::string value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Int(std::atoi(value.c_str()), confidence, comment)
+			Int(std::string value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Int(std::atoi(value.c_str()), author, confidence, comment)
 			{
 				// Already initialised
 			}
@@ -40,13 +40,13 @@ namespace model {
 
 			int32_t value() const { return _value; }
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeInt32;
+				return SubType::TypeInt32;
 			}
 
 			virtual std::shared_ptr<Base> Clone() override {
-				return std::make_shared<Int>(_value, _confidence);
+				return std::make_shared<Int>(_value, 0, _confidence);
 			}
 
 			virtual std::string logString() const override

@@ -21,13 +21,13 @@ namespace model {
 			}
 			
 		public:
-			String() :Base(100, std::string()), _value(), _valueWrapper(_value)
+			String() :Base(100, 0, std::string()), _value(), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
 			}
 			
-			String(const std::string &value, unsigned char confidence = 100, const std::string &comment = std::string()) :
-				Base(confidence, comment), _value(value), _valueWrapper(_value)
+			String(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+				Base(confidence, author, comment), _value(value), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
 			}
@@ -36,9 +36,9 @@ namespace model {
 
 			std::string value() const { return _value; }
 
-			virtual Subtype subtype() const
+			virtual SubType subtype() const
 			{
-				return Subtype::TypeString;
+				return SubType::TypeString;
 			}
 
 			virtual std::shared_ptr<Base> Clone() override {

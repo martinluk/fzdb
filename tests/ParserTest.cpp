@@ -409,33 +409,33 @@ TEST_F(ParserTestIdentifyToken, testECHO) {
 }
 
 //tests for SOURCE_KEYWORD SOURCE
-TEST_F(ParserTestIdentifyToken, testSOURCE) {
-	std::string str = "SOURCE";
-	const unsigned int line = 1;
-	const unsigned int chr = 1;
-	const std::string data0 = "";
+// TEST_F(ParserTestIdentifyToken, testSOURCE) {
+// 	std::string str = "SOURCE";
+// 	const unsigned int line = 1;
+// 	const unsigned int chr = 1;
+// 	const std::string data0 = "";
 
-	TokenItem token = FSparqlParser::identifyToken(str, line, chr);
-	TokenItem token1 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_KEYWORD_MASK | 0x6), 1, 1, ""), "SOURCE");
-	//wrong token type
-	TokenItem token2 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(0x7), 1, 1, ""), "SOURCE");
-	//wrong line number
-	TokenItem token3 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 2, 1, ""), "SOURCE");
-	//wrong character position
-	TokenItem token4 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 2, ""), "SOURCE");
-	//wrong data field
-	TokenItem token5 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 1, "a"), "SOURCE");
-	//wrong string
-	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 1, ""), "}");
+// 	TokenItem token = FSparqlParser::identifyToken(str, line, chr);
+// 	TokenItem token1 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_KEYWORD_MASK | 0x6), 1, 1, ""), "SOURCE");
+// 	//wrong token type
+// 	TokenItem token2 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(0x7), 1, 1, ""), "SOURCE");
+// 	//wrong line number
+// 	TokenItem token3 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 2, 1, ""), "SOURCE");
+// 	//wrong character position
+// 	TokenItem token4 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 2, ""), "SOURCE");
+// 	//wrong data field
+// 	TokenItem token5 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 1, "a"), "SOURCE");
+// 	//wrong string
+// 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+// 	EXPECT_EQ(true, are_equal(token, token1));
+// 	EXPECT_EQ(false, are_equal(token, token2));
+// 	EXPECT_EQ(false, are_equal(token, token3));
+// 	EXPECT_EQ(false, are_equal(token, token4));
+// 	EXPECT_EQ(false, are_equal(token, token5));
+// 	EXPECT_EQ(false, are_equal(token, token6));
 
-}
+// }
 
 
 //tests for DATA_KEYWORD DATA

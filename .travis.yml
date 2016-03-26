@@ -5,6 +5,7 @@ branch:
     only:
         - master
 cache:
+  apt: true
   directories:
     - build/external
 compiler:

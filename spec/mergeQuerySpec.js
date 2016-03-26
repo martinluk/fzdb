@@ -72,7 +72,7 @@ describe("Fuzzy Database", function() {
     });
 
     //test retrieve
-    it("getting the forename of entity:1 after link", function(done) {
+    it("getting the forename of entity:1 after merge", function(done) {
       sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }")
       .then(function(data) {
         expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));
@@ -81,7 +81,7 @@ describe("Fuzzy Database", function() {
     });
 
     //test retrieve
-    it("getting the surname of entity:2 after link", function(done) {
+    it("getting the surname of entity:2 after merge", function(done) {
       sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }")
       .then(function(data) {
         expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '1'})]})}));

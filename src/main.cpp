@@ -19,6 +19,7 @@
 #include "model/Triple.h"
 
 #include "platform.h"
+#include <vedis.h>
 
 //windows specific to handle ctrl-c call
 #if PLATFORM == PLATFORM_WINDOWS

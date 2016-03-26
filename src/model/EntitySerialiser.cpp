@@ -6,7 +6,12 @@
 #include <cassert>
 #include "MemberSerialiser.h"
 #include "spdlog/spdlog.h"
-#include "types/Date.h"
+
+#include "./types/ValueRef.h"
+#include "./types/String.h"
+#include "./types/EntityRef.h"
+#include "./types/Int.h"
+#include "./types/Date.h"
 
 // This should be incremented whenever a change is made to the format!
 #define SERIAL_HEADER_CURRENT_VERSION 1
@@ -29,7 +34,7 @@ struct PropertyHeader
 	std::size_t                 offset;     // Offset of property from beginning of property data chunk.
     std::size_t                 size;       // Size of serialised property data in bytes. This includes all values.
     unsigned int                key;        // Property key.
-    model::types::Base::Subtype subtype;    // Type identifier for the values this property contains.
+    model::types::SubType subtype;    // Type identifier for the values this property contains.
     std::size_t                 valueCount; // How many values this property contains.
 };
 
@@ -40,7 +45,7 @@ EntitySerialiser::EntitySerialiser(const std::shared_ptr<Entity> ent) : _entity(
 
 std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
 {
-    typedef std::map<unsigned int, std::shared_ptr<IEntityProperty>> PropertyTable;
+    typedef std::map<unsigned int, std::shared_ptr<EntityProperty>> PropertyTable;
 
     // Create the initial header.
 	SerialHeader header;
@@ -99,7 +104,7 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
         // Keep track of how many bytes all of the values occupy.
         std::size_t propSerialisedSize = 0;
 
-        std::shared_ptr<IEntityProperty> prop = it->second;
+        std::shared_ptr<EntityProperty> prop = it->second;
 
         // Serialise each value.
         for ( int i = 0; i < prop->count(); i++ )
@@ -146,7 +151,8 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         data += advance;
     }
 
-    ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
+	//TODO: UPDATE THIS
+    //ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
 }
 
 std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
@@ -180,19 +186,19 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData)
 
 		switch (p->subtype)
         {
-		case Base::Subtype::TypeInt32:
+		case SubType::TypeInt32:
             populate<Int>(ent, p, data);
             break;
 
-		case Base::Subtype::TypeString:
+		case SubType::TypeString:
             populate<String>(ent, p, data);
             break;
 
-		case Base::Subtype::TypeEntityRef:
+		case SubType::TypeEntityRef:
             populate<EntityRef>(ent, p, data);
 						break;
 
-		case Base::Subtype::TypeDate:
+		case SubType::TypeDate:
 						populate<Date>(ent, p, data);
 						break;
 

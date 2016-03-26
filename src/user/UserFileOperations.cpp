@@ -17,32 +17,29 @@
 #include <cassert>
 
 #define JSONFILENAME "userFile.json"
+#define ADD_ADMIN_ON_INIT true
 
 #define USERNAME "username"
 #define HASH "passwordHash"
 #define SALT "salt"
+#define ID "id"
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
 
-// JONATHAN: Removed loadCacheFromFile() calls for anything other than the constructor - we don't
-// really need them all the time and can't call them from const functions anyway.
-
-UserFileOperations::UserFileOperations(){
-	//Empty file cache
-	_userFileCache.clear();
-#ifdef INIT_ADD_ADMIN
-	//Add admin into cache
-	UserAttributes admin;
-	admin.userName = ADMIN_USERNAME;
-	admin.salt = Hashing::genSalt();
-	admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-	admin.userGroup = Permission::UserGroup::ADMIN;
-	addUser(admin);
-#else
-	//Load from json
-	//TODO Verify if file exists
-	loadCacheFromFile();
-#endif
+UserFileOperations::UserFileOperations()
+{
+	if (ADD_ADMIN_ON_INIT) {
+		//Add admin into cache
+		UserAttributes admin;
+		admin.userName = ADMIN_USERNAME;
+		admin.salt = Hashing::genSalt();
+		admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
+		admin.userGroup = Permission::UserGroup::ADMIN;
+		addUser(admin);
+	} else { 
+		//Load from json
+		loadCacheFromFile();
+	}
 }
 
 std::string UserFileOperations::pathToLoginFile() {
@@ -51,6 +48,7 @@ std::string UserFileOperations::pathToLoginFile() {
 	dir /= JSONFILENAME;
 	return dir.string();
 }
+
 void UserFileOperations::addUser(const UserAttributes &userAttributes)
 {
 	//Assert that no such user already exist, otherwise throw exception
@@ -67,8 +65,6 @@ void UserFileOperations::addUser(const UserAttributes &userAttributes)
 }
 
 void UserFileOperations::removeUser(const std::string &userName) {
-	//load cache from file
-	//loadCacheFromFile();
 	
 	if( _userFileCache.count(userName) < 1 ) {
 		throw UserNotExistException();
@@ -104,7 +100,6 @@ UserAttributes UserFileOperations::getUserAttributes(const std::string &userName
 void UserFileOperations::loadCacheFromFile()
 {
 	using namespace rapidjson;
-	
 	//XXX Window system should use rb?
 	// TODO: Exception checks on file opening!
 	FILE* fp = fopen(pathToLoginFile().c_str(),"r");
@@ -131,14 +126,16 @@ void UserFileOperations::loadCacheFromFile()
 		assert(userObject.IsObject());
 		using namespace std;
 		//'FindMember' checks existence of member and obtain member at once
-		//TODO Use pre-compiler for json names
+		//Use pre-compiler for json names
 		Value::ConstMemberIterator itrUser = userObject.FindMember(USERNAME);
 		Value::ConstMemberIterator itrHash = userObject.FindMember(HASH);
 		Value::ConstMemberIterator itrSalt = userObject.FindMember(SALT);
+		Value::ConstMemberIterator itrId = userObject.FindMember(ID);
 		Value::ConstMemberIterator itrGroupI = userObject.FindMember(USERGROUPINT);
 		assert( itrUser != userObject.MemberEnd() &&
 				itrHash != userObject.MemberEnd() &&
 				itrSalt != userObject.MemberEnd() &&
+				itrId != userObject.MemberEnd() &&
 				itrGroupI != userObject.MemberEnd());
 
 		//Casting user group int to user group
@@ -155,12 +152,14 @@ void UserFileOperations::loadCacheFromFile()
 		string username = itrUser->value.GetString();
 		string hash = itrHash->value.GetString();
 		string salt = itrSalt->value.GetString();
+		unsigned int id = itrId->value.GetUint();
 		
 		//Add into a user attribute struct
 		UserAttributes attr;
 		attr.userName = username;
 		attr.passwordHash = hash;
 		attr.salt = salt;
+		attr.id = id;
 		
 		//Add into cache
 		_userFileCache[username] = attr;
@@ -196,15 +195,19 @@ void UserFileOperations::saveCacheToFile() const
 		//Adding attributes has time of string
 		Value usernameVal;
 		usernameVal.SetString(StringRef(attr.userName.c_str(),attr.userName.length()));
-		userOV.AddMember(USERNAME,usernameVal,jsonDoc.GetAllocator());
+		userOV.AddMember(USERNAME, usernameVal, jsonDoc.GetAllocator());
 
 		Value passwordHashVal;
 		passwordHashVal.SetString(StringRef(attr.passwordHash.c_str(),attr.passwordHash.length()));
-		userOV.AddMember(HASH,passwordHashVal,jsonDoc.GetAllocator());
+		userOV.AddMember(HASH, passwordHashVal, jsonDoc.GetAllocator());
 
 		Value saltVal;
 		saltVal.SetString(StringRef(attr.salt.c_str(),attr.salt.length()));
-		userOV.AddMember(SALT,saltVal,jsonDoc.GetAllocator());
+		userOV.AddMember(SALT, saltVal, jsonDoc.GetAllocator());
+
+		Value idVal;
+		idVal.SetUint(attr.id);
+		userOV.AddMember(ID, idVal, jsonDoc.GetAllocator());
 
 		//Casting usergroup to char
 		using namespace std;
