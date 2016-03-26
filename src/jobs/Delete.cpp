@@ -12,7 +12,7 @@ QueryResult Delete::executeNonConst()
 {
 	QueryResult result;
 	try {
-		_database->entityManager().Delete(_query.conditions.triples);
+		_database->entityManager().Delete(std::move(_query.conditions));
 	}
 	catch (MismatchedTypeException ex) {
 		return QueryResult::generateError(QueryResult::ErrorCode::TypeMismatch, ex.what());
