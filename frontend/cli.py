@@ -18,6 +18,7 @@ COMMAND_QUIT = 1
 COMMAND_HELP = 2
 COMMAND_JSON_ON = 3
 COMMAND_JSON_OFF = 4
+COMMAND_READ_FILE = 5
 
 sending = True
 promptSymbolRequired = True
@@ -41,11 +42,15 @@ def printHelp():
 	print("Commands:")
 	print(":?              Show this help dialogue.")
 	print(":json [on/off]  Switches raw JSON display on or off.")
+	print(":file [path]    Loads the contents of a file and sends it as data.")
 	print(":quit           Quits the session.")
 	
 def classifyCommand(cmdstr):
 	if cmdstr[0] != ':':
 		return COMMAND_NONE
+	
+	if cmdstr[1:].split(" ")[0] == "file":
+		return COMMAND_READ_FILE
 
 	# Switch statement simulation!
 	return {
@@ -55,7 +60,7 @@ def classifyCommand(cmdstr):
 		"json off": COMMAND_JSON_OFF
 	}.get(cmdstr[1:], COMMAND_UNKNOWN)
 	
-def handleLocalCommand(command):
+def handleLocalCommand(command, originalString):
 	global rawJson
 
 	if command == COMMAND_QUIT:
@@ -73,6 +78,31 @@ def handleLocalCommand(command):
 	elif command == COMMAND_JSON_OFF:
 		rawJson = False
 		print("Raw JSON display turned off.")
+	
+	elif command == COMMAND_READ_FILE:
+		params = originalString.split(" ")
+		if len(params) < 2:
+			print("No file specified to read.")
+		else:
+			filepath = params[1]
+			print("Sending data read from file " + filepath)
+			
+			f = None
+			filedata = ""
+			try:
+				f = open(filepath, 'r')
+				filedata = f.read()
+				print(filedata)
+				performSendData(filedata)
+			
+			except Exception, e:
+				print("Exception reading file: " + str(e))
+
+			finally:
+				if f is not None:
+					f.close()
+				else:	
+					print("ERROR: Unable to open file " + filepath + ".")
 		
 	else:
 		print("Unrecognised command.")
@@ -208,7 +238,7 @@ def performSendData(data):
 	
 	# If it was, handle it and continue to the next loop.
 	if cmdType != COMMAND_NONE:
-		handleLocalCommand(cmdType)
+		handleLocalCommand(cmdType, data)
 		return
 
 	# Otherwise, send the input to the database.
@@ -235,6 +265,9 @@ def performSendFileData():
 	try:
 		f = open(filename, 'r')
 		fileData = f.read()
+
+	except:
+		print("Exception reading file.")
 
 	finally:
 		if f is not None:

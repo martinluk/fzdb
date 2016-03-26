@@ -981,3 +981,33 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 }
 
 #pragma endregion scan_functions
+
+//TODO: Add more type checking
+unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing)
+{
+	if ( addIfMissing && _propertyNames.left.find(str) == _propertyNames.left.end() )
+	{
+			std::cout << "Inserting property " << str << " with type " << (int)type << std::endl;
+			_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
+			_propertyTypes[_lastProperty] = type;
+	}
+
+	return getPropertyName(str, type);
+}
+
+unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type) const
+{
+	auto iter = _propertyNames.left.find(str);
+	if (iter == _propertyNames.left.end()) {
+			return 0;
+	}
+
+	model::types::SubType retrievedType = _propertyTypes.at(iter->second);
+	if (type != model::types::SubType::TypeUndefined && retrievedType != type) {
+		throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
+			+ "'. Requested type '" + model::types::getSubTypeString(type) + "' but got '"
+			+ model::types::getSubTypeString(retrievedType) + "'.").c_str());
+	}
+
+	return iter->second;
+}

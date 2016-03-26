@@ -1,2 +1,0 @@
-INSERT DATA { entity:1 <name> "England" }
-INSERT DATA { entity:2 <type> "Location"; <name> "London"; <subsetOf> 1 }

@@ -92,20 +92,10 @@ private:
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
-	//TODO: Add more type checking
-	unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing)
-	{
-		if ( addIfMissing && _propertyNames.left.find(str) == _propertyNames.left.end() )
-		{
-				_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
-				_propertyTypes[_lastProperty] = type;
-		}
-
-		return getPropertyName(str, type);
-	}
+	unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
 
 	// Pass TypeUndefined to skip type checking.
-	unsigned int getPropertyName(const std::string &str, model::types::SubType type) const
+	unsigned int getPropertyName(const std::string &str, model::types::SubType type) const;
 	{
 		auto iter = _propertyNames.left.find(str);
 		if (iter == _propertyNames.left.end()) {

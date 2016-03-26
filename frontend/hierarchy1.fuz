@@ -1,0 +1,1 @@
+INSERT DATA { entity:1 <type> "Location"; <name> "England" }
