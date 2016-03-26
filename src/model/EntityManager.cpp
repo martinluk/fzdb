@@ -18,6 +18,7 @@
 #include "./types/EntityRef.h"
 #include "./types/Int.h"
 #include "./types/Date.h"
+#include "singletons.h"
 
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
@@ -128,6 +129,7 @@ bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::T
 	if ( _entities.find(target) == _entities.end() )
 	    throw std::runtime_error("'supersetOf' target with ID " + triple.object.value + " does not exist");
 	
+	spdlog::get("main")->info("Setting entity {} as superset of entity {})", entity->getHandle(), target);
 	createHierarchy(entity->getHandle(), target, author, comment);
 	return true;
     }
@@ -137,6 +139,7 @@ bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::T
 	if ( _entities.find(target) == _entities.end() )
 	    throw std::runtime_error("'subsetOf' target with ID " + triple.object.value + " does not exist");
 	
+	spdlog::get("main")->info("Setting entity {} as subset of entity {})", entity->getHandle(), target);
 	createHierarchy(target, entity->getHandle(), author, comment);
 	return true;
     }
@@ -321,11 +324,12 @@ std::string EntityManager::dumpContents() const
 {
     std::stringstream str;
     str << "Number of entities: " << _entities.size() << "\n";
+	const Database* db = Singletons::database();
     
     for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
     {
         const std::shared_ptr<Entity> ent = it->second;
-        str << ent->logString() << "\n";
+        str << ent->logString(db) << "\n";
         if ( ent->propertyCount() > 0 )
         {
             str << "{\n";
@@ -334,7 +338,7 @@ std::string EntityManager::dumpContents() const
             for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
             {
 				std::shared_ptr<EntityProperty> prop = it2->second;
-                str << "  " << prop->logString() << "\n";
+                str << "  " << prop->logString(db) << "\n";
                 
                 if ( prop->count() > 0 )
                 {
@@ -343,7 +347,7 @@ std::string EntityManager::dumpContents() const
                     for ( int i = 0; i < prop->count(); i++ )
                     {
                         BasePointer val = prop->baseValue(i);
-                        str << "    " << val->logString() << "\n";
+                        str << "    " << val->logString(db) << "\n";
                     }
                     
                     str << "  }\n";
@@ -409,17 +413,15 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
 unsigned int EntityManager::getTypeID(const std::string &str)
 {
-	std::string uppercase = util::toUppercase(str);
-
 	// "Generic" type is an empty string.
 	// The ID for this is 0.
-	if ( uppercase.size() < 1 )
+	if ( str.size() < 1 )
 		return ENTITY_TYPE_GENERIC;
 
 	unsigned int id = 0;
 	try
 	{
-		id = _entityTypeNames.at(uppercase);
+		id = _entityTypeNames.at(str);
 	}
 	catch (const std::exception&)
 	{
@@ -428,7 +430,7 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 		_lastTypeID++;
 		id = _lastTypeID;
 		assert(id > 0);
-		_entityTypeNames.insert(std::pair<std::string,unsigned int>(uppercase, id));
+		_entityTypeNames.insert(std::pair<std::string, unsigned int>(str, id));
 	}
 
 	return id;
@@ -555,7 +557,7 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
 #pragma endregion linkingandmerging
 
-void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset, unsigned int author, const std::string &comment)
+void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t low, unsigned int author, const std::string &comment)
 {
     using namespace model::types;
     typedef std::shared_ptr<EntityRef> EntRefPtr;
@@ -564,9 +566,10 @@ void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_
     
     // Assuming entity handles are valid - do we need to check?
     
-    // "This fog is a real pSuper."
-    EntPtr pSuper = _entities[superset];
-    EntPtr pSub = _entities[subset];
+	// High is a superset of low.
+	// Low is a subset of high.
+    EntPtr pHigh = _entities[high];
+    EntPtr pLow = _entities[low];
     
     unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
     unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
@@ -587,18 +590,20 @@ void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_
 		p->append(BasePointer(new EntityRef(h, author, 100, comment)));
     };
     
-    if ( !pSuper->hasProperty(subProperty) )
-		propNotPresent(pSuper, subset, subProperty);
+	// This sets pHigh <supersetOf> entity:low
+    if ( !pHigh->hasProperty(superProperty) )
+		propNotPresent(pHigh, low, superProperty);
     else
-		propPresent(pSuper, subset, subProperty);
+		propPresent(pHigh, low, superProperty);
     
-    if ( !pSub->hasProperty(superProperty) )
-		propNotPresent(pSub, superset, superProperty);
+	// This sets pLow <subsetOf> entity:high
+    if ( !pLow->hasProperty(subProperty) )
+		propNotPresent(pLow, high, subProperty);
     else
-		propPresent(pSub, superset, superProperty);
+		propPresent(pLow, high, subProperty);
 }
 
-void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset)
+void EntityManager::removeHierarchy(Entity::EHandle_t high, Entity::EHandle_t low)
 {
     using namespace model::types;
     typedef std::shared_ptr<EntityRef> EntRefPtr;
@@ -607,23 +612,23 @@ void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_
     
     // Assuming entity handles are valid - do we need to check?
     
-    EntPtr pSuper = _entities[superset];
-    EntPtr pSub = _entities[subset];
+    EntPtr pHigh = _entities[high];
+    EntPtr pLow = _entities[low];
     
     unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
     unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
     
     // Remove the entity references from the properties if they exist.
-    if ( pSuper->hasProperty(subProperty) )
+    if ( pHigh->hasProperty(superProperty) )
     {
-		EntPropertyPtr p = pSuper->getProperty(subProperty);
-		p->remove(EntityRef(subset, 0));
+		EntPropertyPtr p = pHigh->getProperty(superProperty);
+		p->remove(EntityRef(low, 0));
     }
     
-    if ( pSub->hasProperty(superProperty) )
+    if ( pHigh->hasProperty(subProperty) )
     {
-		EntPropertyPtr p = pSub->getProperty(superProperty);
-		p->remove(EntityRef(superset, 0));
+		EntPropertyPtr p = pLow->getProperty(subProperty);
+		p->remove(EntityRef(high, 0));
     }
 }
 
@@ -1010,4 +1015,9 @@ unsigned int EntityManager::getPropertyName(const std::string &str, model::types
 	}
 
 	return iter->second;
+}
+
+const boost::bimap<std::string, unsigned int>& EntityManager::propertyNameMap() const
+{
+	return _propertyNames;
 }

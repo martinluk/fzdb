@@ -87,7 +87,7 @@ public:
 	// This ignores the confidence of the value.
 	void remove(const model::types::Base &value);
 	
-	virtual std::string logString() const override;
+	virtual std::string logString(const Database* db = NULL) const override;
 
 private:
 	unsigned int _key;

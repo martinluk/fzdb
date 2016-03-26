@@ -116,7 +116,7 @@ namespace model
 				return _value == std::stoul(val);
 			}
 
-			virtual std::string logString() const override
+			virtual std::string logString(const Database* db =  NULL) const override
 			{
 				return std::string("Date(") + std::to_string(_value) + std::string(", ")
 					+ std::to_string(confidence()) + std::string(")");

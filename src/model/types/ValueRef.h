@@ -35,7 +35,7 @@ namespace model {
 				return SubType::ValueReference;
 			}
 
-			virtual std::string logString() const override 
+			virtual std::string logString(const Database* db = NULL) const override
 			{
 				return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
 					+ std::to_string(confidence()) + std::string(")");

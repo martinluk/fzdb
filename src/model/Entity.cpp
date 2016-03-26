@@ -40,10 +40,12 @@ unsigned int Entity::getType() const
 	return _type;
 }
 
-std::string Entity::logString() const
+std::string Entity::logString(const Database* db) const
 {
+	std::string typeStr = std::to_string(_type);
+
 	return std::string("Entity(t=")
-		+ std::to_string(_type)
+		+ typeStr
 		+ std::string(", h=")
 		+ std::to_string(handle_)
 		+ std::string(", [")

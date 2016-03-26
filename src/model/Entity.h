@@ -42,7 +42,7 @@ public:
 
 	unsigned int getType() const;	
 
-	virtual std::string logString() const override;
+	virtual std::string logString(const Database* db = NULL) const override;
 
 	enum class LinkStatus {
 		None,

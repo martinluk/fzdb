@@ -57,7 +57,7 @@ namespace model {
 				return std::make_shared<String>(_value, _confidence);
 			}
 
-			virtual std::string logString() const override
+			virtual std::string logString(const Database* db = NULL) const override
 			{
 				return std::string("String(\"") + _value + std::string("\", ")
 					+ std::to_string(confidence()) + std::string(")");

@@ -162,7 +162,7 @@ namespace model {
 				return SubType::TypeUndefined;
 			}
 
-			virtual std::string logString() const
+			virtual std::string logString(const Database* db = NULL) const
 			{
 				return std::string("Base(") + std::to_string(_confidence) + std::string(")");
 			}

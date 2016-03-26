@@ -10,6 +10,8 @@
 #include "./types/Int.h"
 #include "./types/Date.h"
 #include <stdexcept>
+#include "Database.h"
+#include "EntityManager.h"
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
@@ -136,14 +138,23 @@ std::vector<BasePointer> EntityProperty::baseValues() const
 }
 
 
-std::string EntityProperty::logString() const
+std::string EntityProperty::logString(const Database* db) const
 {
 	using namespace model::types;
+
+	std::string keyStr = std::to_string(_key);
+
+	if (db)
+	{
+		auto strIt = db->entityManager().propertyNameMap().right.find(_key);
+		if (strIt != db->entityManager().propertyNameMap().right.end())
+			keyStr = "\"" + strIt->second + "\"";
+	}
 
     return std::string("EntityProperty<")
             + std::string(getSubTypeString(_subtype))
             + std::string(">(k=")
-            + std::to_string(_key)
+            + keyStr
             + std::string(", [")
             + std::to_string(_count)
             + std::string("])");
