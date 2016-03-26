@@ -133,9 +133,9 @@ bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::T
     }
     if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF )
     {
-	long long target = std::stoll(triple.subject.value);
+	long long target = std::stoll(triple.object.value);
 	if ( _entities.find(target) == _entities.end() )
-	    throw std::runtime_error("'subsetOf' target with ID " + triple.subject.value + " does not exist");
+	    throw std::runtime_error("'subsetOf' target with ID " + triple.object.value + " does not exist");
 	
 	createHierarchy(target, entity->getHandle(), author, comment);
 	return true;
@@ -577,7 +577,7 @@ void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_
     {
 		std::vector<BasePointer> vals;
 		vals.push_back(EntRefPtr(new EntityRef(h, author, 100, comment)));
-		EntPropertyPtr p(new EntityProperty(prop, vals));
+		EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::TypeEntityRef, vals));
 		e->insertProperty(p);
     };
     
@@ -588,14 +588,14 @@ void EntityManager::createHierarchy(Entity::EHandle_t superset, Entity::EHandle_
     };
     
     if ( !pSuper->hasProperty(subProperty) )
-	propNotPresent(pSuper, subset, subProperty);
+		propNotPresent(pSuper, subset, subProperty);
     else
-	propPresent(pSuper, subset, subProperty);
+		propPresent(pSuper, subset, subProperty);
     
     if ( !pSub->hasProperty(superProperty) )
-	propNotPresent(pSub, superset, superProperty);
+		propNotPresent(pSub, superset, superProperty);
     else
-	propPresent(pSub, superset, superProperty);
+		propPresent(pSub, superset, superProperty);
 }
 
 void EntityManager::removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset)

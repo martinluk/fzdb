@@ -1,0 +1,9 @@
+INSERT DATA
+{
+	entity:1 <type> "Location";
+	<name> "England" .
+	
+	entity:2 <type> "Location";
+	<name> "London";
+	<subsetOf> entity:1
+}

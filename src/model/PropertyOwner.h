@@ -59,19 +59,7 @@ public:
 		}
 	}
 
-	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object) {
-		// Erase the property if it exists (If not, this will do nothing).
-		//propertyTable_.erase(prop.key());
-		if (!hasProperty(key)) {
-			auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key));
-			pair.second->append(object);
-			_propertyTable.insert(pair);
-		}
-		else {
-			auto prop = getProperty(key);
-			prop->append(object);
-		}
-	}
+	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object);
 
 	// Removes the property with the given key.
 	void removeProperty(const unsigned int &key);

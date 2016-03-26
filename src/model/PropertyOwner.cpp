@@ -53,3 +53,17 @@ void PropertyOwner::clearProperties() {
 int PropertyOwner::propertyCount() const {
 	return _propertyTable.size();
 }
+
+void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object) {
+	// Erase the property if it exists (If not, this will do nothing).
+	//propertyTable_.erase(prop.key());
+	if (!hasProperty(key)) {
+		auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key, object->subtype()));
+		pair.second->append(object);
+		_propertyTable.insert(pair);
+	}
+	else {
+		auto prop = getProperty(key);
+		prop->append(object);
+	}
+}

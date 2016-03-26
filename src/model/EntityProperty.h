@@ -39,9 +39,9 @@ public:
 	// for example if no property matches a given search.
 	// isNull() will return true.
 	EntityProperty();
-	EntityProperty(const unsigned int &key);
+	EntityProperty(const unsigned int &key, model::types::SubType subtype);
 	~EntityProperty();
-	EntityProperty(const unsigned int &key, const std::vector<BasePointer> &values);
+	EntityProperty(const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
 
 	// Returns true if this is a null property (ie. default-constructed).
 	// Internally, a property is null if its key is an empty string.
@@ -90,8 +90,6 @@ public:
 	virtual std::string logString() const override;
 
 private:
-	void initSubtype();
-
 	unsigned int _key;
 	unsigned int _count;
 	model::types::SubType _subtype;

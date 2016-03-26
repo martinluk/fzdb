@@ -92,25 +92,9 @@ private:
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
-	unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
-
 	// Pass TypeUndefined to skip type checking.
 	unsigned int getPropertyName(const std::string &str, model::types::SubType type) const;
-	{
-		auto iter = _propertyNames.left.find(str);
-		if (iter == _propertyNames.left.end()) {
-				return 0;
-		}
-
-		model::types::SubType retrievedType = _propertyTypes.at(iter->second);
-		if (type != model::types::SubType::TypeUndefined && retrievedType != type) {
-			throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
-				+ "'. Requested type '" + model::types::getSubTypeString(type) + "' but got '"
-				+ model::types::getSubTypeString(retrievedType) + "'.").c_str());
-		}
-
-		return iter->second;
-	}
+	unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
 
 	unsigned int getPropertyName(std::string str) const {
 		auto iter = _propertyNames.left.find(str);
