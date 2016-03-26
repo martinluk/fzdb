@@ -43,6 +43,7 @@ describe("fzdb", function() {
 			});
 			it("and now Fred lives in DB", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+					console.log(data.result.data);
 					expect((data.result.data).length).toBe(1);
 					done();
 				});          
