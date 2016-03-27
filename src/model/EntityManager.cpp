@@ -23,9 +23,11 @@ static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
 EntityManager::EntityManager()
 {
-	_lastHandle = Entity::INVALID_EHANDLE;
-	_lastProperty = 0;
-	_lastTypeID = 0;
+	//_lastHandle = Entity::INVALID_EHANDLE;
+	//_lastProperty = 0;
+	//_lastTypeID = 1;
+	//_entityTypeNames.insert(std::pair<std::string, unsigned int>("source", 0));
+	clearAll();
 }
 
 EntityManager::~EntityManager()
@@ -245,11 +247,14 @@ void EntityManager::clearAll()
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
     _lastProperty = 0;
-	_lastTypeID = 0;
+	_lastTypeID = 1;
     _entityTypeNames.clear();
+	_entityTypeNames.insert(std::pair<std::string, unsigned int>("source", 0));
     _propertyNames.clear();
     _propertyTypes.clear();
 	_links.clear();
+	
+	auto unknownSourceEntity = createEntity("source");
 }
 
 std::size_t EntityManager::entityCount() const
