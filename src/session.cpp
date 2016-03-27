@@ -156,7 +156,7 @@ void TCPSession::respond(const std::string response) {
 	// If less than 1024 bytes are received, the response
 	// is complete. If 1024 bytes are sent, the last byte
 	// is always 0.
-	
+
 	char buffer[max_length];
 	memset(buffer, 0, max_length);
 	

@@ -98,7 +98,8 @@ void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::type
 	// Erase the property if it exists (If not, this will do nothing).
 	//propertyTable_.erase(prop.key());
 	if (!hasProperty(key)) {
-		auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key));
+
+		auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key, object->subtype()));
 		pair.second->append(object);
 		_propertyTable.insert(pair);
 	}

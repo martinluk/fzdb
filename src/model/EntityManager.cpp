@@ -18,6 +18,9 @@
 #include "./types/EntityRef.h"
 #include "./types/Int.h"
 #include "./types/Date.h"
+#include "singletons.h"
+
+//#define ENFORCE_ENTITIES_HAVE_TYPES
 
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
@@ -111,15 +114,77 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 	return result;
 }
 
-//Inserts new data into the data store
-void EntityManager::Insert(TriplesBlock&& block) {
+bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::Triple &triple, unsigned int author, const std::string &comment)
+{
+    // If we're setting the type
+    if ( triple.predicate.value == ReservedProperties::TYPE )
+    {
+	    changeEntityType(std::stoll(triple.subject.value), triple.object.value);
+	    return true;
+    }
+    
+    enforceTypeHasBeenSet(entity);
+    
+    // If we're setting a superset or subset, we need to make sure the target (value) exists.
+    // The object will have been created earlier.
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
+    {
+	long long target = std::stoll(triple.object.value);
+	if ( _entities.find(target) == _entities.end() )
+	    throw std::runtime_error("'supersetOf' target with ID " + triple.object.value + " does not exist");
+	
+	spdlog::get("main")->info("Setting entity {} as superset of entity {})", entity->getHandle(), target);
+	createHierarchy(entity->getHandle(), target, author, comment);
+	return true;
+    }
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF )
+    {
+	long long target = std::stoll(triple.object.value);
+	if ( _entities.find(target) == _entities.end() )
+	    throw std::runtime_error("'subsetOf' target with ID " + triple.object.value + " does not exist");
+	
+	spdlog::get("main")->info("Setting entity {} as subset of entity {})", entity->getHandle(), target);
+	createHierarchy(target, entity->getHandle(), author, comment);
+	return true;
+    }
+    
+    return false;
+}
 
+void EntityManager::enforceTypeHasBeenSet(const Entity *entity)
+{
+#ifdef ENFORCE_ENTITIES_HAVE_TYPES
+    if ( entity->getType() == ENTITY_TYPE_GENERIC )
+	throw std::runtime_error("Attempted operation on entity " + std::to_string(entity->getHandle())
+                                 + " before assigning it a type!");
+#endif
+}
+
+void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
+{
+#ifdef ENFORCE_ENTITIES_HAVE_TYPES
+    for ( const Entity* e : ents )
+    {
+	if ( e->getType() == ENTITY_TYPE_GENERIC )
+	    throw std::runtime_error("Entity " + std::to_string(e->getHandle())
+				     + " was not assigned a type!");
+    }
+#endif
+}
+
+//Inserts new data into the data store
+void EntityManager::Insert(TriplesBlock&& block)
+{
 	//sort by entropy
 	block.Sort();
 
 	auto iter = block.triples.cbegin();
 	auto end = block.triples.cend();
 	VariableSet variableSet(block.metaVariables);
+
+	// Keep track of any entity we've modified.
+	// We use this later to make sure all entities have a type.
+	std::set<const Entity *> modifiedEntities;
 
 	for (; iter != end; iter++) {
 		auto triple = *iter;
@@ -149,13 +214,6 @@ void EntityManager::Insert(TriplesBlock&& block) {
 
 			case model::Subject::Type::ENTITYREF: {
 
-				// If we are setting an entity type, do so here.
-				if (triple.predicate.value == ReservedProperties::TYPE)
-				{
-					changeEntityType(std::stoll(triple.subject.value), triple.object.value);
-					continue;
-				}
-
 				auto entity_id = std::stoll(triple.subject.value);
 
 				//create the entity if it doesn't exist
@@ -165,6 +223,14 @@ void EntityManager::Insert(TriplesBlock&& block) {
 				}
 
 				std::shared_ptr<Entity> currentEntity = _entities[entity_id];
+				modifiedEntities.insert(currentEntity.get());
+
+				// If we performed any special operations, skip to the next.
+				// TODO: We haven't handled the author or comment at all here!
+				if (handleSpecialInsertOperations(currentEntity.get(), triple, 0, std::string()))
+					continue;
+
+				enforceTypeHasBeenSet(currentEntity.get());
 
 				//note that the OrderingId attribute of a record is assigned as part of insertion
 				currentEntity->insertProperty(propertyId, newRecord);
@@ -195,6 +261,9 @@ void EntityManager::Insert(TriplesBlock&& block) {
 
 		
 	}
+	
+	// Ensure all the entities we processed have a type.
+	enforceTypeHasBeenSet(modifiedEntities);
 }
 
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
@@ -254,7 +323,7 @@ void EntityManager::clearAll()
     _propertyTypes.clear();
 	_links.clear();
 	
-	auto unknownSourceEntity = createEntity("source");
+	//auto unknownSourceEntity = createEntity("source");
 }
 
 std::size_t EntityManager::entityCount() const
@@ -266,11 +335,12 @@ std::string EntityManager::dumpContents() const
 {
     std::stringstream str;
     str << "Number of entities: " << _entities.size() << "\n";
+	const Database* db = Singletons::database();
     
     for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
     {
         const std::shared_ptr<Entity> ent = it->second;
-        str << ent->logString() << "\n";
+        str << ent->logString(db) << "\n";
         if ( ent->propertyCount() > 0 )
         {
             str << "{\n";
@@ -279,7 +349,7 @@ std::string EntityManager::dumpContents() const
             for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
             {
 				std::shared_ptr<EntityProperty> prop = it2->second;
-                str << "  " << prop->logString() << "\n";
+                str << "  " << prop->logString(db) << "\n";
                 
                 if ( prop->count() > 0 )
                 {
@@ -288,7 +358,7 @@ std::string EntityManager::dumpContents() const
                     for ( int i = 0; i < prop->count(); i++ )
                     {
                         BasePointer val = prop->baseValue(i);
-                        str << "    " << val->logString() << "\n";
+                        str << "    " << val->logString(db) << "\n";
                     }
                     
                     str << "  }\n";
@@ -346,7 +416,7 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
     clearAll();
     GraphSerialiser gSer(this);
-    gSer.unserialise(buffer);
+    gSer.unserialise(buffer, size);
     delete[] buffer;
 
     return true;
@@ -354,17 +424,15 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
 unsigned int EntityManager::getTypeID(const std::string &str)
 {
-	std::string uppercase = util::toUppercase(str);
-
 	// "Generic" type is an empty string.
 	// The ID for this is 0.
-	if ( uppercase.size() < 1 )
+	if ( str.size() < 1 )
 		return ENTITY_TYPE_GENERIC;
 
 	unsigned int id = 0;
 	try
 	{
-		id = _entityTypeNames.at(uppercase);
+		id = _entityTypeNames.at(str);
 	}
 	catch (const std::exception&)
 	{
@@ -373,7 +441,7 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 		_lastTypeID++;
 		id = _lastTypeID;
 		assert(id > 0);
-		_entityTypeNames.insert(std::pair<std::string,unsigned int>(uppercase, id));
+		_entityTypeNames.insert(std::pair<std::string, unsigned int>(str, id));
 	}
 
 	return id;
@@ -486,7 +554,7 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
 	//check we are merging entities of the same type
 	if (keepEntity->getType() != loseEntity->getType()) {
-		throw new std::runtime_error("Attempted to merge entities of different types");
+		throw std::runtime_error("Attempted to merge entities of different types");
 	}
 
 	//copy the properties of loseEntity to keepEntity
@@ -500,13 +568,90 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
 #pragma endregion linkingandmerging
 
+void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t low, unsigned int author, const std::string &comment)
+{
+    using namespace model::types;
+    typedef std::shared_ptr<EntityRef> EntRefPtr;
+    typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
+    typedef std::shared_ptr<Entity> EntPtr;
+    
+    // Assuming entity handles are valid - do we need to check?
+    
+	// High is a superset of low.
+	// Low is a subset of high.
+    EntPtr pHigh = _entities[high];
+    EntPtr pLow = _entities[low];
+    
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
+    
+    // The superset entity holds the subset property pointing to the subset entity, and vice versa.
+    // Lambdas are wonderful for convenience.
+    auto propNotPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
+    {
+		std::vector<BasePointer> vals;
+		vals.push_back(EntRefPtr(new EntityRef(h, author, 100, comment)));
+		EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::TypeEntityRef, vals));
+		e->insertProperty(p);
+    };
+    
+    auto propPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
+    {
+		EntPropertyPtr p = e->getProperty(prop);
+		p->append(BasePointer(new EntityRef(h, author, 100, comment)));
+    };
+    
+	// This sets pHigh <supersetOf> entity:low
+    if ( !pHigh->hasProperty(superProperty) )
+		propNotPresent(pHigh, low, superProperty);
+    else
+		propPresent(pHigh, low, superProperty);
+    
+	// This sets pLow <subsetOf> entity:high
+    if ( !pLow->hasProperty(subProperty) )
+		propNotPresent(pLow, high, subProperty);
+    else
+		propPresent(pLow, high, subProperty);
+}
+
+void EntityManager::removeHierarchy(Entity::EHandle_t high, Entity::EHandle_t low)
+{
+    using namespace model::types;
+    typedef std::shared_ptr<EntityRef> EntRefPtr;
+    typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
+    typedef std::shared_ptr<Entity> EntPtr;
+    
+    // Assuming entity handles are valid - do we need to check?
+    
+    EntPtr pHigh = _entities[high];
+    EntPtr pLow = _entities[low];
+    
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
+    
+    // Remove the entity references from the properties if they exist.
+    if ( pHigh->hasProperty(superProperty) )
+    {
+		EntPropertyPtr p = pHigh->getProperty(superProperty);
+		p->remove(EntityRef(low, 0));
+    }
+    
+    if ( pHigh->hasProperty(subProperty) )
+    {
+		EntPropertyPtr p = pLow->getProperty(subProperty);
+		p->remove(EntityRef(high, 0));
+    }
+}
+
 #pragma region scan_functions
 
 //$a <predicate> <object>
 void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 	
 	//get the property id
-	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeString);
+	// Jonathan: Changed this to pass an undefined type, which skips type checking.
+	// We don't know what the type is in advance!
+	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
 	//the variable has been used before, we only need to iterate over valid values from before
 	if (variableSet.used(variableName)) {
@@ -629,10 +774,9 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 					std::shared_ptr<Entity> currentEntity;
 					if (currentEntityIter != _entities.end()) {
 						currentEntity = _entities.at(entityHandle);
-					}
-					else {
-						throw new std::runtime_error("Attempted to lookup a non-existent entity");
-					}
+					} else {
+						throw std::runtime_error("Attempted to look up a non-existent entity");
+					}					
 					return !currentEntity->hasProperty(propertyId);
 				}), variableSet.getData()->end());
 
@@ -645,7 +789,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 						currentEntity = _entities.at(entityHandle);
 					}
 					else {
-						throw new std::runtime_error("Attempted to lookup a non-existent entity");
+						throw std::runtime_error("Attempted to look up a non-existent entity");
 					}
 					(*iter).emplace(iter->begin() + varIndex2, VariableSetValue(currentEntity->getProperty(propertyId)->baseValue(0)->Clone(), 0, 0));
 				}
@@ -758,7 +902,9 @@ std::vector<unsigned int> EntityManager::Scan5(VariableSet&& variableSet, const 
 	std::vector<unsigned int> rowsAdded;
 
 	//get the property id
-	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeString);
+	// Jonathat: Passing TypeUndefined to ckip type checking, since we don't know
+	// what the type is yet.
+	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
 	if (EntityExists(entityRef)) {
 		auto entity = _entities.at(entityRef);
@@ -851,3 +997,38 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 }
 
 #pragma endregion scan_functions
+
+//TODO: Add more type checking
+unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing)
+{
+	if ( addIfMissing && _propertyNames.left.find(str) == _propertyNames.left.end() )
+	{
+			std::cout << "Inserting property " << str << " with type " << (int)type << std::endl;
+			_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
+			_propertyTypes[_lastProperty] = type;
+	}
+
+	return getPropertyName(str, type);
+}
+
+unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type) const
+{
+	auto iter = _propertyNames.left.find(str);
+	if (iter == _propertyNames.left.end()) {
+			return 0;
+	}
+
+	model::types::SubType retrievedType = _propertyTypes.at(iter->second);
+	if (type != model::types::SubType::TypeUndefined && retrievedType != type) {
+		throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
+			+ "'. Requested type '" + model::types::getSubTypeString(type) + "' but got '"
+			+ model::types::getSubTypeString(retrievedType) + "'.").c_str());
+	}
+
+	return iter->second;
+}
+
+const boost::bimap<std::string, unsigned int>& EntityManager::propertyNameMap() const
+{
+	return _propertyNames;
+}

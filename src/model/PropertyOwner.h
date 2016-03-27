@@ -20,6 +20,10 @@ public:
 
 	virtual ~PropertyOwner();
 
+	PropertyOwner() {
+		_locked = false;
+	}
+
 	// Getters:
 
 	// Returns the property with the given key, or a null property if this is not found.
@@ -47,7 +51,9 @@ public:
 	// Returns the number of properties present.
 	int propertyCount() const;
 
-	void lock() { _locked = true; }
+	void lock() { 
+		_locked = true; 
+	}
 
 protected:
 

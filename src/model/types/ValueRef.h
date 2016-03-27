@@ -35,7 +35,7 @@ namespace model {
 				return SubType::ValueReference;
 			}
 
-			virtual std::string logString() const override 
+			virtual std::string logString(const Database* db = NULL) const override
 			{
 				return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
 					+ std::to_string(confidence()) + std::string(")");
@@ -44,6 +44,15 @@ namespace model {
 			// Inherited via Base
 			virtual bool Equals(const std::string &val) const override {
 				return _value == std::stoll(val);
+			}
+
+			virtual bool valuesEqualOnly(const Base* other) const
+			{
+				const ValueRef* r = dynamic_cast<const ValueRef*>(other);
+				assert(r);
+
+				return Base::valuesEqualOnly(other) && _entity == r->_entity &&
+					_property == r->_property && _value == r->_value;
 			}
 
 			virtual std::string toString() const override {

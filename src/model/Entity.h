@@ -36,13 +36,13 @@ public:
 
 	// Returns whether this entity is null, ie. whether it has an invalid handle.
 	bool isNull() const;
-	
+
 	// Returns this entity's handle.
 	EHandle_t getHandle() const;
 
 	unsigned int getType() const;	
 
-	virtual std::string logString() const override;
+	virtual std::string logString(const Database* db = NULL) const override;
 
 	enum class LinkStatus {
 		None,

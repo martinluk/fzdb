@@ -67,7 +67,7 @@ public:
 	
 	unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
 		if (_metaData.find(var) == _metaData.cend()) {
-			throw new std::runtime_error("Unexpected variable");
+			throw std::runtime_error("Unexpected variable");
 		}
 		else {
 			if (type != _metaData[var].first) {
@@ -75,7 +75,7 @@ public:
 					_metaData[var].first = type;
 				}
 				else {
-					throw new std::runtime_error("Attempted to mix variable types!");
+					throw std::runtime_error("Attempted to mix variable types!");
 				}				
 			}
 			//_data[var].first.push_back(value);
@@ -94,11 +94,11 @@ public:
 	void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, unsigned int row) {
 
 		if (row >= _values.size()) {
-			throw new std::runtime_error("Attempting to add to a non-existent row");
+			throw std::runtime_error("Attempting to add to a non-existent row");
 		}
 
 		if (_metaData.find(var) == _metaData.cend()) {
-			throw new std::runtime_error("Unexpected variable");
+			throw std::runtime_error("Unexpected variable");
 		}
 		else {
 			unsigned char offset = _metaData[var].second;

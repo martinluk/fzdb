@@ -27,14 +27,27 @@ namespace model {
 			
 			MemberSerialiser _memberSerialiser;
 
+			// JONATHAN: Un-const'd these as they don't strictly need to be const and if they
+			// are it messes with the member serialiser. I should fix that but we don't have
+			// time right now.
+
 			// Entity id of source entity
-			const unsigned long long _sourceEntityId;
+			unsigned long long _sourceEntityId;
 
 			// User who created the record
-			const unsigned int _originalAuthorId;
+			unsigned int _originalAuthorId;
 
 			// Time record was created
-			const boost::posix_time::ptime _timeCreated;
+			boost::posix_time::ptime _timeCreated;
+
+			// Convenience for serialisation.
+			boost::gregorian::date::year_type _cYearCreated;
+			boost::gregorian::date::month_type _cMonthCreated;
+			boost::gregorian::date::day_type _cDayCreated;
+			boost::posix_time::time_duration::hour_type _cHourCreated;
+			boost::posix_time::time_duration::min_type _cMinCreated;
+			boost::posix_time::time_duration::sec_type _cSecCreated;
+			boost::posix_time::time_duration::fractional_seconds_type _cFracSecCreated;
 
 			// id for this record - unique for entity/property/id - related to ordering
 			unsigned int _orderingId;
@@ -43,47 +56,52 @@ namespace model {
 			{
 				_memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
 				_memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
+				_memberSerialiser.addPrimitive(&_sourceEntityId, sizeof(_sourceEntityId));
+				_memberSerialiser.addPrimitive(&_originalAuthorId, sizeof(_originalAuthorId));
+
+				_memberSerialiser.addPrimitive(&_cYearCreated, sizeof(&_cYearCreated));
+				_memberSerialiser.addPrimitive(&_cMonthCreated, sizeof(&_cMonthCreated));
+				_memberSerialiser.addPrimitive(&_cDayCreated, sizeof(&_cDayCreated));
+				_memberSerialiser.addPrimitive(&_cHourCreated, sizeof(&_cHourCreated));
+				_memberSerialiser.addPrimitive(&_cMinCreated, sizeof(&_cMinCreated));
+				_memberSerialiser.addPrimitive(&_cSecCreated, sizeof(&_cSecCreated));
+				_memberSerialiser.addPrimitive(&_cFracSecCreated, sizeof(&_cFracSecCreated));
+
 				_memberSerialiser.addDynamicMember(&_commentWrapper);
 			}
 
-		public:
-			
-            // TODO: FIX CPP FILES NOT BEING READ FROM THIS FOLDER.
-            // Until then, we use an ugly workaround.
-            //static const char* SubtypeString[];
-			
-            static const char* SubtypeString(SubType type)
-            {
-                switch (type)
-                {
-                case SubType::TypeInt32:
-                    return "Int32";
-                    
-                case SubType::TypeString:
-                    return "String";
-                    
-                case SubType::TypeEntityRef:
-                    return "EntityRef";
-                    
-                case SubType::PropertyReference:
-                    return "PropertyReference";
+			void initConvenienceMembers()
+			{
+				auto dateCreated = _timeCreated.date();
+				auto timeCreated = _timeCreated.time_of_day();
 
-				case SubType::TypeDate:
-					return "Date";
-                    
-                default:
-                    return "Undefined";
-                }
-            }
+				_cYearCreated = dateCreated.year();
+				_cMonthCreated = dateCreated.month();
+				_cDayCreated = dateCreated.day();
+				_cHourCreated = timeCreated.hours();
+				_cMinCreated = timeCreated.minutes();
+				_cSecCreated = timeCreated.seconds();
+				_cFracSecCreated = timeCreated.fractional_seconds();
+			}
+
+		public:
 
 			Base(unsigned char confidence, unsigned int author, const std::string &cmnt) :
 				_comment(cmnt),
 				_commentWrapper(_comment),
 				_timeCreated(boost::posix_time::second_clock::universal_time()),
 				_sourceEntityId(0),
-				_originalAuthorId(author)
+				_originalAuthorId(author),
+				_cYearCreated(1400),
+				_cMonthCreated(1),
+				_cDayCreated(1),
+				_cHourCreated(0),
+				_cMinCreated(0),
+				_cSecCreated(0),
+				_cFracSecCreated(0)
 			{
 				initMemberSerialiser();
+				initConvenienceMembers();
 				if (confidence > 100) confidence = 100;
 				_confidence = confidence;
 			}
@@ -98,6 +116,12 @@ namespace model {
 
 			virtual bool Equals(const std::string &val) const {
 				return false;
+			}
+			
+			// This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
+			virtual bool valuesEqualOnly(const Base *other) const
+			{
+			    return subtype() == other->subtype();
 			}
 
 			// TODO: Shouldn't this be virtual?
@@ -138,7 +162,7 @@ namespace model {
 				return SubType::TypeUndefined;
 			}
 
-			virtual std::string logString() const
+			virtual std::string logString(const Database* db = NULL) const
 			{
 				return std::string("Base(") + std::to_string(_confidence) + std::string(")");
 			}
@@ -159,9 +183,11 @@ namespace model {
 			}
 
 			// Called to construct from serialised data.
-			Base(const char* &serialisedData) : Base(0, 0, "")
+			Base(const char* &serialisedData, std::size_t length) : Base(0, 0, "")
 			{
-				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
+				initMemberSerialiser();
+				initConvenienceMembers();
+				serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 			}
 		};
 
@@ -172,6 +198,20 @@ namespace model {
 			{
 				return a->confidence() > b->confidence();
 			}
+		};
+		
+		class ValuesEqualOnly
+		{
+			const Base* _ptr;
+		public:
+		    explicit ValuesEqualOnly(const Base* ptr) : _ptr(ptr)
+		    {
+		    }
+		    
+		    bool operator () (const std::shared_ptr<Base> &a) const
+		    {
+			return a->valuesEqualOnly(_ptr);
+		    }
 		};
 	}
 }

@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include "Serialiser.h"
+#include <stdexcept>
 
 class StringMapSerialiser
 {
@@ -11,7 +12,15 @@ public:
 	StringMapSerialiser(std::map<std::string, unsigned int>* map);
 
 	std::size_t serialise(Serialiser &serialiser) const;
-	void unserialise(const char* serialisedData);
+	void unserialise(const char* serialisedData, std::size_t length);
+	
+	class InvalidInputStringTableException : public std::runtime_error
+	{
+	public:
+	    explicit InvalidInputStringTableException(const std::string &msg) : std::runtime_error(msg)
+	    {
+	    }
+	};
 
 private:
 	std::map<std::string, unsigned int>*	_map;

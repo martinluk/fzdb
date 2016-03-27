@@ -4,6 +4,7 @@
 #include "Serialiser.h"
 #include <cstring>
 #include <memory>
+#include <stdexcept>
 
 class Entity;
 
@@ -13,9 +14,15 @@ public:
     EntitySerialiser(const std::shared_ptr<Entity> ent);
 
     std::size_t serialise(Serialiser &serialiser) const;
+    static std::shared_ptr<Entity> unserialise(const char* serialData, std::size_t length);
 
-    // TODO: This is probably unsafe without a length parameter!
-    static std::shared_ptr<Entity> unserialise(const char* serialData);
+    class InvalidInputEntityException : public std::runtime_error
+    {
+    public:
+        explicit InvalidInputEntityException(const std::string &msg) : std::runtime_error(msg)
+        {
+        }
+    };
 
 private:
     const std::shared_ptr<Entity> _entity;

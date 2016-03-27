@@ -32,6 +32,18 @@ namespace model {
 				initMemberSerialiser();
 			}
 			
+			virtual bool valuesEqualOnly(const Base *other) const
+			{
+			    const String* s = dynamic_cast<const String*>(other);
+			    assert(s);
+			    
+			    // If the subtypes are not the same then the base implementation
+			    // will return false and the statement will short-circuit, meaning
+			    // we should avoid dereferencing the pointer if it's null!
+			    return Base::valuesEqualOnly(other)
+			            && _value == s->_value;
+			}
+			
 			virtual ~String() {}
 
 			std::string value() const { return _value; }
@@ -45,7 +57,7 @@ namespace model {
 				return std::make_shared<String>(_value, _confidence);
 			}
 
-			virtual std::string logString() const override
+			virtual std::string logString(const Database* db = NULL) const override
 			{
 				return std::string("String(\"") + _value + std::string("\", ")
 					+ std::to_string(confidence()) + std::string(")");
@@ -66,10 +78,10 @@ namespace model {
 				return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
 			}
 
-			String(const char* &serialisedData) : Base(serialisedData), _value(), _valueWrapper(_value)
+            String(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _value(), _valueWrapper(_value)
 			{
 				initMemberSerialiser();
-				serialisedData += _memberSerialiser.unserialiseAll(serialisedData);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 			}
 		};
 	}

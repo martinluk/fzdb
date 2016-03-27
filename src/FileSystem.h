@@ -2,17 +2,17 @@
 #define FILESYSTEM_H
 
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include "model/Serialiser.h"
 
 namespace FileSystem
 {
-	class FileFormatError : public std::exception
+    class FileFormatError : public std::runtime_error
 	{
-		virtual const char* what() const throw()
-		{
-			return "File format was not valid";
-		}
+    public:
+        FileFormatError() : std::runtime_error("File format was not valid")
+        {
+        }
 	};
 
     // Any existing file is overwritten.

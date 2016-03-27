@@ -9,7 +9,7 @@
 #include <user/UserExceptions.h>
 #include <user/Hashing.h>
 
-#include "../ISession.h"
+class ISession;
 
 class UserOperation : public UserFileOperations
 { 

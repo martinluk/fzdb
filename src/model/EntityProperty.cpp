@@ -9,33 +9,26 @@
 #include "./types/EntityRef.h"
 #include "./types/Int.h"
 #include "./types/Date.h"
+#include <stdexcept>
+#include "Database.h"
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
-void EntityProperty::initSubtype()
-{
-	BasePointer b = std::make_shared<model::types::Base>();
-    _subtype = b->subtype();
-}
-
-EntityProperty::EntityProperty()
+EntityProperty::EntityProperty() : _subtype(model::types::SubType::TypeUndefined)
 {
 	_count = 0;
-    initSubtype();
 }
 
-EntityProperty::EntityProperty(const unsigned int& key) :
-	_key(key) 
+EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType subtype) :
+	_key(key), _subtype(subtype)
 {
 	_count = 0;
-	initSubtype();
 }
 
-EntityProperty::EntityProperty(const unsigned int& key,
-	const std::vector<BasePointer> &values) : _key(key)
+EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType subtype,
+	const std::vector<BasePointer> &values) : _key(key), _subtype(subtype)
 {
 	_count = 0;
-	initSubtype();
     append(values);
 }
 
@@ -75,6 +68,12 @@ unsigned int EntityProperty::count() const
 
 void EntityProperty::append(BasePointer value)
 {
+	if (value->subtype() != _subtype)
+	{
+		throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(value->subtype())
+			+ std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
+	}
+
 	_count += 1;
 	_valuesList.emplace_front(value);
 	_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
@@ -86,6 +85,16 @@ void EntityProperty::append(BasePointer value)
 
 void EntityProperty::append(const std::vector<BasePointer> &list)
 {
+	for (auto it = list.cbegin(); it != list.cend(); ++it)
+	{
+		model::types::SubType st = (*it)->subtype();
+		if (st != _subtype)
+		{
+			throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(st)
+				+ std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
+		}
+	}
+
 	_count += list.size();
 	_valuesList.insert_after(_valuesList.cbefore_begin(), list.begin(), list.end());
 	_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
@@ -128,15 +137,30 @@ std::vector<BasePointer> EntityProperty::baseValues() const
 }
 
 
-std::string EntityProperty::logString() const
+std::string EntityProperty::logString(const Database* db) const
 {
+	using namespace model::types;
+
+	std::string keyStr = std::to_string(_key);
+
+	if (db)
+	{
+		auto strIt = db->entityManager().propertyNameMap().right.find(_key);
+		if (strIt != db->entityManager().propertyNameMap().right.end())
+			keyStr = "\"" + strIt->second + "\"";
+	}
+
     return std::string("EntityProperty<")
-            //+ std::string(model::types::SubTypeString[(int)_subtype])
-		//TODO: WHAT SHOULD THIS BE??
-           // + std::string(model::types::String[(int)_subtype]))
+            + std::string(getSubTypeString(_subtype))
             + std::string(">(k=")
-            + std::to_string(_key)
+            + keyStr
             + std::string(", [")
             + std::to_string(_count)
             + std::string("])");
+}
+
+void EntityProperty::remove(const model::types::Base &value)
+{
+	_valuesList.remove_if(model::types::ValuesEqualOnly(&value));
+	_count = std::distance(_valuesList.cbegin(), _valuesList.cend());
 }
