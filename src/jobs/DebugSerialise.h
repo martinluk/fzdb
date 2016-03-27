@@ -5,6 +5,7 @@
 #include "../Job.h"
 #include "../QueryResult.h"
 
+// Informally tests entity serialisation and outputs the results for inspection.
 class DebugSerialise
 {
 public:

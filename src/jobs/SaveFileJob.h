@@ -4,6 +4,7 @@
 #include "../Job.h"
 #include "QueryResult.h"
 
+// Saves the current database state to a file.
 class SaveFileJob : public Job
 {
 public:

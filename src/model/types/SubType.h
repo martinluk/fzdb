@@ -4,6 +4,7 @@
 namespace model {
     namespace types {
 
+        // Enum for the different subtypes that are defined.
         enum class SubType
         {
             TypeUndefined = 0,
@@ -19,6 +20,7 @@ namespace model {
             SUBTYPE_COUNT
         };
 
+        // Strings corresponding to the enum entries.
         static const char* SubTypeString[] =
         {
             "TypeUndefined",
@@ -31,6 +33,7 @@ namespace model {
             "ValueReference"
         };
 
+        // Convenience function to get a string for a given subtype.
         static const char* getSubTypeString(SubType t)
         {
             return ( t < SubType::TypeUndefined || t >= SubType::SUBTYPE_COUNT )

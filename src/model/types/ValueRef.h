@@ -9,6 +9,12 @@ typedef unsigned long long EHandle_t;
 
 namespace model {
     namespace types {
+
+        // This class is used only by query processing.
+        // Holds a reference to another value. This is
+        // addressed by storing the entity handle, the
+        // property handle within the entity and the
+        // value handle within the property.
         class ValueRef : public Base {
         private:
 

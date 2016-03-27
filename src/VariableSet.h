@@ -14,6 +14,7 @@
 
 using VariableType = model::types::SubType;
 
+// Tim? Describe what this does, it looks like magic. (Or sufficiently advanced technology)
 class VariableSetValue {
 private:
 

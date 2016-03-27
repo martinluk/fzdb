@@ -7,6 +7,7 @@
 
 #include "QueryResult.h"
 
+// Generic "Unknown" job for when an unknown command is invoked.
 class UnknownJob : public Job
 {
 private:

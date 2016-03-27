@@ -8,6 +8,7 @@
 
 #include <string>
 
+// Deletes all entities within the database.
 class Flush : public Job
 {
 public:

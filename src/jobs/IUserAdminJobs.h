@@ -3,6 +3,7 @@
 #include "../user/Permission.h"
 #include "../QueryResult.h"
 
+// Shared base class for user management jobs.
 class IUserAdminJobs : public Job {
     public:
        IUserAdminJobs(std::shared_ptr<ISession> session);

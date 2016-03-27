@@ -17,19 +17,15 @@ using BasePointer = std::shared_ptr<model::types::Base>;
 
 // An entity property is a key-values property that can be aggregated by an entity.
 // Each property has a string key which acts as its identifier.
-// Multiple values can be added, each with a confidence quantifier between 0 and 100,
-// where 0 is impossible and 100 is certain.
-// A property with a single value and a confidence quantifier of 1 is treated as a
+// Multiple values can be added, each with a confidence quantifier between 0 and 100.
+// A property with a single value and a confidence quantifier of 100 is treated as a
 // concrete property.
 // Property keys cannot be changed once the property has been instanciated,
 // as this simplifies property management within entities.
 
-// 14/01/16 - Changed this so that it holds values on the heap,
+// (Jonathan) 14/01/16 - Changed this so that it holds values on the heap,
 // otherwise unserialisation is nigh impossible because it needs to be polymorphic.
 // The object owns all of its values.
-
-// TODO: We may want this class to be implicitly shared, so that we can return
-// properties without having to perform deep copies.
 
 class EntityProperty : public ILogString
 {

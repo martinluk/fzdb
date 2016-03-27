@@ -5,6 +5,8 @@
 #include "DebugJob.h"
 #include "../QueryResult.h"
 
+// Debugging command. Returns a list of all entities in the database,
+// including all their properties and values.
 class DebugDumpEntities
 {
 public:

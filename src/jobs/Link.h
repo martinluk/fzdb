@@ -8,7 +8,8 @@
 #include <string>
 
 namespace jobs {
-
+    
+    // Links two entities together.
     class Link : public Job
     {
     public:
@@ -23,6 +24,7 @@ namespace jobs {
         Entity::EHandle_t _entity2;
     };
 
+    // Unlinks two previously linked entities.
     class Unlink : public Link
     {
     public:
@@ -30,6 +32,7 @@ namespace jobs {
         virtual QueryResult executeNonConst() override;
     };
 
+    // Merges two entities. This is like linking except it cannot be undone.
     class Merge : public Link
     {
     public:

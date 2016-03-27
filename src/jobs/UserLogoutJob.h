@@ -4,6 +4,7 @@
 
 #include "QueryResult.h"
 
+// Logs a currently logged-in user out of the database.
 class UserLogoutJob : public Job {
 public:
     UserLogoutJob(std::shared_ptr<ISession> session);

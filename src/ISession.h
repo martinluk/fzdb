@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
+// Implements base session functionality.
 class ISession
 {
     friend class UserOperation;
@@ -17,12 +18,6 @@ public:
     virtual ~ISession() {}    
     std::string username() const { return _username; }
     unsigned int userId() const { return _userId; }
-
-    // JONATHAN: Removing this - database access should now only be through the Job class' member pointer.
-//    Permission::UserGroup getCurrentUserUserGroup() const
-//    {
-//        return Singletons::cDatabase()->users().getUserGroup(_username);
-//    }
 
 protected:
     virtual void handle_read(const boost::system::error_code& error, size_t bytes_transferred) = 0;

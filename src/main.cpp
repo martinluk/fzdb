@@ -1,12 +1,15 @@
+// Copyright 2015-2016: A Tad Fuzzy
 
+#include <signal.h>
 #include <boost/asio.hpp>
 #include <spdlog/spdlog.h>
+#include <vedis.h>
 
 #include <iostream>
 #include <vector>
-
-#include <signal.h>
 #include <cassert>
+#include <string>
+
 
 #include "./server.h"
 #include "./singletons.h"
@@ -18,10 +21,9 @@
 #include "model/EntityManager.h"
 #include "model/Triple.h"
 
-#include "platform.h"
-#include <vedis.h>
+#include "./platform.h"
 
-//windows specific to handle ctrl-c call
+// windows specific to handle ctrl-c call
 #if PLATFORM == PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -58,7 +60,6 @@ void sigHandler(int s)
  * @return Error code
  */
 int main(int argc, char* argv[]) {
-
     /*
     *   DEFAULT SETTINGS
     */
@@ -217,11 +218,6 @@ BOOL WINAPI ConsoleHandler(DWORD dwType)
     case CTRL_C_EVENT:
         sigHandler(2);
         break;
-    case CTRL_BREAK_EVENT:
-        printf("break\n");
-        break;
-    default:
-        printf("Some other event\n");
     }
     return TRUE;
 }

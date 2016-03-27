@@ -18,9 +18,7 @@
 #include "../Util.h"
 #include "./QuerySettings.h"
 
-// TODO: We need smart pointers! We need to have the manager own the entity
-// and entities should not have delete called on them externally.
-// We also need mutexes!
+// Management class that keeps track of entities and their associated metadata.
 class EntityManager
 {
     friend class GraphSerialiser;
@@ -35,6 +33,7 @@ public:
     void AddProperty(std::string name, unsigned int val) {
         _propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(name, val));
     }    
+
 
     VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
@@ -72,7 +71,7 @@ private:
     
     unsigned int getTypeID(const std::string &str);
 
-    // TODO: This could be an unordered map, but we may want to utilise the
+    // TODO: (Jonathan) This could be an unordered map, but we may want to utilise the
     // numerical nature of the entity handles. O(log n) is still pretty good.
     typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;
 

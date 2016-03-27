@@ -5,6 +5,7 @@
 #include "QueryResult.h"
 #include <string>
 
+// Creates a new entity with the given type.
 class CreateEntityJob : public Job
 {
 public:

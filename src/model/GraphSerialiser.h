@@ -8,6 +8,7 @@
 
 class EntityManager;
 
+// Serialises and unserialises all entity data within an EntityManager.
 class GraphSerialiser
 {
 public:

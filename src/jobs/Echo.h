@@ -6,6 +6,7 @@
 #include "QueryResult.h"
 #include <string>
 
+// Debugging command. Responds with whatever input was passed in.
 class EchoJob : public Job
 {
 public:

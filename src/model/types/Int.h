@@ -7,6 +7,8 @@
 
 namespace model {
     namespace types {
+
+        // Stores an integer value.
         class Int : public Base {
         private:
             friend class TypeSerialiser;

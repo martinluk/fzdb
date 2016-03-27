@@ -9,6 +9,11 @@ typedef unsigned long long EHandle_t;
 
 namespace model {
     namespace types {
+
+        // Class representing a reference to another entity.
+        // This reference is stored as a handle to the entity concerned.
+        // There is no guarantee that this handle will still be valid
+        // when it is used - the caller needs to check!
         class EntityRef : public Base {
         private:
             friend class TypeSerialiser;

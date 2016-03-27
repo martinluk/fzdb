@@ -8,6 +8,8 @@
 
 namespace model {
     namespace types {
+
+        // Stores a string value.
         class String : public Base {
         private:
             friend class TypeSerialiser;

@@ -14,6 +14,8 @@
 
 using boost::asio::ip::tcp;
 
+// The server class handles users attempting to connect to the database.
+// Each user is assigned a session which is deleted when they disconnect.
 class TCPServer
 {
     friend class TCPSession;

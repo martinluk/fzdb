@@ -6,6 +6,7 @@
 
 #include "QueryResult.h"
 
+// Debugging command. Responds with "PONG".
 class PingJob : public Job
 {
 public:

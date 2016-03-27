@@ -10,10 +10,8 @@
 #include "./EntityProperty.h"
 #include "./types/SubType.h"
 
-// Represents an entity in the graph database.
-// Each entity has a handle, which is a unique identifier.
-// An entity's handle cannot be changed once it is instanciated.
-// An entity owns all of its EntityProperties and will delete them as appropriate.
+// This is basically a stripped-down Entity class.
+// TODO: (Jonathan) Tim, you're probably better at explaining this one.
 class PropertyOwner
 {
 public:

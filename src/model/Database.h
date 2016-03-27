@@ -4,15 +4,18 @@
 #include "EntityManager.h"
 #include "../user/UserOperation.h"
 
+// Convenience class that encapsulates the main data within the database application.
 class Database
 {
 public:
     Database();
     ~Database();
     
+    // Entities
     EntityManager& entityManager();
     const EntityManager& entityManager() const;
     
+    // Users
     UserOperation& users();
     const UserOperation& users() const;
     

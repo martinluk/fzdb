@@ -7,6 +7,11 @@ namespace model
 {
     namespace types
     {
+        // Class representing a date (no time).
+        // The date is stored as an integer (Date_t)
+        // and this can be converted to a StructuredDate
+        // (year, month, day). Ordering can also be
+        // specified, eg. before/after some date.
         class Date : public Base
         {
             friend class TypeSerialiser;

@@ -14,7 +14,6 @@
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.
 // An entity's handle cannot be changed once it is instanciated.
-// An entity owns all of its EntityProperties and will delete them as appropriate.
 class Entity : public ILogString, public PropertyOwner
 {
     friend class EntitySerialiser;

@@ -12,24 +12,23 @@
 #include "model/QuerySettings.h"
 
 // Values that don't collide with masks range from 0x0 to 0xf.
-#define TOKEN_SPLITTER_MASK 0b010000
-#define TOKEN_KEYWORD_MASK 0b100000
+#define TOKEN_SPLITTER_MASK 0b010000    // This token is a splitter.
+#define TOKEN_KEYWORD_MASK 0b100000     // This token is a keyword.
 
-// Jonathan: Formatted these a bit more nicely as they're numbers, not flags,
-// and I'm adding to them :P
+// Specifiers for tokens.
 enum class ParsedTokenType {
-        VARIABLE       = 0x0,
-        STRING         = 0x1,
-        INT            = 0x2,
-        NOTIMPLEMENTED = 0x3,
-        PROPERTY       = 0x4,
-        ENTITYREF      = 0x5,
-        CONFIDENCE_RATING = 0x8,
+        VARIABLE       = 0x0,       // Variable: $abc
+        STRING         = 0x1,       // String: "dog"
+        INT            = 0x2,       // Integer: 146
+        NOTIMPLEMENTED = 0x3,       // Placeholder. Something that's not implemented yet.
+        PROPERTY       = 0x4,       // Property: <forename>
+        ENTITYREF      = 0x5,       // Entity handle: entity:1
+        CONFIDENCE_RATING = 0x8,    // Confidence for a value: [80]
 
     //structural
-        OPEN_CURLBRACE  = 0x6,
-        CLOSE_CURLBRACE = 0x7,
-        FILTER = 0x9,
+        OPEN_CURLBRACE  = 0x6,      // {
+        CLOSE_CURLBRACE = 0x7,      // }
+        FILTER = 0x9,               // FILTER: For filtering values.
     
     //keywords
         KEYWORD_SELECT = TOKEN_KEYWORD_MASK | 0x0,
@@ -47,13 +46,14 @@ enum class ParsedTokenType {
         KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
         KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
         KEYWORD_FLUSH  = TOKEN_KEYWORD_MASK | 0xE,
-        KEYWORD_CANON  = TOKEN_KEYWORD_MASK | 0xF,
+        KEYWORD_CANON  = TOKEN_KEYWORD_MASK | 0xF,  // And we're full! Extend the splitter/keyword masks before adding any more keywords.
     
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
         SPLITTER3 = TOKEN_SPLITTER_MASK | 0x2,
 };
 
+// Represents a specific token.
 struct TokenInfo {
 public:
     const ParsedTokenType type;
@@ -143,8 +143,8 @@ enum class QueryType {
     INSERT,
     DEL,
     PING,
-    DEBUGECHO,
-    DEBUGOTHER,
+    DEBUGECHO,  // ECHO
+    DEBUGOTHER, // DEBUG
     LOAD,
     SAVE,
     USER,
@@ -179,6 +179,8 @@ public:
     }
 };
 
+// Actual parser class. Takes a string and returns all the data required to execute its corresponding query.
+// To do so, call Tokenize() on a string and then ParseAll() on the returned tokens.
 class FSparqlParser {
 private:
     static std::string parseConfidenceRating(TokenIterator&& iter, TokenIterator end);

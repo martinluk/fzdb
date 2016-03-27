@@ -4,6 +4,10 @@
 #include <utility>
 #include <vector>
 
+// Class to assist the process of serialisation.
+// SerialProperties are received, which consist of pointers
+// to locations in memory and lengths of the sections to be
+// serialised.
 class Serialiser
 {
 public:

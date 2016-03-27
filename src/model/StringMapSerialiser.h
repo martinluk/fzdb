@@ -6,6 +6,8 @@
 #include "Serialiser.h"
 #include <stdexcept>
 
+// Specialised class used to serialise a table that maps strings to
+// unsigned integers.
 class StringMapSerialiser
 {
 public:

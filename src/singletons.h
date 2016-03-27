@@ -6,10 +6,15 @@
 
 #include <boost/thread/shared_mutex.hpp>
 
+// Namespace of singletons for use throughout the application.
+// Jobs should not use these as they must adhere to the const/non-const
+// pointers provided in the Job class.
 namespace Singletons
 {
     void initialise();
     void shutdown();
+
+    // Sets the path to the file that should be loaded when the database starts.
     void setDataFilePath(const std::string &path);
 
     // Only call these if you know what you're doing!

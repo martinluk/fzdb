@@ -4,6 +4,7 @@
 
 #include "QueryResult.h"
 
+// Logs a user into the database.
 class UserLoginJob : public Job {
 public:
     UserLoginJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password);

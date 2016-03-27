@@ -16,6 +16,7 @@
 namespace model {
     namespace types {
 
+        // Base value type class. All other types inherit from this.
         class Base : public ILogString, public PropertyOwner
         {
         protected:
@@ -27,9 +28,9 @@ namespace model {
             
             MemberSerialiser _memberSerialiser;
 
-            // JONATHAN: Un-const'd these as they don't strictly need to be const and if they
-            // are it messes with the member serialiser. I should fix that but we don't have
-            // time right now.
+            // JONATHAN: Un-const'd these as they don't strictly need to be const (we can just
+            // not provide setter methods) and if they are it messes with the member serialiser.
+            // I should fix that but we don't have time right now.
 
             // Entity id of source entity
             unsigned long long _sourceEntityId;
@@ -124,7 +125,7 @@ namespace model {
                 return subtype() == other->subtype();
             }
 
-            // TODO: Shouldn't this be virtual?
+            // Returns whether this value is equal to the given object.
             bool Equals(const model::Object &object) {
                 if (object.type == model::Object::Type::VARIABLE) return false;
                 if (object.type == model::Object::Type::INT && subtype() != SubType::TypeInt32) return false;
@@ -133,6 +134,7 @@ namespace model {
                 return Equals(object.value);
             }
 
+            // What's the string representation of this value?
             virtual std::string toString() const
             {
                 return "";
@@ -157,6 +159,8 @@ namespace model {
                 _comment = comment;
             }
 
+            // Subclasses reimplement this.
+            // As a base class, our type is undefined.
             virtual SubType subtype() const
             {
                 return SubType::TypeUndefined;
@@ -191,6 +195,7 @@ namespace model {
             }
         };
 
+        // Wrapper class used for comparing confidence with another type.
         template <typename T>
         class ConfidenceCompare {
         public:
@@ -200,6 +205,7 @@ namespace model {
             }
         };
         
+        // Wrapper class used to check whether the value members of two types are equal.
         class ValuesEqualOnly
         {
             const Base* _ptr;

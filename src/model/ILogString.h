@@ -5,6 +5,8 @@
 
 class Database;
 
+// Interface implemented by classes which need a string in order
+// to be printed to a debug log.
 class ILogString
 {
 public:

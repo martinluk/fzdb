@@ -6,6 +6,8 @@
 #include <string>
 #include <stdexcept>
 
+// Convenience class for serialising and unserialising member variables
+// whose values can simply be set by copying into their memory footprint.
 class MemberSerialiser
 {
 public:
@@ -57,6 +59,7 @@ public:
         virtual void memberUnserialise(const char *serialisedData, std::size_t)
         {
             // The data should be null-terminated, so we can just read in.
+            // TODO: (Jonathan) Security implications!!
             _string = serialisedData;
         }
         

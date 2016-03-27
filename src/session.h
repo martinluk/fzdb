@@ -13,9 +13,8 @@ using boost::asio::ip::tcp;
 
 class TCPServer;
 
-// TODO: How to we handle when the connection to this session is ended?
-// We'll want to do this in order to inform the TCPServer that we are no
-// longer live and can be cleaned up.
+// The session class is tied to a user for a particular command.
+// It handles sending and receiving actual data from the user.
 class TCPSession : public ISession, public std::enable_shared_from_this<TCPSession>
 {
 public:

@@ -83,8 +83,9 @@ namespace model {
         }
     };
 
-
-
+    // Class representing a triple.
+    // Holds subject/predicate/object and entropy
+    // value corresponding to how many of these are variables.
     struct Triple {
     public:
         Subject subject;

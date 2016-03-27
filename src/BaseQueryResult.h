@@ -4,6 +4,9 @@
 #include <string>
 #include <rapidjson/document.h>
 
+// Base query result class.
+// The QueryResult class relies on this class for doing the dirty
+// work and actually serialising JSON data.
 class BaseQueryResult
 {
 public:
@@ -13,6 +16,7 @@ public:
     rapidjson::MemoryPoolAllocator<>& allocator();
     
 protected:
+    // Functions for setting values of different types.
     void setValue(const std::string &key, rapidjson::Value &value);
     void setValue(const std::string &key, const std::string &value);
     void setValue(const std::string &key, bool value);

@@ -3,6 +3,9 @@
 */
 #include "./session.h"
 
+// Convenience class for interpreting a user's command.
+// The command is parsed using the FSPARQL parser and the correct job
+// is instanciated and executed.
 class CommandInterpreter
 {
 public:

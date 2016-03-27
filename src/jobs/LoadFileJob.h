@@ -4,6 +4,7 @@
 #include "../Job.h"
 #include "QueryResult.h"
 
+// Loads a specified database file from disk.
 class LoadFileJob : public Job
 {
 public:
