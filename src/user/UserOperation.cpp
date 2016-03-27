@@ -4,6 +4,8 @@
 #include "UserExceptions.h"
 #include "Hashing.h"
 
+#include "../ISession.h"
+
 UserOperation::UserOperation() : UserFileOperations()
 {
     _idGen = IdGenerator(0);

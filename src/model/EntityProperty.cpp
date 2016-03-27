@@ -11,7 +11,6 @@
 #include "./types/Date.h"
 #include <stdexcept>
 #include "Database.h"
-#include "EntityManager.h"
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
