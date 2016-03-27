@@ -5,7 +5,7 @@
 
 QueryResult DebugDumpEntities::execute(const DebugJob &j)
 {
-	QueryResult result;
+    QueryResult result;
     result.setResultDataText(j._database->entityManager().dumpContents());
     return result;
 }

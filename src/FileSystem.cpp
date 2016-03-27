@@ -22,8 +22,8 @@ namespace FileSystem
     {
         std::fstream file;
 
-		FileHeader header;
-		Serialiser::zeroBuffer(&header, sizeof(FileHeader));
+        FileHeader header;
+        Serialiser::zeroBuffer(&header, sizeof(FileHeader));
 
         header.identifier[0] = 'F';
         header.identifier[1] = 'Z';
@@ -54,7 +54,7 @@ namespace FileSystem
     }
     
     std::string workingDirectory()
-    {		
+    {        
         return boost::filesystem::current_path().generic_string();
     }
     
@@ -72,32 +72,32 @@ namespace FileSystem
             if ( flen <= sizeof(FileHeader) )
             {
                 file.close();
-				throw std::length_error("File too small to contain valid data");
+                throw std::length_error("File too small to contain valid data");
             }
 
-	    // Hopefully reading automatically advances the read point in the file?
+        // Hopefully reading automatically advances the read point in the file?
         FileHeader header;
-	    Serialiser::zeroBuffer(&header, sizeof(FileHeader));
+        Serialiser::zeroBuffer(&header, sizeof(FileHeader));
             file.read(reinterpret_cast<char*>(&header), sizeof(FileHeader));
 
             if ( header.identifier[0] != 'F' ||     // Check identifier.
                  header.identifier[1] != 'Z' ||
                  header.identifier[2] != 'D' ||
                  header.identifier[3] != 'B' ||
-                 header.version != FZDB_VERSION)	// Check it's the version we're expecting.
+                 header.version != FZDB_VERSION)    // Check it's the version we're expecting.
             {
                 throw FileFormatError();
             }
-	    
-	    if ( flen - sizeof(FileHeader) != header.size )
-	    {
-		throw std::length_error("Specified internal data size does not equal physical size of file.");
-	    }
-			
-	    if ( length < header.size )
-	    {
-		throw std::length_error("Buffer provided was too small to store the file data.");
-	    }
+        
+        if ( flen - sizeof(FileHeader) != header.size )
+        {
+        throw std::length_error("Specified internal data size does not equal physical size of file.");
+        }
+            
+        if ( length < header.size )
+        {
+        throw std::length_error("Buffer provided was too small to store the file data.");
+        }
             
             file.read(buffer, header.size);
         }
@@ -149,8 +149,8 @@ namespace FileSystem
         {
             file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 
-			FileHeader header;
-			Serialiser::zeroBuffer(&header, sizeof(FileHeader));
+            FileHeader header;
+            Serialiser::zeroBuffer(&header, sizeof(FileHeader));
             file.read(reinterpret_cast<char*>(&header), sizeof(FileHeader));
             length = header.size;
         }

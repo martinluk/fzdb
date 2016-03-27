@@ -16,7 +16,7 @@ QueryResult DebugSaveFile::execute()
     EntityManager manager;
     
     // Create some entities.
-	std::shared_ptr<Entity> e1 = manager.createEntity(std::string());
+    std::shared_ptr<Entity> e1 = manager.createEntity(std::string());
     
     std::vector<std::shared_ptr<String>> values;
     values.push_back(std::make_shared<String>("Arnold", 75));
@@ -24,7 +24,7 @@ QueryResult DebugSaveFile::execute()
     values.push_back(std::make_shared<String>("Clarence", 11));
    // e1->insertProperty<String>(new EntityProperty<String>(1, values));
     
-	std::shared_ptr<Entity> e2 = manager.createEntity(std::string());
+    std::shared_ptr<Entity> e2 = manager.createEntity(std::string());
     
     values.clear();
     values.push_back(std::make_shared<String>("Alice", 98));
@@ -42,16 +42,16 @@ QueryResult DebugSaveFile::execute()
     
     // Write to a file.
     log << "Working directory: " << FileSystem::workingDirectory() << "\n";
-	
-	bool success = true;
-	try
-	{
-		FileSystem::writeFile(FileSystem::workingDirectory() + std::string("/DebugSaveFile.bin"), serialiser);
-	}
-	catch (const std::exception &)
-	{
-		success = false;
-	}
+    
+    bool success = true;
+    try
+    {
+        FileSystem::writeFile(FileSystem::workingDirectory() + std::string("/DebugSaveFile.bin"), serialiser);
+    }
+    catch (const std::exception &)
+    {
+        success = false;
+    }
     
     log << "File write success: " << success << "\n";
     

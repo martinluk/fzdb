@@ -11,4 +11,4 @@ public:
     static QueryResult execute();
 };
 
-#endif	// JOBS_DEBUGSERIALISE_H
+#endif    // JOBS_DEBUGSERIALISE_H

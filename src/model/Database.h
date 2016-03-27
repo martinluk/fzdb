@@ -7,18 +7,18 @@
 class Database
 {
 public:
-	Database();
-	~Database();
-	
-	EntityManager& entityManager();
-	const EntityManager& entityManager() const;
-	
-	UserOperation& users();
-	const UserOperation& users() const;
-	
+    Database();
+    ~Database();
+    
+    EntityManager& entityManager();
+    const EntityManager& entityManager() const;
+    
+    UserOperation& users();
+    const UserOperation& users() const;
+    
 private:
-	EntityManager _entityManager;
-	UserOperation _users;
+    EntityManager _entityManager;
+    UserOperation _users;
 };
 
 #endif // MODEL_DATABASE_H

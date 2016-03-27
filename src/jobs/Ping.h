@@ -10,11 +10,11 @@ class PingJob : public Job
 {
 public:
 
-	PingJob(std::shared_ptr<ISession> session);
+    PingJob(std::shared_ptr<ISession> session);
 
-	virtual bool constOperation() const override { return true; }
-	virtual QueryResult executeConst() const override;
+    virtual bool constOperation() const override { return true; }
+    virtual QueryResult executeConst() const override;
 
 };
 
-#endif	// JOB_PINGJOB_H
+#endif    // JOB_PINGJOB_H

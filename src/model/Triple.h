@@ -6,106 +6,106 @@
 
 namespace model {
 
-	enum class TripleComponentType {
-		EntityRef,
-		String,
-		Integer,
-		Property,
-		Variable
-	};
+    enum class TripleComponentType {
+        EntityRef,
+        String,
+        Integer,
+        Property,
+        Variable
+    };
 
-	struct Subject {
-	public:
+    struct Subject {
+    public:
 
-		enum class Type {
-			ENTITYREF,
-			VARIABLE
-		};
+        enum class Type {
+            ENTITYREF,
+            VARIABLE
+        };
 
-		Type type;
-		std::string value;
+        Type type;
+        std::string value;
 
-		Subject() { }
+        Subject() { }
 
-		Subject(Type t, std::string val) : value(val) {
-			type = t;
-		}
-	};
+        Subject(Type t, std::string val) : value(val) {
+            type = t;
+        }
+    };
 
-	struct Predicate {
-	public:
+    struct Predicate {
+    public:
 
-		enum class Type {
-			PROPERTY,
-			VARIABLE
-		};
+        enum class Type {
+            PROPERTY,
+            VARIABLE
+        };
 
-		Type type;
-		std::string value;
+        Type type;
+        std::string value;
 
-		Predicate() { }
+        Predicate() { }
 
-		Predicate(Type t, std::string val) : value(val) {
-			type = t;
-		}
-	};
+        Predicate(Type t, std::string val) : value(val) {
+            type = t;
+        }
+    };
 
-	struct Object {
-	public:
+    struct Object {
+    public:
 
-		enum class Type {
-			VARIABLE = 0b0001,
-			ENTITYREF = 0b1000,
-			STRING = 0b1001,
-			INT = 0b1010
-		};
+        enum class Type {
+            VARIABLE = 0b0001,
+            ENTITYREF = 0b1000,
+            STRING = 0b1001,
+            INT = 0b1010
+        };
 
-		const static int VALUE_MASK = 0b1000;
+        const static int VALUE_MASK = 0b1000;
 
-		unsigned char certainty;
-		bool hasCertainty;
+        unsigned char certainty;
+        bool hasCertainty;
 
-		static inline bool IsValue(Type t) {
-			return ((int)t & model::Object::VALUE_MASK) != 0;
-		}
+        static inline bool IsValue(Type t) {
+            return ((int)t & model::Object::VALUE_MASK) != 0;
+        }
 
-		Type type;
-		std::string value;
+        Type type;
+        std::string value;
 
-		Object() : hasCertainty(false) { }
+        Object() : hasCertainty(false) { }
 
-		Object(Type t, std::string val) : value(val), hasCertainty(false) {
-			type = t;
-		}
+        Object(Type t, std::string val) : value(val), hasCertainty(false) {
+            type = t;
+        }
 
-		Object(Type t, std::string val, unsigned char cert) : value(val), certainty(cert), hasCertainty(true) {
-			type = t;
-		}
-	};
+        Object(Type t, std::string val, unsigned char cert) : value(val), certainty(cert), hasCertainty(true) {
+            type = t;
+        }
+    };
 
 
 
-	struct Triple {
-	public:
-		Subject subject;
-		Predicate predicate;
-		Object object;
+    struct Triple {
+    public:
+        Subject subject;
+        Predicate predicate;
+        Object object;
 
-		std::string meta_variable;
+        std::string meta_variable;
 
-		std::vector<std::string> variables();
+        std::vector<std::string> variables();
 
-		Triple(Subject sub, Predicate pred, Object obj) : subject(sub), predicate(pred), object(obj) {}
-		Triple(Subject sub, Predicate pred, Object obj, std::string meta_var) : subject(sub), predicate(pred), object(obj), meta_variable(meta_var) {}
+        Triple(Subject sub, Predicate pred, Object obj) : subject(sub), predicate(pred), object(obj) {}
+        Triple(Subject sub, Predicate pred, Object obj, std::string meta_var) : subject(sub), predicate(pred), object(obj), meta_variable(meta_var) {}
 
-		unsigned char Entropy() {
-			unsigned char entropy = 0;
-			if (subject.type == Subject::Type::VARIABLE) entropy++;
-			if (predicate.type == Predicate::Type::VARIABLE) entropy++;
-			if (object.type == Object::Type::VARIABLE) entropy++;
-			return entropy;
-		}
-	};
+        unsigned char Entropy() {
+            unsigned char entropy = 0;
+            if (subject.type == Subject::Type::VARIABLE) entropy++;
+            if (predicate.type == Predicate::Type::VARIABLE) entropy++;
+            if (object.type == Object::Type::VARIABLE) entropy++;
+            return entropy;
+        }
+    };
 
 }
 

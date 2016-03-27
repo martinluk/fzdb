@@ -14,17 +14,17 @@
 class UserOperation : public UserFileOperations
 { 
 public: 
-	UserOperation();
-	
-	Permission::UserGroup login(std::shared_ptr<ISession>&& session, const std::string &userName, const std::string &password);
-	void addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup);
-	void removeUser(const std::string &userName);
-	void changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup);
-	Permission::UserGroup getUserGroup(const std::string &userName) const;
+    UserOperation();
+    
+    Permission::UserGroup login(std::shared_ptr<ISession>&& session, const std::string &userName, const std::string &password);
+    void addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup);
+    void removeUser(const std::string &userName);
+    void changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup);
+    Permission::UserGroup getUserGroup(const std::string &userName) const;
 
 private:
-	IdGenerator _idGen;
+    IdGenerator _idGen;
 
 };
 
-#endif	// USER_USEROPERATION_H
+#endif    // USER_USEROPERATION_H

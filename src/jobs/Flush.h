@@ -14,8 +14,8 @@ public:
 
   Flush(std::shared_ptr<ISession> session);
 
-	virtual bool constOperation() const override { return false; }
-	virtual QueryResult executeNonConst() override;
+    virtual bool constOperation() const override { return false; }
+    virtual QueryResult executeNonConst() override;
 };
 
 

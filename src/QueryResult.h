@@ -10,16 +10,16 @@ public:
   
   enum class ErrorCode
   {
-	  NoError = 0,
-	  GenericError,
-	  ParseError,
-	  NotImplemented,
-	  TypeMismatch,
-	  FileSystemError,
-	  InsufficientPermissions,
-	  UserDataError,
+      NoError = 0,
+      GenericError,
+      ParseError,
+      NotImplemented,
+      TypeMismatch,
+      FileSystemError,
+      InsufficientPermissions,
+      UserDataError,
 
-	  UnhandledError    // Implies something happened while processing that we didn't account for.
+      UnhandledError    // Implies something happened while processing that we didn't account for.
   };
   
   static const std::string PROPERTY_STATUS;
@@ -36,16 +36,16 @@ public:
   // QueryResult interface - these properties should always be present within the JSON.
   /*
    * {
-   *	status: [bool],
-   *	errorCode: [int],
-   *	info: [string],
+   *    status: [bool],
+   *    errorCode: [int],
+   *    info: [string],
    * 
-   *	// Empty object if not applicable.
-   *	result:
-   *	{
-   *		type: [string],	// "text" or "fsparql"
-   *		data: [string] if "text", [array] if "fsparql" 
-   *	}
+   *    // Empty object if not applicable.
+   *    result:
+   *    {
+   *        type: [string],    // "text" or "fsparql"
+   *        data: [string] if "text", [array] if "fsparql" 
+   *    }
    * }
    */
   

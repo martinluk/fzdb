@@ -7,13 +7,13 @@
 class LoadFileJob : public Job
 {
 public:
-	LoadFileJob(std::shared_ptr<ISession> session, const std::string &message);
+    LoadFileJob(std::shared_ptr<ISession> session, const std::string &message);
 
-	virtual bool constOperation() const override { return false; }
-	virtual QueryResult executeNonConst() override;
-	
+    virtual bool constOperation() const override { return false; }
+    virtual QueryResult executeNonConst() override;
+    
 private:
-	std::string	_message;
+    std::string    _message;
 };
 
-#endif	// JOBS_LOADFILEJOB_H
+#endif    // JOBS_LOADFILEJOB_H

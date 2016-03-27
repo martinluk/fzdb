@@ -8,13 +8,13 @@
 class CreateEntityJob : public Job
 {
 public:
-	CreateEntityJob(std::shared_ptr<ISession> session, const std::string &type);
+    CreateEntityJob(std::shared_ptr<ISession> session, const std::string &type);
 
-	virtual bool constOperation() const override { return false; }
-	virtual QueryResult executeNonConst() override;
-	
+    virtual bool constOperation() const override { return false; }
+    virtual QueryResult executeNonConst() override;
+    
 private:
-	std::string _type;
+    std::string _type;
 };
 
-#endif	// JOBS_CREATEENTITYJOB_H
+#endif    // JOBS_CREATEENTITYJOB_H

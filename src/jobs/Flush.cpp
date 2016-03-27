@@ -10,9 +10,9 @@ Flush::Flush(std::shared_ptr<ISession> session) : Job(session)
 
 QueryResult Flush::executeNonConst()
 {
-	_database->entityManager().clearAll();
-	
-	QueryResult result;
+    _database->entityManager().clearAll();
+    
+    QueryResult result;
     result.setResultDataText("Database cleared.");
     return result;
 }

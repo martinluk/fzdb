@@ -7,13 +7,13 @@
 class SaveFileJob : public Job
 {
 public:
-	SaveFileJob(std::shared_ptr<ISession> session, const std::string &message);
+    SaveFileJob(std::shared_ptr<ISession> session, const std::string &message);
 
-	virtual bool constOperation() const override { return true; }
-	virtual QueryResult executeConst() const override;
-	
+    virtual bool constOperation() const override { return true; }
+    virtual QueryResult executeConst() const override;
+    
 private:
-	mutable std::string	_message;
+    mutable std::string    _message;
 };
 
-#endif	// JOBS_SAVEFILEJOB_H
+#endif    // JOBS_SAVEFILEJOB_H

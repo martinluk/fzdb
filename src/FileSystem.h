@@ -8,12 +8,12 @@
 namespace FileSystem
 {
     class FileFormatError : public std::runtime_error
-	{
+    {
     public:
         FileFormatError() : std::runtime_error("File format was not valid")
         {
         }
-	};
+    };
 
     // Any existing file is overwritten.
     void writeFile(const std::string &filename, const Serialiser &serialiser);

@@ -24,22 +24,22 @@ std::string outputSerialiserData(const Serialiser &serialiser)
     log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
 
     // i progresses in multiples of 8.
-	unsigned int total = 0;
-	unsigned int line = 1;
+    unsigned int total = 0;
+    unsigned int line = 1;
     for (int i = 0; i < length; i += 8)
     {
             if ( i > 0 )
                 log << "\n";
 
-			log.unsetf(std::ios_base::right);
-			log.setf(std::ios_base::left);
-			log << std::setfill (' ') << std::setw(6) << (std::string("[") + std::to_string(line) + std::string("]"));
+            log.unsetf(std::ios_base::right);
+            log.setf(std::ios_base::left);
+            log << std::setfill (' ') << std::setw(6) << (std::string("[") + std::to_string(line) + std::string("]"));
 
-			log.unsetf(std::ios_base::left);
-			log.setf(std::ios_base::right);
-			log << std::setw(0) << " ";
+            log.unsetf(std::ios_base::left);
+            log.setf(std::ios_base::right);
+            log << std::setw(0) << " ";
 
-			log << std::hex << std::setfill ('0') << std::setw(2);
+            log << std::hex << std::setfill ('0') << std::setw(2);
 
             // j selects the characters in each batch of 8.
             for(int j = 0; j < 8 && i+j < length; j++)
@@ -51,15 +51,15 @@ std::string outputSerialiserData(const Serialiser &serialiser)
                     // with a negative sign and spam 'ffffff', which we don't want.
                     int num = static_cast<unsigned char>(buffer[i+j]);
                     log << std::setfill ('0') << std::setw(2) << std::hex << num;
-					total++;
+                    total++;
 
-					if ( i+j == length-1 )
-					{
-						for (int space = 0; space < 8 - j - 1; space++)
-						{
-							log << "   ";
-						}
-					}
+                    if ( i+j == length-1 )
+                    {
+                        for (int space = 0; space < 8 - j - 1; space++)
+                        {
+                            log << "   ";
+                        }
+                    }
             }
 
             log << "\t";
@@ -71,29 +71,29 @@ std::string outputSerialiserData(const Serialiser &serialiser)
                     else
                             log << buffer[i+j];
 
-					if ( i+j == length-1 )
-					{
-						for (int space = 0; space < 8 - j - 1; space++)
-						{
-							log << " ";
-						}
-					}
+                    if ( i+j == length-1 )
+                    {
+                        for (int space = 0; space < 8 - j - 1; space++)
+                        {
+                            log << " ";
+                        }
+                    }
             }
 
-			log << " | ";
+            log << " | ";
 
-			log.unsetf(std::ios_base::right);
-			log.setf(std::ios_base::left);
-			log.setf(std::ios_base::showbase);
+            log.unsetf(std::ios_base::right);
+            log.setf(std::ios_base::left);
+            log.setf(std::ios_base::showbase);
 
-			log << std::setfill (' ') << std::setw(6) << std::hex << total;
-			log.unsetf(std::ios_base::showbase);
-			log << " (" << std::dec << total << ")";
+            log << std::setfill (' ') << std::setw(6) << std::hex << total;
+            log.unsetf(std::ios_base::showbase);
+            log << " (" << std::dec << total << ")";
 
-			log.unsetf(std::ios_base::left);
-			log.setf(std::ios_base::right);
+            log.unsetf(std::ios_base::left);
+            log.setf(std::ios_base::right);
 
-			line++;
+            line++;
     }
 
     return log.str();
@@ -155,14 +155,14 @@ QueryResult DebugSerialise::execute()
     Serialiser serialiser;
 
     std::shared_ptr<Base> tBase = std::make_shared<Base>(53, 0, std::string());
-	std::shared_ptr<Int> tInt = std::make_shared<Int>(1337, 0, (unsigned char)72);
-	std::shared_ptr<String> tString = std::make_shared<String>(std::string("Body of Baywatch, face of Crimewatch"), 0, 26);
-	std::shared_ptr<EntityRef> tEntRef = std::make_shared<EntityRef>((EHandle_t)1234, 0, 99);
+    std::shared_ptr<Int> tInt = std::make_shared<Int>(1337, 0, (unsigned char)72);
+    std::shared_ptr<String> tString = std::make_shared<String>(std::string("Body of Baywatch, face of Crimewatch"), 0, 26);
+    std::shared_ptr<EntityRef> tEntRef = std::make_shared<EntityRef>((EHandle_t)1234, 0, 99);
 
-	log << "Testing serialisation of Base type.\n";
-	log << testSerialise(tBase) << "\n";
+    log << "Testing serialisation of Base type.\n";
+    log << testSerialise(tBase) << "\n";
 
-	{
+    {
         serialiser.clear();
         TypeSerialiser tser(tBase);
         tser.serialise(serialiser);
@@ -170,48 +170,48 @@ QueryResult DebugSerialise::execute()
         log << "Unserialised Base: " << newBase->logString() << "\n";
     }
 
-	log << "\n";
+    log << "\n";
 
-	log << "Testing serialisation of Int type.\n";
-	log << testSerialise(tInt) << "\n";
+    log << "Testing serialisation of Int type.\n";
+    log << testSerialise(tInt) << "\n";
 
     {
         serialiser.clear();
         TypeSerialiser tser(tInt);
         tser.serialise(serialiser);
-		std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+        std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised Int: " << newBase->logString() << "\n";
     }
 
     log << "\n";
 
-	log << "Testing serialisation of String type.\n";
-	log << testSerialise(tString) << "\n";
+    log << "Testing serialisation of String type.\n";
+    log << testSerialise(tString) << "\n";
 
-	{
+    {
         serialiser.clear();
         TypeSerialiser tser(tString);
         tser.serialise(serialiser);
-		std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+        std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised String: " << newBase->logString() << "\n";
     }
 
     log << "\n";
 
-	log << "Testing serialisation of EntityRef type.\n";
-	log << testSerialise(tEntRef) << "\n";
+    log << "Testing serialisation of EntityRef type.\n";
+    log << testSerialise(tEntRef) << "\n";
 
     {
         serialiser.clear();
         TypeSerialiser tser(tEntRef);
         tser.serialise(serialiser);
-		std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+        std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
         log << "Unserialised EntityRef: " << newBase->logString() << "\n";
     }
 
     log << "\n";
 
-	std::shared_ptr<Entity> ent = std::make_shared<Entity>(12345, 67890);
+    std::shared_ptr<Entity> ent = std::make_shared<Entity>(12345, 67890);
 
     {
         std::vector<std::shared_ptr<String>> values;
@@ -223,7 +223,7 @@ QueryResult DebugSerialise::execute()
     }
 
     {
-		std::vector<std::shared_ptr<Int>> values;
+        std::vector<std::shared_ptr<Int>> values;
         values.push_back(std::make_shared<Int>(1337, 100));
         values.push_back(std::make_shared<Int>(420, 90));
         values.push_back(std::make_shared<Int>(8008, 80));
@@ -231,10 +231,10 @@ QueryResult DebugSerialise::execute()
         //ent->insertProperty<Int>(new EntityProperty<Int>(2, values));
     }
 
-	log << "Testing serialisation of Entity.\n";
-	log << testSerialise(ent) << "\n";
+    log << "Testing serialisation of Entity.\n";
+    log << testSerialise(ent) << "\n";
 
-	{
+    {
         serialiser.clear();
         EntitySerialiser eSer(ent);
         eSer.serialise(serialiser);
@@ -252,11 +252,11 @@ QueryResult DebugSerialise::execute()
 
         log << "\n";
 
-		//With shared_ptr newEnt will be deleted automatically when it falls out of scope
+        //With shared_ptr newEnt will be deleted automatically when it falls out of scope
         //delete newEnt;
-	}
-	
+    }
+    
     QueryResult result;
-	result.setResultDataText(log.str());
+    result.setResultDataText(log.str());
     return result;
 }

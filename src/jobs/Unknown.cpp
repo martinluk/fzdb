@@ -7,5 +7,5 @@ UnknownJob::UnknownJob(std::shared_ptr<ISession> session, std::string name) : Jo
 
 QueryResult UnknownJob::executeConst() const
 {
-	return QueryResult::generateError(QueryResult::ErrorCode::NotImplemented, std::string("Unknown command: ") + _name + std::string("."));
+    return QueryResult::generateError(QueryResult::ErrorCode::NotImplemented, std::string("Unknown command: ") + _name + std::string("."));
 }

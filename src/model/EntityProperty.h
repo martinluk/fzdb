@@ -33,68 +33,68 @@ using BasePointer = std::shared_ptr<model::types::Base>;
 
 class EntityProperty : public ILogString
 {
-	friend class EntitySerialiser;
+    friend class EntitySerialiser;
 public:
-	// Constructs a null property. This can be used for returning 'null',
-	// for example if no property matches a given search.
-	// isNull() will return true.
-	EntityProperty();
-	EntityProperty(const unsigned int &key, model::types::SubType subtype);
-	~EntityProperty();
-	EntityProperty(const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
+    // Constructs a null property. This can be used for returning 'null',
+    // for example if no property matches a given search.
+    // isNull() will return true.
+    EntityProperty();
+    EntityProperty(const unsigned int &key, model::types::SubType subtype);
+    ~EntityProperty();
+    EntityProperty(const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
 
-	// Returns true if this is a null property (ie. default-constructed).
-	// Internally, a property is null if its key is an empty string.
-	bool isNull() const;
+    // Returns true if this is a null property (ie. default-constructed).
+    // Internally, a property is null if its key is an empty string.
+    bool isNull() const;
 
-	// Returns true if this property is concrete.
-	// A property is concrete if it has one value of confidence 1.
-	bool isConcrete() const;
+    // Returns true if this property is concrete.
+    // A property is concrete if it has one value of confidence 1.
+    bool isConcrete() const;
 
-	// Returns true if the property is empty.
-	// A property is empty if it has no values.
-	bool isEmpty() const;
+    // Returns true if the property is empty.
+    // A property is empty if it has no values.
+    bool isEmpty() const;
 
-	// Getters
-	const unsigned int& keyRef() const;
+    // Getters
+    const unsigned int& keyRef() const;
 
-	virtual unsigned int count() const;
+    virtual unsigned int count() const;
 
-	//std::vector<std::shared_ptr<T>> values() const;
-	//std::shared_ptr<T> const& value(int index) const;
+    //std::vector<std::shared_ptr<T>> values() const;
+    //std::shared_ptr<T> const& value(int index) const;
 
-	virtual BasePointer baseValue(int index) const;
-	virtual std::vector<BasePointer> baseValues() const;
+    virtual BasePointer baseValue(int index) const;
+    virtual std::vector<BasePointer> baseValues() const;
 
-	//virtual std::shared_ptr<T> top() const;
-	virtual BasePointer baseTop() const;
-	
-	virtual unsigned int key() const;
-	virtual model::types::SubType subtype() const { return _subtype; }
+    //virtual std::shared_ptr<T> top() const;
+    virtual BasePointer baseTop() const;
+    
+    virtual unsigned int key() const;
+    virtual model::types::SubType subtype() const { return _subtype; }
 
-	// Setters:
+    // Setters:
 
-	// Appends a value to the value list.
-	void append(BasePointer value);
+    // Appends a value to the value list.
+    void append(BasePointer value);
 
-	// Appends a list of values.
-	void append(const std::vector<BasePointer> &list);
+    // Appends a list of values.
+    void append(const std::vector<BasePointer> &list);
 
-	// Clears this property of any values.
-	void clear();
+    // Clears this property of any values.
+    void clear();
 
-	// Removes any entries whose value matches.
-	// This ignores the confidence of the value.
-	void remove(const model::types::Base &value);
-	
-	virtual std::string logString(const Database* db = NULL) const override;
+    // Removes any entries whose value matches.
+    // This ignores the confidence of the value.
+    void remove(const model::types::Base &value);
+    
+    virtual std::string logString(const Database* db = NULL) const override;
 
 private:
-	unsigned int _key;
-	unsigned int _count;
-	model::types::SubType _subtype;
+    unsigned int _key;
+    unsigned int _count;
+    model::types::SubType _subtype;
 
-	std::forward_list<BasePointer> _valuesList;
+    std::forward_list<BasePointer> _valuesList;
 };
 
-#endif	// MODEL_ENTITYPROPERTY_H
+#endif    // MODEL_ENTITYPROPERTY_H

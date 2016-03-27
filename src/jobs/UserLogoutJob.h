@@ -6,12 +6,12 @@
 
 class UserLogoutJob : public Job {
 public:
-	UserLogoutJob(std::shared_ptr<ISession> session);
-	
-	virtual bool constOperation() const override { return true; }
-	virtual QueryResult executeConst() const override;
+    UserLogoutJob(std::shared_ptr<ISession> session);
+    
+    virtual bool constOperation() const override { return true; }
+    virtual QueryResult executeConst() const override;
 
 private:
-	std::shared_ptr<ISession> _session;
+    std::shared_ptr<ISession> _session;
 };
 

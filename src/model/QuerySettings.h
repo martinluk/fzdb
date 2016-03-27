@@ -3,7 +3,7 @@
 
 struct QuerySettings {
 public:
-	bool canon = false;
+    bool canon = false;
 };
 
 

@@ -1,45 +1,45 @@
 #ifndef FUZZY_MODEL_TYPES_SUBTYPE
-#define	FUZZY_MODEL_TYPES_SUBTYPE
+#define    FUZZY_MODEL_TYPES_SUBTYPE
 
 namespace model {
-	namespace types {
+    namespace types {
 
-		enum class SubType
-		{
-			TypeUndefined = 0,
-			TypeInt32,
-			TypeString,
-			TypeEntityRef,
-			TypeDate,
+        enum class SubType
+        {
+            TypeUndefined = 0,
+            TypeInt32,
+            TypeString,
+            TypeEntityRef,
+            TypeDate,
 
-			//Used in query processing but cannot be stored
-			PropertyReference,
-			ValueReference,
+            //Used in query processing but cannot be stored
+            PropertyReference,
+            ValueReference,
 
-			SUBTYPE_COUNT
-		};
+            SUBTYPE_COUNT
+        };
 
-		static const char* SubTypeString[] =
-		{
-			"TypeUndefined",
-			"TypeInt32",
-			"TypeString",
-			"TypeEntityRef",
-			"TypeDate",
+        static const char* SubTypeString[] =
+        {
+            "TypeUndefined",
+            "TypeInt32",
+            "TypeString",
+            "TypeEntityRef",
+            "TypeDate",
 
-			"PropertyReference",
-			"ValueReference"
-		};
+            "PropertyReference",
+            "ValueReference"
+        };
 
-		static const char* getSubTypeString(SubType t)
-		{
-			return ( t < SubType::TypeUndefined || t >= SubType::SUBTYPE_COUNT )
-				? SubTypeString[(int)SubType::TypeUndefined]
-				: SubTypeString[(int)t];
-		}
+        static const char* getSubTypeString(SubType t)
+        {
+            return ( t < SubType::TypeUndefined || t >= SubType::SUBTYPE_COUNT )
+                ? SubTypeString[(int)SubType::TypeUndefined]
+                : SubTypeString[(int)t];
+        }
 
-		class Base;
-	}
+        class Base;
+    }
 }
 
 #endif //FUZZY_MODEL_TYPES_SUBTYPE

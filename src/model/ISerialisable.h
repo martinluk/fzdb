@@ -18,4 +18,4 @@ namespace model
     };
 }
 
-#endif	// MODEL_ISERIALISABLE_H
+#endif    // MODEL_ISERIALISABLE_H

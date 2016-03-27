@@ -59,11 +59,11 @@ void sigHandler(int s)
  */
 int main(int argc, char* argv[]) {
 
-	/*
-	*   DEFAULT SETTINGS
-	*/
-	unsigned int port = 1407;
-	int loggingLevel = 0;
+    /*
+    *   DEFAULT SETTINGS
+    */
+    unsigned int port = 1407;
+    int loggingLevel = 0;
 
  /*
   *   HANDLE COMMAND LINE ARGUMENTS
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
       if(loggingLevel == 1) sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_st>("logfile", "txt", 23, 59, true));
       auto combined_logger = std::make_shared<spdlog::logger>("main", begin(sinks), end(sinks));
       spdlog::register_logger(combined_logger);
-	  combined_logger.get()->set_level(spdlog::level::trace);
+      combined_logger.get()->set_level(spdlog::level::trace);
   }
   catch (const spdlog::spdlog_ex& ex)
   {
@@ -165,8 +165,8 @@ int main(int argc, char* argv[]) {
   sigaction(SIGINT, &sigIntHandler, NULL);
 #else
   if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
-	  fprintf(stderr, "Unable to install handler!\n");
-	  return EXIT_FAILURE;
+      fprintf(stderr, "Unable to install handler!\n");
+      return EXIT_FAILURE;
   }
 #endif
 
@@ -177,8 +177,8 @@ int main(int argc, char* argv[]) {
   try {
     std::cout << "Fuzzy Database v0.1" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
-	std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
-	std::cout << "CTRL-C to stop" << std::endl;
+    std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
+    std::cout << "CTRL-C to stop" << std::endl;
 
     // Create the IO service.
     // This is essentially a link to the OS' IO system.
@@ -213,16 +213,16 @@ int main(int argc, char* argv[]) {
 #if PLATFORM == PLATFORM_WINDOWS
 BOOL WINAPI ConsoleHandler(DWORD dwType)
 {
-	switch (dwType) {
-	case CTRL_C_EVENT:
-		sigHandler(2);
-		break;
-	case CTRL_BREAK_EVENT:
-		printf("break\n");
-		break;
-	default:
-		printf("Some other event\n");
-	}
-	return TRUE;
+    switch (dwType) {
+    case CTRL_C_EVENT:
+        sigHandler(2);
+        break;
+    case CTRL_BREAK_EVENT:
+        printf("break\n");
+        break;
+    default:
+        printf("Some other event\n");
+    }
+    return TRUE;
 }
 #endif
