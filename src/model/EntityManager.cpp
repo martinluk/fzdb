@@ -957,6 +957,7 @@ std::vector<unsigned int> EntityManager::Scan6(VariableSet&& variableSet, const 
     return rowsAdded;
 }
 
+// entity $b $c
 void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2, const std::string&& metaVar) const {
     
     Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
@@ -977,31 +978,60 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
             iterableProperties = entity->properties();
         }
 
-        //iterate through properties
-        for (auto propertyPair : iterableProperties) {
-            auto vals = propertyPair.second->baseValues();
-            for (auto value : vals) {
+		if (variableSet.used(variableName2)) {
+			auto varNameId = variableSet.indexOf(variableName);
+			auto varName2Id = variableSet.indexOf(variableName2);
 
-                //if variablename2 is already set
-                if (variableSet.used(variableName2)) {
-                    auto rows = variableSet.find(variableName2, value->toString());
-                    for (auto rowId : rows) {
-                        variableSet.add(std::move(variableName),
-                            VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0),
-                            std::move(_propertyTypes.at(propertyPair.first)), rowId);
-                    }
-                }
-                else {
-                    auto rowId = variableSet.add(std::move(variableName), 
-                        VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0),
-                        model::types::SubType::PropertyReference);
+			for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
+				auto iter = (variableSet.getData()->begin() + i);
 
-                    variableSet.add(std::move(variableName2),
-                        VariableSetValue(value->Clone(), 0, 0),
-                        std::move(_propertyTypes.at(propertyPair.first)), rowId);
-                }                
-            }
-        }
+				if ((*iter)[varName2Id].empty()) continue;
+
+				bool found = false;
+
+				for (auto propertyPair : iterableProperties) {
+					auto met = entity->meetsCondition(propertyPair.first, model::Object(model::Object::Type::STRING, (*iter)[varName2Id].dataPointer()->toString()));
+					if (met.size() > 0) {
+						(*iter)[varNameId] = VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0);
+						found = true;
+					}
+				}
+
+				if (!found) {
+					variableSet.getData()->erase(iter);
+				}
+
+				/*if ((*iter)[varName2Id].dataPointer()->Equals(*vals[0].get())) {
+
+				}
+
+				auto rows = variableSet.find(variableName2, value->toString());
+				for (auto rowId : rows) {
+				variableSet.add(std::move(variableName),
+				VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0),
+				std::move(_propertyTypes.at(propertyPair.first)), rowId);
+				}*/
+			}
+		}
+		else {
+
+			//iterate through properties
+			for (auto propertyPair : iterableProperties) {
+				auto vals = propertyPair.second->baseValues();
+
+				for (auto value : vals) {
+
+					auto rowId = variableSet.add(std::move(variableName),
+						VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0),
+						model::types::SubType::PropertyReference);
+
+					variableSet.add(std::move(variableName2),
+						VariableSetValue(value->Clone(), 0, 0),
+						std::move(_propertyTypes.at(propertyPair.first)), rowId);
+				}
+			}
+
+		}        
     }
 
 }

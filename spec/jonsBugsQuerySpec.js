@@ -39,25 +39,37 @@ describe("Fuzzy Database", function() {
     describe("with the simpsons data loaded", function() {
 
       beforeAll(function(done) {
-        h.sendCmd(simpsonsTestData).then(done);
+        h.sendCmd("FLUSH").then(function() {
+          h.sendCmd(simpsonsTestData).then(done);
+        });
       });
 
       h.testCase("retrieving all forenames and surnames",  
 
-      `SELECT $forename $surname WHERE { $id <forename> $forename ; <surname> $surname }`,
+        `SELECT $forename $surname WHERE { $id <forename> $forename ; <surname> $surname }`,
 
-      // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
-      h.resultTemplate(
-        [{"forename": "Homer", "surname": "Simpson"},
-        {"forename": "Homer", "surname": "Power"}, 
-        {"forename": "Max", "surname": "Simpson"}, 
-        {"forename": "Max", "surname": "Power"}, 
-        {"forename": "Marge", "surname": "Simpson"},
-        {"forename": "Marge", "surname": "Bouvier"}, 
-        {"forename": "Ned", "surname": "Flanders"}, 
-        {"forename": "Moe", "surname": "Szyslak"}]
-      )
-    );
+        // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
+        h.resultTemplate(
+          [{"forename": "Homer", "surname": "Simpson"},
+          {"forename": "Homer", "surname": "Power"}, 
+          {"forename": "Max", "surname": "Simpson"}, 
+          {"forename": "Max", "surname": "Power"}, 
+          {"forename": "Marge", "surname": "Simpson"},
+          {"forename": "Marge", "surname": "Bouvier"}, 
+          {"forename": "Ned", "surname": "Flanders"}, 
+          {"forename": "Moe", "surname": "Szyslak"}]
+        )
+      );
+
+      h.testCase("killer query 1",  
+
+        `SELECT $a $b WHERE { entity:1 <surname> $a . entity:2 $b $a . entity:3 <forename> $c }`,
+
+        // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
+        h.resultTemplate(
+          [{"a":"Simpson","b":"2"}]
+        )
+      );
 
     });
  

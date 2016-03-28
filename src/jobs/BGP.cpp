@@ -39,6 +39,9 @@ QueryResult BGP::executeConst() const
             bool hasValues = false;
 
             for (auto iter2 = _query.selectLine.cbegin(); iter2 != _query.selectLine.cend(); iter2++) {
+
+				if (!variables.contains(*iter2))continue;
+
                 auto i = variables.indexOf(*iter2);
 
                 std::shared_ptr<model::types::Base> basePtr = (*iter)[i].dataPointer();
