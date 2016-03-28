@@ -777,18 +777,40 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
                 }), variableSet.getData()->end());
 
                 //TODO: but what about the type of the new data being added? :/
-                for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+                //for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+				for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
+					auto iter = (variableSet.getData()->begin() + i);
+					
                     Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[varIndex].dataPointer())->value();
                     auto currentEntityIter = _entities.find(entityHandle);
                     std::shared_ptr<Entity> currentEntity;
+
                     if (currentEntityIter != _entities.end()) {
                         currentEntity = _entities.at(entityHandle);
                     }
                     else {
                         throw std::runtime_error("Attempted to look up a non-existent entity");
                     }
-                    (*iter).emplace(iter->begin() + varIndex2, VariableSetValue(currentEntity->getProperty(propertyId)->baseValue(0)->Clone(), 0, 0));
+
+					auto values = currentEntity->getProperty(propertyId)->baseValues();
+
+					*(iter->begin() + varIndex2) = VariableSetValue(values[0]->Clone(), 0, 0);
+                
+					for (size_t valId = 1; valId < values.size(); valId++) {
+						std::vector<VariableSetValue> newVec;
+						for (size_t j = 0; j < iter->size(); j++) {
+							if (j != varIndex2) {
+								newVec.push_back((*iter)[j]);
+							}
+							else {
+								newVec.push_back(VariableSetValue(values[valId]->Clone(), 0, 0));
+							}
+						}
+						variableSet.getData()->emplace(iter + 1, newVec);
+					}
                 }
+
+				break;
             } // /model::types::SubType::TypeEntityRef
 
             case model::types::SubType::ValueReference: {
@@ -806,17 +828,9 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
                         variableSet.addToMetaRefRow(vsv.metaRef(), varIndex, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
                     }
                 }
+				break;
             }
         
-        }
-
-
-        if (variableSet.typeOf(variableName) == model::types::SubType::TypeEntityRef) {
-
-            
-        }
-        else {
-            //TODO: TypeException
         }
         return;
     }

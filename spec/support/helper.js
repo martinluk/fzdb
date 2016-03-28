@@ -17,14 +17,15 @@ helper.sendCmd = function(cmd) {
         client.removeListener('data', onDataFunc);
         resolve(JSON.parse(resultString + data));
       } else {
-        if(client.bytesRead-beforeBytes == 1024) {
-          //more to read
-          resultString += data.slice(0, -1);
-          beforeBytes = client.bytesRead;
-        } else {
-          //very bad - throw
-          throw new Error("Somehow read more than 1024 bytes :/")
+        var dataAsString = data.toString();
+
+        for(var i = 0; i<data.length; i++) {
+          if(data[i] != 0) {
+            resultString += dataAsString[i];
+          }
         }
+        
+        beforeBytes = client.bytesRead;
       }        
     };
 

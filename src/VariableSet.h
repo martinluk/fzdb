@@ -102,6 +102,16 @@ public:
             throw std::runtime_error("Unexpected variable");
         }
         else {
+
+			if (type != _metaData[var].first) {
+				if (_metaData[var].first == VariableType::TypeUndefined) {
+					_metaData[var].first = type;
+				}
+				else {
+					throw std::runtime_error("Attempted to mix variable types!");
+				}
+			}
+
             unsigned char offset = _metaData[var].second;
             _variablesUsed[offset] = true;
             //_values[row][_metaData[var].second] = value;
