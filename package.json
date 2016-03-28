@@ -10,5 +10,8 @@
     "express": "^4.13.4",
     "httpdispatcher": "^1.0.0",
     "jasmine": "^2.4.1"
+  },
+  "devDependencies": {
+    "lodash": "^4.6.1"
   }
 }
