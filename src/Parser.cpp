@@ -18,6 +18,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     static const boost::regex intRegex("[0-9]+");
     static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
     static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
+	static const boost::regex newEntityRegex("NEW\\( *\\$(.+) *\\)");
 
    boost::smatch matches;
    std::string data0 = "";
@@ -53,6 +54,11 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
         data0 = matches[1];
       str = matches[2];
     }
+
+   else if (boost::regex_match(str, matches, newEntityRegex)) {
+	   tokenType = ParsedTokenType::NEWENTITY;
+	   str = matches[1];
+   }
 
     else if (boost::regex_match(str, matches, simpleConfidenceRatingRegex)) {
         tokenType = ParsedTokenType::CONFIDENCE_RATING;
@@ -205,7 +211,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
         //spdlog::get("main")->info("Token type: {} Token content: {}", (int)iter->first.type, iter->second);
         if (iter->first.type == ParsedTokenType::CLOSE_CURLBRACE) {
             
-            if (pos != 2) {
+            if (pos != 3) {
                 throw ParseException("Incomplete triple!");
             }
 
@@ -235,8 +241,12 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
                     break;
                 case ParsedTokenType::FILTER:
                     tripleBlock.Add(parseFilter(std::move(iter->first), std::move(iter->second)));
-                    pos = 0;
+                    pos = 3;
                     break;
+				case ParsedTokenType::NEWENTITY:
+					tripleBlock.Add(iter->second);
+					pos = 3;
+					break;
                 case ParsedTokenType::KEYWORD_META:
                     if (inMetaBlock) {
                         throw ParseException("META blocks cannot be nested");
@@ -310,6 +320,7 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
                     model::Triple trip(model::Subject(subType, sub), model::Predicate(predType, pred), o, currentMetaVar);
                     tripleBlock.Add(std::move(trip));
                 }
+				pos = 3;
                 break;
             }
         }
@@ -404,12 +415,13 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                 type = QueryType::INSERT;
                 conditions = ParseInsert(std::move(iter), tokens.end());
             }
-            break;
-        }
 
-        if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
-            *iter++;
-            whereClause = ParseInsert(std::move(iter), tokens.end());
+			if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+				*iter++;
+				whereClause = ParseInsert(std::move(iter), tokens.end());
+				break;
+			}
+
             break;
         }
 
