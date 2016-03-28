@@ -1,5 +1,4 @@
 var h = require('./support/helper.js');
-var gen = require('./support/generator.js');
 var _ = require('lodash');
 
 // load test data

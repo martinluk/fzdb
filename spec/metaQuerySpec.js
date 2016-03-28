@@ -1,5 +1,4 @@
 var h = require('./support/helper.js');
-var gen = require('./support/generator.js');
 
 var simpsonsTestData = h.getData("simpsons_meta.fuz");
 
