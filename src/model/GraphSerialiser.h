@@ -8,6 +8,7 @@
 
 class EntityManager;
 
+// Serialises and unserialises all entity data within an EntityManager.
 class GraphSerialiser
 {
 public:
@@ -20,9 +21,9 @@ public:
     class InvalidInputGraphException : public std::runtime_error
     {
     public:
-	explicit InvalidInputGraphException(const std::string &msg) : std::runtime_error(msg)
-	{
-	}
+    explicit InvalidInputGraphException(const std::string &msg) : std::runtime_error(msg)
+    {
+    }
     };
     
 private:

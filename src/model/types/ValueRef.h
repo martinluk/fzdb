@@ -8,58 +8,64 @@
 typedef unsigned long long EHandle_t;
 
 namespace model {
-	namespace types {
-		class ValueRef : public Base {
-		private:
+    namespace types {
 
-			EHandle_t _entity;
-			unsigned int _property;
-			unsigned int _value;
-			
-		public:
-			ValueRef(unsigned long long entity, unsigned int prop, unsigned int value) : Base(100, 0, std::string()), 
-				_value(value), _entity(entity), _property(prop) {}
-	
-			virtual ~ValueRef() {}
+        // This class is used only by query processing.
+        // Holds a reference to another value. This is
+        // addressed by storing the entity handle, the
+        // property handle within the entity and the
+        // value handle within the property.
+        class ValueRef : public Base {
+        private:
 
-			EHandle_t entity() const { return _entity; }
-			unsigned int prop() const { return _property; }
-			unsigned int value() const { return _value; }
+            EHandle_t _entity;
+            unsigned int _property;
+            unsigned int _value;
+            
+        public:
+            ValueRef(unsigned long long entity, unsigned int prop, unsigned int value) : Base(100, 0, std::string()), 
+                _value(value), _entity(entity), _property(prop) {}
+    
+            virtual ~ValueRef() {}
 
-			virtual std::shared_ptr<Base> Clone() override {
-				return std::make_shared<ValueRef>(_entity, _property, _value);
-			}
+            EHandle_t entity() const { return _entity; }
+            unsigned int prop() const { return _property; }
+            unsigned int value() const { return _value; }
 
-			virtual SubType subtype() const
-			{
-				return SubType::ValueReference;
-			}
+            virtual std::shared_ptr<Base> Clone() override {
+                return std::make_shared<ValueRef>(_entity, _property, _value);
+            }
 
-			virtual std::string logString(const Database* db = NULL) const override
-			{
-				return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
-					+ std::to_string(confidence()) + std::string(")");
-			}
+            virtual SubType subtype() const
+            {
+                return SubType::ValueReference;
+            }
 
-			// Inherited via Base
-			virtual bool Equals(const std::string &val) const override {
-				return _value == std::stoll(val);
-			}
+            virtual std::string logString(const Database* db = NULL) const override
+            {
+                return std::string("EntityRef(") + std::to_string(_value) + std::string(", ")
+                    + std::to_string(confidence()) + std::string(")");
+            }
 
-			virtual bool valuesEqualOnly(const Base* other) const
-			{
-				const ValueRef* r = dynamic_cast<const ValueRef*>(other);
-				assert(r);
+            // Inherited via Base
+            virtual bool Equals(const std::string &val) const override {
+                return _value == std::stoll(val);
+            }
 
-				return Base::valuesEqualOnly(other) && _entity == r->_entity &&
-					_property == r->_property && _value == r->_value;
-			}
+            virtual bool valuesEqualOnly(const Base* other) const
+            {
+                const ValueRef* r = dynamic_cast<const ValueRef*>(other);
+                assert(r);
 
-			virtual std::string toString() const override {
-				return std::to_string(_value);
-			}
-		};
-	}
+                return Base::valuesEqualOnly(other) && _entity == r->_entity &&
+                    _property == r->_property && _value == r->_value;
+            }
+
+            virtual std::string toString() const override {
+                return std::to_string(_value);
+            }
+        };
+    }
 }
 
 

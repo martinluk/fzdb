@@ -7,9 +7,9 @@ boost::thread_group JobQueue::_threads;
 
 
 void JobQueue::ExecuteJob(Job* job) {
-	QueryResult result = job->execute();
+    QueryResult result = job->execute();
   job->Session()->respond(result.toJson());
-	delete job;
+    delete job;
 }
 
 void JobQueue::Init(boost::asio::io_service* service) {

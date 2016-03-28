@@ -19,17 +19,17 @@ QueryResult DebugLoadFile::execute()
     // Read in the debug file.
     std::vector<char> buffer;
     std::string filename = FileSystem::workingDirectory() + std::string("/DebugSaveFile.bin");
-	
-	bool success = true;
-	try
-	{
-		FileSystem::readFile(filename, buffer);
-	}
-	catch (const std::exception &)
-	{
-		success = false;
-	}
-	
+    
+    bool success = true;
+    try
+    {
+        FileSystem::readFile(filename, buffer);
+    }
+    catch (const std::exception &)
+    {
+        success = false;
+    }
+    
     if ( !success )
     {
         log << "Unable to read file '" << filename << "'. Have you run SAVEFILE previously?\n";

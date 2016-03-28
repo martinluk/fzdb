@@ -26,18 +26,18 @@ namespace util
         return elems;
     }
 
-		std::string toUppercase(const std::string &str)
-		{
-			std::string uppercase(str.c_str());
-			std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
-			return uppercase;
-		}
+        std::string toUppercase(const std::string &str)
+        {
+            std::string uppercase(str.c_str());
+            std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), [](unsigned char c) { return std::toupper(c); });
+            return uppercase;
+        }
 
-		std::string toLowercase(const std::string &str)
-		{
-			std::string lowercase(str.c_str());
-			std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), [](unsigned char c) { return std::tolower(c); });
-			return lowercase;
-		}
+        std::string toLowercase(const std::string &str)
+        {
+            std::string lowercase(str.c_str());
+            std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), [](unsigned char c) { return std::tolower(c); });
+            return lowercase;
+        }
 
 }

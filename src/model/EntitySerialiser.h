@@ -8,6 +8,7 @@
 
 class Entity;
 
+// Serialises and unserialises the data within an Entity object.
 class EntitySerialiser
 {
 public:

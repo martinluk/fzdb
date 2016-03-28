@@ -4,27 +4,27 @@
 #include "../user/UserOperation.h"
 
 DemoteAdminJob::DemoteAdminJob(std::shared_ptr<ISession> session, const std::string &username):IUserAdminJobs(session) {
-	_username = username;
+    _username = username;
 }
 
 QueryResult DemoteAdminJob::executeNonConst()
 {
-	if ( !hasAdminPermissions() )
-		return errorNoAdminPermissions();
-	
+    if ( !hasAdminPermissions() )
+        return errorNoAdminPermissions();
+    
     try {
         Permission::UserGroup group = _database->users().getUserGroup(_username); //Throws user not exist exception
 
         if (group != Permission::UserGroup::ADMIN) {
-        	return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, "User to demote is not an admin.");
-		}
+            return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, "User to demote is not an admin.");
+        }
     } catch (const std::exception &ex) {
         return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
     }
-	
-	_database->users().changeUserGroup(_username, Permission::UserGroup::EDITOR);
-	
-	QueryResult result;
+    
+    _database->users().changeUserGroup(_username, Permission::UserGroup::EDITOR);
+    
+    QueryResult result;
     result.setResultDataText(std::string("User ") + _username + std::string(" demoted to editor."));
     return result;
 }

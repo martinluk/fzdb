@@ -3,11 +3,12 @@
 #include "../user/Permission.h"
 #include "../QueryResult.h"
 
+// Shared base class for user management jobs.
 class IUserAdminJobs : public Job {
-	public:
+    public:
        IUserAdminJobs(std::shared_ptr<ISession> session);
-	   
+       
     protected:
-		bool hasAdminPermissions() const;
-		static QueryResult errorNoAdminPermissions();
+        bool hasAdminPermissions() const;
+        static QueryResult errorNoAdminPermissions();
 };

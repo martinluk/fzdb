@@ -1,6 +1,9 @@
 
 #include <stack>
 
+// Class used for generating IDs.
+// If an ID is released, call addDeleted() to let the generator know.
+// Released IDs are kept in a stack and re-allocated.
 class IdGenerator {
 private:
   unsigned int _count;

@@ -5,6 +5,7 @@
 #include "../Job.h"
 #include "QueryResult.h"
 
+// Tests saving a sample file.
 class DebugSaveFile
 {
 public:

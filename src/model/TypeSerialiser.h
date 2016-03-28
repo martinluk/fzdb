@@ -10,6 +10,7 @@ namespace model
 {
     namespace types
     {
+        // Convenience class for serialising value types.
         class TypeSerialiser
         {
         public:

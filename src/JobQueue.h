@@ -7,6 +7,7 @@
 #include <boost/thread.hpp>
 #include "Job.h"
 
+// Queue of jobs to be executed. Has capability for multithreading.
 class JobQueue
 {
 private:

@@ -10,15 +10,13 @@
 #include "./EntityProperty.h"
 #include "./types/SubType.h"
 
-// Represents an entity in the graph database.
-// Each entity has a handle, which is a unique identifier.
-// An entity's handle cannot be changed once it is instanciated.
-// An entity owns all of its EntityProperties and will delete them as appropriate.
+// This is basically a stripped-down Entity class.
+// TODO: (Jonathan) Tim, you're probably better at explaining this one.
 class PropertyOwner
 {
 public:
 
-	virtual ~PropertyOwner();
+    virtual ~PropertyOwner();
 
 	PropertyOwner() {
 		_locked = false;
@@ -31,25 +29,25 @@ public:
 
 	void insertProperty(std::shared_ptr<EntityProperty> prop);
 
-	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object);
+    void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object);
 
-	// Removes the property with the given key.
-	void removeProperty(const unsigned int &key);
+    // Removes the property with the given key.
+    void removeProperty(const unsigned int &key);
 
-	// Tests if the entity has a property
-	bool hasProperty(const unsigned int &key);
+    // Tests if the entity has a property
+    bool hasProperty(const unsigned int &key);
 
-	// Returns read only reference to the property table
-	const std::map<unsigned int, std::shared_ptr<EntityProperty>>& properties() const;
+    // Returns read only reference to the property table
+    const std::map<unsigned int, std::shared_ptr<EntityProperty>>& properties() const;
 
-	// Tests if the entity meets the condition
-	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
+    // Tests if the entity meets the condition
+    std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
 
-	// Clears all properties on the entity.
-	void clearProperties();
+    // Clears all properties on the entity.
+    void clearProperties();
 
-	// Returns the number of properties present.
-	int propertyCount() const;
+    // Returns the number of properties present.
+    int propertyCount() const;
 
 	void lock() { 
 		_locked = true; 
@@ -67,4 +65,4 @@ protected:
 	}
 };
 
-#endif	// MODEL_PROPERTY_OWNER_H
+#endif    // MODEL_PROPERTY_OWNER_H

@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 
+// Convenience functions.
 namespace util
 {
     std::vector<std::string> split(const std::string &s, char delim);
