@@ -6,18 +6,19 @@
 #include "spdlog/spdlog.h"
 
 // Increment this when the format changes.
+// TODO: Need to update this to cater for new things!
 #define SERIAL_HEADER_CURRENT_VERSION 1
 
 struct SerialHeader
 {
-    unsigned short version;            // Version of the serialisation structure.
-    std::size_t size;                // Total serialised size in bytes.
+    unsigned short version;             // Version of the serialisation structure.
+    std::size_t size;                   // Total serialised size in bytes.
 
-    std::size_t typeMapOffset;        // Offset from beginning of serialisation where the type map data resides.
-    std::size_t    typeMapLength;        // Length of this serialisation in bytes.
+    std::size_t typeMapOffset;          // Offset from beginning of serialisation where the type map data resides.
+    std::size_t typeMapLength;          // Length of this serialisation in bytes.
 
-    std::size_t entityDataOffset;    // Offset from beginning of serialisation where the entity data resides.
-    std::size_t    entityDataLength;    // Length of this serialisation in bytes.
+    std::size_t entityDataOffset;       // Offset from beginning of serialisation where the entity data resides.
+    std::size_t entityDataLength;       // Length of this serialisation in bytes.
 };
 
 struct EntityDataHeader
