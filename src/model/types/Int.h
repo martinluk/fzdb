@@ -32,7 +32,7 @@ namespace model {
                 initMemberSerialiser();
             }
             
-            Int(std::string value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+            Int(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Int(std::atoi(value.c_str()), author, confidence, comment)
             {
                 // Already initialised
@@ -76,6 +76,13 @@ namespace model {
 
             virtual std::string toString() const override {
                 return std::to_string(_value);
+            }
+
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const Int* cOther = dynamic_cast<const Int*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _value == cOther->_value;
             }
 
         protected:

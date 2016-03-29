@@ -19,40 +19,11 @@ namespace model {
         // Base value type class. All other types inherit from this.
         class Base : public ILogString, public PropertyOwner
         {
-        protected:
-            friend class TypeSerialiser;
-            unsigned char _confidence;
-            
-            std::string _comment;
-            MemberSerialiser::DynamicStringMember _commentWrapper;
-            
+            // Jonathan: this member serialiser needs to be private otherwise subclasses defining their own end up adding
+            // their entries to this one!
+        private:
             MemberSerialiser _memberSerialiser;
 
-            // JONATHAN: Un-const'd these as they don't strictly need to be const (we can just
-            // not provide setter methods) and if they are it messes with the member serialiser.
-            // I should fix that but we don't have time right now.
-
-            // Entity id of source entity
-            unsigned long long _sourceEntityId;
-
-            // User who created the record
-            unsigned int _originalAuthorId;
-
-            // Time record was created
-            boost::posix_time::ptime _timeCreated;
-
-            // Convenience for serialisation.
-            boost::gregorian::date::year_type _cYearCreated;
-            boost::gregorian::date::month_type _cMonthCreated;
-            boost::gregorian::date::day_type _cDayCreated;
-            boost::posix_time::time_duration::hour_type _cHourCreated;
-            boost::posix_time::time_duration::min_type _cMinCreated;
-            boost::posix_time::time_duration::sec_type _cSecCreated;
-            boost::posix_time::time_duration::fractional_seconds_type _cFracSecCreated;
-
-            // id for this record - unique for entity/property/id - related to ordering
-            unsigned int _orderingId;
-        
             void initMemberSerialiser()
             {
                 _memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
@@ -84,6 +55,38 @@ namespace model {
                 _cSecCreated = timeCreated.seconds();
                 _cFracSecCreated = timeCreated.fractional_seconds();
             }
+
+        protected:
+            friend class TypeSerialiser;
+            unsigned char _confidence;
+            
+            std::string _comment;
+            MemberSerialiser::DynamicStringMember _commentWrapper;
+
+            // JONATHAN: Un-const'd these as they don't strictly need to be const (we can just
+            // not provide setter methods) and if they are it messes with the member serialiser.
+            // I should fix that but we don't have time right now.
+
+            // Entity id of source entity
+            unsigned long long _sourceEntityId;
+
+            // User who created the record
+            unsigned int _originalAuthorId;
+
+            // Time record was created
+            boost::posix_time::ptime _timeCreated;
+
+            // Convenience for serialisation.
+            boost::gregorian::date::year_type _cYearCreated;
+            boost::gregorian::date::month_type _cMonthCreated;
+            boost::gregorian::date::day_type _cDayCreated;
+            boost::posix_time::time_duration::hour_type _cHourCreated;
+            boost::posix_time::time_duration::min_type _cMinCreated;
+            boost::posix_time::time_duration::sec_type _cSecCreated;
+            boost::posix_time::time_duration::fractional_seconds_type _cFracSecCreated;
+
+            // id for this record - unique for entity/property/id - related to ordering
+            unsigned int _orderingId;
 
         public:
 
@@ -177,6 +180,18 @@ namespace model {
 
             unsigned int OrderingId() {
                 return _orderingId;
+            }
+
+            // For debugging - make sure we are -exactly- the same as the other type.
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                return subtype() == other->subtype() &&
+                        _confidence == other->_confidence &&
+                        _comment == other->_comment &&
+                        _orderingId == other->_orderingId &&
+                        _originalAuthorId == other->_originalAuthorId &&
+                        _sourceEntityId == other->_sourceEntityId &&
+                        _timeCreated == other->_timeCreated;
             }
 
         protected:

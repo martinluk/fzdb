@@ -14,7 +14,7 @@ struct SerialHeader
     SubType subtype;
 };
 
-TypeSerialiser::TypeSerialiser(const std::shared_ptr<Base> type) : baseType_(type)
+TypeSerialiser::TypeSerialiser(const std::shared_ptr<Base> &type) : baseType_(type)
 {
 }
 

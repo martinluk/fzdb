@@ -64,6 +64,15 @@ namespace model {
             virtual std::string toString() const override {
                 return std::to_string(_value);
             }
+
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const ValueRef* cOther = dynamic_cast<const ValueRef*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _entity == cOther->_entity &&
+                        _property == cOther->_property &&
+                        _value == cOther->_value;
+            }
         };
     }
 }

@@ -149,14 +149,14 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         if ( !val.get() )
         {
             throw EntitySerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
-                                                                + " of entity " + std::to_string(ent->handle())
+                                                                + " of entity " + std::to_string(ent->getHandle())
                                                                 + " - null property returned.");
         }
 
         if ( val->subtype() != header->subtype )
         {
             throw EntitySerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
-                                                                + " of entity " + std::to_string(ent->handle())
+                                                                + " of entity " + std::to_string(ent->getHandle())
                                                                 + ": subtype \"" + model::types::getSubTypeString(val->subtype())
                                                                 + "\" does not match expected subtype \""
                                                                 + model::types::getSubTypeString(header->subtype) + "\".");
@@ -166,7 +166,7 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         data += advance;
     }
 
-    ent->insertProperty(BasePointer(header->key, values));
+    ent->insertProperty(std::shared_ptr<EntityProperty>(new EntityProperty(header->key, header->subtype, values)));
 }
 
 std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, std::size_t length)
@@ -232,7 +232,7 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
 
         default:
             throw InvalidInputEntityException("Error unserialising property " + std::to_string(p->key)
-                                              + " of entity " + std::to_string(ent->handle())
+                                              + " of entity " + std::to_string(ent->getHandle())
                                               + ": subtype \"" + model::types::getSubTypeString(p->subtype)
                                               + "\" is invalid.");
         }

@@ -21,14 +21,16 @@ std::size_t MemberSerialiser::serialisePrimitives(Serialiser &serialiser) const
 std::size_t MemberSerialiser::unserialisePrimitives(const char *serialisedData, std::size_t length)
 {
     std::size_t unserialised = 0;
+    int count = 0;
     for ( auto it = _primitives.begin(); it != _primitives.end(); ++it )
     {
         if ( unserialised + it->second > length )
-            throw InvalidInputMemberException("Primitive member length exceeds length of input data.");
+            throw InvalidInputMemberException("Length of primitive member " + std::to_string(count) + " exceeds length of input data.");
 
         memcpy(it->first, serialisedData, it->second);
         unserialised += it->second;
         serialisedData += it->second;
+        count++;
     }
     
     return unserialised;
@@ -70,18 +72,20 @@ std::size_t MemberSerialiser::serialiseDynamicMembers(Serialiser &serialiser) co
 std::size_t MemberSerialiser::unserialiseDynamicMembers(const char *serialisedData, std::size_t length)
 {
     std::size_t unserialised = 0;
+    int count = 0;
     for ( auto it = _dynamicMembers.begin(); it != _dynamicMembers.end(); ++it )
     {
         IDynamicMember* d = *it;
         const std::size_t* l = reinterpret_cast<const std::size_t*>(serialisedData);
 
         if ( unserialised + *l > length )
-            throw InvalidInputMemberException("Dynamic member length exceeds length of input data.");
+            throw InvalidInputMemberException("Length of primitive member " + std::to_string(count) + " exceeds length of input data.");
 
         serialisedData += sizeof(std::size_t);
         d->memberUnserialise(serialisedData, *l);
         unserialised += sizeof(std::size_t) + *l;
         serialisedData += *l;
+        count++;
     }
     
     return unserialised;

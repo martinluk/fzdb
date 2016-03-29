@@ -83,6 +83,13 @@ namespace model {
                 return std::to_string(_value);
             }
 
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const EntityRef* cOther = dynamic_cast<const EntityRef*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _value == cOther->_value;
+            }
+
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
             {
