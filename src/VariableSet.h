@@ -65,6 +65,13 @@ public:
         }
         
     }
+
+	void extend(std::string variableName) {
+		
+		_variablesUsed.push_back(false);
+		_metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, _size);
+		_size++;
+	}
     
     unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
         if (_metaData.find(var) == _metaData.cend()) {

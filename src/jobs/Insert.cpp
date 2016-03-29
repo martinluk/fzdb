@@ -11,7 +11,7 @@ Insert::Insert(std::shared_ptr<ISession> session, Query query) : Job(session), _
 QueryResult Insert::executeNonConst()
 {
     try {
-        _database->entityManager().Insert(std::move(_query.conditions));
+        _database->entityManager().Insert(std::move(_query.conditions), std::move(_query.whereClause), std::move(_query.settings));
     }
     catch (MismatchedTypeException ex) {
         return QueryResult::generateError(QueryResult::ErrorCode::TypeMismatch, ex.what());

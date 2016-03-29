@@ -107,7 +107,7 @@ struct TriplesBlock {
 public:
     std::vector<model::Triple> triples;
     std::vector<IFilter*> filters;
-	std::set<std::string> newEntities;
+	std::set<std::pair<std::string, std::string>> newEntities;
     std::set<std::string> variables;
     std::set<std::string> metaVariables;
 
@@ -125,8 +125,12 @@ public:
       filters.push_back(filter);   
    }
 
-   void Add(std::string newEntity) {
-	   newEntities.insert(newEntity);
+   void Add(std::string newEntity, std::string type) {
+	   newEntities.insert(std::make_pair(newEntity, type));
+   }
+
+   const bool HasNewEntities() {
+	   return newEntities.size() > 0;
    }
 
    void Sort() {

@@ -169,9 +169,18 @@ void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
 }
 
 //Inserts new data into the data store
-void EntityManager::Insert(TriplesBlock&& block)
+void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, QuerySettings&& settings)
 {
-    //sort by entropy
+	VariableSet whereVars = BGP(whereBlock, settings);
+
+	for (auto newVar : whereBlock.newEntities) {
+		whereVars.extend(newVar.first);
+		auto newEntity = createEntity(newVar.second);
+		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
+		whereVars.add(std::move(newVar.first), VariableSetValue(entityPointer, 0, 0), VariableType::TypeEntityRef);
+	}
+	
+	//sort by entropy
     block.Sort();
 
     auto iter = block.triples.cbegin();
@@ -215,7 +224,8 @@ void EntityManager::Insert(TriplesBlock&& block)
                 //create the entity if it doesn't exist
                 if (_entities.find(entity_id) == _entities.end())
                 {
-                    _entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
+                    //_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
+					throw std::runtime_error("No entity with id " + std::to_string(entity_id) + " was found");
                 }
 
                 std::shared_ptr<Entity> currentEntity = _entities[entity_id];
@@ -240,16 +250,31 @@ void EntityManager::Insert(TriplesBlock&& block)
 
             case model::Subject::Type::VARIABLE: {
                 if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end()) {
-                    throw std::runtime_error("Only meta-variables are allowed in INSERT statements at this time");
-                }
+					if (whereVars.contains(triple.subject.value)) {
+						if (whereVars.typeOf(triple.subject.value) != VariableType::TypeEntityRef) {
+							throw new std::runtime_error("Variables bound in the WHERE clause of an insert statement used in the body of that statement MUST resolve to entity values");
+						}
 
-                auto values = variableSet.getData(triple.subject.value);
+						auto varId = whereVars.indexOf(triple.subject.value);
 
-                for (auto val : values) {
-                    std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
-                    auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
-                    record->insertProperty(propertyId, newRecord);
-                }
+						for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+							if ((*whereVarIter)[varId].empty()) continue;
+
+							Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*whereVarIter)[varId].dataPointer())->value();
+							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
+							currentEntity->insertProperty(propertyId, newRecord);
+						}
+					}
+				} else {
+
+					auto values = variableSet.getData(triple.subject.value);
+
+					for (auto val : values) {
+						std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
+						auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+						record->insertProperty(propertyId, newRecord);
+					}
+				}
                 break;
             }
         
@@ -312,14 +337,19 @@ void EntityManager::clearAll()
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
     _lastProperty = 0;
-	_lastTypeID = 1;
-    _entityTypeNames.clear();
-	_entityTypeNames.insert(std::pair<std::string, unsigned int>("source", 0));
+	_lastTypeID = 0;
+    _entityTypeNames.clear();	
     _propertyNames.clear();
-    _propertyTypes.clear();
+	_propertyTypes.clear();
 	_links.clear();
 	
-	//auto unknownSourceEntity = createEntity("source");
+	_entityTypeNames.insert(std::pair<std::string, unsigned int>("source", _lastTypeID++));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("name", _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty, model::types::SubType::TypeString));
+	auto id = _propertyNames.left.at("name");
+	auto unknownSourceEntity = createEntity("source");
+	unknownSourceEntity->insertProperty(_lastProperty++, std::make_shared<model::types::String>("Unknown Source", 0));
+	unknownSourceEntity->lock();
 }
 
 std::size_t EntityManager::entityCount() const
@@ -468,6 +498,10 @@ std::set<Entity::EHandle_t> EntityManager::getLinkGraph(const Entity::EHandle_t 
 
 void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2) {
 
+	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {
+		throw std::runtime_error("Attempting to link non-existant entity");
+	}
+
     //create link sets if they do not exists
     if (_links.find(entityId) == _links.end()) _links[entityId] = std::set<Entity::EHandle_t>();
     if (_links.find(entityId2) == _links.end()) _links[entityId2] = std::set<Entity::EHandle_t>();
@@ -488,6 +522,10 @@ void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity:
 }
 
 void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
+	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {
+		throw std::runtime_error("Attempting to unlink non-existant entity");
+	}
 
     //if they are not actually linked, return
     if (_links.find(entityId) == _links.end() || _links.find(entityId2) == _links.end() ||
@@ -537,6 +575,10 @@ void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t
 
 // Merges the entities with the given Ids. The entity with the higher Id number is deleted.
 void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
+	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {
+		throw std::runtime_error("Attempting to link final non-existant entity");
+	}
 
     //we will keep the entity with the lower id
     Entity::EHandle_t keep, lose;
