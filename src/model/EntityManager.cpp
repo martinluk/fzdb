@@ -195,19 +195,30 @@ void EntityManager::Insert(TriplesBlock&& block) {
 	}
 }
 
-void EntityManager::Delete(TriplesBlock&& block) {
+void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> selectLine) {
 	/* 
 	 * For each variable described in triple block
 	 * delete it
 	 */
+	using VariableType = model::types::SubType;
 	//Get VariableSet from BGP
 	QuerySettings qs;
-	VariableSet vs = BGP(block, qs); 
-	spdlog::get("main")->info("Current triple block");
+	VariableSet variableSet = BGP(block, qs);
 	//Iterating over the returned variable set
-	
-	auto vs_data = vs.getData();
-
+	auto values = variableSet.getData(); //std::vector<std::vector<VariableSetValue>>
+	//Find out row number that is entity
+	for (auto row : *values) {
+		//Iterating over the column
+		for (VariableSetValue val: row) {
+			spdlog::get("main")->info("Am I here?");
+			if (val.entity()!=0) {
+				//Value's entity value is set, meaning it is entity
+				//Delete entity.
+				_entities.erase(val.entity());
+			} 
+			//TODO Remove all properties that are link to the entity getting deleted
+		}
+	}
 }
 
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)

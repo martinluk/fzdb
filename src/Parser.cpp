@@ -422,7 +422,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 				else { throw ParseException("Expected 'WHERE'"); }
 			}
 			else {
-				throw ParseException("Incomplete SELECT statement");
+				throw ParseException("Incomplete DELETE statement");
 			}
 			break;
 		}

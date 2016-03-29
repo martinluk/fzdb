@@ -39,7 +39,7 @@ public:
 
 	void Insert(TriplesBlock&& triples);
 
-	void Delete(TriplesBlock&& triples);
+	void Delete(TriplesBlock&& triples, std::vector<std::string> selectLine);
 
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
