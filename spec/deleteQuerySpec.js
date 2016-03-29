@@ -43,18 +43,19 @@ describe("fzdb", function() {
 			});
 			it("and now Fred lives in DB", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					console.log(data.result.data);
 					expect((data.result.data).length).toBe(1);
 					done();
 				});          
 			});
 			it("Running the delete query", function(done) {
-				sendCmd("DELETE DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
+				sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+					expect(data.status).toBe(true);
 					done();
 				});    
 			});
 			it("Resulting in Fred no longer lives in DB", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+					console.log(data);
 					expect((data.result.data).length).toBe(0);
 					done();
 				});          
@@ -85,10 +86,12 @@ describe("fzdb", function() {
 					done();
 				});          
 			});    
-			it("Having entity 1 and entity 2", function(done) {
+			it("Having entity 1", function(done) {
 				sendCmd("INSERT DATA { entity:1 <forename> \"Fred\" }") .then(function(data) {done(); });    
-				sendCmd("INSERT DATA { entity:2 <surname> \"Smith\" }") .then(function(data) { done(); });       
 			});    
+			it("Having entity 2", function(done) {
+				sendCmd("INSERT DATA { entity:2 <surname> \"Smith\" }") .then(function(data) { done(); });       
+			});
 			it("'Entity 2 contains data", function(done) {
 				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\"}").then(function(data) {
 					//console.log(data);
@@ -106,8 +109,8 @@ describe("fzdb", function() {
 					done();
 				});     
 			});
-			xit("Deleting entity 1", function(done) {
-				sendCmd("DELETE DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
+			it("Deleting entity 1", function(done) {
+				sendCmd("DELETE DATA {  <forename> \"Fred\" }").then(function(data) {
 					expect(data).toEqual(jasmine.objectContaining({
 						status:true,
 						errorCode: 0
@@ -132,7 +135,7 @@ describe("fzdb", function() {
 			});
 
 		});
-		xdescribe("Entities with properties:", function() {
+		describe("Entities with properties:", function() {
 			/* XXX Need double checking behaviour
 			 * Add with two properties
 			 * Delete one of the property
@@ -150,36 +153,6 @@ describe("fzdb", function() {
 					done();
 				});      
 			});
-
-			//TODO 
-			
-			it("Final clean up", function(done) {
-				sendCmd("FLUSH").then(function(data) { done(); });    
-			});
-
-		});
-		xdescribe("Delete all using ?x ?y ?z:", function() {
-			/* XXX Need double checking behaviour
-			 * Add some entities
-			 * Delete $x $y $z
-			 * Nothing left.
-			 */
-			it("Starting new db state", function(done) {
-				sendCmd("FLUSH").then(function(data) { done(); });    
-			});
-			it("Adding some entities", function(done) {
-				done(); //TODO
-			});
-			it("Delete $x $y $z", function(done) {
-				done(); //TODO
-			});
-			it("Assert there is nothing left", function(done) {
-				done(); //TODO
-			});
-			it("Final clean up", function(done) {
-				sendCmd("FLUSH").then(function(data) { done(); });    
-			});
-
 		});
 	});
 });
