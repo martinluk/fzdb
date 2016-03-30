@@ -169,13 +169,18 @@ void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
 }
 
 //Inserts new data into the data store
-void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, QuerySettings&& settings)
+std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, QuerySettings&& settings)
 {
 	VariableSet whereVars = BGP(whereBlock, settings);
 
 	for (auto newVar : whereBlock.newEntities) {
 		whereVars.extend(newVar.first);
+	}
+
+	std::map<std::string, Entity::EHandle_t> createdEntities;
+	for (auto newVar : whereBlock.newEntities) {
 		auto newEntity = createEntity(newVar.second);
+		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
 		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
 		whereVars.add(std::move(newVar.first), VariableSetValue(entityPointer, 0, 0), VariableType::TypeEntityRef);
 	}
@@ -195,22 +200,34 @@ void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, Quer
         auto triple = *iter;
 
         unsigned char confidence = triple.object.hasCertainty ? triple.object.certainty : 100;
-        std::shared_ptr<model::types::Base> newRecord;
+        std::vector<std::shared_ptr<model::types::Base>> newRecords;
         model::types::SubType newRecordType;
 
         switch (triple.object.type) {
         case model::Object::Type::STRING:
             newRecordType = model::types::SubType::TypeString;
-            newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+            newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
             break;
         case model::Object::Type::ENTITYREF:
             newRecordType = model::types::SubType::TypeEntityRef;
-            newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
             break;
         case model::Object::Type::INT:
             newRecordType = model::types::SubType::TypeInt32;
-            newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
             break;
+		case model::Object::Type::VARIABLE: {
+				auto varId = whereVars.indexOf(triple.object.value);
+				for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+					if ((*whereVarIter)[varId].empty()) continue;
+					//one new record for each match!
+					//TODO: make this work!!
+					// $a <wife> $b WHERE { NEW($a) . NEW($b) }
+					newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
+				}
+				newRecordType = whereVars.typeOf(triple.object.value);
+				break;
+			}
         }
 
         unsigned int propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
@@ -239,12 +256,14 @@ void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, Quer
                 enforceTypeHasBeenSet(currentEntity.get());
 
                 //note that the OrderingId attribute of a record is assigned as part of insertion
-                currentEntity->insertProperty(propertyId, newRecord);
-                if (triple.meta_variable != "") {
-                    variableSet.add(std::move(triple.meta_variable),
-                        VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
-                        model::types::SubType::ValueReference);
-                }
+				for (auto newRecord : newRecords) {
+					currentEntity->insertProperty(propertyId, newRecord);
+					if (triple.meta_variable != "") {
+						variableSet.add(std::move(triple.meta_variable),
+							VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
+							model::types::SubType::ValueReference);
+					}
+				}
                 break;
             } // END: case model::Subject::Type::ENTITYREF
 
@@ -262,7 +281,14 @@ void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, Quer
 
 							Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*whereVarIter)[varId].dataPointer())->value();
 							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
-							currentEntity->insertProperty(propertyId, newRecord);
+							for (auto newRecord : newRecords) {
+								currentEntity->insertProperty(propertyId, newRecord);
+								if (triple.meta_variable != "") {
+									variableSet.add(std::move(triple.meta_variable),
+										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, newRecord->OrderingId()), propertyId, entityHandle),
+										model::types::SubType::ValueReference);
+								}
+							}
 						}
 					}
 				} else {
@@ -272,7 +298,9 @@ void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, Quer
 					for (auto val : values) {
 						std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
 						auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
-						record->insertProperty(propertyId, newRecord);
+						for (auto newRecord : newRecords) {
+							record->insertProperty(propertyId, newRecord);
+						}
 					}
 				}
                 break;
@@ -285,6 +313,8 @@ void EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, Quer
     
     // Ensure all the entities we processed have a type.
     enforceTypeHasBeenSet(modifiedEntities);
+
+	return createdEntities;
 }
 
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
