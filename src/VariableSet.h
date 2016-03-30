@@ -10,7 +10,7 @@
 #include <iterator>
 #include <algorithm>
 
-#include "model/types/Base.h"
+#include "./types/Base.h"
 
 using VariableType = model::types::SubType;
 

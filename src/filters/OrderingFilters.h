@@ -2,7 +2,7 @@
 #define FUZZY_FILTER_ORDERINGFILTERS
 
 #include "./IFilter.h"
-#include "../model/types/Int.h"
+#include "../types/Int.h"
 
 #include <string>
 #include <boost/regex.hpp>

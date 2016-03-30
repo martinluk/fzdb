@@ -7,10 +7,10 @@
 #include "spdlog/spdlog.h"
 
 #include "../model/TypeSerialiser.h"
-#include "../model/types/Base.h"
-#include "../model/types/Int.h"
-#include "../model/types/String.h"
-#include "../model/types/EntityRef.h"
+#include "../types/Base.h"
+#include "../types/Int.h"
+#include "../types/String.h"
+#include "../types/EntityRef.h"
 #include "../model/Entity.h"
 #include "../model/EntitySerialiser.h"
 

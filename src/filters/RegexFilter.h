@@ -2,7 +2,7 @@
 #define FUZZY_FILTER_REGEX
 
 #include "./IFilter.h"
-#include "../model/types/String.h"
+#include "../types/String.h"
 
 #include <boost/regex.hpp>
 
