@@ -223,7 +223,7 @@ describe("Fuzzy Database", function() {
       client.write("SELECT $a WHERE { entity:2 $a \"Marco\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'forename'})]})}));
         done();
       });      
     });

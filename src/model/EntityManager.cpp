@@ -523,6 +523,11 @@ std::set<Entity::EHandle_t> EntityManager::getLinkGraph(const Entity::EHandle_t 
     return visited;
 }
 
+const std::string EntityManager::getPropertyName(unsigned int propertyId) const
+{
+	return _propertyNames.right.at(propertyId);
+}
+
 void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2) {
 
 	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {

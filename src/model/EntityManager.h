@@ -65,6 +65,8 @@ public:
     //move to private
     std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
 
+	const std::string getPropertyName(unsigned int propertyId) const;
+
     const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
 private:
     void changeEntityType(Entity::EHandle_t id, const std::string &type);
