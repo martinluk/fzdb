@@ -29,7 +29,7 @@ void PropertyOwner::removeProperty(const unsigned int &key) {
 }
 
 // Tests if the entity has a property
-bool PropertyOwner::hasProperty(const unsigned int &key) {
+bool PropertyOwner::hasProperty(const unsigned int &key) const {
     return _propertyTable.find(key) != _propertyTable.cend();
 }
 

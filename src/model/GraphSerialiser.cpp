@@ -107,7 +107,7 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
     pHeader->typeMapLength = header.typeMapLength;
     pHeader->entityDataOffset = header.entityDataOffset;
     pHeader->entityDataLength = header.entityDataLength;
-    
+   
     return totalSerialised;
 }
 

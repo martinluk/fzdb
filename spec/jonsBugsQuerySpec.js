@@ -68,7 +68,7 @@ describe("Fuzzy Database", function() {
 
         // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
         h.resultTemplate(
-          [{"a":"Simpson","b":"3"}]
+          [{"a":"Simpson","b":"7"}]
         )
       );
 

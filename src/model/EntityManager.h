@@ -68,10 +68,14 @@ public:
 	const std::string getPropertyName(unsigned int propertyId) const;
 
     const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
+
+	unsigned int getTypeID(const std::string &str);
+	std::string getTypeName(const unsigned int id) const {
+		return _entityTypeNames.right.at(id);
+	}
 private:
-    void changeEntityType(Entity::EHandle_t id, const std::string &type);
-    
-    unsigned int getTypeID(const std::string &str);
+    void changeEntityType(Entity::EHandle_t id, const std::string &type);   
+   
 
     // TODO: (Jonathan) This could be an unordered map, but we may want to utilise the
     // numerical nature of the entity handles. O(log n) is still pretty good.
@@ -84,7 +88,7 @@ private:
     unsigned int _lastTypeID;
 
     // This maps string type names to entity type IDs.
-    std::map<std::string, unsigned int> _entityTypeNames;
+	boost::bimap<std::string, unsigned int> _entityTypeNames;
 
     boost::bimap<std::string, unsigned int> _propertyNames;
     std::map<unsigned int, model::types::SubType> _propertyTypes;
@@ -99,7 +103,7 @@ private:
     unsigned int getPropertyName(const std::string &str, model::types::SubType type) const;
     unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
 
-    unsigned int getPropertyName(std::string str) const {
+    unsigned int getPropertyId(std::string str) const {
         auto iter = _propertyNames.left.find(str);
         if (iter == _propertyNames.left.end()) {
             return 0;

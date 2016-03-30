@@ -18,7 +18,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     static const boost::regex intRegex("[0-9]+");
     static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
     static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
-	static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+),([a-zA-Z0-9]+)\\)");
+	static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *([a-zA-Z0-9]+) *\\)");
 
    boost::smatch matches;
    std::string data0 = "";
@@ -56,9 +56,9 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     }
 
    else if (boost::regex_match(str, matches, newEntityRegex)) {
-	   tokenType = ParsedTokenType::NEWENTITY;
-	   str = matches[1];
+	   tokenType = ParsedTokenType::NEWENTITY;	   
 	   data0 = matches[2];
+	   str = matches[1];
    }
 
     else if (boost::regex_match(str, matches, simpleConfidenceRatingRegex)) {

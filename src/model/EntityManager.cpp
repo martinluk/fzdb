@@ -366,20 +366,29 @@ void EntityManager::clearAll()
 {
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
-    _lastProperty = 0;
+    _lastProperty = 1;
 	_lastTypeID = 0;
     _entityTypeNames.clear();	
     _propertyNames.clear();
 	_propertyTypes.clear();
 	_links.clear();
 	
-	_entityTypeNames.insert(std::pair<std::string, unsigned int>("source", _lastTypeID++));
+	_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type("source", _lastTypeID++));
 	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("name", _lastProperty));
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty, model::types::SubType::TypeString));
 	auto id = _propertyNames.left.at("name");
 	auto unknownSourceEntity = createEntity("source");
 	unknownSourceEntity->insertProperty(_lastProperty++, std::make_shared<model::types::String>("Unknown Source", 0));
 	unknownSourceEntity->lock();
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::TYPE, _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUBSET_OF, _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUPERSET_OF, _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
 }
 
 std::size_t EntityManager::entityCount() const
@@ -486,15 +495,15 @@ unsigned int EntityManager::getTypeID(const std::string &str)
         return ENTITY_TYPE_GENERIC;
 
     unsigned int id = 0;
-	if (_entityTypeNames.find(str) != _entityTypeNames.end())
+	if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
 	{
-		id = _entityTypeNames.at(str);
+		id = _entityTypeNames.left.at(str);
 	}
 	else {
 		_lastTypeID++;
 		id = _lastTypeID;
 		assert(id > 0);
-		_entityTypeNames.insert(std::pair<std::string, unsigned int>(str, id));
+		_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, id));
 	}
 
     return id;
@@ -823,7 +832,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
     
     //get the property id
-    const unsigned int propertyId = this->getPropertyName(predicate.value);
+    const unsigned int propertyId = this->getPropertyId(predicate.value);
 
     //TODO: consider the case where variableName2 is already in variableSet
 

@@ -15,7 +15,7 @@ struct EntryHeader
     std::size_t stringSize;    // Serialised size of the string.
 };
 
-StringMapSerialiser::StringMapSerialiser(std::map<std::string, unsigned int> *map) : _map(map)
+StringMapSerialiser::StringMapSerialiser(boost::bimap<std::string, unsigned int> *map) : _map(map)
 {
 
 }
@@ -50,7 +50,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
     EntryHeader* ehBase = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(SerialHeader));
     std::size_t bytesSerialised = 0;
     int i = 0;
-    for ( auto it = _map->cbegin(); it != _map->cend(); ++it )
+    for ( auto it = _map->left.begin(); it != _map->left.end(); ++it )
     {
         std::size_t ourOffset = serialiser.size() - dataBegin;\
         const std::string &str = it->first;
@@ -107,6 +107,6 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);
         data += sizeof(unsigned int);
 
-        _map->insert(std::pair<std::string, unsigned int>(std::string(data), *id));
+        _map->insert(boost::bimap<std::string, unsigned int>::value_type(std::string(data), *id));
     }
 }

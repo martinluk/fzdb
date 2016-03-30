@@ -1,7 +1,7 @@
 #ifndef STRINGMAPSERIALISER_H
 #define STRINGMAPSERIALISER_H
 
-#include <map>
+#include <boost/bimap.hpp>
 #include <string>
 #include "Serialiser.h"
 #include <stdexcept>
@@ -11,7 +11,7 @@
 class StringMapSerialiser
 {
 public:
-    StringMapSerialiser(std::map<std::string, unsigned int>* map);
+    StringMapSerialiser(boost::bimap<std::string, unsigned int>* map);
 
     std::size_t serialise(Serialiser &serialiser) const;
     void unserialise(const char* serialisedData, std::size_t length);
@@ -25,7 +25,7 @@ public:
     };
 
 private:
-    std::map<std::string, unsigned int>*    _map;
+	boost::bimap<std::string, unsigned int>*    _map;
 };
 
 #endif // STRINGMAPSERIALISER_H
