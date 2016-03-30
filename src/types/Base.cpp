@@ -18,7 +18,7 @@ std::shared_ptr<EntityProperty> Base::getProperty(const unsigned int &key) const
 		 }
 		 case 7: {
 		 auto output = std::make_shared<EntityProperty>(7, model::types::SubType::TypeString);
-		 output->append(std::make_shared<model::types::String>(std::to_string(_originalAuthorId), 0));
+		 output->append(std::make_shared<model::types::String>(boost::posix_time::to_simple_string(_timeCreated), 0));
 		 return output;
 		 }
 	 default:

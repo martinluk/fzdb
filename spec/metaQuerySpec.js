@@ -34,8 +34,12 @@ describe("Fuzzy Database", function() {
         ]));
     });
 
-    describe("retrieving meta values : ", function() {
-
+    describe("retrieving meta values", function() {
+      h.testCase("source",
+       'SELECT $a $c WHERE { META $b { entity:2 <forename> $c } . $b <fuz:source> $a }',
+        h.resultTemplate([
+          {"a":"0","c":"Homer"},{"a":"0","c":"Max"}
+        ]));
     });
 
   });

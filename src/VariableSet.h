@@ -165,6 +165,13 @@ public:
         return _metaData[name].first;
     }
 
+	const VariableType typeOf(unsigned char id) {
+		for (auto md : _metaData) {
+			if (md.second.second == id)return md.second.first;
+		}
+		return VariableType::TypeUndefined;
+	}
+
     const unsigned char indexOf(std::string name) {
         return _metaData[name].second;
     }
@@ -186,8 +193,8 @@ public:
     void addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
         bool found = false;
         for (int i = 0; i < _values.size(); i++) {
-            for (int j = 0; j < _values[i].size(); j++) {
-                if (_values[i][j].metaRef() == metaRef) {
+            for (unsigned char j = 0; j < _values[i].size(); j++) {
+                if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
                     _values[i][position] = val;
                     found = true;
                     break;

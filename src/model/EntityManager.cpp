@@ -917,7 +917,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
                         auto subprop = val->getProperty(propertyId);
                         //TODO: should be all values
                         auto valueToStore = subprop->baseTop()->Clone();
-                        variableSet.addToMetaRefRow(vsv.metaRef(), varIndex, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
+                        variableSet.addToMetaRefRow(vsv.metaRef(), varIndex2, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
                     }
                 }
 				break;
@@ -1009,12 +1009,26 @@ std::vector<unsigned int> EntityManager::Scan5(VariableSet&& variableSet, const 
     const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
     if (EntityExists(entityRef)) {
-        auto entity = _entities.at(entityRef);
-        if (entity->hasProperty(propertyId)) {
-            for (auto value : entity->getProperty(propertyId)->baseValues()) {
-                rowsAdded.push_back(variableSet.add(std::move(variableName),
-                    VariableSetValue(value->Clone(), propertyId, entityRef), 
-                    std::move(_propertyTypes.at(propertyId))));
+        auto currentEntity = _entities.at(entityRef);
+        if (currentEntity->hasProperty(propertyId)) {
+            for (auto value : currentEntity->getProperty(propertyId)->baseValues()) {
+
+				auto vsv = VariableSetValue(value->Clone(), propertyId, entityRef);
+
+				if (metaVar != "") {
+
+					unsigned int metaRef = variableSet.getMetaRef();
+					vsv.metaRef(metaRef);
+
+						//TODO:
+						//is it necessery to repeat the entity and property handles?
+						auto valueRef = std::make_shared<model::types::ValueRef>(currentEntity->getHandle(), propertyId, value->OrderingId());
+						auto vsv2 = VariableSetValue(valueRef, propertyId, currentEntity->getHandle());
+						vsv2.metaRef(metaRef);
+						variableSet.add(std::move(metaVar), std::move(vsv2), model::types::SubType::ValueReference);
+				}
+
+                rowsAdded.push_back(variableSet.add(std::move(variableName), std::move(vsv), std::move(_propertyTypes.at(propertyId))));
             }            
         }
     }
