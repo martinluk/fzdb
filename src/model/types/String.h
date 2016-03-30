@@ -20,6 +20,8 @@ namespace model {
             void initMemberSerialiser()
             {
                 _memberSerialiser.addDynamicMember(&_valueWrapper);
+
+                _memberSerialiser.setInitialised();
             }
             
         public:

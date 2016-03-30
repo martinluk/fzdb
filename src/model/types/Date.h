@@ -98,6 +98,11 @@ namespace model
             {
                 return _value;
             }
+
+            SubType subtype() const
+            {
+                return SubType::TypeDate;
+            }
             
             StructuredDate date() const
             {
@@ -157,6 +162,8 @@ namespace model
             {
                 _memberSerialiser.addPrimitive(&_value, sizeof(_value));
                 _memberSerialiser.addPrimitive(&_order, sizeof(_order));
+
+                _memberSerialiser.setInitialised();
             }
         };
     }

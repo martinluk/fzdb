@@ -4,6 +4,7 @@
 #include <string>
 
 #include "./Base.h"
+#include <iostream>
 
 namespace model {
     namespace types {
@@ -18,6 +19,8 @@ namespace model {
             void initMemberSerialiser()
             {
                 _memberSerialiser.addPrimitive(&_value, sizeof(_value));
+
+                _memberSerialiser.setInitialised();
             }
 
         public:
@@ -88,13 +91,13 @@ namespace model {
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
             {
-                return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
+                return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
             Int(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
             {
                 initMemberSerialiser();
-                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };
     }

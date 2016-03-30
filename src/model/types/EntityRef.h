@@ -23,6 +23,8 @@ namespace model {
             void initMemberSerialiser()
             {
                 _memberSerialiser.addPrimitive(&_value, sizeof(_value));
+
+                _memberSerialiser.setInitialised();
             }
             
         public:
@@ -96,7 +98,7 @@ namespace model {
                 //return Base::serialiseSubclass(serialiser)
                 //    + serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
                 
-                return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
+                return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
             EntityRef(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
@@ -105,7 +107,7 @@ namespace model {
                 //serialisedData += sizeof(_value);
                 
                 initMemberSerialiser();
-                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };
     }

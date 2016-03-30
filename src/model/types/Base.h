@@ -40,6 +40,8 @@ namespace model {
                 _memberSerialiser.addPrimitive(&_cFracSecCreated, sizeof(&_cFracSecCreated));
 
                 _memberSerialiser.addDynamicMember(&_commentWrapper);
+
+                _memberSerialiser.setInitialised();
             }
 
             void initConvenienceMembers()
@@ -204,7 +206,6 @@ namespace model {
             // Called to construct from serialised data.
             Base(const char* &serialisedData, std::size_t length) : Base(0, 0, "")
             {
-                initMemberSerialiser();
                 initConvenienceMembers();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
