@@ -1,4 +1,11 @@
 /*var net = require('net');
+var gen = require('./support/generator.js');
+
+var largeData = gen([{
+  count: 250,
+  type: "person",
+  template: `<forename> "Alexis#"; <surname> "Sanchez#"`
+}]);
 
 describe("Fuzzy Database", function() {
   var client;
@@ -26,6 +33,7 @@ describe("Fuzzy Database", function() {
 	
 	//test insert with 2 properties
 	it("Adding 250 entities", function(done) {
+   client.write(largeData);
 		client.on('data', function(data) {
         done();
       });      
