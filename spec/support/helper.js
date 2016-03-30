@@ -13,20 +13,27 @@ helper.sendCmd = function(cmd) {
     var resultString = "";
 
     var onDataFunc = function(data) {
+
       if((client.bytesRead-beforeBytes) < 1024) {
         //we are done - disconnect client and resolve promise
         client.removeListener('data', onDataFunc);
         resolve(JSON.parse(resultString + data));
       } else {
-        var dataAsString = data.toString();
+          var dataAsString = data.toString();
 
-        for(var i = 0; i<data.length; i++) {
-          if(data[i] != 0) {
-            resultString += dataAsString[i];
-          }
-        }
-        
-        beforeBytes = client.bytesRead;
+          for(var i = 0; i<data.length; i++) {
+            if(data[i] != 0) {
+              resultString += dataAsString[i];
+            }
+          }    
+
+          if((client.bytesRead-beforeBytes) % 1024 != 0) {
+            //we are done - disconnect client and resolve promise
+            client.removeListener('data', onDataFunc);
+            resolve(JSON.parse(resultString));
+          }  
+
+          beforeBytes = client.bytesRead;      
       }        
     };
 

@@ -486,19 +486,16 @@ unsigned int EntityManager::getTypeID(const std::string &str)
         return ENTITY_TYPE_GENERIC;
 
     unsigned int id = 0;
-    try
-    {
-        id = _entityTypeNames.at(str);
-    }
-    catch (const std::exception&)
-    {
-        // The string was not in the table yet.
-        // Assign it a new ID.
-        _lastTypeID++;
-        id = _lastTypeID;
-        assert(id > 0);
-        _entityTypeNames.insert(std::pair<std::string, unsigned int>(str, id));
-    }
+	if (_entityTypeNames.find(str) != _entityTypeNames.end())
+	{
+		id = _entityTypeNames.at(str);
+	}
+	else {
+		_lastTypeID++;
+		id = _lastTypeID;
+		assert(id > 0);
+		_entityTypeNames.insert(std::pair<std::string, unsigned int>(str, id));
+	}
 
     return id;
 }
