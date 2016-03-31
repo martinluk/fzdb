@@ -1140,9 +1140,6 @@ bool EntityManager::memberwiseEqual(const EntityManager &other) const
             Entity::EHandle_t, std::set<Entity::EHandle_t> >(_links, other._links) )
         return false;
 
-    printPrimitiveMaps<std::map<std::string, unsigned int>,
-            std::string, unsigned int>(_entityTypeNames, other._entityTypeNames);
-
     if ( !comparePrimitiveMaps<std::map<std::string, unsigned int>,
                 std::string, unsigned int>(_entityTypeNames, other._entityTypeNames) )
         return false;

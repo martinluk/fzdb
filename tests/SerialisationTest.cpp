@@ -118,6 +118,16 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
 // Check that files are written to and read from disk correctly.
 TEST_F(SerialisationTest, testWriteReadFiles)
 {
+    EntityManager manager;
+    std::shared_ptr<Entity> ent = manager.createEntity("newType");
+    createSampleEntity(ent);
+    std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
+    manager.linkEntities(ent->getHandle(), ent2->getHandle());
 
-    EXPECT_EQ(true, false);
+    manager.saveToFile("serialisationTest.bin");
+
+    EntityManager manager2;
+    manager2.loadFromFile("serialisationTest.bin");
+
+    EXPECT_EQ(true, manager.memberwiseEqual(manager2));
 }
