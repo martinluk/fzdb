@@ -15,6 +15,7 @@
 #include "model/TypeSerialiser.h"
 #include "model/Serialiser.h"
 #include "model/EntitySerialiser.h"
+#include "model/GraphSerialiser.h"
 
 class SerialisationTest : public ::testing::Test
 {
@@ -39,11 +40,10 @@ void testSerialisation(const BasePointer &typePtr)
     EXPECT_EQ(advance, serialisedLength);
 }
 
-std::shared_ptr<Entity> createSampleEntity()
+void createSampleEntity(std::shared_ptr<Entity> &ent)
 {
     using namespace model::types;
 
-    std::shared_ptr<Entity> ent(new Entity(0, 1));
     EntityProperty* propInt = new EntityProperty(1, model::types::SubType::TypeInt32);
     EntityProperty* propString = new EntityProperty(2, model::types::SubType::TypeString);
     EntityProperty* propDate = new EntityProperty(3, model::types::SubType::TypeDate);
@@ -66,8 +66,6 @@ std::shared_ptr<Entity> createSampleEntity()
     ent->insertProperty(std::shared_ptr<EntityProperty>(propString));
     ent->insertProperty(std::shared_ptr<EntityProperty>(propDate));
     ent->insertProperty(std::shared_ptr<EntityProperty>(propEntityRef));
-
-    return ent;
 }
 
 // Test that values of different types serialise and unserialise correctly.
@@ -86,7 +84,8 @@ TEST_F(SerialisationTest, testSerialiseEntities)
 {
     using namespace model::types;
 
-    std::shared_ptr<Entity> ent = createSampleEntity();
+    std::shared_ptr<Entity> ent(new Entity(0, 1));
+    createSampleEntity(ent);
 
     Serialiser serialiser;
     EntitySerialiser entSer(ent);
@@ -100,8 +99,20 @@ TEST_F(SerialisationTest, testSerialiseEntities)
 TEST_F(SerialisationTest, testSerialiseEntityManager)
 {
     EntityManager manager;
+    std::shared_ptr<Entity> ent = manager.createEntity("newType");
+    createSampleEntity(ent);
+    std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
+    manager.linkEntities(ent->getHandle(), ent2->getHandle());
 
-    EXPECT_EQ(true, false);
+    Serialiser serialiser;
+    GraphSerialiser gSer(&manager);
+    gSer.serialise(serialiser);
+
+    EntityManager manager2;
+    GraphSerialiser gSer2(&manager2);
+    gSer2.unserialise(serialiser.begin(), serialiser.size());
+
+    EXPECT_EQ(true, manager.memberwiseEqual(manager2));
 }
 
 // Check that files are written to and read from disk correctly.

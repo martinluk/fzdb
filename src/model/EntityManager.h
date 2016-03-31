@@ -66,11 +66,9 @@ public:
     std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
 
     const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
-private:
-    void changeEntityType(Entity::EHandle_t id, const std::string &type);
-    
-    unsigned int getTypeID(const std::string &str);
 
+    bool memberwiseEqual(const EntityManager &other) const;
+private:
     // TODO: (Jonathan) This could be an unordered map, but we may want to utilise the
     // numerical nature of the entity handles. O(log n) is still pretty good.
     typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;
@@ -83,10 +81,11 @@ private:
 
     // This maps string type names to entity type IDs.
     std::map<std::string, unsigned int> _entityTypeNames;
-
     boost::bimap<std::string, unsigned int> _propertyNames;
     std::map<unsigned int, model::types::SubType> _propertyTypes;
     
+    void changeEntityType(Entity::EHandle_t id, const std::string &type);
+    unsigned int getTypeID(const std::string &str);
     bool handleSpecialInsertOperations(Entity* entity, const model::Triple &triple, unsigned int author, const std::string &comment);
     static void enforceTypeHasBeenSet(const Entity* entity);
     static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);

@@ -1072,3 +1072,63 @@ const boost::bimap<std::string, unsigned int>& EntityManager::propertyNameMap() 
 {
     return _propertyNames;
 }
+
+template<typename T, typename A, typename B>
+bool comparePrimitiveMaps(const T &mapA, const T &mapB)
+{
+    if ( mapA.size() != mapB.size() )
+        return false;
+
+    for ( auto it = mapA.begin(); it != mapA.end(); ++it )
+    {
+        const B &thisVal = it->second;
+
+        auto otherIt = mapB.find(it->first);
+        if ( otherIt == mapB.end() )
+            return false;
+
+        const B &otherVal = otherIt->second;
+        if ( thisVal != otherVal )
+            return false;
+    }
+
+    return true;
+}
+
+bool EntityManager::memberwiseEqual(const EntityManager &other) const
+{
+    if ( _entities.size() != other._entities.size() )
+        return false;
+
+    for ( auto it = _entities.begin(); it != _entities.end(); ++it )
+    {
+        const Entity* thisEnt = it->second.get();
+
+        auto otherEntIt = other._entities.find(it->first);
+        if ( otherEntIt == other._entities.end() )
+            return false;
+
+        const Entity* otherEnt = otherEntIt->second.get();
+        if ( !thisEnt->memberwiseEqual(otherEnt) )
+            return false;
+    }
+
+    if ( !comparePrimitiveMaps<std::map<Entity::EHandle_t, std::set<Entity::EHandle_t> >,
+            Entity::EHandle_t, std::set<Entity::EHandle_t> >(_links, other._links) )
+        return false;
+
+    if ( !comparePrimitiveMaps<std::map<std::string, unsigned int>,
+                std::string, unsigned int>(_entityTypeNames, other._entityTypeNames) )
+        return false;
+
+    // We assume that if the left map is equal, so is the right.
+    if ( !comparePrimitiveMaps<boost::bimap<std::string, unsigned int>::left_map,
+            std::string, unsigned int>(_propertyNames.left, other._propertyNames.left) )
+        return false;
+
+    if ( !comparePrimitiveMaps<std::map<unsigned int, model::types::SubType>,
+            unsigned int, model::types::SubType>(_propertyTypes, other._propertyTypes) )
+        return false;
+
+    return true;
+}

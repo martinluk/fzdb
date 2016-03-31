@@ -1,5 +1,6 @@
 #include "StringMapSerialiser.h"
 #include <cstring>
+#include <cassert>
 
 #include "spdlog/spdlog.h"
 
@@ -15,9 +16,12 @@ struct EntryHeader
     std::size_t stringSize;    // Serialised size of the string.
 };
 
-StringMapSerialiser::StringMapSerialiser(std::map<std::string, unsigned int> *map) : _map(map)
+StringMapSerialiser::StringMapSerialiser(std::map<std::string, unsigned int> *map) : _map(map), _bimap(NULL)
 {
+}
 
+StringMapSerialiser::StringMapSerialiser(boost::bimap<std::__cxx11::string, unsigned int> *bimap) : _map(NULL), _bimap(bimap)
+{
 }
 
 std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
@@ -50,27 +54,44 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
     EntryHeader* ehBase = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(SerialHeader));
     std::size_t bytesSerialised = 0;
     int i = 0;
-    for ( auto it = _map->cbegin(); it != _map->cend(); ++it )
-    {
-        std::size_t ourOffset = serialiser.size() - dataBegin;\
-        const std::string &str = it->first;
-        unsigned int id = it->second;
 
-        std::size_t serialisedThisLoop = serialiser.serialise(Serialiser::SerialProperty(&id, sizeof(unsigned int)));
+    auto lambda = [&] (const std::string &first, unsigned int second)
+    {
+        std::size_t ourOffset = serialiser.size() - dataBegin;
+        std::size_t serialisedThisLoop = serialiser.serialise(Serialiser::SerialProperty(&second, sizeof(unsigned int)));
 
         // We use size+1 to ensure that a null terminator is present in the serialised stream.
-        char* buffer = new char[str.size() + 1];
-        memset(buffer, 0, str.size()+1);
-        strcpy(buffer, str.c_str());
-        serialisedThisLoop += serialiser.serialise(Serialiser::SerialProperty(buffer, str.size()+1));
+        char* buffer = new char[first.size() + 1];
+        memset(buffer, 0, first.size()+1);
+        strcpy(buffer, first.c_str());
+        serialisedThisLoop += serialiser.serialise(Serialiser::SerialProperty(buffer, first.size()+1));
         delete buffer;
 
         EntryHeader* pHeader = &(ehBase[i]);
-        pHeader->stringSize = str.size()+1;
+        pHeader->stringSize = first.size()+1;
         pHeader->offset = ourOffset;
 
         bytesSerialised += serialisedThisLoop;
         i++;
+    };
+
+    if ( _map )
+    {
+        for ( auto it = _map->cbegin(); it != _map->cend(); ++it )
+        {
+            lambda(it->first, it->second);
+        }
+    }
+    else if ( _bimap )
+    {
+        for( auto it = _bimap->left.begin(); it != _bimap->left.end(); ++it )
+        {
+            lambda(it->first, it->second);
+        }
+    }
+    else
+    {
+        assert(false);
     }
 
     SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
@@ -107,6 +128,11 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);
         data += sizeof(unsigned int);
 
-        _map->insert(std::pair<std::string, unsigned int>(std::string(data), *id));
+        if ( _map )
+            _map->insert(std::pair<std::string, unsigned int>(std::string(data), *id));
+        else if ( _bimap )
+            _bimap->insert(boost::bimap<std::string, unsigned int>::value_type(std::string(data), *id));
+        else
+            assert(false);
     }
 }

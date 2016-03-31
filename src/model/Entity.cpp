@@ -66,15 +66,18 @@ bool Entity::memberwiseEqual(const Entity *other) const
             _propertyTable.size() != other->_propertyTable.size() )
         return false;
 
-    auto thisIt = _propertyTable.begin();
-    auto otherIt = other->_propertyTable.begin();
-    while ( thisIt != _propertyTable.end() && otherIt != other->_propertyTable.end() )
+
+    for ( auto it = _propertyTable.begin(); it != _propertyTable.end(); ++it )
     {
-        if ( !thisIt->second->memberwiseEqual(otherIt->second.get()) )
+        const EntityProperty* thisProp = it->second.get();
+
+        auto otherIt = other->_propertyTable.find(it->first);
+        if ( otherIt == other->_propertyTable.end() )
             return false;
 
-        ++thisIt;
-        ++otherIt;
+        const EntityProperty* otherProp = otherIt->second.get();
+        if ( !thisProp->memberwiseEqual(otherProp) )
+            return false;
     }
 
     return true;
