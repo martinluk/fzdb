@@ -29,7 +29,7 @@ void PropertyOwner::removeProperty(const unsigned int &key) {
 }
 
 // Tests if the entity has a property
-bool PropertyOwner::hasProperty(const unsigned int &key) const {
+bool PropertyOwner::hasProperty(const unsigned int &key, bool linked) const {
     return _propertyTable.find(key) != _propertyTable.cend();
 }
 
@@ -39,7 +39,7 @@ const std::map<unsigned int, std::shared_ptr<EntityProperty>>& PropertyOwner::pr
 }
 
 // Tests if the entity meets the condition
-std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, const model::Object&& obj) {
+std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked) {
     if (!hasProperty(propertyId)) return std::vector<BasePointer>();
     std::vector<BasePointer> values = getProperty(propertyId)->baseValues();
     values.erase(std::remove_if(values.begin(), values.end(), [obj](BasePointer ptr) { return !ptr->Equals(obj); }), values.end());

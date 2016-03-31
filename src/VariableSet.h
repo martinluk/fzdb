@@ -41,11 +41,11 @@ public:
         _metaRef = metaRef;
     }
 
-    unsigned int metaRef() {
+    unsigned int metaRef() const {
         return _metaRef;
     }
 
-    bool empty() {
+    bool empty() const {
         return _ptr ==  nullptr;
     }
 };
@@ -71,6 +71,12 @@ public:
 		_variablesUsed.push_back(false);
 		_metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, _size);
 		_size++;
+	}
+
+	unsigned int add(const std::vector<VariableSetValue>&& row) {
+		if (row.size() != _size) throw std::runtime_error("Attempted to insert a row of the wrong size");
+		_values.push_back(row);
+		return _values.size() - 1;
 	}
     
     unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
@@ -217,6 +223,32 @@ public:
             return allEmpty;
         }), _values.end());
     }
+
+	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable, std::string value) {
+		std::vector<std::vector<VariableSetValue>> results;
+		for (auto row : _values) {
+			if (!row[_metaData[variable].second].empty() && row[_metaData[value].second].dataPointer()->Equals(value)) {
+				results.emplace_back(row);
+			}
+		}
+		return results;
+	}
+
+	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable) {
+		std::vector<std::vector<VariableSetValue>> results;
+		for (auto row : _values) {
+			if (!row[_metaData[variable].second].empty()) {
+				results.emplace_back(row);
+			}
+		}
+		return results;
+	}
+
+	void removeRowsWith(std::string variable) {
+		_values.erase(std::remove_if(_values.begin(), _values.end(), [&, this, variable](std::vector<VariableSetValue> row) {
+			return !row[_metaData[variable].second].empty();
+		}), _values.end());
+	}
 
 private:
     std::map<std::string, std::pair<VariableType, unsigned char>> _metaData;

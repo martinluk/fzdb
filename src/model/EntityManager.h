@@ -46,6 +46,7 @@ public:
     std::shared_ptr<model::types::Base> dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const;
     
     std::vector<std::shared_ptr<Entity>> entityList() const;
+	std::shared_ptr<Entity> getEntity(Entity::EHandle_t entity) const;
     std::size_t entityCount() const;
     
     void clearAll();

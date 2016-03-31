@@ -53,9 +53,9 @@ public:
         return _linkStatus;
     }
 
-	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj) override;
+	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked = false) override;
 
-	bool hasProperty(const unsigned int &key) const override;
+	bool hasProperty(const unsigned int &key, bool linked = false) const override;
 	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 
 private:
@@ -66,7 +66,7 @@ private:
     }
 
 private:
-    EHandle_t    handle_;
+    EHandle_t _handle;
     unsigned int _type;
     LinkStatus _linkStatus;
 

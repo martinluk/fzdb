@@ -8,17 +8,17 @@
 
 const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 
-Entity::Entity(unsigned int type) : handle_(Entity::INVALID_EHANDLE), _type(type), _linkStatus(Entity::LinkStatus::None)
+Entity::Entity(unsigned int type) : _handle(Entity::INVALID_EHANDLE), _type(type), _linkStatus(Entity::LinkStatus::None)
 {
     initMemberSerialiser();
 }
 
-Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(type), _linkStatus(Entity::LinkStatus::None)
+Entity::Entity(unsigned int type, EHandle_t handle) : _handle(handle), _type(type), _linkStatus(Entity::LinkStatus::None)
 {
     initMemberSerialiser();
 }
 
-std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const model::Object && obj)
+std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const model::Object && obj, bool linked)
 {
 	//handle type comparison
 	if (propertyId == 2) {
@@ -31,12 +31,45 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 			return std::vector<std::shared_ptr<model::types::Base>>();
 		}
 	}
-	return PropertyOwner::meetsCondition(propertyId, std::move(obj));
+
+	//handle linking
+	switch (_linkStatus) {
+	case LinkStatus::Master: {
+		std::vector<std::shared_ptr<model::types::Base>> results = PropertyOwner::meetsCondition(propertyId, std::move(obj));
+		auto graph = Singletons::database()->entityManager().getLinkGraph(_handle, std::set<Entity::EHandle_t>());
+		for (auto entId : graph) {
+			if (entId == _handle) continue;
+			auto subResult = Singletons::database()->entityManager().getEntity(entId)->meetsCondition(propertyId, std::move(obj), true);
+			results.insert(results.end(), subResult.begin(), subResult.end());
+		}
+		return results;
+	}
+	case LinkStatus::Slave:
+		if(!linked) return std::vector<std::shared_ptr<model::types::Base>>();
+	case LinkStatus::None:
+		return PropertyOwner::meetsCondition(propertyId, std::move(obj));
+	}	
 }
 
-bool Entity::hasProperty(const unsigned int & key) const
+bool Entity::hasProperty(const unsigned int & key, bool linked) const
 {
 	if (key == 2) return true; //return true if it's type
+							   //handle linking
+	/*switch (_linkStatus) {
+	case LinkStatus::Master: {
+		if (PropertyOwner::hasProperty(key)) return true;
+		auto graph = Singletons::database()->entityManager().getLinkGraph(_handle, std::set<Entity::EHandle_t>());
+		for (auto entId : graph) {
+			if (entId == _handle) continue;
+			if (Singletons::database()->entityManager().getEntity(entId)->hasProperty(key, true)) return true;
+		}
+		return false;
+	}
+	case LinkStatus::Slave:
+		if (!linked) return false;
+	case LinkStatus::None:
+		return PropertyOwner::hasProperty(key);
+	}*/
 	return PropertyOwner::hasProperty(key);
 }
 
@@ -47,12 +80,14 @@ std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) co
 		output->append(std::make_shared<model::types::String>(Singletons::database()->entityManager().getTypeName(_type), 0));
 		return output;
 	}
-	return PropertyOwner::getProperty(key);
+
+	//this needs to be linkified too
+	return PropertyOwner::getProperty(key);	
 }
 
 void Entity::initMemberSerialiser()
 {
-    _memberSerialiser.addPrimitive(&handle_, sizeof(handle_));
+    _memberSerialiser.addPrimitive(&_handle, sizeof(_handle));
     _memberSerialiser.addPrimitive(&_type, sizeof(_type));
 }
 
@@ -62,12 +97,12 @@ Entity::~Entity()
 
 bool Entity::isNull() const
 {
-    return handle_ == INVALID_EHANDLE;
+    return _handle == INVALID_EHANDLE;
 }
 
 Entity::EHandle_t Entity::getHandle() const
 {
-    return handle_;
+    return _handle;
 }
 
 unsigned int Entity::getType() const
@@ -82,7 +117,7 @@ std::string Entity::logString(const Database* db) const
     return std::string("Entity(t=")
         + typeStr
         + std::string(", h=")
-        + std::to_string(handle_)
+        + std::to_string(_handle)
         + std::string(", [")
         + std::to_string(_propertyTable.size())
         + std::string("])");

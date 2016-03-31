@@ -179,7 +179,7 @@ namespace model {
                 return _orderingId;
             }
 
-			bool hasProperty(const unsigned int &key) const override {
+			bool hasProperty(const unsigned int &key, bool linked = false) const override {
 				if (key == 5) return true;
 				if (key == 6) return true;
 				if (key == 7) return true;
