@@ -37,7 +37,7 @@ public:
 
     VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
-    void Insert(TriplesBlock&& triples);
+	std::map<std::string, Entity::EHandle_t> Insert(TriplesBlock&& triples, TriplesBlock&& whereBlock, QuerySettings&& settings);
 
     bool EntityExists(Entity::EHandle_t handle) const {
         return _entities.find(handle) != _entities.cend();
@@ -65,7 +65,16 @@ public:
     //move to private
     std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
 
+	const std::string getPropertyName(unsigned int propertyId) const;
+
     const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
+
+	unsigned int getTypeID(const std::string &str);
+	std::string getTypeName(const unsigned int id) const {
+		return _entityTypeNames.right.at(id);
+	}
+private:
+    void changeEntityType(Entity::EHandle_t id, const std::string &type);   
 
     bool memberwiseEqual(const EntityManager &other) const;
 private:
@@ -80,7 +89,7 @@ private:
     unsigned int _lastTypeID;
 
     // This maps string type names to entity type IDs.
-    std::map<std::string, unsigned int> _entityTypeNames;
+	boost::bimap<std::string, unsigned int> _entityTypeNames;
     boost::bimap<std::string, unsigned int> _propertyNames;
     std::map<unsigned int, model::types::SubType> _propertyTypes;
     
@@ -96,7 +105,7 @@ private:
     unsigned int getPropertyName(const std::string &str, model::types::SubType type) const;
     unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
 
-    unsigned int getPropertyName(std::string str) const {
+    unsigned int getPropertyId(std::string str) const {
         auto iter = _propertyNames.left.find(str);
         if (iter == _propertyNames.left.end()) {
             return 0;

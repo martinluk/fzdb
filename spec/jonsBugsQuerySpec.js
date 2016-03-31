@@ -13,26 +13,27 @@ describe("Fuzzy Database", function() {
 
     //tests are run sequentially
 
-    h.testCase("Adding 150 entities",  // name
+    h.testCase("Inserting entities with a subsetOf",  // name
       `INSERT DATA
 {
-    entity:1 <type> \"Location\";
-    <name> \"England\" .
+    $a <name> \"England\" .
 
-    entity:2 <type> \"Location\";
-    <name> \"London\";
-    <subsetOf> entity:1
+    $b <name> \"London\";
+    <subsetOf> $a
+} WHERE {
+  NEW($a,Location) .
+  NEW($b,Location)
 }`, // command
-      { status: true, errorCode: 0, info: '', result: { type: 'text', data: 'Inserted 5 triples.' } } // result
+      { status: true, errorCode: 0, info: 'Inserted 3 triples.', result: { type: 'fsparql', data: { a: '2', b: '3' } } } // result
     );
 
-    h.testCase("Retrieving entities which have a profession set - 50 entities",  
+    h.testCase("Retrieving entities entities with a subsetOf",  
 
       `SELECT $id $other WHERE { $id <subsetOf> $other; <name> "London" }`,
 
       // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
       h.resultTemplate(
-        [ { id: '2', other: '1' }]
+        [ { id: '3', other: '2' }]
       )
     );
 
@@ -63,11 +64,11 @@ describe("Fuzzy Database", function() {
 
       h.testCase("killer query 1",  
 
-        `SELECT $a $b WHERE { entity:1 <surname> $a . entity:2 $b $a . entity:3 <forename> $c }`,
+        `SELECT $a $b WHERE { entity:2 <surname> $a . entity:3 $b $a . entity:4 <forename> $c }`,
 
         // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
         h.resultTemplate(
-          [{"a":"Simpson","b":"2"}]
+          [{"a":"Simpson","b":"10"}]
         )
       );
 

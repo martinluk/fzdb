@@ -29,6 +29,7 @@ enum class ParsedTokenType {
         OPEN_CURLBRACE  = 0x6,      // {
         CLOSE_CURLBRACE = 0x7,      // }
         FILTER = 0x9,               // FILTER: For filtering values.
+	    NEWENTITY = 0xa,            // NEWENTITY: For creating new entities
     
     //keywords
         KEYWORD_SELECT = TOKEN_KEYWORD_MASK | 0x0,
@@ -106,6 +107,7 @@ struct TriplesBlock {
 public:
     std::vector<model::Triple> triples;
     std::vector<IFilter*> filters;
+	std::set<std::pair<std::string, std::string>> newEntities;
     std::set<std::string> variables;
     std::set<std::string> metaVariables;
 
@@ -121,6 +123,14 @@ public:
 
    void Add(IFilter* filter) {
       filters.push_back(filter);   
+   }
+
+   void Add(std::string newEntity, std::string type) {
+	   newEntities.insert(std::make_pair(newEntity, type));
+   }
+
+   const bool HasNewEntities() {
+	   return newEntities.size() > 0;
    }
 
    void Sort() {

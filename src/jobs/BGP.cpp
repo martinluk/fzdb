@@ -49,7 +49,7 @@ QueryResult BGP::executeConst() const
                 if (!(bool(basePtr))) continue;
 
                 rapidjson::Value val3;
-                val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());
+				val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());        
 
                 rapidjson::Value varName;
                 varName.SetString((*iter2).c_str(), result.allocator());

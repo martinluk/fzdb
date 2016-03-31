@@ -26,7 +26,7 @@ public:
 	// Getters:
 
 	// Returns the property with the given key, or a null property if this is not found.
-	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const;
+	virtual std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const;
 
 	void insertProperty(std::shared_ptr<EntityProperty> prop);
 
@@ -36,13 +36,13 @@ public:
     void removeProperty(const unsigned int &key);
 
     // Tests if the entity has a property
-    bool hasProperty(const unsigned int &key);
+    virtual bool hasProperty(const unsigned int &key) const;
 
     // Returns read only reference to the property table
     const std::map<unsigned int, std::shared_ptr<EntityProperty>>& properties() const;
 
     // Tests if the entity meets the condition
-    std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
+    virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
 
     // Clears all properties on the entity.
     void clearProperties();

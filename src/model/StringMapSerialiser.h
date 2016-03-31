@@ -1,7 +1,7 @@
 #ifndef STRINGMAPSERIALISER_H
 #define STRINGMAPSERIALISER_H
 
-#include <map>
+#include <boost/bimap.hpp>
 #include <string>
 #include "Serialiser.h"
 #include <stdexcept>

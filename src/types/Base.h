@@ -1,14 +1,14 @@
 #ifndef FUZZY_MODEL_TYPES_BASE
 #define FUZZY_MODEL_TYPES_BASE
 
-#include "../Serialiser.h"
+#include "../model/Serialiser.h"
 #include <cassert>
 #include <cstring>
 #include <memory>
-#include "../ILogString.h"
-#include "../Triple.h"
-#include "../MemberSerialiser.h"
-#include "../PropertyOwner.h"
+#include "../model/ILogString.h"
+#include "../model/Triple.h"
+#include "../model/MemberSerialiser.h"
+#include "../model/PropertyOwner.h"
 #include "./SubType.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -195,6 +195,14 @@ namespace model {
                         _sourceEntityId == other->_sourceEntityId &&
                         _timeCreated == other->_timeCreated;
             }
+			bool hasProperty(const unsigned int &key) const override {
+				if (key == 5) return true;
+				if (key == 6) return true;
+				if (key == 7) return true;
+				return PropertyOwner::hasProperty(key);
+			}
+
+			std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 
         protected:
             // Called when serialising.

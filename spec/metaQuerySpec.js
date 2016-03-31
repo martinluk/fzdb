@@ -17,12 +17,12 @@ describe("Fuzzy Database", function() {
 
       h.testCase("sanity check", 'SELECT $a WHERE { $a <forename> "Homer" }',
         h.resultTemplate([
-          {"a":"1"}
+          {"a":"2"}
         ]));
 
       h.testCase("no restrictions on meta value", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } }',
         h.resultTemplate([
-          {"a":"1"}
+          {"a":"2"}
         ]));
 
       h.testCase("meta value restricted and false", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } . $b <test> "Kit" }',
@@ -30,12 +30,16 @@ describe("Fuzzy Database", function() {
 
       h.testCase("meta value restricted and true", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } . $b <test> "Cake" }',
         h.resultTemplate([
-          {"a":"1"}
+          {"a":"2"}
         ]));
     });
 
-    describe("retrieving meta values : ", function() {
-
+    describe("retrieving meta values", function() {
+      h.testCase("source",
+       'SELECT $a $c WHERE { META $b { entity:2 <forename> $c } . $b <fuz:source> $a }',
+        h.resultTemplate([
+          {"a":"0","c":"Homer"},{"a":"0","c":"Max"}
+        ]));
     });
 
   });

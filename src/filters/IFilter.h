@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "../model/types/Base.h"
+#include "../types/Base.h"
 #include "../VariableSet.h"
 
 class IFilter {

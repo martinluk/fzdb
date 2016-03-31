@@ -19,6 +19,7 @@
 #include "./types/EntityRef.h"
 #include "./types/Int.h"
 #include "./types/Date.h"
+#include "./types/Property.h"
 #include "singletons.h"
 
 //#define ENFORCE_ENTITIES_HAVE_TYPES
@@ -170,9 +171,23 @@ void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
 }
 
 //Inserts new data into the data store
-void EntityManager::Insert(TriplesBlock&& block)
+std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, QuerySettings&& settings)
 {
-    //sort by entropy
+	VariableSet whereVars = BGP(whereBlock, settings);
+
+	for (auto newVar : whereBlock.newEntities) {
+		whereVars.extend(newVar.first);
+	}
+
+	std::map<std::string, Entity::EHandle_t> createdEntities;
+	for (auto newVar : whereBlock.newEntities) {
+		auto newEntity = createEntity(newVar.second);
+		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
+		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
+		whereVars.add(std::move(newVar.first), VariableSetValue(entityPointer, 0, 0), VariableType::TypeEntityRef);
+	}
+	
+	//sort by entropy
     block.Sort();
 
     auto iter = block.triples.cbegin();
@@ -187,22 +202,34 @@ void EntityManager::Insert(TriplesBlock&& block)
         auto triple = *iter;
 
         unsigned char confidence = triple.object.hasCertainty ? triple.object.certainty : 100;
-        std::shared_ptr<model::types::Base> newRecord;
+        std::vector<std::shared_ptr<model::types::Base>> newRecords;
         model::types::SubType newRecordType;
 
         switch (triple.object.type) {
         case model::Object::Type::STRING:
             newRecordType = model::types::SubType::TypeString;
-            newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+            newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
             break;
         case model::Object::Type::ENTITYREF:
             newRecordType = model::types::SubType::TypeEntityRef;
-            newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
             break;
         case model::Object::Type::INT:
             newRecordType = model::types::SubType::TypeInt32;
-            newRecord = std::make_shared<model::types::String>(triple.object.value, 0, confidence);
+			newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
             break;
+		case model::Object::Type::VARIABLE: {
+				auto varId = whereVars.indexOf(triple.object.value);
+				for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+					if ((*whereVarIter)[varId].empty()) continue;
+					//one new record for each match!
+					//TODO: make this work!!
+					// $a <wife> $b WHERE { NEW($a) . NEW($b) }
+					newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
+				}
+				newRecordType = whereVars.typeOf(triple.object.value);
+				break;
+			}
         }
 
         unsigned int propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
@@ -216,7 +243,8 @@ void EntityManager::Insert(TriplesBlock&& block)
                 //create the entity if it doesn't exist
                 if (_entities.find(entity_id) == _entities.end())
                 {
-                    _entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
+                    //_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
+					throw std::runtime_error("No entity with id " + std::to_string(entity_id) + " was found");
                 }
 
                 std::shared_ptr<Entity> currentEntity = _entities[entity_id];
@@ -230,27 +258,53 @@ void EntityManager::Insert(TriplesBlock&& block)
                 enforceTypeHasBeenSet(currentEntity.get());
 
                 //note that the OrderingId attribute of a record is assigned as part of insertion
-                currentEntity->insertProperty(propertyId, newRecord);
-                if (triple.meta_variable != "") {
-                    variableSet.add(std::move(triple.meta_variable),
-                        VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
-                        model::types::SubType::ValueReference);
-                }
+				for (auto newRecord : newRecords) {
+					currentEntity->insertProperty(propertyId, newRecord);
+					if (triple.meta_variable != "") {
+						variableSet.add(std::move(triple.meta_variable),
+							VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
+							model::types::SubType::ValueReference);
+					}
+				}
                 break;
             } // END: case model::Subject::Type::ENTITYREF
 
             case model::Subject::Type::VARIABLE: {
                 if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end()) {
-                    throw std::runtime_error("Only meta-variables are allowed in INSERT statements at this time");
-                }
+					if (whereVars.contains(triple.subject.value)) {
+						if (whereVars.typeOf(triple.subject.value) != VariableType::TypeEntityRef) {
+							throw new std::runtime_error("Variables bound in the WHERE clause of an insert statement used in the body of that statement MUST resolve to entity values");
+						}
 
-                auto values = variableSet.getData(triple.subject.value);
+						auto varId = whereVars.indexOf(triple.subject.value);
 
-                for (auto val : values) {
-                    std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
-                    auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
-                    record->insertProperty(propertyId, newRecord);
-                }
+						for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+							if ((*whereVarIter)[varId].empty()) continue;
+
+							Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*whereVarIter)[varId].dataPointer())->value();
+							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
+							for (auto newRecord : newRecords) {
+								currentEntity->insertProperty(propertyId, newRecord);
+								if (triple.meta_variable != "") {
+									variableSet.add(std::move(triple.meta_variable),
+										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, newRecord->OrderingId()), propertyId, entityHandle),
+										model::types::SubType::ValueReference);
+								}
+							}
+						}
+					}
+				} else {
+
+					auto values = variableSet.getData(triple.subject.value);
+
+					for (auto val : values) {
+						std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
+						auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+						for (auto newRecord : newRecords) {
+							record->insertProperty(propertyId, newRecord);
+						}
+					}
+				}
                 break;
             }
         
@@ -261,6 +315,8 @@ void EntityManager::Insert(TriplesBlock&& block)
     
     // Ensure all the entities we processed have a type.
     enforceTypeHasBeenSet(modifiedEntities);
+
+	return createdEntities;
 }
 
 void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
@@ -312,15 +368,38 @@ void EntityManager::clearAll()
 {
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
-    _lastProperty = 0;
-	_lastTypeID = 1;
-    _entityTypeNames.clear();
-	_entityTypeNames.insert(std::pair<std::string, unsigned int>("source", 0));
+    _lastProperty = 1;
+	_lastTypeID = 0;
+    _entityTypeNames.clear();	
     _propertyNames.clear();
-    _propertyTypes.clear();
+	_propertyTypes.clear();
 	_links.clear();
 	
-	//auto unknownSourceEntity = createEntity("source");
+	_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type("source", _lastTypeID++));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("name", _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty, model::types::SubType::TypeString));
+	auto id = _propertyNames.left.at("name");
+	auto unknownSourceEntity = createEntity("source");
+	unknownSourceEntity->insertProperty(_lastProperty++, std::make_shared<model::types::String>("Unknown Source", 0));
+	unknownSourceEntity->lock();
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::TYPE, _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUBSET_OF, _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUPERSET_OF, _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:author", _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:source", _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:created", _lastProperty));
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
 }
 
 std::size_t EntityManager::entityCount() const
@@ -427,19 +506,16 @@ unsigned int EntityManager::getTypeID(const std::string &str)
         return ENTITY_TYPE_GENERIC;
 
     unsigned int id = 0;
-    try
-    {
-        id = _entityTypeNames.at(str);
-    }
-    catch (const std::out_of_range&)
-    {
-        // The string was not in the table yet.
-        // Assign it a new ID.
-        _lastTypeID++;
-        id = _lastTypeID;
-        assert(id > 0);
-        _entityTypeNames.insert(std::pair<std::string, unsigned int>(str, id));
-    }
+	if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
+	{
+		id = _entityTypeNames.left.at(str);
+	}
+	else {
+		_lastTypeID++;
+		id = _lastTypeID;
+		assert(id > 0);
+		_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, id));
+	}
 
     return id;
 }
@@ -467,7 +543,16 @@ std::set<Entity::EHandle_t> EntityManager::getLinkGraph(const Entity::EHandle_t 
     return visited;
 }
 
+const std::string EntityManager::getPropertyName(unsigned int propertyId) const
+{
+	return _propertyNames.right.at(propertyId);
+}
+
 void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2) {
+
+	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {
+		throw std::runtime_error("Attempting to link non-existant entity");
+	}
 
     //create link sets if they do not exists
     if (_links.find(entityId) == _links.end()) _links[entityId] = std::set<Entity::EHandle_t>();
@@ -489,6 +574,10 @@ void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity:
 }
 
 void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
+	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {
+		throw std::runtime_error("Attempting to unlink non-existant entity");
+	}
 
     //if they are not actually linked, return
     if (_links.find(entityId) == _links.end() || _links.find(entityId2) == _links.end() ||
@@ -538,6 +627,10 @@ void EntityManager::unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t
 
 // Merges the entities with the given Ids. The entity with the higher Id number is deleted.
 void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2) {
+
+	if (_entities.find(entityId) == _entities.end() || _entities.find(entityId2) == _entities.end()) {
+		throw std::runtime_error("Attempting to link final non-existant entity");
+	}
 
     //we will keep the entity with the lower id
     Entity::EHandle_t keep, lose;
@@ -750,53 +843,77 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
     
     //get the property id
-    const unsigned int propertyId = this->getPropertyName(predicate.value);
+    const unsigned int propertyId = this->getPropertyId(predicate.value);
 
     //TODO: consider the case where variableName2 is already in variableSet
 
     //the variable has been used before, we only need to iterate over valid values from before
     if (variableSet.used(variableName)) {
 
-        unsigned char varIndex = variableSet.indexOf(variableName),
-            varIndex2 = variableSet.indexOf(variableName2);
+		unsigned char varIndex = variableSet.indexOf(variableName),
+			varIndex2 = variableSet.indexOf(variableName2);
 
-        switch (variableSet.typeOf(variableName)) {
+		if (variableSet.used(variableName2)) {
+			// this cannot add any new data, only remove it
+			if (variableSet.typeOf(variableName) != model::types::SubType::TypeEntityRef) {
+				throw std::runtime_error("Not yet implemented :/");
+			}
 
-            case model::types::SubType::TypeEntityRef: {
+			variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
+				[&, this, varIndex](std::vector<VariableSetValue> row) {
+				Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+				auto currentEntityIter = _entities.find(entityHandle);
+				std::shared_ptr<Entity> currentEntity;
+				if (currentEntityIter != _entities.end()) {
+					currentEntity = _entities.at(entityHandle);
+				}
+				else {
+					throw std::runtime_error("Attempted to look up a non-existent entity");
+				}
 
-                variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-                    [&, this, varIndex](std::vector<VariableSetValue> row) {
-                    Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
-                    auto currentEntityIter = _entities.find(entityHandle);
-                    std::shared_ptr<Entity> currentEntity;
-                    if (currentEntityIter != _entities.end()) {
-                        currentEntity = _entities.at(entityHandle);
-                    } else {
-                        throw std::runtime_error("Attempted to look up a non-existent entity");
-                    }                    
-                    return !currentEntity->hasProperty(propertyId);
-                }), variableSet.getData()->end());
+				return currentEntity->meetsCondition(propertyId, model::Object(model::Object::Type::STRING, row[varIndex2].dataPointer()->toString())).size() == 0;
+			}), variableSet.getData()->end());
+		}
+		else {			
 
-                //TODO: but what about the type of the new data being added? :/
-                //for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+			switch (variableSet.typeOf(variableName)) {
+
+			case model::types::SubType::TypeEntityRef: {
+
+				variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
+					[&, this, varIndex](std::vector<VariableSetValue> row) {
+					Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+					auto currentEntityIter = _entities.find(entityHandle);
+					std::shared_ptr<Entity> currentEntity;
+					if (currentEntityIter != _entities.end()) {
+						currentEntity = _entities.at(entityHandle);
+					}
+					else {
+						throw std::runtime_error("Attempted to look up a non-existent entity");
+					}
+					return !currentEntity->hasProperty(propertyId);
+				}), variableSet.getData()->end());
+
+				//TODO: but what about the type of the new data being added? :/
+				//for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
 				for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
 					auto iter = (variableSet.getData()->begin() + i);
-					
-                    Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[varIndex].dataPointer())->value();
-                    auto currentEntityIter = _entities.find(entityHandle);
-                    std::shared_ptr<Entity> currentEntity;
 
-                    if (currentEntityIter != _entities.end()) {
-                        currentEntity = _entities.at(entityHandle);
-                    }
-                    else {
-                        throw std::runtime_error("Attempted to look up a non-existent entity");
-                    }
+					Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[varIndex].dataPointer())->value();
+					auto currentEntityIter = _entities.find(entityHandle);
+					std::shared_ptr<Entity> currentEntity;
+
+					if (currentEntityIter != _entities.end()) {
+						currentEntity = _entities.at(entityHandle);
+					}
+					else {
+						throw std::runtime_error("Attempted to look up a non-existent entity");
+					}
 
 					auto values = currentEntity->getProperty(propertyId)->baseValues();
 
 					*(iter->begin() + varIndex2) = VariableSetValue(values[0]->Clone(), 0, 0);
-                
+
 					for (size_t valId = 1; valId < values.size(); valId++) {
 						std::vector<VariableSetValue> newVec;
 						for (size_t j = 0; j < iter->size(); j++) {
@@ -809,30 +926,31 @@ void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableN
 						}
 						variableSet.getData()->emplace(iter + 1, newVec);
 					}
-                }
+				}
 
 				break;
-            } // /model::types::SubType::TypeEntityRef
+				} // /model::types::SubType::TypeEntityRef
 
-            case model::types::SubType::ValueReference: {
+			case model::types::SubType::ValueReference: {
 
-                for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-                    if (!(*iter)[varIndex].dataPointer()) continue;
-                    auto vsv = (*iter)[varIndex];
-                    std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
-                    auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
-                    //check if val meets the property
-                    if (val->hasProperty(propertyId)) {
-                        auto subprop = val->getProperty(propertyId);
-                        //TODO: should be all values
-                        auto valueToStore = subprop->baseTop()->Clone();
-                        variableSet.addToMetaRefRow(vsv.metaRef(), varIndex, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
-                    }
-                }
+				for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
+					if (!(*iter)[varIndex].dataPointer()) continue;
+					auto vsv = (*iter)[varIndex];
+					std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
+					auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+					//check if val meets the property
+					if (val->hasProperty(propertyId)) {
+						auto subprop = val->getProperty(propertyId);
+						//TODO: should be all values
+						auto valueToStore = subprop->baseTop()->Clone();
+						variableSet.addToMetaRefRow(vsv.metaRef(), varIndex2, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
+					}
+				}
 				break;
-            }
-        
-        }
+			}
+
+			}
+		}
         return;
     }
 
@@ -890,7 +1008,7 @@ void EntityManager::Scan4(VariableSet&& variableSet, const std::string variableN
                 model::types::SubType::TypeEntityRef);
 
             variableSet.add(std::move(variableName2),
-                VariableSetValue(std::make_shared<model::types::Int>(prop.first, 0), prop.first, entity.first),
+                VariableSetValue(std::make_shared<model::types::Property>(prop.first, 0), prop.first, entity.first),
                 model::types::SubType::PropertyReference);
 
             auto type = _propertyTypes.at(prop.first);
@@ -918,12 +1036,26 @@ std::vector<unsigned int> EntityManager::Scan5(VariableSet&& variableSet, const 
     const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
     if (EntityExists(entityRef)) {
-        auto entity = _entities.at(entityRef);
-        if (entity->hasProperty(propertyId)) {
-            for (auto value : entity->getProperty(propertyId)->baseValues()) {
-                rowsAdded.push_back(variableSet.add(std::move(variableName),
-                    VariableSetValue(value->Clone(), propertyId, entityRef), 
-                    std::move(_propertyTypes.at(propertyId))));
+        auto currentEntity = _entities.at(entityRef);
+        if (currentEntity->hasProperty(propertyId)) {
+            for (auto value : currentEntity->getProperty(propertyId)->baseValues()) {
+
+				auto vsv = VariableSetValue(value->Clone(), propertyId, entityRef);
+
+				if (metaVar != "") {
+
+					unsigned int metaRef = variableSet.getMetaRef();
+					vsv.metaRef(metaRef);
+
+						//TODO:
+						//is it necessery to repeat the entity and property handles?
+						auto valueRef = std::make_shared<model::types::ValueRef>(currentEntity->getHandle(), propertyId, value->OrderingId());
+						auto vsv2 = VariableSetValue(valueRef, propertyId, currentEntity->getHandle());
+						vsv2.metaRef(metaRef);
+						variableSet.add(std::move(metaVar), std::move(vsv2), model::types::SubType::ValueReference);
+				}
+
+                rowsAdded.push_back(variableSet.add(std::move(variableName), std::move(vsv), std::move(_propertyTypes.at(propertyId))));
             }            
         }
     }
@@ -948,7 +1080,7 @@ std::vector<unsigned int> EntityManager::Scan6(VariableSet&& variableSet, const 
             for (auto value : vals) {
                 if (value->Equals(object)) {
                     rowsAdded.push_back(variableSet.add(std::move(variableName),
-                        VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0),
+                        VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
                         model::types::SubType::PropertyReference));
                 }
             }
@@ -1023,7 +1155,7 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 				for (auto value : vals) {
 
 					auto rowId = variableSet.add(std::move(variableName),
-						VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0),
+						VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
 						model::types::SubType::PropertyReference);
 
 					variableSet.add(std::move(variableName2),

@@ -123,7 +123,6 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
 
     SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBase);
     memcpy(pHeader, &header, sizeof(SerialHeader));
-    
     return totalSerialised;
 }
 

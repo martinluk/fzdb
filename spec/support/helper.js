@@ -1,5 +1,6 @@
 var net = require('net');
 var fs = require('fs');
+var _ = require('lodash');
 
 var client;
 var helper = {};
@@ -12,20 +13,27 @@ helper.sendCmd = function(cmd) {
     var resultString = "";
 
     var onDataFunc = function(data) {
+
       if((client.bytesRead-beforeBytes) < 1024) {
         //we are done - disconnect client and resolve promise
         client.removeListener('data', onDataFunc);
         resolve(JSON.parse(resultString + data));
       } else {
-        var dataAsString = data.toString();
+          var dataAsString = data.toString();
 
-        for(var i = 0; i<data.length; i++) {
-          if(data[i] != 0) {
-            resultString += dataAsString[i];
-          }
-        }
-        
-        beforeBytes = client.bytesRead;
+          for(var i = 0; i<data.length; i++) {
+            if(data[i] != 0) {
+              resultString += dataAsString[i];
+            }
+          }    
+
+          if((client.bytesRead-beforeBytes) % 1024 != 0) {
+            //we are done - disconnect client and resolve promise
+            client.removeListener('data', onDataFunc);
+            resolve(JSON.parse(resultString));
+          }  
+
+          beforeBytes = client.bytesRead;      
       }        
     };
 
@@ -33,14 +41,19 @@ helper.sendCmd = function(cmd) {
   });     
 };
 
-helper.testCase = function(name, command, expected) {
+helper.testCase = function(name, command, expected, timeout) {
+  if(timeout == undefined) timeout = 1000;
   it(name, function(done) {
      helper.sendCmd(command)
     .then(function(data) {
-      expect(data).toEqual(expected);
-      done();
+      if(_.isFunction(expected)) {
+        expected(data, done);
+      } else {
+        expect(data).toEqual(expected);
+        done();
+      }            
     }); 
-  });    
+  }, timeout);    
 };
 
 helper.resultTemplate = function(results) {

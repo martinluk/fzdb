@@ -10,7 +10,7 @@
 #include <iterator>
 #include <algorithm>
 
-#include "model/types/Base.h"
+#include "./types/Base.h"
 
 using VariableType = model::types::SubType;
 
@@ -65,6 +65,13 @@ public:
         }
         
     }
+
+	void extend(std::string variableName) {
+		
+		_variablesUsed.push_back(false);
+		_metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, _size);
+		_size++;
+	}
     
     unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
         if (_metaData.find(var) == _metaData.cend()) {
@@ -158,6 +165,13 @@ public:
         return _metaData[name].first;
     }
 
+	const VariableType typeOf(unsigned char id) {
+		for (auto md : _metaData) {
+			if (md.second.second == id)return md.second.first;
+		}
+		return VariableType::TypeUndefined;
+	}
+
     const unsigned char indexOf(std::string name) {
         return _metaData[name].second;
     }
@@ -179,8 +193,8 @@ public:
     void addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
         bool found = false;
         for (int i = 0; i < _values.size(); i++) {
-            for (int j = 0; j < _values[i].size(); j++) {
-                if (_values[i][j].metaRef() == metaRef) {
+            for (unsigned char j = 0; j < _values[i].size(); j++) {
+                if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
                     _values[i][position] = val;
                     found = true;
                     break;

@@ -1,6 +1,6 @@
 #include "DebugLoadFile.h"
 #include "../model/EntityManager.h"
-#include "../model/types/String.h"
+#include "../types/String.h"
 #include "../model/EntityProperty.h"
 #include "../model/GraphSerialiser.h"
 #include "../FileSystem.h"
