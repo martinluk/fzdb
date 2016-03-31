@@ -299,6 +299,16 @@ describe("Fuzzy Database", function() {
     });
 	
 	//test select - Option 6 entity <prop> $c
+	it("This test should retrieve nothing", function(done) {
+      client.write("SELECT $a WHERE { entity:2 <surname> $a . entity:3 <surname> $a}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Reus'}), ({a: 'Szyslak'})]})}));
+        done();
+      });      
+    }); 
+	
+	//test select - Option 6 entity <prop> $c
     it("Retrieving drinks property of entity 2", function(done) {
       client.write("SELECT $a WHERE { entity:2 <drinks> $a}");
       client.once('data', function(data) {
