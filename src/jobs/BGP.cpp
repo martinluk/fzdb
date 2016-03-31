@@ -49,13 +49,7 @@ QueryResult BGP::executeConst() const
                 if (!(bool(basePtr))) continue;
 
                 rapidjson::Value val3;
-				if (variables.typeOf(*iter2) == model::types::SubType::PropertyReference) {
-					std::string propName = _database->entityManager().getPropertyName(std::stoul((*iter)[i].dataPointer()->toString()));
-					val3.SetString(propName.c_str(), result.allocator());
-				}
-				else {
-					val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());
-				}                
+				val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());        
 
                 rapidjson::Value varName;
                 varName.SetString((*iter2).c_str(), result.allocator());
