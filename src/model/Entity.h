@@ -53,6 +53,8 @@ public:
         return _linkStatus;
     }
 
+    bool memberwiseEqual(const Entity* other) const;
+
 private:
     void initMemberSerialiser();
 

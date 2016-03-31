@@ -17,8 +17,12 @@ Entity::Entity(unsigned int type, EHandle_t handle) : handle_(handle), _type(typ
 
 void Entity::initMemberSerialiser()
 {
+    _memberSerialiser.addPrimitive(&_locked, sizeof(_locked));
     _memberSerialiser.addPrimitive(&handle_, sizeof(handle_));
     _memberSerialiser.addPrimitive(&_type, sizeof(_type));
+    _memberSerialiser.addPrimitive(&_linkStatus, sizeof(_linkStatus));
+
+    _memberSerialiser.setInitialised();
 }
 
 Entity::~Entity()
@@ -51,4 +55,27 @@ std::string Entity::logString(const Database* db) const
         + std::string(", [")
         + std::to_string(_propertyTable.size())
         + std::string("])");
+}
+
+bool Entity::memberwiseEqual(const Entity *other) const
+{
+    if (_locked != other->_locked ||
+            handle_ != other->handle_ ||
+            _type != other->_type ||
+            _linkStatus != other->_linkStatus ||
+            _propertyTable.size() != other->_propertyTable.size() )
+        return false;
+
+    auto thisIt = _propertyTable.begin();
+    auto otherIt = other->_propertyTable.begin();
+    while ( thisIt != _propertyTable.end() && otherIt != other->_propertyTable.end() )
+    {
+        if ( !thisIt->second->memberwiseEqual(otherIt->second.get()) )
+            return false;
+
+        ++thisIt;
+        ++otherIt;
+    }
+
+    return true;
 }

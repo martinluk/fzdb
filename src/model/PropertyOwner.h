@@ -9,6 +9,7 @@
 #include "./Triple.h"
 #include "./EntityProperty.h"
 #include "./types/SubType.h"
+#include "MemberSerialiser.h"
 
 // This is basically a stripped-down Entity class.
 // TODO: (Jonathan) Tim, you're probably better at explaining this one.

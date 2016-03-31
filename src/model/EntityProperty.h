@@ -85,6 +85,8 @@ public:
     
     virtual std::string logString(const Database* db = NULL) const override;
 
+    bool memberwiseEqual(const EntityProperty* other) const;
+
 private:
     unsigned int _key;
     unsigned int _count;
