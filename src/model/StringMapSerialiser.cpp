@@ -26,13 +26,14 @@ StringMapSerialiser::StringMapSerialiser(boost::bimap<std::__cxx11::string, unsi
 
 std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 {
+    assert(_map || _bimap);
     std::size_t origSize = serialiser.size();
 
     // Create a header.
     SerialHeader header;
     Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
     header.size = 0;    // We don't know this yet.
-    header.count = _map->size();
+    header.count = _map ? _map->size() : _bimap->size();
 
     std::vector<Serialiser::SerialProperty> propList;
     propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
@@ -51,23 +52,23 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
     std::size_t headerChunkSize = dataBegin - origSize;
 
     // Serialise each entry.
-    EntryHeader* ehBase = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(SerialHeader));
     std::size_t bytesSerialised = 0;
     int i = 0;
 
     auto lambda = [&] (const std::string &first, unsigned int second)
     {
-        std::size_t ourOffset = serialiser.size() - dataBegin;
         std::size_t serialisedThisLoop = serialiser.serialise(Serialiser::SerialProperty(&second, sizeof(unsigned int)));
+        std::size_t ourOffset = serialiser.size() - origSize;
 
         // We use size+1 to ensure that a null terminator is present in the serialised stream.
         char* buffer = new char[first.size() + 1];
         memset(buffer, 0, first.size()+1);
-        strcpy(buffer, first.c_str());
+        memcpy(buffer, first.c_str(), first.size());
         serialisedThisLoop += serialiser.serialise(Serialiser::SerialProperty(buffer, first.size()+1));
         delete buffer;
 
-        EntryHeader* pHeader = &(ehBase[i]);
+        EntryHeader* pHeader = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(SerialHeader));
+        pHeader += i;
         pHeader->stringSize = first.size()+1;
         pHeader->offset = ourOffset;
 
@@ -96,8 +97,9 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 
     SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
     pHeader->size = headerChunkSize + bytesSerialised;
+    assert(pHeader->size == serialiser.size() - origSize);
 
-    return serialiser.size() - origSize;
+    return pHeader->size;
 }
 
 void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t length)
@@ -105,7 +107,8 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
     if ( pHeader->size != length )
     {
-        throw InvalidInputStringTableException("Internal string table size does not match size of data.");
+        throw InvalidInputStringTableException("Internal string table size does not match size of data (recorded length is "
+                                               + std::to_string(pHeader->size) + " but length passed in is " + std::to_string(length) + ").");
     }
 
     const EntryHeader* eHeader = reinterpret_cast<const EntryHeader*>(serialisedData + sizeof(SerialHeader));
@@ -122,7 +125,7 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         if ( e->offset + e->stringSize > length )
             throw InvalidInputStringTableException("Length of string " + std::to_string(i) + " exceeds length of input data.");
         
-        if ( data + e->stringSize - 1 != '\0' )
+        if ( e->stringSize > 0 && *(data + e->stringSize - 1) != '\0' )
             throw InvalidInputStringTableException("String " + std::to_string(i) + " is not null-terminated.");
         
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);

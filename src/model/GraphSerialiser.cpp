@@ -57,14 +57,9 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
     std::vector<std::shared_ptr<Entity> > entList = _manager->entityList();
 
     header.version = SERIAL_HEADER_CURRENT_VERSION;
-    
-    // Zero the fields we don't know yet.
     header.size = 0;
-    header.typeMapOffset = 0;
-    header.typeMapLength = 0;
-    header.entityDataOffset = 0;
-    header.entityDataLength = 0;
 
+    // Serialise this first with dummy data. It'll get overwritten with accurate data later.
     serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
 
     // Firstly serialise the type map.
@@ -123,14 +118,11 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
     }
 
     header.entityDataLength = serialiser.size() - header.entityDataOffset;
-    
-    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBase);
     std::size_t totalSerialised = serialiser.size() - indexBase;
-    pHeader->size = totalSerialised;
-    pHeader->typeMapOffset = header.typeMapOffset;
-    pHeader->typeMapLength = header.typeMapLength;
-    pHeader->entityDataOffset = header.entityDataOffset;
-    pHeader->entityDataLength = header.entityDataLength;
+    header.size = totalSerialised;
+
+    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBase);
+    memcpy(pHeader, &header, sizeof(SerialHeader));
     
     return totalSerialised;
 }
@@ -145,18 +137,11 @@ void GraphSerialiser::unserialise(const char *serialisedData, std::size_t length
         StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
         typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset, pHeader->typeMapLength);
 
-        // Create in intermediate map for the string map serialiser to modify.
-        // Then we insert these into the bimap.
-        std::map<std::string, unsigned int> tempMap;
-        StringMapSerialiser propertyNameSerialiser(&tempMap);
-        propertyNameSerialiser.unserialise(serialisedData + pHeader->propertyNameMapOffset, pHeader->propertyTypeMapLength);
-        for ( auto it = tempMap.begin(); it != tempMap.end(); ++it )
-        {
-            _manager->_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(it->first, it->second));
-        }
+        StringMapSerialiser propertyNameSerialiser(&_manager->_propertyNames);
+        propertyNameSerialiser.unserialise(serialisedData + pHeader->propertyNameMapOffset, pHeader->propertyNameMapLength);
 
         PrimitiveMapSerialiser<unsigned int, model::types::SubType> propertyTypeSerialiser(_manager->_propertyTypes);
-        propertyTypeSerialiser.unserialise(serialisedData + pHeader->propertyTypeMapOffset, pHeader->propertyNameMapLength);
+        propertyTypeSerialiser.unserialise(serialisedData + pHeader->propertyTypeMapOffset, pHeader->propertyTypeMapLength);
 
         unserialise(_manager->_links, serialisedData + pHeader->linkMapOffset, pHeader->linkMapLength);
     
@@ -218,8 +203,8 @@ void GraphSerialiser::unserialise(std::map<Entity::EHandle_t, std::set<Entity::E
 
     const std::size_t* pCount = reinterpret_cast<const std::size_t*>(data);
     data += sizeof(std::size_t);
-    if ( data - serialisedData >= length )
-        throw InvalidInputGraphException("Entity link table input is not long enough to contain valid data.");
+    if ( data - serialisedData > length )
+        throw InvalidInputGraphException("Entity link table input is not long enough to contain header.");
 
     for ( std::size_t i = 0; i < *pCount; i++ )
     {
@@ -230,7 +215,7 @@ void GraphSerialiser::unserialise(std::map<Entity::EHandle_t, std::set<Entity::E
 
         const std::size_t* pNumValues = reinterpret_cast<const std::size_t*>(data);
         data += sizeof(std::size_t);
-        if ( data - serialisedData >= length )
+        if ( data - serialisedData > length )
             throw InvalidInputGraphException("Entity link table input " + std::to_string(i) + " exceeded length of input data.");
 
         std::set<Entity::EHandle_t> set;
@@ -238,7 +223,7 @@ void GraphSerialiser::unserialise(std::map<Entity::EHandle_t, std::set<Entity::E
         {
             const Entity::EHandle_t* val = reinterpret_cast<const Entity::EHandle_t*>(data);
             data += sizeof(Entity::EHandle_t);
-            if ( data - serialisedData >= length )
+            if ( data - serialisedData > length )
                 throw InvalidInputGraphException("Entity link table value " + std::to_string(j) + " of input "
                                                  + std::to_string(i) + " exceeded length of input data.");
 

@@ -24,8 +24,7 @@ std::size_t PrimitiveMapSerialiser<A,B>::serialise(Serialiser &serialiser) const
     header.primitiveBSize = sizeof(B);
     header.size = sizeof(SerialHeader) + (header.count * (header.primitiveASize + header.primitiveBSize));
 
-    std::vector<Serialiser::SerialProperty> propList;
-    propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+    serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
 
     // Serialise each entry.
     for ( auto it = _map.cbegin(); it != _map.cend(); ++it )
@@ -48,8 +47,8 @@ void PrimitiveMapSerialiser<A,B>::unserialise(const char *data, std::size_t leng
 
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(data);
     const char* dataBegin = data + sizeof(SerialHeader);
-    if ( dataBegin - data >= length )
-        throw InvalidPrimitiveMapInputException("Input data is not long enough to contain actual input.");
+    if ( dataBegin - data > length )
+        throw InvalidPrimitiveMapInputException("Input data is not long enough to contain primitive map header.");
 
     std::size_t stride = pHeader->primitiveASize + pHeader->primitiveBSize;
 

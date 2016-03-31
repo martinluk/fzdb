@@ -188,7 +188,7 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
     if ( pHeader->memberDataOffset + pHeader->memberDataLength > length )
         throw InvalidInputEntityException("Length of member data exceeds length of input data.");
 
-    if ( pHeader->propertyDataOffset >= length )
+    if ( pHeader->propertyDataOffset > length || (pHeader->propertyCount > 0 && pHeader->propertyDataOffset == length) )
         throw InvalidInputEntityException("Property data offset exceeds length of input data.");
 
     if ( pHeader->propertyDataOffset + pHeader->propertyDataLength > length )
