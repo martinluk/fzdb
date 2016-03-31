@@ -2,6 +2,7 @@
 #include <cassert>
 #include <set>
 #include <sstream>
+#include <iostream>
 #include "../FileSystem.h"
 #include "GraphSerialiser.h"
 #include "../Util.h"
@@ -430,7 +431,7 @@ unsigned int EntityManager::getTypeID(const std::string &str)
     {
         id = _entityTypeNames.at(str);
     }
-    catch (const std::exception&)
+    catch (const std::out_of_range&)
     {
         // The string was not in the table yet.
         // Assign it a new ID.
@@ -1095,6 +1096,28 @@ bool comparePrimitiveMaps(const T &mapA, const T &mapB)
     return true;
 }
 
+template<typename T, typename A, typename B>
+void printPrimitiveMaps(const T &mapA, const T &mapB)
+{
+    std::cout << "Map A has " << mapA.size() << " items." << std::endl;
+    int i = 0;
+    for ( auto it = mapA.begin(); it != mapA.end(); ++it )
+    {
+        std::cout << "Item " << i << ": " << it->first << " -> " << it->second << std::endl;
+
+        i++;
+    }
+
+    std::cout << "Map B has " << mapB.size() << " items." << std::endl;
+    i = 0;
+    for ( auto it = mapB.begin(); it != mapB.end(); ++it )
+    {
+        std::cout << "Item " << i << ": " << it->first << " -> " << it->second << std::endl;
+
+        i++;
+    }
+}
+
 bool EntityManager::memberwiseEqual(const EntityManager &other) const
 {
     if ( _entities.size() != other._entities.size() )
@@ -1116,6 +1139,9 @@ bool EntityManager::memberwiseEqual(const EntityManager &other) const
     if ( !comparePrimitiveMaps<std::map<Entity::EHandle_t, std::set<Entity::EHandle_t> >,
             Entity::EHandle_t, std::set<Entity::EHandle_t> >(_links, other._links) )
         return false;
+
+    printPrimitiveMaps<std::map<std::string, unsigned int>,
+            std::string, unsigned int>(_entityTypeNames, other._entityTypeNames);
 
     if ( !comparePrimitiveMaps<std::map<std::string, unsigned int>,
                 std::string, unsigned int>(_entityTypeNames, other._entityTypeNames) )

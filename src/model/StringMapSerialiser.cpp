@@ -57,8 +57,8 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 
     auto lambda = [&] (const std::string &first, unsigned int second)
     {
-        std::size_t serialisedThisLoop = serialiser.serialise(Serialiser::SerialProperty(&second, sizeof(unsigned int)));
         std::size_t ourOffset = serialiser.size() - origSize;
+        std::size_t serialisedThisLoop = serialiser.serialise(Serialiser::SerialProperty(&second, sizeof(unsigned int)));
 
         // We use size+1 to ensure that a null terminator is present in the serialised stream.
         char* buffer = new char[first.size() + 1];
@@ -125,7 +125,7 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         if ( e->offset + e->stringSize > length )
             throw InvalidInputStringTableException("Length of string " + std::to_string(i) + " exceeds length of input data.");
         
-        if ( e->stringSize > 0 && *(data + e->stringSize - 1) != '\0' )
+        if ( e->stringSize > 0 && *(data + sizeof(int) + e->stringSize - 1) != '\0' )
             throw InvalidInputStringTableException("String " + std::to_string(i) + " is not null-terminated.");
         
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);

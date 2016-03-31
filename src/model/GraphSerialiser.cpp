@@ -135,6 +135,9 @@ void GraphSerialiser::unserialise(const char *serialisedData, std::size_t length
     try
     {
         StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
+
+        // Clear otherwise we get a double "source" entry.
+        _manager->_entityTypeNames.clear();
         typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset, pHeader->typeMapLength);
 
         StringMapSerialiser propertyNameSerialiser(&_manager->_propertyNames);
