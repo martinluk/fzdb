@@ -13,14 +13,14 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+class EntityManager;
+
 namespace model {
     namespace types {
 
         // Base value type class. All other types inherit from this.
         class Base : public ILogString, public PropertyOwner
         {
-            // Jonathan: this member serialiser needs to be private otherwise subclasses defining their own end up adding
-            // their entries to this one!
         private:
             MemberSerialiser _memberSerialiser;
 

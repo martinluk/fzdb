@@ -14,7 +14,7 @@ QueryResult DebugLoadFile::execute()
     std::stringstream log;
     
     // Create an entity manager.
-    EntityManager manager;
+    EntityManager manager(NULL);
     
     // Read in the debug file.
     std::vector<char> buffer;

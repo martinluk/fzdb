@@ -24,7 +24,7 @@ class EntityManager
     friend class GraphSerialiser;
     friend class Entity;
 public:
-    EntityManager();
+    EntityManager(Database* db);
     ~EntityManager();
 
     // Creates an entity on the heap and returns a pointer to it.
@@ -69,18 +69,17 @@ public:
 
     const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
 
-	unsigned int getTypeID(const std::string &str);
 	std::string getTypeName(const unsigned int id) const {
 		return _entityTypeNames.right.at(id);
 	}
-private:
-    void changeEntityType(Entity::EHandle_t id, const std::string &type);   
 
     bool memberwiseEqual(const EntityManager &other) const;
+
 private:
     // TODO: (Jonathan) This could be an unordered map, but we may want to utilise the
     // numerical nature of the entity handles. O(log n) is still pretty good.
     typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;
+    Database* _database;
 
     EntityMap _entities;
     std::map<Entity::EHandle_t, std::set<Entity::EHandle_t>> _links;

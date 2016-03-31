@@ -26,7 +26,7 @@
 
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
-EntityManager::EntityManager()
+EntityManager::EntityManager(Database *db) : _database(db)
 {
 	clearAll();
 }
@@ -43,6 +43,13 @@ std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type)
     assert(_lastHandle != Entity::INVALID_EHANDLE);
 
     std::shared_ptr<Entity> e = std::make_shared<Entity>(typeID, _lastHandle);
+
+    // Jonathan: NEW: Set the manager pointer within the entity.
+    // This means entities can now query the manager tables for stuff,
+    // without going through Singletons (which would be bad because then the
+    // job const guarantees would be broken).
+    e->_manager = this;
+
     _entities.insert(std::pair<Entity::EHandle_t, std::shared_ptr<Entity> >(_lastHandle, e));
 
     return e;
@@ -411,12 +418,11 @@ std::string EntityManager::dumpContents() const
 {
     std::stringstream str;
     str << "Number of entities: " << _entities.size() << "\n";
-    const Database* db = Singletons::database();
     
     for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
     {
         const std::shared_ptr<Entity> ent = it->second;
-        str << ent->logString(db) << "\n";
+        str << ent->logString(_database) << "\n";
         if ( ent->propertyCount() > 0 )
         {
             str << "{\n";
@@ -425,7 +431,7 @@ std::string EntityManager::dumpContents() const
             for ( auto it2 = propMap.cbegin(); it2 != propMap.cend(); ++it2 )
             {
                 std::shared_ptr<EntityProperty> prop = it2->second;
-                str << "  " << prop->logString(db) << "\n";
+                str << "  " << prop->logString(_database) << "\n";
                 
                 if ( prop->count() > 0 )
                 {
@@ -434,7 +440,7 @@ std::string EntityManager::dumpContents() const
                     for ( int i = 0; i < prop->count(); i++ )
                     {
                         BasePointer val = prop->baseValue(i);
-                        str << "    " << val->logString(db) << "\n";
+                        str << "    " << val->logString(_database) << "\n";
                     }
                     
                     str << "  }\n";
@@ -1272,11 +1278,11 @@ bool EntityManager::memberwiseEqual(const EntityManager &other) const
             Entity::EHandle_t, std::set<Entity::EHandle_t> >(_links, other._links) )
         return false;
 
-    if ( !comparePrimitiveMaps<std::map<std::string, unsigned int>,
-                std::string, unsigned int>(_entityTypeNames, other._entityTypeNames) )
+    // We assume that if the left map is equal, so is the right.
+    if ( !comparePrimitiveMaps<boost::bimap<std::string, unsigned int>::left_map,
+                std::string, unsigned int>(_entityTypeNames.left, other._entityTypeNames.left) )
         return false;
 
-    // We assume that if the left map is equal, so is the right.
     if ( !comparePrimitiveMaps<boost::bimap<std::string, unsigned int>::left_map,
             std::string, unsigned int>(_propertyNames.left, other._propertyNames.left) )
         return false;

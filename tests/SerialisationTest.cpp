@@ -4,11 +4,11 @@
 #include <vector>
 #include <string>
 
-#include "model/types/Int.h"
-#include "model/types/String.h"
-#include "model/types/Date.h"
-#include "model/types/EntityRef.h"
-#include "model/types/SubType.h"
+#include "types/Int.h"
+#include "types/String.h"
+#include "types/Date.h"
+#include "types/EntityRef.h"
+#include "types/SubType.h"
 #include "model/Entity.h"
 #include "model/EntityManager.h"
 
@@ -98,7 +98,7 @@ TEST_F(SerialisationTest, testSerialiseEntities)
 // Test that entity manager with different numbers of entities serialises and unserialises correctly.
 TEST_F(SerialisationTest, testSerialiseEntityManager)
 {
-    EntityManager manager;
+    EntityManager manager(NULL);
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
     createSampleEntity(ent);
     std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
@@ -108,7 +108,7 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
     GraphSerialiser gSer(&manager);
     gSer.serialise(serialiser);
 
-    EntityManager manager2;
+    EntityManager manager2(NULL);
     GraphSerialiser gSer2(&manager2);
     gSer2.unserialise(serialiser.begin(), serialiser.size());
 
@@ -118,7 +118,7 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
 // Check that files are written to and read from disk correctly.
 TEST_F(SerialisationTest, testWriteReadFiles)
 {
-    EntityManager manager;
+    EntityManager manager(NULL);
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
     createSampleEntity(ent);
     std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
@@ -126,7 +126,7 @@ TEST_F(SerialisationTest, testWriteReadFiles)
 
     manager.saveToFile("serialisationTest.bin");
 
-    EntityManager manager2;
+    EntityManager manager2(NULL);
     manager2.loadFromFile("serialisationTest.bin");
 
     EXPECT_EQ(true, manager.memberwiseEqual(manager2));

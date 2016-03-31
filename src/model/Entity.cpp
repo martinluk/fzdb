@@ -22,10 +22,17 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 {
 	//handle type comparison
 	if (propertyId == 2) {
-		if (obj.type == model::Object::Type::STRING && Singletons::database()->entityManager().getTypeID(obj.value) == _type) {
-			return std::vector<std::shared_ptr<model::types::Base>>{
-				std::make_shared<model::types::String>(obj.value, 0)
-			};
+        if (obj.type == model::Object::Type::STRING)
+        {
+            if ( !_manager )
+                throw std::runtime_error("Cannot return entity type string: manager does not exist.");
+
+            if ( _manager->getTypeID(obj.value) == _type )
+            {
+                return std::vector<std::shared_ptr<model::types::Base>>{
+                    std::make_shared<model::types::String>(obj.value, 0)
+                };
+            }
 		}
 		else {
 			return std::vector<std::shared_ptr<model::types::Base>>();
@@ -44,7 +51,12 @@ std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) co
 {
 	if (key == 2) {
 		auto output = std::make_shared<EntityProperty>(2, model::types::SubType::TypeString);
-		output->append(std::make_shared<model::types::String>(Singletons::database()->entityManager().getTypeName(_type), 0));
+
+        if ( !_manager )
+            throw std::runtime_error("Cannot return entity type string: manager does not exist.");
+
+        output->append(std::make_shared<model::types::String>(_manager->getTypeName(_type), 0));
+
 		return output;
 	}
 	return PropertyOwner::getProperty(key);

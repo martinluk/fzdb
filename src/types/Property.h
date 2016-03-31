@@ -9,7 +9,6 @@
 namespace model {
     namespace types {
 
-        // Stores a string value.
         class Property : public Base {
         private:
             friend class TypeSerialiser;

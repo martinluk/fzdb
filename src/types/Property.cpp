@@ -6,5 +6,8 @@ using namespace model::types;
 
 std::string Property::toString() const
 {
-	return Singletons::database()->entityManager().getPropertyName(_value);
+    if ( !_manager )
+        throw std::runtime_error("Cannot return entity type string: manager does not exist.");
+
+    return _manager->getPropertyName(_value);
 }

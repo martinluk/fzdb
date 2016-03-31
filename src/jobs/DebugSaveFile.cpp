@@ -13,7 +13,7 @@ QueryResult DebugSaveFile::execute()
     std::stringstream log;
     
     // Create an entity manager.
-    EntityManager manager;
+    EntityManager manager(NULL);
     
     // Create some entities.
     std::shared_ptr<Entity> e1 = manager.createEntity(std::string());

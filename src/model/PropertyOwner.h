@@ -11,17 +11,16 @@
 #include "./types/SubType.h"
 #include "MemberSerialiser.h"
 
+class EntityManager;
+
 // This is basically a stripped-down Entity class.
 // TODO: (Jonathan) Tim, you're probably better at explaining this one.
 class PropertyOwner
 {
+    friend class EntityManager;
 public:
-
+    PropertyOwner();
     virtual ~PropertyOwner();
-
-	PropertyOwner() {
-		_locked = false;
-	}
 
 	// Getters:
 
@@ -58,6 +57,7 @@ protected:
 
 	std::map<unsigned int, std::shared_ptr<EntityProperty>> _propertyTable;
 	bool _locked;
+    EntityManager* _manager;
 
 	inline void checkLock() {
 		if (_locked) {
