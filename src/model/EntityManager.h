@@ -189,7 +189,10 @@ private:
 
 
 	// Scan Helpers
-	std::vector<unsigned int> ScanHelp1(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object, const std::string&& metaVar) const;
+	std::vector<unsigned int> ScanHelp1(VariableSet&& variableSet, const std::shared_ptr<Entity>&& entity, 
+		const std::map<unsigned int, std::shared_ptr<EntityProperty>>&& properties, const std::string variableName, 
+		const model::Object&& object, const std::string&& metaVar) const;
+
 	std::vector<unsigned int> ScanHelp2(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const;
 };
 
