@@ -283,7 +283,13 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 							Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*whereVarIter)[varId].dataPointer())->value();
 							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
 							for (auto newRecord : newRecords) {
-								currentEntity->insertProperty(propertyId, newRecord/*->Clone()*/);
+								// TODO : figure out why clone VariableRef doesn't work :/
+								if (whereVars.typeOf(varId) == model::types::SubType::TypeEntityRef) {
+									currentEntity->insertProperty(propertyId, newRecord->Clone());
+								}
+								else {
+									currentEntity->insertProperty(propertyId, newRecord);
+								}								
 								if (triple.meta_variable != "") {
 									variableSet.add(std::move(triple.meta_variable),
 										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, newRecord->OrderingId()), propertyId, entityHandle),
