@@ -307,6 +307,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 					for (auto val : values) {
 						std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
 						auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+                        assert(record->_manager == this);
 						for (auto newRecord : newRecords) {
 							record->insertProperty(propertyId, newRecord);
 						}
@@ -522,6 +523,25 @@ unsigned int EntityManager::getTypeID(const std::string &str)
 		assert(id > 0);
 		_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, id));
 	}
+
+    return id;
+}
+
+unsigned int EntityManager::getTypeID(const std::string &str) const
+{
+    // "Generic" type is an empty string.
+    // The ID for this is 0.
+    if ( str.size() < 1 )
+        return ENTITY_TYPE_GENERIC;
+
+    unsigned int id = 0;
+    if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
+    {
+        id = _entityTypeNames.left.at(str);
+    }
+    else {
+        throw std::runtime_error("No type ID for string \"" + str + "\".");
+    }
 
     return id;
 }
@@ -1032,7 +1052,7 @@ void EntityManager::Scan4(VariableSet&& variableSet, const std::string variableN
                 model::types::SubType::TypeEntityRef);
 
             variableSet.add(std::move(variableName2),
-                VariableSetValue(std::make_shared<model::types::Property>(prop.first, 0), prop.first, entity.first),
+                VariableSetValue(std::shared_ptr<model::types::Property>(new model::types::Property(prop.first, this, 0)), prop.first, entity.first),
                 model::types::SubType::PropertyReference);
 
             auto type = _propertyTypes.at(prop.first);
@@ -1104,7 +1124,7 @@ std::vector<unsigned int> EntityManager::Scan6(VariableSet&& variableSet, const 
             for (auto value : vals) {
                 if (value->Equals(object)) {
                     rowsAdded.push_back(variableSet.add(std::move(variableName),
-                        VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
+                        VariableSetValue(std::shared_ptr<model::types::Property>(new model::types::Property(propertyPair.first, this, 0)), 0, 0),
                         model::types::SubType::PropertyReference));
                 }
             }
@@ -1179,7 +1199,7 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 				for (auto value : vals) {
 
 					auto rowId = variableSet.add(std::move(variableName),
-						VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
+                        VariableSetValue(std::shared_ptr<model::types::Property>(new model::types::Property(propertyPair.first, this, 0)), 0, 0),
 						model::types::SubType::PropertyReference);
 
 					variableSet.add(std::move(variableName2),

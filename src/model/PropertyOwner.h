@@ -57,7 +57,7 @@ protected:
 
 	std::map<unsigned int, std::shared_ptr<EntityProperty>> _propertyTable;
 	bool _locked;
-    EntityManager* _manager;
+    const EntityManager* _manager;
 
 	inline void checkLock() {
 		if (_locked) {

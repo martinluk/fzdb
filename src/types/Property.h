@@ -18,17 +18,21 @@ namespace model {
             void initMemberSerialiser()
             {
 				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
+
+                _memberSerialiser.setInitialised();
             }
             
         public:
 			Property() : Base(100, 0, std::string()), _value()
             {
+                _manager = NULL;
                 initMemberSerialiser();
             }
             
-			Property(const unsigned int value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+            Property(const unsigned int value, const EntityManager* manager, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(value)
             {
+                _manager = manager;
                 initMemberSerialiser();
             }
             
@@ -54,7 +58,7 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::make_shared<Property>(_value, _confidence);
+                return std::shared_ptr<Base>(new Property(_value, _manager, _confidence));
             }
 
             virtual std::string logString(const Database* db = NULL) const override

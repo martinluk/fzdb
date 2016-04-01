@@ -31,7 +31,7 @@ describe("Fuzzy Database", function() {
 	
     //test insert
     it("setting entity:2's forname to Fred", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\"") }");
+      client.write("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }");
       client.once('data', function(data) {
         done();
       });      

@@ -94,6 +94,7 @@ private:
     
     void changeEntityType(Entity::EHandle_t id, const std::string &type);
     unsigned int getTypeID(const std::string &str);
+    unsigned int getTypeID(const std::string &str) const;
     bool handleSpecialInsertOperations(Entity* entity, const model::Triple &triple, unsigned int author, const std::string &comment);
     static void enforceTypeHasBeenSet(const Entity* entity);
     static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);
