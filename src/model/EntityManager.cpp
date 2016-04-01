@@ -119,43 +119,6 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
     return result;
 }
 
-bool EntityManager::handleSpecialInsertOperations(Entity *entity, const model::Triple &triple, unsigned int author, const std::string &comment)
-{
-    // If we're setting the type
-    if ( triple.predicate.value == ReservedProperties::TYPE )
-    {
-        changeEntityType(std::stoll(triple.subject.value), triple.object.value);
-        return true;
-    }
-    
-    enforceTypeHasBeenSet(entity);
-    
-    // If we're setting a superset or subset, we need to make sure the target (value) exists.
-    // The object will have been created earlier.
-    if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
-    {
-    long long target = std::stoll(triple.object.value);
-    if ( _entities.find(target) == _entities.end() )
-        throw std::runtime_error("'supersetOf' target with ID " + triple.object.value + " does not exist");
-    
-    spdlog::get("main")->info("Setting entity {} as superset of entity {})", entity->getHandle(), target);
-    createHierarchy(entity->getHandle(), target, author, comment);
-    return true;
-    }
-    if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF )
-    {
-    long long target = std::stoll(triple.object.value);
-    if ( _entities.find(target) == _entities.end() )
-        throw std::runtime_error("'subsetOf' target with ID " + triple.object.value + " does not exist");
-    
-    spdlog::get("main")->info("Setting entity {} as subset of entity {})", entity->getHandle(), target);
-    createHierarchy(target, entity->getHandle(), author, comment);
-    return true;
-    }
-    
-    return false;
-}
-
 void EntityManager::enforceTypeHasBeenSet(const Entity *entity)
 {
 #ifdef ENFORCE_ENTITIES_HAVE_TYPES
@@ -205,69 +168,92 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
     // We use this later to make sure all entities have a type.
     std::set<const Entity *> modifiedEntities;
 
-    for (; iter != end; iter++) {
+    // Iterate over each triple.
+    for (; iter != end; iter++)
+    {
+        // I know virtually everyone else I've spoken to hates putting beginning braces
+        // on new lines, but if there was ever a case for that it would be here.
+        // It's so much more readable now!
+
         auto triple = *iter;
 
         unsigned char confidence = triple.object.hasCertainty ? triple.object.certainty : 100;
         std::vector<std::shared_ptr<model::types::Base>> newRecords;
         model::types::SubType newRecordType;
 
-        switch (triple.object.type) {
-        case model::Object::Type::STRING:
-            newRecordType = model::types::SubType::TypeString;
-            newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
-            break;
-        case model::Object::Type::ENTITYREF:
-            newRecordType = model::types::SubType::TypeEntityRef;
-			newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
-            break;
-        case model::Object::Type::INT:
-            newRecordType = model::types::SubType::TypeInt32;
-			newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
-            break;
-		case model::Object::Type::VARIABLE: {
-				auto varId = whereVars.indexOf(triple.object.value);
-				for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
-					if ((*whereVarIter)[varId].empty()) continue;
-					//one new record for each match!
-					//TODO: make this work!!
-					// $a <wife> $b WHERE { NEW($a) . NEW($b) }
-					newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
-				}
-				newRecordType = whereVars.typeOf(triple.object.value);
-				break;
-			}
+        // Depending on the triple type, create a value to hold the data.
+        // In some cases there may be multiple values.
+        switch (triple.object.type)
+        {
+            case model::Object::Type::STRING:
+                newRecordType = model::types::SubType::TypeString;
+                newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
+                break;
+            case model::Object::Type::ENTITYREF:
+                newRecordType = model::types::SubType::TypeEntityRef;
+                newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value, 0, confidence));
+                break;
+            case model::Object::Type::INT:
+                newRecordType = model::types::SubType::TypeInt32;
+                newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, 0, confidence));
+                break;
+            case model::Object::Type::VARIABLE:
+            {
+                auto varId = whereVars.indexOf(triple.object.value);
+                for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++)
+                {
+                    if ((*whereVarIter)[varId].empty()) continue;
+                    //one new record for each match!
+                    //TODO: make this work!!
+                    // $a <wife> $b WHERE { NEW($a) . NEW($b) }
+
+                    // dataPointer() resolves to a BasePointer.
+                    newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
+                }
+                newRecordType = whereVars.typeOf(triple.object.value);
+                break;
+            }
         }
 
+        // Get the ID of the property with the given name.
         unsigned int propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
         
-        switch (triple.subject.type) {
-
-            case model::Subject::Type::ENTITYREF: {
-
+        // Switch depending on what the subject of the query is.
+        switch (triple.subject.type)
+        {
+            // EntityRef means we're doing something to an entity in the database
+            // that's been explicitly specified by ID.
+            case model::Subject::Type::ENTITYREF:
+            {
+                // Get the ID.
                 auto entity_id = std::stoll(triple.subject.value);
 
-                //create the entity if it doesn't exist
+                // Error out if the entity doesn't exist.
                 if (_entities.find(entity_id) == _entities.end())
                 {
                     //_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
 					throw std::runtime_error("No entity with id " + std::to_string(entity_id) + " was found");
                 }
 
+                // Get a pointer to the entity.
                 std::shared_ptr<Entity> currentEntity = _entities[entity_id];
+
+                // Keep track that we modified it.
                 modifiedEntities.insert(currentEntity.get());
 
-                // If we performed any special operations, skip to the next.
-                // TODO: We haven't handled the author or comment at all here!
-                if (handleSpecialInsertOperations(currentEntity.get(), triple, 0, std::string()))
+                // TODO: Author and comment!
+                if ( performSpecialInsertOperations(triple, newRecords, newRecordType, 0, std::string()) )
                     continue;
 
-                enforceTypeHasBeenSet(currentEntity.get());
-
                 //note that the OrderingId attribute of a record is assigned as part of insertion
-				for (auto newRecord : newRecords) {
-					currentEntity->insertProperty(propertyId, newRecord);
-					if (triple.meta_variable != "") {
+                // For each value we need to insert:
+                for (auto newRecord : newRecords)
+                {
+                    // Add it to the property (cloning).
+                    currentEntity->insertProperty(propertyId, newRecord->Clone());
+
+                    if (triple.meta_variable != "")
+                    {
 						variableSet.add(std::move(triple.meta_variable),
 							VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
 							model::types::SubType::ValueReference);
@@ -276,23 +262,41 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 break;
             } // END: case model::Subject::Type::ENTITYREF
 
-            case model::Subject::Type::VARIABLE: {
-                if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end()) {
-					if (whereVars.contains(triple.subject.value)) {
-						if (whereVars.typeOf(triple.subject.value) != VariableType::TypeEntityRef) {
+            // Variable means that it's some entity/entities referred to elsewhere in the query.
+            case model::Subject::Type::VARIABLE:
+            {
+                if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end())
+                {
+                    if (whereVars.contains(triple.subject.value))
+                    {
+                        if (whereVars.typeOf(triple.subject.value) != VariableType::TypeEntityRef)
+                        {
 							throw new std::runtime_error("Variables bound in the WHERE clause of an insert statement used in the body of that statement MUST resolve to entity values");
 						}
 
 						auto varId = whereVars.indexOf(triple.subject.value);
 
-						for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+                        for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++)
+                        {
 							if ((*whereVarIter)[varId].empty()) continue;
 
 							Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*whereVarIter)[varId].dataPointer())->value();
+                            // TODO: Do we need to check the handle is valid?
+
 							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
-							for (auto newRecord : newRecords) {
+                            modifiedEntities.insert(currentEntity.get());
+
+                            // TODO: Author and comment!
+                            if ( performSpecialInsertOperations(triple, newRecords, newRecordType, 0, std::string()) )
+                                continue;
+
+                            for (auto newRecord : newRecords)
+                            {
+                                // Insert the current record into the current entity.
 								currentEntity->insertProperty(propertyId, newRecord);
-								if (triple.meta_variable != "") {
+
+                                if (triple.meta_variable != "")
+                                {
 									variableSet.add(std::move(triple.meta_variable),
 										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, newRecord->OrderingId()), propertyId, entityHandle),
 										model::types::SubType::ValueReference);
@@ -300,25 +304,26 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 							}
 						}
 					}
-				} else {
+                }
+                else
+                {
 
 					auto values = variableSet.getData(triple.subject.value);
 
-					for (auto val : values) {
+                    for (auto val : values)
+                    {
 						std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
 						auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
                         assert(record->_manager == this);
-						for (auto newRecord : newRecords) {
+                        for (auto newRecord : newRecords)
+                        {
 							record->insertProperty(propertyId, newRecord);
 						}
 					}
 				}
                 break;
             }
-        
         }
-
-        
     }
     
     // Ensure all the entities we processed have a type.
@@ -327,20 +332,44 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 	return createdEntities;
 }
 
-void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &type)
+bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
+                                                   model::types::SubType newRecordType, unsigned int author, const std::string &comment)
 {
+    // If we reference the type, perform a type change.
+    if ( triple.predicate.value == ReservedProperties::TYPE )
+    {
+        if ( triple.object.type != model::Object::Type::STRING )
+            throw std::runtime_error("Entity types must be specified as strings.");
+
+        changeEntityType(currentEntity.get(), triple.object.value);
+        return true;
+    }
+
+    // If we should do hierarchy things, do so here.
+    if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF ||
+         triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
+    {
+        createHierarchy(triple, author, comment, newRecords, newRecordType);
+        return true;
+    }
+
+    return false;
+}
+
+void EntityManager::createHierarchy(const model::Triple &triple, unsigned int author, const std::string &comment,
+                                    const std::vector<std::shared_ptr<model::types::Base> > &newRecords, model::types::SubType newRecordType)
+{
+    // TODO
+}
+
+void EntityManager::changeEntityType(Entity *ent, const std::string &type)
+{
+    // TODO: If the entity changes type, hierarchy relationships may become semantically invalid
+    // (since they should only be between entities of the same type)!
+
     unsigned int typeID = getTypeID(type);
-    spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", id, type, typeID);
-    
-    auto it = _entities.find(id);
-    if (it == _entities.end())
-    {
-        _entities[id] = std::make_shared<Entity>(typeID, id);
-    }
-    else
-    {
-        it->second->_type = typeID;
-    }
+    spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", ent->getHandle(), type, typeID);
+    ent->_type = typeID;
 }
 
 std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const
@@ -732,12 +761,14 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     };
     
     // This sets pHigh <supersetOf> entity:low
+    std::cout << "Setting " << high << " <supersetOf> " << low << std::endl;
     if ( !pHigh->hasProperty(superProperty) )
         propNotPresent(pHigh, low, superProperty);
     else
         propPresent(pHigh, low, superProperty);
     
     // This sets pLow <subsetOf> entity:high
+    std::cout << "Setting " << low << " <subsetOf> " << high << std::endl;
     if ( !pLow->hasProperty(subProperty) )
         propNotPresent(pLow, high, subProperty);
     else
