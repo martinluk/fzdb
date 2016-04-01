@@ -204,6 +204,10 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
     const char* memberData = serialData + pHeader->memberDataOffset;
     ent->_memberSerialiser.unserialiseAll(memberData, pHeader->memberDataLength);
 
+    // If we're locked, unlock temporarily.
+    bool wasLocked = ent->_locked;
+    ent->_locked = false;
+
     // Unserialise the properties.
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(SerialHeader));
     for ( int i = 0; i < pHeader->propertyCount; i++ )
@@ -237,6 +241,8 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
                                               + "\" is invalid.");
         }
     }
+
+    ent->_locked = wasLocked;
     
     return ent;
 }

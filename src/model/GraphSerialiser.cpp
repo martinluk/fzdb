@@ -129,26 +129,27 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
 void GraphSerialiser::unserialise(const char *serialisedData, std::size_t length)
 {
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
-    _manager->clearAll();
     
     try
     {
         StringMapSerialiser typeMapSerialiser(&_manager->_entityTypeNames);
-
-        // Clear otherwise we get a double "source" entry.
         _manager->_entityTypeNames.clear();
         typeMapSerialiser.unserialise(serialisedData + pHeader->typeMapOffset, pHeader->typeMapLength);
 
         StringMapSerialiser propertyNameSerialiser(&_manager->_propertyNames);
+        _manager->_propertyNames.clear();
         propertyNameSerialiser.unserialise(serialisedData + pHeader->propertyNameMapOffset, pHeader->propertyNameMapLength);
 
         PrimitiveMapSerialiser<unsigned int, model::types::SubType> propertyTypeSerialiser(_manager->_propertyTypes);
+        _manager->_propertyTypes.clear();
         propertyTypeSerialiser.unserialise(serialisedData + pHeader->propertyTypeMapOffset, pHeader->propertyTypeMapLength);
 
+        _manager->_links.clear();
         unserialise(_manager->_links, serialisedData + pHeader->linkMapOffset, pHeader->linkMapLength);
     
         const EntityDataHeader* pEntData = reinterpret_cast<const EntityDataHeader*>(serialisedData + pHeader->entityDataOffset);
         const EntityHeader* pEntHeaders = reinterpret_cast<const EntityHeader*>(pEntData + 1);
+        _manager->_entities.clear();
         for ( int i = 0; i < pEntData->entityCount; i++ )
         {
             const EntityHeader* pEntHeader = &(pEntHeaders[i]);

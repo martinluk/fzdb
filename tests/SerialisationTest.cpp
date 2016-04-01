@@ -44,10 +44,10 @@ void createSampleEntity(std::shared_ptr<Entity> &ent)
 {
     using namespace model::types;
 
-    EntityProperty* propInt = new EntityProperty(1, model::types::SubType::TypeInt32);
-    EntityProperty* propString = new EntityProperty(2, model::types::SubType::TypeString);
-    EntityProperty* propDate = new EntityProperty(3, model::types::SubType::TypeDate);
-    EntityProperty* propEntityRef = new EntityProperty(4, model::types::SubType::TypeEntityRef);
+    EntityProperty* propInt = new EntityProperty(5, model::types::SubType::TypeInt32);
+    EntityProperty* propString = new EntityProperty(6, model::types::SubType::TypeString);
+    EntityProperty* propDate = new EntityProperty(7, model::types::SubType::TypeDate);
+    EntityProperty* propEntityRef = new EntityProperty(8, model::types::SubType::TypeEntityRef);
 
     propInt->append(BasePointer(new Int(1234, 42, 98, "Integer comment")));
     propInt->append(BasePointer(new Int(5678, 24, 89, "Integer comment")));
