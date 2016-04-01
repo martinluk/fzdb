@@ -21,8 +21,8 @@ describe("Fuzzy Database", function() {
     $b <name> \"London\";
     <subsetOf> $a
 } WHERE {
-  NEW($a,Location) .
-  NEW($b,Location)
+  NEW($a,"Location") .
+  NEW($b,"Location")
 }`, // command
       { status: true, errorCode: 0, info: 'Inserted 3 triples.', result: { type: 'fsparql', data: { a: '2', b: '3' } } } // result
     );

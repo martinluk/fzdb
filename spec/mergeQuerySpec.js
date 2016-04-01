@@ -30,7 +30,7 @@ describe("Fuzzy Database", function() {
     //test insert
     var fredId;
     it("setting entity:1's forename to Fred", function(done) {
-      sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,person) }")
+      sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,"person") }")
       .then(function(data) {
         fredId = data.result.data.a;
         done();
@@ -40,7 +40,7 @@ describe("Fuzzy Database", function() {
     //test insert
     var smithId;
     it("setting entity:2's surname to Smith", function(done) {
-      sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,person) }")
+      sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,"person") }")
       .then(function(data) {
         smithId = data.result.data.a;
         done();

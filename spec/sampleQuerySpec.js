@@ -31,7 +31,7 @@ describe("Fuzzy Database", function() {
 	
     //test insert
     it("setting entity:2's forname to Fred", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -58,7 +58,7 @@ describe("Fuzzy Database", function() {
 
 	//test insert with 2 properties
     it("setting entity:3's forename to 'Ned' and surname to 'Flanders'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Ned\"; <surname> \"Flanders\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Ned\"; <surname> \"Flanders\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -86,7 +86,7 @@ describe("Fuzzy Database", function() {
 	
 	//test insert with 4 properties
 	it("setting entity:2's forename to 'Marco' and surname to 'Reus', which is aged '28' and drinks 'Water'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -94,7 +94,7 @@ describe("Fuzzy Database", function() {
 	
 	//test insert with 5 properties
     it("setting entity:3's forename to 'Moe' and surname to 'Szyslak', which is aged '34', drinks 'Beer' and has as a profession 'Bartender'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Beer\"; <profession> \"Bartender\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Beer\"; <profession> \"Bartender\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -102,7 +102,7 @@ describe("Fuzzy Database", function() {
 
 	//test insert with 4 properties
 	it("setting entity:4's forename to 'Marco' and surname to 'Polo', which is aged '34', drinks 'Wine'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -379,7 +379,7 @@ describe("Fuzzy Database", function() {
     });
 	//test insert with 4 properties
 	it("setting entity:2's forename to 'Marco' and surname to 'Reus', which is aged '28' and drinks 'Water'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -387,7 +387,7 @@ describe("Fuzzy Database", function() {
 	
 	//test insert with 5 properties
     it("setting entity:3's forename to 'Moe' and surname to 'Szyslak', which is aged '34', drinks 'Beer' and has as a profession 'Bartender'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Beer\"; <profession> \"Bartender\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Beer\"; <profession> \"Bartender\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -395,7 +395,7 @@ describe("Fuzzy Database", function() {
 
 	//test insert with 4 properties
 	it("setting entity:4's forename to 'Marco' and surname to 'Polo', which is aged '34', drinks 'Wine'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -465,7 +465,7 @@ describe("Fuzzy Database", function() {
 
   //Multiple insert working
   it("having multiple inserts'", function(done) {
-      client.write("INSERT DATA { $per1 <forename> \"Homer\", [60] \"Max\"; <surname> \"Simpson\", [60] \"Power\"; <age> 38 ; <wife> $per2; <drinks> \"Beer\" . $per2 <forename> \"Marge\"; <surname> \"Simpson\", [40] \"Bouvier\"; <age> 34 . $per3 <forename> \"Ned\"; <surname> \"Flanders\" . $per4 <forename> \"Moe\"; <surname> \"Szyslak\"; <occupation> \"Bartender\" }  WHERE { NEW($per1,person) .  NEW($per2,person) . NEW($per3,person) . NEW($per4,person) }");
+      client.write("INSERT DATA { $per1 <forename> \"Homer\", [60] \"Max\"; <surname> \"Simpson\", [60] \"Power\"; <age> 38 ; <wife> $per2; <drinks> \"Beer\" . $per2 <forename> \"Marge\"; <surname> \"Simpson\", [40] \"Bouvier\"; <age> 34 . $per3 <forename> \"Ned\"; <surname> \"Flanders\" . $per4 <forename> \"Moe\"; <surname> \"Szyslak\"; <occupation> \"Bartender\" }  WHERE { NEW($per1,"person") .  NEW($per2,"person") . NEW($per3,"person") . NEW($per4,"person") }");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
         assignedIds = resultJSON.result.data;
@@ -475,7 +475,7 @@ describe("Fuzzy Database", function() {
   
   //Multiple insert working
   it("having multiple inserts'", function(done) {
-      client.write("INSERT DATA { $per1 <forename> \"Phil\", [60] \"Max\"; <surname> \"Travis\", [60] \"Power\"; <age> 38 ; <wife> $per2; <drinks> \"Beer\" . $per2 <forename> \"Marge\"; <surname> \"Sinclair\", [40] \"Dentist\"; <age> 37 . $per3 <forename> \"Barney\"; <surname> \"Stinson\"; <profession> \"magician\" . $per4 <forename> \"Moe\"; <surname> \"Szyslak\"; <occupation> \"Bartender\" } WHERE { NEW($per1,person) . NEW($per2,person) . NEW($per3,person) . NEW($per4,person) }");
+      client.write("INSERT DATA { $per1 <forename> \"Phil\", [60] \"Max\"; <surname> \"Travis\", [60] \"Power\"; <age> 38 ; <wife> $per2; <drinks> \"Beer\" . $per2 <forename> \"Marge\"; <surname> \"Sinclair\", [40] \"Dentist\"; <age> 37 . $per3 <forename> \"Barney\"; <surname> \"Stinson\"; <profession> \"magician\" . $per4 <forename> \"Moe\"; <surname> \"Szyslak\"; <occupation> \"Bartender\" } WHERE { NEW($per1,"person") . NEW($per2,"person") . NEW($per3,"person") . NEW($per4,"person") }");
       client.once('data', function(data) {
         done();
       });      
@@ -504,7 +504,7 @@ describe("Fuzzy Database", function() {
 
 	//test insert with 4 properties
 	it("setting entity:2's forename to 'Marco' and surname to 'Reus', which is aged '28' and drinks 'Water'", function(done) {
-      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,person) }");
+      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,"person") }");
       client.once('data', function(data) {
         done();
       });      

@@ -18,7 +18,7 @@ module.exports = function(desc) {
   for(var i=0; i<desc.length; i++) {
     for(var j=0; j<desc[i].count; j++) {
       outputString += `
-        NEW($per${totalCount},${desc[i].type}) .`;
+        NEW($per${totalCount},"${desc[i].type}") .`;
       totalCount++;
     }
   }  

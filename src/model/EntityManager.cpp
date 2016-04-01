@@ -682,8 +682,8 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     EntPtr pHigh = _entities[high];
     EntPtr pLow = _entities[low];
     
-    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
-    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef);
     
     // The superset entity holds the subset property pointing to the subset entity, and vice versa.
     // Lambdas are wonderful for convenience.

@@ -7,7 +7,8 @@ using namespace model::types;
 std::string Property::toString() const
 {
     if ( !_manager )
-        throw std::runtime_error("Cannot return entity type string: manager does not exist.");
+        throw std::runtime_error("Cannot return type string for " + getSubTypeString(subtype()) + " property "
+                                 + std::to_string(_value) + ": manager does not exist.");
 
     return _manager->getPropertyName(_value);
 }
