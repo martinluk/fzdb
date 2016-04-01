@@ -207,13 +207,16 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
 	//Iterating over the returned variable set
 	auto values = variableSet.getData(); //std::vector<std::vector<VariableSetValue>>
 	//Find out row number that is entity
+	spdlog::get("main")->info("Has data");
 	for (auto row : *values) {
 		//Iterating over the column
+		spdlog::get("main")->info("Entered row");
 		for (VariableSetValue val: row) {
-			spdlog::get("main")->info("Am I here?");
+			spdlog::get("main")->info("Entered value");
 			if (val.entity()!=0) {
 				//Value's entity value is set, meaning it is entity
 				//Delete entity.
+				spdlog::get("main")->info("---- Deleting entity {}", val.entity());
 				_entities.erase(val.entity());
 			} 
 			//TODO Remove all properties that are link to the entity getting deleted
