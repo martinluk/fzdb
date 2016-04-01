@@ -339,10 +339,10 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     auto values = variableSet.getData(); //std::vector<std::vector<VariableSetValue>>
     //Find out row number that is entity
     spdlog::get("main")->info("Has data");
-    for(auto iter=variableSet.getData()->cvwgin(); iter!=variableSet.getData()->cend(); iter++){
+    for(auto iter=variableSet.getData()->cbegin(); iter!=variableSet.getData()->cend(); iter++){
         //Iterating over the column
         spdlog::get("main")->info("Entered row");
-        for (VariableSetValue val: row) {
+        for (VariableSetValue val: *iter) {
             spdlog::get("main")->info("Entered value");
             if (val.entity()!=0) {
                 //Value's entity value is set, meaning it is entity
