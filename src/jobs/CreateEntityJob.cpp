@@ -8,9 +8,9 @@ CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session, const std::s
 
 QueryResult CreateEntityJob::executeNonConst()
 {
-	std::shared_ptr<Entity> e = _database->entityManager().createEntity(_type);
+    std::shared_ptr<Entity> e = _database->entityManager().createEntity(_type);
 
-	std::string id = std::to_string(e->getHandle());
+    std::string id = std::to_string(e->getHandle());
 
   QueryResult result;
   result.setResultDataText(std::string("Entity created with handle") + id);

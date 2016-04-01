@@ -8,14 +8,15 @@
 
 #include <string>
 
+// Deletes all entities within the database.
 class Flush : public Job
 {
 public:
 
   Flush(std::shared_ptr<ISession> session);
 
-	virtual bool constOperation() const override { return false; }
-	virtual QueryResult executeNonConst() override;
+    virtual bool constOperation() const override { return false; }
+    virtual QueryResult executeNonConst() override;
 };
 
 

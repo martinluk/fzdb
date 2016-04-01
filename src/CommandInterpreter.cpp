@@ -19,13 +19,13 @@
 
 void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::string command) {
 
-	command.erase(std::remove(command.begin(), command.end(), '\n'), command.end());
-	command.erase(std::remove(command.begin(), command.end(), '\r'), command.end());
+    command.erase(std::remove(command.begin(), command.end(), '\n'), command.end());
+    command.erase(std::remove(command.begin(), command.end(), '\r'), command.end());
 
-	auto tokens = FSparqlParser::Tokenize(command);
+    auto tokens = FSparqlParser::Tokenize(command);
 
-	try {
-		Query query = FSparqlParser::ParseAll(tokens);
+    try {
+        Query query = FSparqlParser::ParseAll(tokens);
 
 		switch (query.type) {
 		case QueryType::PING:
@@ -75,4 +75,3 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
 		session->respond(QueryResult::generateError(QueryResult::ErrorCode::GenericError, std::string("Unexpected error: ") + ex.what()).toJson());
 	}
 }
-

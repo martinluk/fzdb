@@ -3,9 +3,15 @@
 
 #include <cstring>
 #include "Serialiser.h"
+#include <stdexcept>
+#include <string>
+#include <set>
+#include <map>
 
+#include "Entity.h"
 class EntityManager;
 
+// Serialises and unserialises all entity data within an EntityManager.
 class GraphSerialiser
 {
 public:
@@ -13,11 +19,20 @@ public:
     
     std::size_t serialise(Serialiser &serialiser) const;
     
-    // NOTE: This function does not clear the current list of entities within the manager.
-    // TODO: This is probably unsafe without a length parameter!
-    void unserialise(const char* serialisedData);
+    void unserialise(const char* serialisedData, std::size_t length);
+    
+    class InvalidInputGraphException : public std::runtime_error
+    {
+    public:
+    explicit InvalidInputGraphException(const std::string &msg) : std::runtime_error(msg)
+    {
+    }
+    };
     
 private:
+    std::size_t serialise(const std::map<Entity::EHandle_t, std::set<Entity::EHandle_t> > &map, Serialiser &serialiser) const;
+    void unserialise(std::map<Entity::EHandle_t, std::set<Entity::EHandle_t> > &map, const char* serialisedData, std::size_t length);
+
     EntityManager* _manager;
 };
 

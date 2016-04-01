@@ -1,0 +1,10 @@
+INSERT DATA
+{
+	$eng <name> "England" .
+	
+	$lon <name> "London";
+	<subsetOf> $eng
+} WHERE {
+	NEW($eng, "Location") .
+	NEW($lon, "Location")
+}

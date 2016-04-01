@@ -48,3 +48,4 @@ build
 exclude/*
 
 node_modules
+tools/structs/structs

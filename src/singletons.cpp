@@ -6,14 +6,14 @@
 
 namespace Singletons
 {
-	Database* _database = NULL;
-	boost::shared_mutex _databaseMutex;
-	
-	std::string _dataFilePath;
+    Database* _database = NULL;
+    boost::shared_mutex _databaseMutex;
+    
+    std::string _dataFilePath;
 
-	void initialise()
-	{
-		_database = new Database();
+    void initialise()
+    {
+        _database = new Database();
                 if ( _dataFilePath.size() > 0 )
                 {
                     if ( !_database->entityManager().loadFromFile(_dataFilePath))
@@ -25,30 +25,30 @@ namespace Singletons
                         std::cout << "Loaded file " << _dataFilePath << " successfully." << std::endl;
                     }
                 }
-	}
+    }
 
-	void shutdown()
-	{
-		delete _database;
-	}
+    void shutdown()
+    {
+        delete _database;
+    }
 
-	void setDataFilePath(const std::string &path)
-	{
-		_dataFilePath = path;
-	}
-	
-	Database* database()
-	{
-		return _database;
-	}
-	
-	const Database* cDatabase()
-	{
-		return _database;
-	}
-	
-	boost::shared_mutex& databaseMutex()
-	{
-		return _databaseMutex;
-	}
+    void setDataFilePath(const std::string &path)
+    {
+        _dataFilePath = path;
+    }
+    
+    Database* database()
+    {
+        return _database;
+    }
+    
+    const Database* cDatabase()
+    {
+        return _database;
+    }
+    
+    boost::shared_mutex& databaseMutex()
+    {
+        return _databaseMutex;
+    }
 }

@@ -5,6 +5,7 @@
 #include "../Job.h"
 #include "QueryResult.h"
 
+// Tests loading a file that was previously saved using DebugSaveFile.
 class DebugLoadFile
 {
 public:

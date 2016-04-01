@@ -1,12 +1,13 @@
 #ifndef FUZZY_JOBQUEUE
 #define FUZZY_JOBQUEUE
 
-#define THREAD_COUNT 2
+#define THREAD_COUNT 1
 
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include "Job.h"
 
+// Queue of jobs to be executed. Has capability for multithreading.
 class JobQueue
 {
 private:

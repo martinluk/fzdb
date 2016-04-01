@@ -7,16 +7,17 @@
 
 #include "QueryResult.h"
 
+// Generic "Unknown" job for when an unknown command is invoked.
 class UnknownJob : public Job
 {
 private:
   std::string _name;
 
 public:
-	UnknownJob(std::shared_ptr<ISession> session, std::string name);
-	
-	virtual bool constOperation() const override { return true; }
-	virtual QueryResult executeConst() const;
+    UnknownJob(std::shared_ptr<ISession> session, std::string name);
+    
+    virtual bool constOperation() const override { return true; }
+    virtual QueryResult executeConst() const;
 };
 
-#endif	// JOBS_UNKNOWNJOB_H
+#endif    // JOBS_UNKNOWNJOB_H

@@ -8,6 +8,7 @@
 
 #include <string>
 
+// Insers a set of triples into the database.
 class Insert : public Job
 {
 public:
