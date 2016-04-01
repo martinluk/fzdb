@@ -5,7 +5,6 @@
 #include <string>
 #include "Serialiser.h"
 #include <stdexcept>
-#include <boost/bimap.hpp>
 
 // Specialised class used to serialise a table that maps strings to
 // unsigned integers.

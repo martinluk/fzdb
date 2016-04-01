@@ -20,7 +20,7 @@ StringMapSerialiser::StringMapSerialiser(std::map<std::string, unsigned int> *ma
 {
 }
 
-StringMapSerialiser::StringMapSerialiser(boost::bimap<std::__cxx11::string, unsigned int> *bimap) : _map(NULL), _bimap(bimap)
+StringMapSerialiser::StringMapSerialiser(boost::bimap<std::string, unsigned int> *bimap) : _map(NULL), _bimap(bimap)
 {
 }
 

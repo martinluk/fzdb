@@ -1,9 +1,10 @@
 INSERT DATA
 {
-	entity:1 <type> "Location";
-	<name> "England" .
+	$eng <name> "England" .
 	
-	entity:2 <type> "Location";
-	<name> "London";
-	<subsetOf> entity:1
+	$lon <name> "London";
+	<subsetOf> $eng
+} WHERE {
+	NEW($eng, "Location") .
+	NEW($lon, "Location")
 }

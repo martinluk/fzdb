@@ -17,6 +17,8 @@
 #include "model/EntitySerialiser.h"
 #include "model/GraphSerialiser.h"
 
+// TODO: Extend these. They probably don't cover all edge cases.
+
 class SerialisationTest : public ::testing::Test
 {
 protected:
@@ -40,14 +42,14 @@ void testSerialisation(const BasePointer &typePtr)
     EXPECT_EQ(advance, serialisedLength);
 }
 
-void createSampleEntity(std::shared_ptr<Entity> &ent)
+void createSampleEntity(std::shared_ptr<Entity> &ent, unsigned int idBase)
 {
     using namespace model::types;
 
-    EntityProperty* propInt = new EntityProperty(5, model::types::SubType::TypeInt32);
-    EntityProperty* propString = new EntityProperty(6, model::types::SubType::TypeString);
-    EntityProperty* propDate = new EntityProperty(7, model::types::SubType::TypeDate);
-    EntityProperty* propEntityRef = new EntityProperty(8, model::types::SubType::TypeEntityRef);
+    EntityProperty* propInt = new EntityProperty(idBase++, model::types::SubType::TypeInt32);
+    EntityProperty* propString = new EntityProperty(idBase++, model::types::SubType::TypeString);
+    EntityProperty* propDate = new EntityProperty(idBase++, model::types::SubType::TypeDate);
+    EntityProperty* propEntityRef = new EntityProperty(idBase++, model::types::SubType::TypeEntityRef);
 
     propInt->append(BasePointer(new Int(1234, 42, 98, "Integer comment")));
     propInt->append(BasePointer(new Int(5678, 24, 89, "Integer comment")));
@@ -85,7 +87,7 @@ TEST_F(SerialisationTest, testSerialiseEntities)
     using namespace model::types;
 
     std::shared_ptr<Entity> ent(new Entity(0, 1));
-    createSampleEntity(ent);
+    createSampleEntity(ent, 7);
 
     Serialiser serialiser;
     EntitySerialiser entSer(ent);
@@ -100,7 +102,7 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
 {
     EntityManager manager(NULL);
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
-    createSampleEntity(ent);
+    createSampleEntity(ent, 7);
     std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
     manager.linkEntities(ent->getHandle(), ent2->getHandle());
 
@@ -120,7 +122,7 @@ TEST_F(SerialisationTest, testWriteReadFiles)
 {
     EntityManager manager(NULL);
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
-    createSampleEntity(ent);
+    createSampleEntity(ent, 7);
     std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
     manager.linkEntities(ent->getHandle(), ent2->getHandle());
 

@@ -671,7 +671,11 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
     typedef std::shared_ptr<Entity> EntPtr;
     
-    // Assuming entity handles are valid - do we need to check?
+    if ( _entities.find(high) == _entities.end() )
+        throw std::runtime_error("Entity with ID" + std::to_string(high) + " does not exist.");
+
+    if ( _entities.find(low) == _entities.end() )
+        throw std::runtime_error("Entity with ID" + std::to_string(low) + " does not exist.");
     
     // High is a superset of low.
     // Low is a subset of high.
@@ -694,6 +698,16 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     auto propPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
     {
         EntPropertyPtr p = e->getProperty(prop);
+
+        // Check whether this entity is already part of this property.
+        std::vector<BasePointer> list = p->baseValues();
+        for ( const BasePointer &v : list )
+        {
+            EntityRef* e = dynamic_cast<EntityRef*>(v.get());
+            if ( e->value() == h )
+                return;
+        }
+
         p->append(BasePointer(new EntityRef(h, author, 100, comment)));
     };
     
@@ -717,7 +731,11 @@ void EntityManager::removeHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
     typedef std::shared_ptr<Entity> EntPtr;
     
-    // Assuming entity handles are valid - do we need to check?
+    if ( _entities.find(high) == _entities.end() )
+        throw std::runtime_error("Entity with ID" + std::to_string(high) + " does not exist.");
+
+    if ( _entities.find(low) == _entities.end() )
+        throw std::runtime_error("Entity with ID" + std::to_string(low) + " does not exist.");
     
     EntPtr pHigh = _entities[high];
     EntPtr pLow = _entities[low];
