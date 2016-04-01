@@ -221,10 +221,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 				auto varId = whereVars.indexOf(triple.object.value);
 				for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
 					if ((*whereVarIter)[varId].empty()) continue;
-					//one new record for each match!
-					//TODO: make this work!!
-					// $a <wife> $b WHERE { NEW($a) . NEW($b) }
-					newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
+	    			newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
 				}
 				newRecordType = whereVars.typeOf(triple.object.value);
 				break;
@@ -284,15 +281,13 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
 							for (auto newRecord : newRecords) {
 								// TODO : figure out why clone VariableRef doesn't work :/
-								if (whereVars.typeOf(varId) == model::types::SubType::TypeEntityRef) {
-									currentEntity->insertProperty(propertyId, newRecord->Clone());
-								}
-								else {
-									currentEntity->insertProperty(propertyId, newRecord);
-								}								
+
+								auto clonedRecord = newRecord->Clone();
+								currentEntity->insertProperty(propertyId, clonedRecord);
+						
 								if (triple.meta_variable != "") {
 									variableSet.add(std::move(triple.meta_variable),
-										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, newRecord->OrderingId()), propertyId, entityHandle),
+										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, clonedRecord->OrderingId()), propertyId, entityHandle),
 										model::types::SubType::ValueReference);
 								}
 							}
