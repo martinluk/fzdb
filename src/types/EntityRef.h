@@ -60,7 +60,7 @@ namespace model {
             EHandle_t value() const { return _value; }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::make_shared<EntityRef>(_value, _confidence);
+                return std::make_shared<EntityRef>(_value, _originalAuthorId, _confidence);
             }
 
             virtual SubType subtype() const

@@ -122,9 +122,9 @@ private:
 
     void Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2,    const std::string variableName3, const std::string&& metaVar) const;
 
-    std::vector<unsigned int> Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const;
+    void Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const;
 
-    std::vector<unsigned int> Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object, const std::string&& metaVar) const;
+    void Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,     const model::Object&& object, const std::string&& metaVar) const;
 
     void Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName,  const std::string variableName2, const std::string&& metaVar) const;
 
@@ -187,6 +187,10 @@ private:
 	// Entity Property Value
 	void ScanEPR(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const;
 
+
+	// Scan Helpers
+	std::vector<unsigned int> ScanHelp1(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object, const std::string&& metaVar) const;
+	std::vector<unsigned int> ScanHelp2(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const;
 };
 
 #endif    // MODEL_ENTITY_MANAGER_H

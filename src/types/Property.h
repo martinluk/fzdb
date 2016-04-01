@@ -55,7 +55,7 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::make_shared<Property>(_value, _confidence);
+                return std::make_shared<Property>(_value, _originalAuthorId, _confidence);
             }
 
             virtual std::string logString(const Database* db = NULL) const override
