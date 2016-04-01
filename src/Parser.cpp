@@ -396,28 +396,99 @@ std::vector<std::string> FSparqlParser::ParseSelectLine(TokenIterator&& iter, To
 //parses a tokenised list of strings to give a query object
 Query FSparqlParser::ParseAll(TokenList tokens) {
 
-    auto iter = tokens.begin();
+	auto iter = tokens.begin();
 
-    QueryType type;
-    StringMap sources;
-    TriplesBlock conditions;
-    TriplesBlock whereClause;
-    std::vector<std::string> selectLine;
-    std::string data0;
-    std::vector<long long int> entities;
-    QuerySettings canon;
+	QueryType type;
+	StringMap sources;
+	TriplesBlock conditions;
+	TriplesBlock whereClause;
+	std::vector<std::string> selectLine;
+	std::string data0;
+	std::vector<long long int> entities;
+	QuerySettings canon;
 
-    //while (iter != tokens.end()) {
-    do {
-        if (iter->first.type == ParsedTokenType::KEYWORD_INSERT) {
-            *iter++;
-            if (iter->first.type == ParsedTokenType::KEYWORD_DATA) {
-                iter++;
-                type = QueryType::INSERT;
-                conditions = ParseInsert(std::move(iter), tokens.end());				
-            }
+	do {
+		if (iter->first.type == ParsedTokenType::KEYWORD_INSERT) {
+			*iter++;
+			if (iter->first.type == ParsedTokenType::KEYWORD_DATA) {
+				iter++;
+				type = QueryType::INSERT;
+				conditions = ParseInsert(std::move(iter), tokens.end());
+			}
+			break;
+		}
 
-			if (iter != tokens.end() && iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+		if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
+			//Sample query 
+			//Delete $a WHERE {$a 'surname' 'Fred'}
+			iter++;
+			type = QueryType::DELETE;
+			if (iter != tokens.end()) {
+				if (iter->first.type == ParsedTokenType::KEYWORD_CANON) {
+					canon.canon = true; iter++; }
+				selectLine = ParseSelectLine(std::move(iter), tokens.end());
+				if (iter != tokens.end() && iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+					iter++; whereClause = ParseInsert(std::move(iter), tokens.end());
+				}
+				else { throw ParseException("Expected 'WHERE'"); }
+			}
+			else {
+				throw ParseException("Incomplete DELETE statement");
+			}
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+			*iter++;
+			whereClause = ParseInsert(std::move(iter), tokens.end());
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_PING) {
+			*iter++;
+			type = QueryType::PING;
+
+			if (iter != tokens.end()) {
+				throw ParseException("PING does not take any arguments");
+			}
+
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_FLUSH) {
+			*iter++;
+			type = QueryType::FLUSH;
+
+			if (iter != tokens.end()) {
+				throw ParseException("Flush does not take any arguments");
+			}
+
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_ECHO) {
+			*iter++;
+			type = QueryType::DEBUGECHO;
+
+			if (iter != tokens.end()) {
+				data0 = iter->second;
+				*iter++;
+				if (iter != tokens.end()) {
+					throw ParseException("ECHO only takes one argument");
+				}
+			}
+
+			break;
+		}
+
+		if (iter->first.type == ParsedTokenType::KEYWORD_DEBUG)
+		{
+			*iter++;
+			type = QueryType::DEBUGOTHER;
+
+			if (iter != tokens.end())
+			{
+				data0 = iter->second;
 				*iter++;
 				whereClause = ParseInsert(std::move(iter), tokens.end());
 				break;

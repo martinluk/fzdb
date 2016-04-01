@@ -149,12 +149,13 @@ public:
 //Types of query
 //ECHO is called DEBUGECHO to avoid a namespace collision on linux
 enum class QueryType {
-    SELECT,
-    INSERT,
-    DEL,
-    PING,
-    DEBUGECHO,  // ECHO
-    DEBUGOTHER, // DEBUG
+	SELECT,
+	INSERT,
+	DELETE,
+	DEL,
+	PING,
+    DEBUGECHO,
+    DEBUGOTHER,
     LOAD,
     SAVE,
     USER,

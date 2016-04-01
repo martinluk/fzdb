@@ -12,6 +12,9 @@ apt-get -y install git-all
 apt-get -y install vim
 apt-get -y install screen
 
+# install node.js the usual way (will also install npm this time)
+sudo apt-get install -y nodejs
+
 #Installing application independencies
 set -x #Output progress
 apt-get -y install build-essential
@@ -25,4 +28,11 @@ tar -xzf cmake-3.0.2-Linux-64.tar.gz
 cp -fR cmake-3.0.2-Linux-64/* /usr
 rm -rf cmake-3.0.2-Linux-64
 rm cmake-3.0.2-Linux-64.tar.gz
+
+#Node stuff
+
+#PPA from nodesource
+curl -sL https://deb.nodesource.com/setup | sudo bash -
+apt-get -y install nodejs
+
 set +x #Stop outputting progress

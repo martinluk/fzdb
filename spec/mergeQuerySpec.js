@@ -1,4 +1,5 @@
 var net = require('net');
+var Promise = require("es6-promise").Promise
 
 describe("Fuzzy Database", function() {
   var client;

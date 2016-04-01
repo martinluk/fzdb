@@ -37,6 +37,8 @@ public:
 
     VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
+	void Delete(TriplesBlock&& triples, std::vector<std::string> selectLine);
+
 	std::map<std::string, Entity::EHandle_t> Insert(TriplesBlock&& triples, TriplesBlock&& whereBlock, QuerySettings&& settings);
 
     bool EntityExists(Entity::EHandle_t handle) const {
