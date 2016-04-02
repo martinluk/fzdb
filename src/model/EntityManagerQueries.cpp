@@ -275,30 +275,6 @@ void EntityManager::ScanUVR(VariableSet&& variableSet, const std::string variabl
 
 void EntityManager::ScanUUR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
 
-	/*auto varId = variableSet.indexOf(variableName);
-
-	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if ((*iter)[varId].empty()) continue;
-		Entity::EHandle_t entityId = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[varId].dataPointer())->value();
-
-		auto entity = _entities.at(entityId);
-
-		std::map<unsigned int, std::shared_ptr<EntityProperty>> iterableProperties;
-		auto data = variableSet.getData(variableName2);
-		std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](VariableSetValue b) {
-			std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(b.dataPointer());
-			return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), entity->getProperty(prop->value()));
-		});
-
-		auto rows = ScanHelp1(std::move(variableSet), std::move(entity), std::move(iterableProperties), variableName2, std::move(object), std::move(metaVar));
-
-		for (auto row : rows) {
-			variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId),
-				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
-		}
-	}*/
-
 	unsigned char varIndex = variableSet.indexOf(variableName);
 	unsigned char varIndex2 = variableSet.indexOf(variableName2);
 
@@ -355,7 +331,43 @@ void EntityManager::ScanVPV(VariableSet&& variableSet, const std::string variabl
 }
 
 void EntityManager::ScanVPU(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+	
+	auto varIndex = variableSet.indexOf(variableName);
+	auto varIndex2 = variableSet.indexOf(variableName2);
 
+	const unsigned int propertyId = this->getPropertyId(predicate.value);
+
+	for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
+		if (iter->at(varIndex2).empty()) continue;
+		auto val = iter->at(varIndex2).dataPointer();
+
+		bool removeRow = true;
+		for (auto entityIter = _entities.cbegin(); entityIter != _entities.cend(); entityIter++) {
+
+			auto matchValues = entityIter->second->meetsCondition(propertyId, std::move(val));
+
+			if (matchValues.size() > 0) {
+				removeRow = false;
+
+				auto entityRef = std::make_shared<model::types::EntityRef>(entityIter->second->getHandle(), 0);
+
+				(*iter)[varIndex] = VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle());
+
+				for (auto matchIter = matchValues.begin() + 1; matchIter < matchValues.end(); matchIter++) {
+
+					auto newRow = variableSet.add(std::move(variableName), VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle()),
+						model::types::SubType::TypeEntityRef, std::move(metaVar));
+
+					variableSet.add(std::move(variableName2), VariableSetValue(iter->at(varIndex2).dataPointer()->Clone(), propertyId,
+						entityIter->second->getHandle()), iter->at(varIndex2).dataPointer()->subtype(), std::move(metaVar), newRow);
+				}
+			}
+		}
+
+		if (removeRow) {
+			iter = variableSet.getData()->erase(iter);
+		}
+	}
 }
 
 void EntityManager::ScanUPV(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
@@ -606,7 +618,7 @@ void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& su
 	std::map<unsigned int, std::shared_ptr<EntityProperty>> iterableProperties;
 	auto data = variableSet.getData(variableName);
 	std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](VariableSetValue b) {
-		std::shared_ptr<model::types::Int> prop = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(b.dataPointer());
+		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(b.dataPointer());
 		return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), currentEntity->getProperty(prop->value()));
 	});
 
@@ -643,7 +655,18 @@ void EntityManager::ScanEVR(VariableSet&& variableSet, const model::Subject&& su
 }
 
 void EntityManager::ScanEUR(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object, const std::string&& metaVar) const {
+	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 
+	unsigned char varIndex = variableSet.indexOf(variableName);
+
+	auto currentEntity = _entities.at(entityRef);
+
+	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
+		[&, this, varIndex](std::vector<VariableSetValue> row) {
+		if (row[varIndex].empty()) return false;
+		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[varIndex].dataPointer());
+		return currentEntity->meetsCondition(prop->value(), std::move(object)).size() == 0;
+	}), variableSet.getData()->end());
 }
 
 // Entity Property $c - Scan 5

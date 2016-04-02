@@ -41,9 +41,12 @@ helper.sendCmd = function(cmd) {
   });     
 };
 
-helper.testCase = function(name, command, expected, timeout) {
+helper.testCase = function(name, command, expected, timeout, focus) {
   if(timeout == undefined) timeout = 1000;
-  it(name, function(done) {
+  if(focus == undefined) focus = false;
+  var specFunc = it;
+  if(focus) specFunc = fit;
+  specFunc(name, function(done) {
      helper.sendCmd(command)
     .then(function(data) {
       if(_.isFunction(expected)) {
@@ -73,5 +76,7 @@ helper.setupClient = function(done) {
 helper.getData = function(name) {
   return fs.readFileSync("./spec/data/" + name, "utf8");
 }
+
+helper.defaultTimeout = 1000;
 
 module.exports = helper;
