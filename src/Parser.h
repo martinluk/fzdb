@@ -24,6 +24,7 @@ enum class ParsedTokenType {
         PROPERTY       = 0x4,       // Property: <forename>
         ENTITYREF      = 0x5,       // Entity handle: entity:1
         CONFIDENCE_RATING = 0x8,    // Confidence for a value: [80]
+        DATE = 0xb,
 
     //structural
         OPEN_CURLBRACE  = 0x6,      // {

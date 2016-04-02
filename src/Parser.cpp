@@ -19,6 +19,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
     static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
     static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *(\"[a-zA-Z0-9]+\") *\\)");
+    static const boost::regex simpleDateRegex("(0[1-9]|[1-2][0-9]|3[0-1])\\/(0[1-9]|1[0-2])\\/([0-9][0-9][0-9][0-9])");  // More validation still required.
 
    boost::smatch matches;
    std::string data0 = "";
@@ -38,6 +39,12 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     else if (boost::regex_match(str, matches, propertyRegex)) {
         tokenType = ParsedTokenType::PROPERTY;
       str = matches[1];
+    }
+
+    // This needs to precede the integer check.
+    else if ( boost::regex_match(str, matches, simpleDateRegex) )
+    {
+        tokenType = ParsedTokenType::DATE;
     }
 
     else if (boost::regex_match(str, matches, entityRefRegex)) {
@@ -301,6 +308,9 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
                     break;
                 case ParsedTokenType::ENTITYREF:
                     objType = model::Object::Type::ENTITYREF;
+                    break;
+                case ParsedTokenType::DATE:
+                    objType = model::Object::Type::DATE;
                     break;
                 default:
                     throw ParseException("Unknown symbol: " + iter->second);

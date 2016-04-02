@@ -197,6 +197,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 newRecordType = model::types::SubType::TypeInt32;
                 newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, 0, confidence));
                 break;
+            case model::Object::Type::DATE:
+                newRecordType = model::types::SubType::TypeDate;
+                // TODO: Ordering?
+                newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value),
+                                                                          0, model::types::Date::Ordering::EqualTo, confidence));
             case model::Object::Type::VARIABLE:
             {
                 auto varId = whereVars.indexOf(triple.object.value);
