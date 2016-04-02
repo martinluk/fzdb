@@ -68,9 +68,9 @@ public:
 
 	unsigned int add(const std::vector<VariableSetValue>&& row);
     
-    unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type);
+    unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar);
 
-    void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, unsigned int row);
+    void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row);
 
     std::vector<unsigned int> find(const std::string varName, const std::string value);
 

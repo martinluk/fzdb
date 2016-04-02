@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "./types/Base.h"
+#include "./types/ValueRef.h"
 
 using VariableType = model::types::SubType;
 
@@ -38,14 +39,14 @@ unsigned int VariableSet::add(const std::vector<VariableSetValue>&& row) {
 	return _values.size() - 1;
 }
 
-unsigned int VariableSet::add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
+unsigned int VariableSet::add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar) {
 	std::vector<VariableSetValue> newRow(_size);
 	_values.push_back(newRow);
-	add(std::move(var), std::move(value), std::move(type), _values.size() - 1);
+	add(std::move(var), std::move(value), std::move(type), std::move(metaVar), _values.size() - 1);
 	return _values.size() - 1;
 }
 
-void VariableSet::add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, unsigned int row) {
+void VariableSet::add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row) {
 
     if (row >= _values.size()) {
         throw std::runtime_error("Attempting to add to a non-existent row");
@@ -67,6 +68,18 @@ void VariableSet::add(const std::string&& var, VariableSetValue&& value, const V
 
         unsigned char offset = _metaData[var].second;
         _variablesUsed[offset] = true;
+
+		if (metaVar != "") {
+			unsigned int metaRef = getMetaRef();
+			auto valueRef = std::make_shared<model::types::ValueRef>(value.entity(), value.property(), value.dataPointer()->OrderingId());
+			auto vsv2 = VariableSetValue(valueRef, value.property(), value.entity());
+
+			value.metaRef(metaRef);
+			vsv2.metaRef(metaRef);
+
+			add(std::move(metaVar), std::move(vsv2), model::types::SubType::ValueReference, "");
+		}
+
         //_values[row][_metaData[var].second] = value;
         _values[row].erase(_values[row].begin() + offset);
         _values[row].emplace(_values[row].begin() + offset, value);
