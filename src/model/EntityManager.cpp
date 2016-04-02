@@ -206,16 +206,13 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
 	//Iterating over the returned variable set
 	auto data = BGP(block, qs).getData(); //std::vector<std::vector<VariableSetValue>>
 	//Find out row number that is entity
-    spdlog::get("main")->debug("Has data of size {}", data->size());
-    for(auto colIter=data->cbegin(); colIter!=data->cend(); colIter++){
-        //Iterating over the column
-        //colIter dataType std::vector<VariableSetValue>
-        spdlog::get("main")->debug("Entered column of size {}",(*colIter).size());
-        for(auto rowIter = (*colIter).cbegin(); rowIter!=(*colIter).cend(); rowIter++){
-			unsigned long long entityId = (*rowIter).entity();
+    spdlog::get("main")->debug("Data has size {}",data->size());
+    for(auto outIter=data->cbegin(); outIter!=data->cend(); outIter++){
+        spdlog::get("main")->debug("Entered row of size {}",(*outIter).size());
+        for(auto inIter = (*outIter).cbegin(); inIter!=(*outIter).cend(); inIter++){
+			unsigned long long entityId = (*inIter).entity();
 			if (entityId!=0) {
 				//Value's entity value is set, meaning it is entity
-				//Delete entity.
 				spdlog::get("main")->warn("Deleting entity {}", entityId);
 				_entities.erase(entityId);
 			} 
