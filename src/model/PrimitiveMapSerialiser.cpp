@@ -2,6 +2,7 @@
 #include "types/SubType.h"
 #include <cassert>
 #include <string>
+#include <cstring>
 
 struct SerialHeader
 {
@@ -60,8 +61,8 @@ void PrimitiveMapSerialiser<A,B>::unserialise(const char *data, std::size_t leng
 
         A a;
         B b;
-        memcpy(&a, d, pHeader->primitiveASize);
-        memcpy(&b, d + pHeader->primitiveASize, pHeader->primitiveBSize);
+        std::memcpy(&a, d, pHeader->primitiveASize);
+        std::memcpy(&b, d + pHeader->primitiveASize, pHeader->primitiveBSize);
         _map.insert(std::pair<A,B>(a,b));
     }
 }
