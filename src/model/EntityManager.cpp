@@ -214,7 +214,8 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
         for(auto rowIter = (*colIter).cbegin(); rowIter!=(*colIter).cend(); rowIter++){
         //for (VariableSetValue val: *colIter) {
 			spdlog::get("main")->debug("Entered value");
-			VariableSetValue val = *rowIter;
+			VariableSetValue val = *rowIter;    //FIXME Causing seg fault 
+			spdlog::get("main")->debug("Assigned");
 			if (val.entity()!=0) {
 				//Value's entity value is set, meaning it is entity
 				//Delete entity.
