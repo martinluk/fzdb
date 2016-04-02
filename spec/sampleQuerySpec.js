@@ -529,7 +529,35 @@ describe("Fuzzy Database", function() {
         expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
-    }); 
+    });
+
+    // Jonathan: Testing hierarchies.
+    it("Creating a simple hierarchy", function(done) {
+      client.write("INSERT DATA { $eng <name> \"England\" . $lon <name> \"London\"; <subsetOf> $eng } WHERE { NEW($eng, \"Location\") . NEW($lon, \"Location\") }");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"Inserted 3 triples.","result":{"type":"fsparql","data":{"eng":"2","lon":"3"}}}));
+        done();
+      });      
+    });
+
+    it("Querying the hierarchy for superset link", function(done) {
+      client.write("SELECT $a WHERE { $a <supersetOf> $b }");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":[{"a":"2"}]}}));
+        done();
+      });      
+    });
+
+    it("Querying the hierarchy for subset link", function(done) {
+      client.write("SELECT $a WHERE { $a <subsetOf> $b }");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":[{"a":"3"}]}}));
+        done();
+      });      
+    });
 	
 	});
 });
