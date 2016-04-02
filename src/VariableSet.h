@@ -15,6 +15,14 @@
 using VariableType = model::types::SubType;
 
 // Tim? Describe what this does, it looks like magic. (Or sufficiently advanced technology)
+
+// VariableSet is essentially a table of values
+// Each column represents a variable in the query
+// Each row represents a 'result'
+// It is intended to be the data-interchange between the scan functions and so has been developed
+// in a rather hacky fashion and really needs tidying up a bit
+
+// VariableSetValue is a simple wrapper around the values stored in the VariableSet
 class VariableSetValue {
 private:
 
@@ -54,201 +62,48 @@ class VariableSet {
 
 public:
 
-    VariableSet(const std::set<std::string> &variableNames = std::set<std::string>()) {
-        _size = variableNames.size();
-        _nextMetaRef = 0;
-        _variablesUsed = std::vector<bool>(_size);
-        unsigned char count = 0;
-        for (auto variableName : variableNames) {
-            _variablesUsed[count] = false;
-            _metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, count++);            
-        }
-        
-    }
+    VariableSet(const std::set<std::string> &variableNames = std::set<std::string>());
 
-	void extend(std::string variableName) {
-		
-		_variablesUsed.push_back(false);
-		_metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, _size);
-		_size++;
-	}
+	void extend(std::string variableName);
 
-	unsigned int add(const std::vector<VariableSetValue>&& row) {
-		if (row.size() != _size) throw std::runtime_error("Attempted to insert a row of the wrong size");
-		_values.push_back(row);
-		return _values.size() - 1;
-	}
+	unsigned int add(const std::vector<VariableSetValue>&& row);
     
-    unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type) {
-        if (_metaData.find(var) == _metaData.cend()) {
-            throw std::runtime_error("Unexpected variable");
-        }
-        else {
-            if (type != _metaData[var].first) {
-                if (_metaData[var].first == VariableType::TypeUndefined) {
-                    _metaData[var].first = type;
-                }
-                else {
-                    throw std::runtime_error("Attempted to mix variable types!");
-                }                
-            }
-            //_data[var].first.push_back(value);
-            std::vector<VariableSetValue> newRow(_size);
+    unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type);
 
-            //replace without copying
-            newRow.erase(newRow.begin() + _metaData[var].second);
-            newRow.emplace(newRow.begin() + _metaData[var].second, value);
+    void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, unsigned int row);
 
-            _variablesUsed[_metaData[var].second] = true;
-            _values.push_back(newRow);
-            return _values.size() - 1;
-        }
-    }
+    std::vector<unsigned int> find(const std::string varName, const std::string value);
 
-    void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, unsigned int row) {
+    std::vector<std::vector<VariableSetValue>>* getData();
 
-        if (row >= _values.size()) {
-            throw std::runtime_error("Attempting to add to a non-existent row");
-        }
+    std::vector<VariableSetValue> getData(const std::string varName);
 
-        if (_metaData.find(var) == _metaData.cend()) {
-            throw std::runtime_error("Unexpected variable");
-        }
-        else {
+    std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData();
 
-			if (type != _metaData[var].first) {
-				if (_metaData[var].first == VariableType::TypeUndefined) {
-					_metaData[var].first = type;
-				}
-				else {
-					throw std::runtime_error("Attempted to mix variable types!");
-				}
-			}
+    const bool contains(std::string name);
 
-            unsigned char offset = _metaData[var].second;
-            _variablesUsed[offset] = true;
-            //_values[row][_metaData[var].second] = value;
-            _values[row].erase(_values[row].begin() + offset);
-            _values[row].emplace(_values[row].begin() + offset, value);
-        }
-    }
+    const bool used(std::string name);
 
-    std::vector<unsigned int> find(const std::string varName, const std::string value) {
-        auto col = _metaData[varName].second;
-        std::vector<unsigned int> output;
-        for (unsigned int i = 0; i < _values.size(); i++) {
-            if (_values[i][col].dataPointer()->Equals(value)) output.push_back(i);
-        }
-        return output;
-    }
+    const VariableType typeOf(std::string name);
 
-    std::vector<std::vector<VariableSetValue>>* getData() {
-        return &_values;
-    }
+	const VariableType typeOf(unsigned char id);
 
-    std::vector<VariableSetValue> getData(const std::string varName) {
-        auto col = _metaData[varName].second;
-        std::vector<VariableSetValue> output;
-        std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::vector<VariableSetValue> row) {
-            return row[col];
-        });
-        return output;
-    }
+    const unsigned char indexOf(std::string name);
 
-    std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData() {
-        return _metaData;
-    }
+    const unsigned int getMetaRef();
 
-    const bool contains(std::string name) {
-        return _metaData.find(name) != _metaData.cend();
-    }
+    void removeMetaRefs(unsigned int metaRef);
 
-    const bool used(std::string name) {
-        return _variablesUsed[_metaData[name].second];
-    }
-
-    const VariableType typeOf(std::string name) {
-        return _metaData[name].first;
-    }
-
-	const VariableType typeOf(unsigned char id) {
-		for (auto md : _metaData) {
-			if (md.second.second == id)return md.second.first;
-		}
-		return VariableType::TypeUndefined;
-	}
-
-    const unsigned char indexOf(std::string name) {
-        return _metaData[name].second;
-    }
-
-    const unsigned int getMetaRef() {
-        return _nextMetaRef++;
-    }
-
-    void removeMetaRefs(unsigned int metaRef) {
-        for(int i = 0; i < _values.size(); i++) {
-            for (int j = 0; j < _values[i].size(); j++) {
-                if (_values[i][j].metaRef() == metaRef) {
-                    _values[i][j] = VariableSetValue();
-                }
-            }
-        }
-    }
-
-    void addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
-        bool found = false;
-        for (int i = 0; i < _values.size(); i++) {
-            for (unsigned char j = 0; j < _values[i].size(); j++) {
-                if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
-                    _values[i][position] = val;
-                    found = true;
-                    break;
-                }
-            }
-            if (found)break;
-        }
-    }
+    void addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val);
 
     //this doesn't seem to work
-    void trimEmptyRows() {
-        _values.erase(std::remove_if(_values.begin(), _values.end(), [](std::vector<VariableSetValue> row) {
-            bool allEmpty = true;
-            for (auto val : row) {
-                if (!val.empty()) {
-                    allEmpty = false;
-                    break;
-                }
-            }
-            return allEmpty;
-        }), _values.end());
-    }
+    void trimEmptyRows();
 
-	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable, std::string value) {
-		std::vector<std::vector<VariableSetValue>> results;
-		for (auto row : _values) {
-			if (!row[_metaData[variable].second].empty() && row[_metaData[value].second].dataPointer()->Equals(value)) {
-				results.emplace_back(row);
-			}
-		}
-		return results;
-	}
+	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable, std::string value);
 
-	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable) {
-		std::vector<std::vector<VariableSetValue>> results;
-		for (auto row : _values) {
-			if (!row[_metaData[variable].second].empty()) {
-				results.emplace_back(row);
-			}
-		}
-		return results;
-	}
+	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable);
 
-	void removeRowsWith(std::string variable) {
-		_values.erase(std::remove_if(_values.begin(), _values.end(), [&, this, variable](std::vector<VariableSetValue> row) {
-			return !row[_metaData[variable].second].empty();
-		}), _values.end());
-	}
+	void removeRowsWith(std::string variable);
 
 private:
     std::map<std::string, std::pair<VariableType, unsigned char>> _metaData;
