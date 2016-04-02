@@ -1,5 +1,4 @@
 var net = require('net');
-var Promise = require("es6-promise").Promise
 
 describe("fzdb", function() {
   var client;
@@ -25,7 +24,7 @@ describe("fzdb", function() {
 	}
 
 	describe("delete queries:", function() {
-		describe("DB with one entity", function() {
+		fdescribe("DB with one entity", function() {
 			it("Flush db", function(done) {
 				sendCmd("FLUSH").then(function(data) {
 					done(); 

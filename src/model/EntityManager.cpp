@@ -203,20 +203,22 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
 	using VariableType = model::types::SubType;
 	//Get VariableSet from BGP
 	QuerySettings qs;
-	VariableSet variableSet = BGP(block, qs);
 	//Iterating over the returned variable set
-	auto values = variableSet.getData(); //std::vector<std::vector<VariableSetValue>>
+	auto data = BGP(block, qs).getData(); //std::vector<std::vector<VariableSetValue>>
 	//Find out row number that is entity
-	spdlog::get("main")->info("Has data");
-	for (auto row : *values) {
-		//Iterating over the column
-		spdlog::get("main")->info("Entered row");
-		for (VariableSetValue val: row) {
-			spdlog::get("main")->info("Entered value");
+    spdlog::get("main")->debug("Has data of size {}", data->size());
+    for(auto colIter=data->cbegin(); colIter!=data->cend(); colIter++){
+        //Iterating over the column
+        //colIter dataType std::vector<VariableSetValue>
+        spdlog::get("main")->debug("Entered column");
+        for(auto rowIter = (*colIter).cbegin(); rowIter!=(*colIter).cend(); rowIter++){
+        //for (VariableSetValue val: *colIter) {
+			spdlog::get("main")->debug("Entered value");
+			VariableSetValue val = *rowIter;
 			if (val.entity()!=0) {
 				//Value's entity value is set, meaning it is entity
 				//Delete entity.
-				spdlog::get("main")->info("---- Deleting entity {}", val.entity());
+				spdlog::get("main")->warn("---- Deleting entity {}", val.entity());
 				_entities.erase(val.entity());
 			} 
 			//TODO Remove all properties that are link to the entity getting deleted
