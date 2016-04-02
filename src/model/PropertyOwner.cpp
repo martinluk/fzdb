@@ -52,6 +52,11 @@ std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, 
     return values;
 }
 
+std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked)
+{
+	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), linked);
+}
+
 // Clears all properties on the entity.
 void PropertyOwner::clearProperties() {
   checkLock();

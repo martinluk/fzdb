@@ -275,7 +275,7 @@ void EntityManager::ScanUVR(VariableSet&& variableSet, const std::string variabl
 
 void EntityManager::ScanUUR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
 
-	auto varId = variableSet.indexOf(variableName);
+	/*auto varId = variableSet.indexOf(variableName);
 
 	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
 		if ((*iter)[varId].empty()) continue;
@@ -284,7 +284,7 @@ void EntityManager::ScanUUR(VariableSet&& variableSet, const std::string variabl
 		auto entity = _entities.at(entityId);
 
 		std::map<unsigned int, std::shared_ptr<EntityProperty>> iterableProperties;
-		auto data = variableSet.getData(variableName);
+		auto data = variableSet.getData(variableName2);
 		std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](VariableSetValue b) {
 			std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(b.dataPointer());
 			return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), entity->getProperty(prop->value()));
@@ -297,7 +297,30 @@ void EntityManager::ScanUUR(VariableSet&& variableSet, const std::string variabl
 				VariableSetValue(std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId),
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
-	}
+	}*/
+
+	unsigned char varIndex = variableSet.indexOf(variableName);
+	unsigned char varIndex2 = variableSet.indexOf(variableName2);
+
+	// Only delete rows that match the pattern perfectly... does this make sense?
+	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
+		[&, this, varIndex](std::vector<VariableSetValue> row) {
+		if (row[varIndex].empty()) return false;
+		if (row[varIndex2].empty()) return false;
+
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+		auto currentEntity = _entities.at(entityHandle);
+
+		unsigned int propertyId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[varIndex2].dataPointer())->value();
+
+		if (!currentEntity->hasProperty(propertyId)) return true;
+		if (currentEntity->meetsCondition(propertyId, std::move(object)).size() > 0) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}), variableSet.getData()->end());
 }
 
 
@@ -629,7 +652,29 @@ void EntityManager::ScanEPV(VariableSet&& variableSet, const model::Subject&& su
 }
 
 void EntityManager::ScanEPU(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const {
+	
+	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 
+	//get the property id
+	// Jonathat: Passing TypeUndefined to ckip type checking, since we don't know
+	// what the type is yet.
+	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
+	unsigned char varIndex = variableSet.indexOf(variableName);
+	if (EntityExists(entityRef)) {
+		auto currentEntity = _entities.at(entityRef);
+
+		variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
+			[&, this, varIndex](std::vector<VariableSetValue> row) {
+			if (row[varIndex].empty()) return false;
+			if (!currentEntity->hasProperty(propertyId)) return true;
+			if (currentEntity->meetsCondition(propertyId, std::move(row[varIndex].dataPointer())).size() > 0) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		}), variableSet.getData()->end());
+	}
 }
 
 // Entity Property Value - No scan :(

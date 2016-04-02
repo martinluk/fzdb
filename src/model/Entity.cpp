@@ -58,6 +58,11 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 	}	
 }
 
+std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked)
+{
+	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), linked);
+}
+
 bool Entity::hasProperty(const unsigned int & key, bool linked) const
 {
 	if (key == 2) return true; //return true if it's type

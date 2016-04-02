@@ -42,6 +42,7 @@ public:
 
     // Tests if the entity meets the condition
     virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked = false);
+	virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked = false);
 
     // Clears all properties on the entity.
     void clearProperties();

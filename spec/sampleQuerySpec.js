@@ -168,25 +168,25 @@ describe("Fuzzy Database", function() {
       });      
     });
 	
-/*	//test select - Option 2 $a <prop> $b - FAULTY, SHOULD RETURN NOTHING
+	//test select - Option 2 $a <prop> $b - FAULTY, SHOULD RETURN NOTHING
     it("In this case, select option 2, should retrieve entity 3, as it is the only one which has both the drinks and profession properties set", function(done) {
-      client.write("SELECT $a WHERE { $a <drinks> $b . $a <profession> $b}");
+      client.write("SELECT $a WHERE { $a <drinks> $b . $a <profession> $c}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
         expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '3'})]})}));
         done();
       });      
     });
-*/	
+	
 	//test select - Option 2 $a <prop> $b
- /*   it("In this case, select option 2, should retrieve nothing, but it returns entity 3", function(done) {
+    it("In this case, select option 2, should retrieve nothing, but it returns entity 3", function(done) {
       client.write("SELECT $a WHERE { $a <drinks> $b . $a <profession> $b}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '3'})]})}));
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[]})}));
         done();
-      });      
-    });  */
+      });   
+    });
 
 
 	//test select - Option 2 $a <prop> $b
@@ -248,36 +248,26 @@ describe("Fuzzy Database", function() {
       });      
     });
 
-/*	//test select - Option 3 $a $b value 
-    it("Select entities which contain Marco and which have an age of 34", function(done) {
+	//test select - Option 3 $a $b value 
+    it("Select entities which have a property which is equal to both Marco and 34", function(done) {
       client.write("SELECT $a WHERE { $a $b \"Marco\" . $a $b \"34\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'}), ({a: '4'}), ({a: '3'}), ({a: '4'})]})}));
+        expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[]}});
         done();
       });      
     });
 	
 	//test select - Option 3 $a $b value 
-    it("Select properties which contain Marco and which contain the value 34", function(done) {
+    it("Select properties which are equal to both Marco and 34 for the same entity", function(done) {
       client.write("SELECT $b WHERE { $a $b \"Marco\" . $a $b \"34\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({b: 'forename'}), ({b: 'forename'}), ({b: 'age'}), ({b: 'age'})]})}));
+        expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[]}});
         done();
       });      
     });
-*/	
-	//test select - Option 4 $a $b $c 
-  //   it("Select entities which contain Marco ", function(done) {
-  //     client.write("SELECT $a WHERE { $a $b $c . entity:2 <forename> \"Marco\"}");
-  //     client.once('data', function(data) {
-		// var resultJSON = JSON.parse(data);
-  //       expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'}), ({a: '4'})]})}));
-  //       done();
-  //     });      
-  //   });
-
+    
 	//test select - Option 6 entity <prop> $c
     it("Retrieving the surname of entity 2", function(done) {
       client.write("SELECT $a WHERE { entity:2 <surname> $a}");
@@ -299,14 +289,14 @@ describe("Fuzzy Database", function() {
     });
 	
 	//test select - Option 6 entity <prop> $c
-	// it("This test should retrieve nothing", function(done) {
- //      client.write("SELECT $a WHERE { entity:2 <surname> $a . entity:3 <surname> $a}");
- //      client.once('data', function(data) {
-	// 	var resultJSON = JSON.parse(data);
- //        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Reus'}), ({a: 'Szyslak'})]})}));
- //        done();
- //      });      
- //    }); 
+	it("Retrieve the common surname of entity:2 and entity:3", function(done) {
+      client.write("SELECT $a WHERE { entity:2 <surname> $a . entity:3 <surname> $a}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[]}}));
+        done();
+      });      
+    }); 
 	
 	//test select - Option 6 entity <prop> $c
     it("Retrieving drinks property of entity 2", function(done) {
@@ -529,35 +519,7 @@ describe("Fuzzy Database", function() {
         expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
-    });
-
-    // Jonathan: Testing hierarchies.
-    it("Creating a simple hierarchy", function(done) {
-      client.write("INSERT DATA { $eng <name> \"England\" . $lon <name> \"London\"; <subsetOf> $eng } WHERE { NEW($eng, \"Location\") . NEW($lon, \"Location\") }");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"Inserted 3 triples.","result":{"type":"fsparql","data":{"eng":"2","lon":"3"}}}));
-        done();
-      });      
-    });
-
-    it("Querying the hierarchy for superset link", function(done) {
-      client.write("SELECT $a WHERE { $a <supersetOf> $b }");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":[{"a":"2"}]}}));
-        done();
-      });      
-    });
-
-    it("Querying the hierarchy for subset link", function(done) {
-      client.write("SELECT $a WHERE { $a <subsetOf> $b }");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":[{"a":"3"}]}}));
-        done();
-      });      
-    });
+    });   
 	
 	});
 });
