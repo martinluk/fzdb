@@ -112,7 +112,9 @@ namespace model {
             virtual ~Base() {}
 
             virtual std::shared_ptr<Base> Clone() {
-                return std::make_shared<Base>(_confidence, _originalAuthorId, _comment);
+				auto cloned = std::make_shared<Base>(_confidence, _originalAuthorId, _comment);
+				cloned->_orderingId = _orderingId;
+                return cloned;
             }
 
             virtual bool Equals(const std::string &val) const {

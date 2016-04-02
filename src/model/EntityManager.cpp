@@ -337,6 +337,12 @@ void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &ty
 
 std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const
 {
+	if (prop == 0) {
+		throw std::exception("deference error");
+	}
+	if (_entities.at(entity)->getProperty(prop)->count() <= val) {
+		throw std::exception("deference error");
+	}
     return _entities.at(entity)->getProperty(prop)->baseValue(val);
 }
 
@@ -1211,7 +1217,9 @@ void EntityManager::ScanVPR(VariableSet&& variableSet, const std::string variabl
 
 		matches = currentEntity->meetsCondition(propertyId, std::move(object));
 		for (auto match : matches) {
-			VariableSetValue vsv = VariableSetValue(std::make_shared<model::types::EntityRef>(currentEntity->getHandle(), 0), propertyId, currentEntity->getHandle());
+			auto newValue = std::make_shared<model::types::EntityRef>(currentEntity->getHandle(), 0);
+			newValue->OrderingId(match->OrderingId());
+			VariableSetValue vsv = VariableSetValue(newValue, propertyId, currentEntity->getHandle());
 			variableSet.add(std::move(variableName), std::move(vsv), model::types::SubType::TypeEntityRef, std::move(metaVar));
 		}
 	}
