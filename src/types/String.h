@@ -20,6 +20,8 @@ namespace model {
             void initMemberSerialiser()
             {
                 _memberSerialiser.addDynamicMember(&_valueWrapper);
+
+                _memberSerialiser.setInitialised();
             }
             
         public:
@@ -74,6 +76,13 @@ namespace model {
             // Inherited via Base
             virtual bool Equals(const std::string &val) const override {
                 return _value == val;
+            }
+
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const String* cOther = dynamic_cast<const String*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _value == cOther->_value;
             }
 
         protected:

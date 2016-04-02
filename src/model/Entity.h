@@ -55,6 +55,9 @@ public:
 
 	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked = false) override;
 
+    bool memberwiseEqual(const Entity* other) const;
+
+
 	bool hasProperty(const unsigned int &key, bool linked = false) const override;
 	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 

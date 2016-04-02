@@ -22,10 +22,17 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 {
 	//handle type comparison
 	if (propertyId == 2) {
-		if (obj.type == model::Object::Type::STRING && Singletons::database()->entityManager().getTypeID(obj.value) == _type) {
-			return std::vector<std::shared_ptr<model::types::Base>>{
-				std::make_shared<model::types::String>(obj.value, 0)
-			};
+        if (obj.type == model::Object::Type::STRING)
+        {
+            if ( !_manager )
+                throw std::runtime_error("Cannot return entity type string: manager does not exist.");
+
+            if ( _manager->getTypeID(obj.value) == _type )
+            {
+                return std::vector<std::shared_ptr<model::types::Base>>{
+                    std::make_shared<model::types::String>(obj.value, 0)
+                };
+            }
 		}
 		else {
 			return std::vector<std::shared_ptr<model::types::Base>>();
@@ -77,7 +84,12 @@ std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) co
 {
 	if (key == 2) {
 		auto output = std::make_shared<EntityProperty>(2, model::types::SubType::TypeString);
-		output->append(std::make_shared<model::types::String>(Singletons::database()->entityManager().getTypeName(_type), 0));
+
+        if ( !_manager )
+            throw std::runtime_error("Cannot return entity type string: manager does not exist.");
+
+        output->append(std::make_shared<model::types::String>(_manager->getTypeName(_type), 0));
+
 		return output;
 	}
 
@@ -88,7 +100,12 @@ std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) co
 void Entity::initMemberSerialiser()
 {
     _memberSerialiser.addPrimitive(&_handle, sizeof(_handle));
+    _memberSerialiser.addPrimitive(&_locked, sizeof(_locked));
+
     _memberSerialiser.addPrimitive(&_type, sizeof(_type));
+    _memberSerialiser.addPrimitive(&_linkStatus, sizeof(_linkStatus));
+
+    _memberSerialiser.setInitialised();
 }
 
 Entity::~Entity()
@@ -121,4 +138,30 @@ std::string Entity::logString(const Database* db) const
         + std::string(", [")
         + std::to_string(_propertyTable.size())
         + std::string("])");
+}
+
+bool Entity::memberwiseEqual(const Entity *other) const
+{
+    if (_locked != other->_locked ||
+            _handle != other->_handle ||
+            _type != other->_type ||
+            _linkStatus != other->_linkStatus ||
+            _propertyTable.size() != other->_propertyTable.size() )
+        return false;
+
+
+    for ( auto it = _propertyTable.begin(); it != _propertyTable.end(); ++it )
+    {
+        const EntityProperty* thisProp = it->second.get();
+
+        auto otherIt = other->_propertyTable.find(it->first);
+        if ( otherIt == other->_propertyTable.end() )
+            return false;
+
+        const EntityProperty* otherProp = otherIt->second.get();
+        if ( !thisProp->memberwiseEqual(otherProp) )
+            return false;
+    }
+
+    return true;
 }

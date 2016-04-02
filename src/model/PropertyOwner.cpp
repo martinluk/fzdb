@@ -2,7 +2,13 @@
 
 #include "./types/Base.h"
 
-PropertyOwner::~PropertyOwner() {}
+PropertyOwner::PropertyOwner() : _locked(false), _manager(NULL)
+{
+}
+
+PropertyOwner::~PropertyOwner()
+{
+}
 
 // Getters:
 
@@ -78,6 +84,11 @@ void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop) {
 
   checkLock();
 
+  for (auto value : prop->baseValues())
+  {
+    value->_manager = _manager;
+  }
+
   if (hasProperty(prop->key())) {
     auto existingProp = getProperty(prop->key());
     for (auto value : prop->baseValues()) {
@@ -93,9 +104,8 @@ void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop) {
 void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object) {
 
   checkLock();
+  object->_manager = _manager;
 
-  // Erase the property if it exists (If not, this will do nothing).
-  //propertyTable_.erase(prop.key());
   if (!hasProperty(key)) {
 
     auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key, object->subtype()));

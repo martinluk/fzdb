@@ -22,8 +22,8 @@ INSERT DATA {
 	<occupation> "Bartender"
 	
 } WHERE {
-	NEW($per1,person) .
-	NEW($per2,person) .
-	NEW($per3,person) .
-	NEW($per4,person)
+        NEW($per1,"person") .
+        NEW($per2,"person") .
+        NEW($per3,"person") .
+        NEW($per4,"person")
 }

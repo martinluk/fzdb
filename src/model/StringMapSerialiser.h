@@ -11,7 +11,7 @@
 class StringMapSerialiser
 {
 public:
-    StringMapSerialiser(boost::bimap<std::string, unsigned int>* map);
+    StringMapSerialiser(boost::bimap<std::string, unsigned int>* bimap);
 
     std::size_t serialise(Serialiser &serialiser) const;
     void unserialise(const char* serialisedData, std::size_t length);
@@ -25,7 +25,7 @@ public:
     };
 
 private:
-	boost::bimap<std::string, unsigned int>*    _map;
+    boost::bimap<std::string, unsigned int>* _bimap;
 };
 
 #endif // STRINGMAPSERIALISER_H

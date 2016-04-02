@@ -4,6 +4,7 @@
 #include <string>
 
 #include "./Base.h"
+#include <iostream>
 
 namespace model {
     namespace types {
@@ -18,6 +19,8 @@ namespace model {
             void initMemberSerialiser()
             {
                 _memberSerialiser.addPrimitive(&_value, sizeof(_value));
+
+                _memberSerialiser.setInitialised();
             }
 
         public:
@@ -32,7 +35,7 @@ namespace model {
                 initMemberSerialiser();
             }
             
-            Int(std::string value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+            Int(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Int(std::atoi(value.c_str()), author, confidence, comment)
             {
                 // Already initialised
@@ -80,16 +83,23 @@ namespace model {
                 return std::to_string(_value);
             }
 
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const Int* cOther = dynamic_cast<const Int*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _value == cOther->_value;
+            }
+
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
             {
-                return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialisePrimitives(serialiser);
+                return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
             Int(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
             {
                 initMemberSerialiser();
-                serialisedData += _memberSerialiser.unserialisePrimitives(serialisedData, length);
+                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };
     }

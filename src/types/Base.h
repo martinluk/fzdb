@@ -13,20 +13,57 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+class EntityManager;
+
 namespace model {
     namespace types {
 
         // Base value type class. All other types inherit from this.
         class Base : public ILogString, public PropertyOwner
         {
+        private:
+            MemberSerialiser _memberSerialiser;
+
+            void initMemberSerialiser()
+            {
+                _memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
+                _memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
+                _memberSerialiser.addPrimitive(&_sourceEntityId, sizeof(_sourceEntityId));
+                _memberSerialiser.addPrimitive(&_originalAuthorId, sizeof(_originalAuthorId));
+
+                _memberSerialiser.addPrimitive(&_cYearCreated, sizeof(&_cYearCreated));
+                _memberSerialiser.addPrimitive(&_cMonthCreated, sizeof(&_cMonthCreated));
+                _memberSerialiser.addPrimitive(&_cDayCreated, sizeof(&_cDayCreated));
+                _memberSerialiser.addPrimitive(&_cHourCreated, sizeof(&_cHourCreated));
+                _memberSerialiser.addPrimitive(&_cMinCreated, sizeof(&_cMinCreated));
+                _memberSerialiser.addPrimitive(&_cSecCreated, sizeof(&_cSecCreated));
+                _memberSerialiser.addPrimitive(&_cFracSecCreated, sizeof(&_cFracSecCreated));
+
+                _memberSerialiser.addDynamicMember(&_commentWrapper);
+
+                _memberSerialiser.setInitialised();
+            }
+
+            void initConvenienceMembers()
+            {
+                auto dateCreated = _timeCreated.date();
+                auto timeCreated = _timeCreated.time_of_day();
+
+                _cYearCreated = dateCreated.year();
+                _cMonthCreated = dateCreated.month();
+                _cDayCreated = dateCreated.day();
+                _cHourCreated = timeCreated.hours();
+                _cMinCreated = timeCreated.minutes();
+                _cSecCreated = timeCreated.seconds();
+                _cFracSecCreated = timeCreated.fractional_seconds();
+            }
+
         protected:
             friend class TypeSerialiser;
             unsigned char _confidence;
             
             std::string _comment;
             MemberSerialiser::DynamicStringMember _commentWrapper;
-            
-            MemberSerialiser _memberSerialiser;
 
             // JONATHAN: Un-const'd these as they don't strictly need to be const (we can just
             // not provide setter methods) and if they are it messes with the member serialiser.
@@ -52,38 +89,6 @@ namespace model {
 
             // id for this record - unique for entity/property/id - related to ordering
             unsigned int _orderingId;
-        
-            void initMemberSerialiser()
-            {
-                _memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
-                _memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
-                _memberSerialiser.addPrimitive(&_sourceEntityId, sizeof(_sourceEntityId));
-                _memberSerialiser.addPrimitive(&_originalAuthorId, sizeof(_originalAuthorId));
-
-                _memberSerialiser.addPrimitive(&_cYearCreated, sizeof(&_cYearCreated));
-                _memberSerialiser.addPrimitive(&_cMonthCreated, sizeof(&_cMonthCreated));
-                _memberSerialiser.addPrimitive(&_cDayCreated, sizeof(&_cDayCreated));
-                _memberSerialiser.addPrimitive(&_cHourCreated, sizeof(&_cHourCreated));
-                _memberSerialiser.addPrimitive(&_cMinCreated, sizeof(&_cMinCreated));
-                _memberSerialiser.addPrimitive(&_cSecCreated, sizeof(&_cSecCreated));
-                _memberSerialiser.addPrimitive(&_cFracSecCreated, sizeof(&_cFracSecCreated));
-
-                _memberSerialiser.addDynamicMember(&_commentWrapper);
-            }
-
-            void initConvenienceMembers()
-            {
-                auto dateCreated = _timeCreated.date();
-                auto timeCreated = _timeCreated.time_of_day();
-
-                _cYearCreated = dateCreated.year();
-                _cMonthCreated = dateCreated.month();
-                _cDayCreated = dateCreated.day();
-                _cHourCreated = timeCreated.hours();
-                _cMinCreated = timeCreated.minutes();
-                _cSecCreated = timeCreated.seconds();
-                _cFracSecCreated = timeCreated.fractional_seconds();
-            }
 
         public:
 
@@ -181,6 +186,18 @@ namespace model {
                 return _orderingId;
             }
 
+            // For debugging - make sure we are -exactly- the same as the other type.
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                return subtype() == other->subtype() &&
+                        _confidence == other->_confidence &&
+                        _comment == other->_comment &&
+                        _orderingId == other->_orderingId &&
+                        _originalAuthorId == other->_originalAuthorId &&
+                        _sourceEntityId == other->_sourceEntityId &&
+                        _timeCreated == other->_timeCreated;
+            }
+
 			bool hasProperty(const unsigned int &key, bool linked = false) const override {
 				if (key == 5) return true;
 				if (key == 6) return true;
@@ -189,7 +206,6 @@ namespace model {
 			}
 
 			std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
-
 
         protected:
             // Called when serialising.
@@ -201,7 +217,6 @@ namespace model {
             // Called to construct from serialised data.
             Base(const char* &serialisedData, std::size_t length) : Base(0, 0, "")
             {
-                initMemberSerialiser();
                 initConvenienceMembers();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }

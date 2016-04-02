@@ -73,26 +73,34 @@ public:
     // Their size is known at compile time.
     void addPrimitive(void* location, std::size_t size);
     void clearPrimitives();
-    std::size_t serialisePrimitives(Serialiser &serialiser) const;
-    std::size_t unserialisePrimitives(const char* serialisedData, std::size_t length);
+    int primitiveMemberCount() const;
     
     // Dynamic members' sizes are not known until runtime.
     void addDynamicMember(IDynamicMember* idm);
     void clearDynamicMembers();
-    std::size_t serialiseDynamicMembers(Serialiser &serialiser) const;
-    std::size_t unserialiseDynamicMembers(const char* serialisedData, std::size_t length);
+    int dynamicMemberCount() const;
     
     std::size_t serialiseAll(Serialiser &serialiser) const;
 
     // TODO: Handle the length better here? We don't know the individual lengths of the
     // primitive and dynamic member chunks.
     std::size_t unserialiseAll(const char* serialisedData, std::size_t length);
+
+    void setInitialised();
     
 private:
     typedef std::pair<void*, std::size_t> PrimitivePair;
+
+    std::size_t serialisePrimitives(Serialiser &serialiser) const;
+    std::size_t serialiseDynamicMembers(Serialiser &serialiser) const;
+    std::size_t unserialisePrimitives(const char* serialisedData, std::size_t length);
+    std::size_t unserialiseDynamicMembers(const char* serialisedData, std::size_t length);
+    std::size_t totalPrimitiveBytes() const;
+    std::size_t totalDynamicBytes() const;
     
     std::vector<PrimitivePair> _primitives;
     std::vector<IDynamicMember*> _dynamicMembers;
+    bool _initialised;
 };
 
 #endif // MODEL_MEMBERSERIALISER_H

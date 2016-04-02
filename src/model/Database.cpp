@@ -1,6 +1,6 @@
 #include "Database.h"
 
-Database::Database()
+Database::Database() : _entityManager(this), _users()
 {
 }
 

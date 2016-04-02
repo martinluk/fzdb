@@ -98,6 +98,11 @@ namespace model
             {
                 return _value;
             }
+
+            SubType subtype() const
+            {
+                return SubType::TypeDate;
+            }
             
             StructuredDate date() const
             {
@@ -127,7 +132,15 @@ namespace model
                     + std::to_string(confidence()) + std::string(")");
             }
 
-        private:
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const Date* cOther = dynamic_cast<const Date*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _value == cOther->_value &&
+                        _order == cOther->_order;
+            }
+
+        protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
             {
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
@@ -139,15 +152,19 @@ namespace model
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
 
-        Date_t _value;
-        Ordering _order;
-        MemberSerialiser _memberSerialiser;
+            Date_t _value;
+            Ordering _order;
 
-        void initMemberSerialiser()
-        {
-            _memberSerialiser.addPrimitive(&_value, sizeof(_value));
-            _memberSerialiser.addPrimitive(&_order, sizeof(_order));
-        }
+        private:
+            MemberSerialiser _memberSerialiser;
+
+            void initMemberSerialiser()
+            {
+                _memberSerialiser.addPrimitive(&_value, sizeof(_value));
+                _memberSerialiser.addPrimitive(&_order, sizeof(_order));
+
+                _memberSerialiser.setInitialised();
+            }
         };
     }
 }

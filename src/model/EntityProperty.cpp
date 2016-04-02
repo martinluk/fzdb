@@ -164,3 +164,28 @@ void EntityProperty::remove(const model::types::Base &value)
     _valuesList.remove_if(model::types::ValuesEqualOnly(&value));
     _count = std::distance(_valuesList.cbegin(), _valuesList.cend());
 }
+
+bool EntityProperty::memberwiseEqual(const EntityProperty *other) const
+{
+    if ( _key != other->_key ||
+         _count != other->_count ||
+         _subtype != other->_subtype )
+        return false;
+
+    auto thisIt = _valuesList.begin();
+    auto otherIt = other->_valuesList.begin();
+
+    while ( thisIt != _valuesList.end() )
+    {
+        if ( otherIt == other->_valuesList.end() )
+            return false;
+
+        if ( !(*thisIt)->memberwiseEqual((*otherIt).get()) )
+            return false;
+
+        ++thisIt;
+        ++otherIt;
+    }
+
+    return otherIt == other->_valuesList.end();
+}

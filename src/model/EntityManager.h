@@ -24,7 +24,7 @@ class EntityManager
     friend class GraphSerialiser;
     friend class Entity;
 public:
-    EntityManager();
+    EntityManager(Database* db);
     ~EntityManager();
 
     // Creates an entity on the heap and returns a pointer to it.
@@ -70,17 +70,17 @@ public:
 
     const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
 
-	unsigned int getTypeID(const std::string &str);
 	std::string getTypeName(const unsigned int id) const {
 		return _entityTypeNames.right.at(id);
 	}
-private:
-    void changeEntityType(Entity::EHandle_t id, const std::string &type);   
-   
 
+    bool memberwiseEqual(const EntityManager &other) const;
+
+private:
     // TODO: (Jonathan) This could be an unordered map, but we may want to utilise the
     // numerical nature of the entity handles. O(log n) is still pretty good.
     typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;
+    Database* _database;
 
     EntityMap _entities;
     std::map<Entity::EHandle_t, std::set<Entity::EHandle_t>> _links;
@@ -90,13 +90,21 @@ private:
 
     // This maps string type names to entity type IDs.
 	boost::bimap<std::string, unsigned int> _entityTypeNames;
-
     boost::bimap<std::string, unsigned int> _propertyNames;
     std::map<unsigned int, model::types::SubType> _propertyTypes;
     
-    bool handleSpecialInsertOperations(Entity* entity, const model::Triple &triple, unsigned int author, const std::string &comment);
+    void changeEntityType(Entity* ent, const std::string &type);
+    unsigned int getTypeID(const std::string &str);
+    unsigned int getTypeID(const std::string &str) const;
     static void enforceTypeHasBeenSet(const Entity* entity);
     static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);
+
+    void createHierarchy(const model::Triple &triple, Entity* ent, unsigned int author, const std::string &comment,
+                         const std::vector<std::shared_ptr<model::types::Base> > &newRecords,model::types::SubType newRecordType);
+
+    void removeHierarchy(const model::Triple &triple);
+    bool performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
+                                  model::types::SubType newRecordType, unsigned int author, const std::string &comment);
     
     void insertEntity(std::shared_ptr<Entity> ent);
 

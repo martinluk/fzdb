@@ -18,15 +18,15 @@
 
 struct SerialHeader
 {
-    unsigned short    version;            // Version identifier.
-    std::size_t     size;                // Total size of this serialised entity in bytes.
-    std::size_t     propertyCount;        // How many property headers to expect after this header.
+    unsigned short  version;            // Version identifier.
+    std::size_t     size;               // Total size of this serialised entity in bytes.
+    std::size_t     propertyCount;      // How many property headers to expect after this header.
 
-    std::size_t        memberDataOffset;    // Offset from beginning of data that the member data begins.
-    std::size_t        memberDataLength;    // Length of member data in bytes.
+    std::size_t     memberDataOffset;   // Offset from beginning of data that the member data begins.
+    std::size_t     memberDataLength;   // Length of member data in bytes.
 
-    std::size_t        propertyDataOffset;    // Offset from beginning of data that the property data begins.
-    std::size_t        propertyDataLength;    // Length of all property data in bytes.
+    std::size_t     propertyDataOffset; // Offset from beginning of data that the property data begins.
+    std::size_t     propertyDataLength; // Length of all property data in bytes.
 };
 
 struct PropertyHeader
@@ -34,7 +34,7 @@ struct PropertyHeader
     std::size_t                 offset;     // Offset of property from beginning of property data chunk.
     std::size_t                 size;       // Size of serialised property data in bytes. This includes all values.
     unsigned int                key;        // Property key.
-    model::types::SubType subtype;    // Type identifier for the values this property contains.
+    model::types::SubType       subtype;    // Type identifier for the values this property contains.
     std::size_t                 valueCount; // How many values this property contains.
 };
 
@@ -136,23 +136,37 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const
     return pHeader->size;
 }
 
-template <typename T>
 void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const char* data)
 {
     using namespace model::types;
 
-    std::vector<std::shared_ptr<T>> values;
+    std::vector<BasePointer> values;
     for ( int i = 0; i < header->valueCount; i++ )
     {
         std::size_t advance = 0;
-        std::shared_ptr<T> val = std::dynamic_pointer_cast<T, Base>(TypeSerialiser::unserialise(data, &advance));
-        assert(val);
+        BasePointer val = TypeSerialiser::unserialise(data, &advance);
+
+        if ( !val.get() )
+        {
+            throw EntitySerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
+                                                                + " of entity " + std::to_string(ent->getHandle())
+                                                                + " - null property returned.");
+        }
+
+        if ( val->subtype() != header->subtype )
+        {
+            throw EntitySerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
+                                                                + " of entity " + std::to_string(ent->getHandle())
+                                                                + ": subtype \"" + model::types::getSubTypeString(val->subtype())
+                                                                + "\" does not match expected subtype \""
+                                                                + model::types::getSubTypeString(header->subtype) + "\".");
+        }
+
         values.push_back(val);
         data += advance;
     }
 
-    //TODO: UPDATE THIS
-    //ent->insertProperty<T>(new EntityProperty<T>(header->key, values));
+    ent->insertProperty(std::shared_ptr<EntityProperty>(new EntityProperty(header->key, header->subtype, values)));
 }
 
 std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, std::size_t length)
@@ -174,7 +188,7 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
     if ( pHeader->memberDataOffset + pHeader->memberDataLength > length )
         throw InvalidInputEntityException("Length of member data exceeds length of input data.");
 
-    if ( pHeader->propertyDataOffset >= length )
+    if ( pHeader->propertyDataOffset > length || (pHeader->propertyCount > 0 && pHeader->propertyDataOffset == length) )
         throw InvalidInputEntityException("Property data offset exceeds length of input data.");
 
     if ( pHeader->propertyDataOffset + pHeader->propertyDataLength > length )
@@ -189,6 +203,10 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
     // Unserialise the members.
     const char* memberData = serialData + pHeader->memberDataOffset;
     ent->_memberSerialiser.unserialiseAll(memberData, pHeader->memberDataLength);
+
+    // If we're locked, unlock temporarily.
+    bool wasLocked = ent->_locked;
+    ent->_locked = false;
 
     // Unserialise the properties.
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(SerialHeader));
@@ -210,25 +228,21 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
         switch (p->subtype)
         {
         case SubType::TypeInt32:
-            populate<Int>(ent, p, data);
-            break;
-
         case SubType::TypeString:
-            populate<String>(ent, p, data);
-            break;
-
         case SubType::TypeEntityRef:
-            populate<EntityRef>(ent, p, data);
-                        break;
-
         case SubType::TypeDate:
-                        populate<Date>(ent, p, data);
-                        break;
+            populate(ent, p, data);\
+            break;
 
         default:
-            assert(false);
+            throw InvalidInputEntityException("Error unserialising property " + std::to_string(p->key)
+                                              + " of entity " + std::to_string(ent->getHandle())
+                                              + ": subtype \"" + model::types::getSubTypeString(p->subtype)
+                                              + "\" is invalid.");
         }
     }
+
+    ent->_locked = wasLocked;
     
     return ent;
 }

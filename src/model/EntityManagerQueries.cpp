@@ -156,7 +156,7 @@ void EntityManager::Scan4(VariableSet&& variableSet, const std::string variableN
 				model::types::SubType::TypeEntityRef, std::move(metaVar));
 
 			variableSet.add(std::move(variableName2),
-				VariableSetValue(std::make_shared<model::types::Property>(prop.first, 0), prop.first, entity.first),
+				VariableSetValue(std::make_shared<model::types::Property>(prop.first, this, 0), prop.first, entity.first),
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
 			auto type = _propertyTypes.at(prop.first);
@@ -509,7 +509,7 @@ void EntityManager::ScanEVV(VariableSet&& variableSet, const model::Subject&& su
 		for (auto value : vals) {
 
 			auto rowId = variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
+				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
 			variableSet.add(std::move(variableName2),
@@ -564,7 +564,7 @@ void EntityManager::ScanEUV(VariableSet&& variableSet, const model::Subject&& su
 		for (auto value : vals) {
 
 			auto rowId = variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
+				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
 			variableSet.add(std::move(variableName2),
@@ -652,7 +652,7 @@ std::vector<unsigned int> EntityManager::ScanHelp1(VariableSet&& variableSet, co
 		for (auto value : vals) {
 			if (value->Equals(object)) {
 				rowsAdded.push_back(variableSet.add(std::move(variableName),
-					VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, 0), 0, 0),
+					VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
 					model::types::SubType::PropertyReference, std::move(metaVar)));
 			}
 		}

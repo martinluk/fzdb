@@ -9,7 +9,6 @@
 namespace model {
     namespace types {
 
-        // Stores a string value.
         class Property : public Base {
         private:
             friend class TypeSerialiser;
@@ -19,17 +18,21 @@ namespace model {
             void initMemberSerialiser()
             {
 				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
+
+                _memberSerialiser.setInitialised();
             }
             
         public:
 			Property() : Base(100, 0, std::string()), _value()
             {
+                _manager = NULL;
                 initMemberSerialiser();
             }
             
-			Property(const unsigned int value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+            Property(const unsigned int value, const EntityManager* manager, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(value)
             {
+                _manager = manager;
                 initMemberSerialiser();
             }
             
@@ -55,7 +58,7 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Property>(_value, _originalAuthorId, _confidence);
+                auto cloned = std::make_shared<Property>(_value, _manager, _originalAuthorId, _confidence);
 				cloned->_orderingId = _orderingId;
 				return cloned;
             }
