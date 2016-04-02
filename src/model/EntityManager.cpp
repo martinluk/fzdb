@@ -338,10 +338,10 @@ void EntityManager::changeEntityType(Entity::EHandle_t id, const std::string &ty
 std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const
 {
 	if (prop == 0) {
-		throw std::exception("deference error");
+		throw std::runtime_error("deference error");
 	}
 	if (_entities.at(entity)->getProperty(prop)->count() <= val) {
-		throw std::exception("deference error");
+		throw std::runtime_error("deference error");
 	}
     return _entities.at(entity)->getProperty(prop)->baseValue(val);
 }
