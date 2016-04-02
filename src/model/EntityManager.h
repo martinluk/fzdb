@@ -98,11 +98,11 @@ private:
     static void enforceTypeHasBeenSet(const Entity* entity);
     static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);
 
-    void createHierarchy(const model::Triple &triple, unsigned int author, const std::string &comment,
+    void createHierarchy(const model::Triple &triple, Entity* ent, unsigned int author, const std::string &comment,
                          const std::vector<std::shared_ptr<model::types::Base> > &newRecords,model::types::SubType newRecordType);
 
     void removeHierarchy(const model::Triple &triple);
-    bool performSpecialInsertOperations(const model::Triple &triple, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
+    bool performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
                                   model::types::SubType newRecordType, unsigned int author, const std::string &comment);
     
     void insertEntity(std::shared_ptr<Entity> ent);

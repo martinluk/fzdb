@@ -13,13 +13,13 @@
 #include "spdlog/spdlog.h"
 #include "../Util.h"
 
-#include "./types/Base.h"
-#include "./types/ValueRef.h"
-#include "./types/String.h"
-#include "./types/EntityRef.h"
-#include "./types/Int.h"
-#include "./types/Date.h"
-#include "./types/Property.h"
+#include "../types/Base.h"
+#include "../types/ValueRef.h"
+#include "../types/String.h"
+#include "../types/EntityRef.h"
+#include "../types/Int.h"
+#include "../types/Date.h"
+#include "../types/Property.h"
 #include "singletons.h"
 
 //#define ENFORCE_ENTITIES_HAVE_TYPES
@@ -242,7 +242,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 modifiedEntities.insert(currentEntity.get());
 
                 // TODO: Author and comment!
-                if ( performSpecialInsertOperations(triple, newRecords, newRecordType, 0, std::string()) )
+                if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
                     continue;
 
                 //note that the OrderingId attribute of a record is assigned as part of insertion
@@ -287,7 +287,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                             modifiedEntities.insert(currentEntity.get());
 
                             // TODO: Author and comment!
-                            if ( performSpecialInsertOperations(triple, newRecords, newRecordType, 0, std::string()) )
+                            if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
                                 continue;
 
                             for (auto newRecord : newRecords)
@@ -332,7 +332,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 	return createdEntities;
 }
 
-bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
+bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
                                                    model::types::SubType newRecordType, unsigned int author, const std::string &comment)
 {
     // If we reference the type, perform a type change.
@@ -341,7 +341,7 @@ bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, 
         if ( triple.object.type != model::Object::Type::STRING )
             throw std::runtime_error("Entity types must be specified as strings.");
 
-        changeEntityType(currentEntity.get(), triple.object.value);
+        changeEntityType(ent, triple.object.value);
         return true;
     }
 
@@ -349,17 +349,39 @@ bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, 
     if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF ||
          triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
     {
-        createHierarchy(triple, author, comment, newRecords, newRecordType);
+        createHierarchy(triple, ent, author, comment, newRecords, newRecordType);
         return true;
     }
 
     return false;
 }
 
-void EntityManager::createHierarchy(const model::Triple &triple, unsigned int author, const std::string &comment,
+void EntityManager::createHierarchy(const model::Triple &triple, Entity* ent, unsigned int author, const std::string &comment,
                                     const std::vector<std::shared_ptr<model::types::Base> > &newRecords, model::types::SubType newRecordType)
 {
-    // TODO
+    // Check what our record type is.
+    if ( newRecordType != model::types::SubType::TypeEntityRef )
+        throw std::runtime_error("Expected entity handle for target of hierarchy creation but got \""
+                                 + std::string(model::types::getSubTypeString(newRecordType)) + "\".");
+
+    // For each record:
+    for ( const std::shared_ptr<model::types::Base> &ptr : newRecords )
+    {
+        model::types::Base* b = ptr.get();
+        model::types::EntityRef* r = dynamic_cast<model::types::EntityRef*>(b);
+
+        // This should always be true, if the record type passed in is correct.
+        assert(r);
+
+        if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
+        {
+            createHierarchy(ent->getHandle(), r->value(), author, comment);
+        }
+        else
+        {
+            createHierarchy(r->value(), ent->getHandle(), author, comment);
+        }
+    }
 }
 
 void EntityManager::changeEntityType(Entity *ent, const std::string &type)
