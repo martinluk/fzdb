@@ -210,17 +210,14 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     for(auto colIter=data->cbegin(); colIter!=data->cend(); colIter++){
         //Iterating over the column
         //colIter dataType std::vector<VariableSetValue>
-        spdlog::get("main")->debug("Entered column");
+        spdlog::get("main")->debug("Entered column of size {}",(*colIter).size());
         for(auto rowIter = (*colIter).cbegin(); rowIter!=(*colIter).cend(); rowIter++){
-        //for (VariableSetValue val: *colIter) {
-			spdlog::get("main")->debug("Entered value");
-			VariableSetValue val = *rowIter;    //FIXME Causing seg fault 
-			spdlog::get("main")->debug("Assigned");
-			if (val.entity()!=0) {
+			unsigned long long entityId = (*rowIter).entity();
+			if (entityId!=0) {
 				//Value's entity value is set, meaning it is entity
 				//Delete entity.
-				spdlog::get("main")->warn("---- Deleting entity {}", val.entity());
-				_entities.erase(val.entity());
+				spdlog::get("main")->warn("Deleting entity {}", entityId);
+				_entities.erase(entityId);
 			} 
 			//TODO Remove all properties that are link to the entity getting deleted
 		}
