@@ -647,13 +647,20 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                 case 1:
                     iter++;
                     //iter now=arg1
-                    data0 = iter->second;
+                    data0 = iter->second; //Retrieve data from first argument
+                    break;
+                case 2:
+                    iter++;
+                    //iter now=arg1
+                    data0 = iter->second; //Retrieve data from first argument
+                    iter++;
+                    //iter now=arg2
+                    data1 = iter->second; //Retrieve data from second argument
                     break;
                 default:
                     assert(numberOfArg>=0 /*Make sure numberOfArg is assigned*/);
                     assert(numberOfArg<=2 /*Query class only accept two args at most, implement otherwise if nessasary*/);
             }
-                    iter++;
             //Should be finish parsing USER
             if (iter != tokens.end()) {
                 std::string leftover = iter->second;
