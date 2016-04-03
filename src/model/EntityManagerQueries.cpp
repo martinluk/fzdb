@@ -21,26 +21,23 @@
 #include "./types/Property.h"
 #include "singletons.h"
 
-
-
-
 //$a <predicate> <object>
-void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::Scan1(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 
 	//get the property id
 
 	//the variable has been used before, we only need to iterate over valid values from before
-	if (variableSet.used(variableName)) {
+	if (variableSet.used(variableId)) {
 
 		//in this scan we can only remove variables from variableset
-		switch (variableSet.typeOf(variableName)) {
+		switch (variableSet.typeOf(variableId)) {
 		case model::types::SubType::TypeEntityRef: {
-			ScanUPR(std::move(variableSet), variableName, std::move(predicate), std::move(object), std::move(metaVar));
+			ScanUPR(std::move(variableSet), variableId, std::move(predicate), std::move(object), std::move(metaVar));
 			break;
 		}
 
 		case model::types::SubType::ValueReference: {
-			ScanMPR(std::move(variableSet), variableName, std::move(predicate), std::move(object), std::move(metaVar));
+			ScanMPR(std::move(variableSet), variableId, std::move(predicate), std::move(object), std::move(metaVar));
 			break;
 		}
 
@@ -52,202 +49,306 @@ void EntityManager::Scan1(VariableSet&& variableSet, const std::string variableN
 	}
 
 	//the variable has not been used, add all the values found!
-	ScanVPR(std::move(variableSet), variableName, std::move(predicate), std::move(object), std::move(metaVar));
+	ScanVPR(std::move(variableSet), variableId, std::move(predicate), std::move(object), std::move(metaVar));
 }
 
 
 //$a <predicate> $b
-void EntityManager::Scan2(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::Scan2(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 
 	//TODO: consider the case where variableName2 is already in variableSet
 
 	//the variable has been used before, we only need to iterate over valid values from before
-	if (variableSet.used(variableName)) {
+	if (variableSet.used(variableId)) {
 
-		if (variableSet.used(variableName2)) {
+		if (variableSet.used(variableId2)) {
 			// this cannot add any new data, only remove it			
-			switch (variableSet.typeOf(variableName)) {
+			switch (variableSet.typeOf(variableId)) {
 			case model::types::SubType::TypeEntityRef:
-				ScanUPU(std::move(variableSet), variableName, std::move(predicate), variableName2, std::move(metaVar));
+				ScanUPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 				break;
 			case model::types::SubType::ValueReference:
-				ScanMPU(std::move(variableSet), variableName, std::move(predicate), variableName2, std::move(metaVar));
+				ScanMPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 				break;
 			}
 		}
 		else {
-			switch (variableSet.typeOf(variableName)) {
+			switch (variableSet.typeOf(variableId)) {
 
 			case model::types::SubType::TypeEntityRef:
-				ScanUPV(std::move(variableSet), variableName, std::move(predicate), variableName2, std::move(metaVar));
+				ScanUPV(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 				break;
 			case model::types::SubType::ValueReference:
-				ScanMPV(std::move(variableSet), variableName, std::move(predicate), variableName2, std::move(metaVar));
+				ScanMPV(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 				break;
 			}
 		}
 		return;
 	}
 	else {
-		if (variableSet.used(variableName2)) {
-			ScanVPU(std::move(variableSet), variableName, std::move(predicate), variableName2, std::move(metaVar));
+		if (variableSet.used(variableId2)) {
+			ScanVPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 		}
 		else {
-			ScanVPV(std::move(variableSet), variableName, std::move(predicate), variableName2, std::move(metaVar));
+			ScanVPV(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 		}
 	}
 }
 
 //$a $b "Value"
-void EntityManager::Scan3(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::Scan3(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
-	if (variableSet.used(variableName)) {
+	if (variableSet.used(variableId)) {
 
-		if (variableSet.used(variableName2)) {
+		if (variableSet.used(variableId2)) {
 			// this cannot add any new data, only remove it			
-			switch (variableSet.typeOf(variableName)) {
+			switch (variableSet.typeOf(variableId)) {
 			case model::types::SubType::TypeEntityRef:
-				ScanUUR(std::move(variableSet), variableName, variableName2, std::move(object), std::move(metaVar));
+				ScanUUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 				break;
 			case model::types::SubType::ValueReference:
-				ScanMUR(std::move(variableSet), variableName, variableName2, std::move(object), std::move(metaVar));
+				ScanMUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 				break;
 			}
 		}
 		else {
-			switch (variableSet.typeOf(variableName)) {
+			switch (variableSet.typeOf(variableId)) {
 			case model::types::SubType::TypeEntityRef:
-				ScanUVR(std::move(variableSet), variableName, variableName2, std::move(object), std::move(metaVar));
+				ScanUVR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 				break;
 			case model::types::SubType::ValueReference:
-				ScanMVR(std::move(variableSet), variableName, variableName2, std::move(object), std::move(metaVar));
+				ScanMVR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 				break;
 			}
 		}
 		return;
 	}
 	else {
-		if (variableSet.used(variableName2)) {
-			ScanVUR(std::move(variableSet), variableName, variableName2, std::move(object), std::move(metaVar));
+		if (variableSet.used(variableId2)) {
+			ScanVUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 		}
 		else {
-			ScanVVR(std::move(variableSet), variableName, variableName2, std::move(object), std::move(metaVar));
+			ScanVVR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 		}
 	}
 }
 
 //$a $b $c
-void EntityManager::Scan4(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const std::string variableName3, const std::string&& metaVar) const {
+void EntityManager::Scan4(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
 
-	//TODO: Check variable types
-
-	//TODO: Cover cases where the variables have been used before :/
-	if (variableSet.contains(variableName) || variableSet.contains(variableName2) || variableSet.contains(variableName3)) {
-		return;
-	}
-
-	//If no variables have been used so far, get EVERYTHING!
-
-	for (auto entity : _entities) {
-		for (auto prop : entity.second->properties()) {
-
-			variableSet.add(std::move(variableName),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(entity.first, 0), prop.first, entity.first),
-				model::types::SubType::TypeEntityRef, std::move(metaVar));
-
-			variableSet.add(std::move(variableName2),
-				VariableSetValue(std::make_shared<model::types::Property>(prop.first, this, 0), prop.first, entity.first),
-				model::types::SubType::PropertyReference, std::move(metaVar));
-
-			auto type = _propertyTypes.at(prop.first);
-			std::shared_ptr<model::types::Base> val = entity.second->getProperty(prop.first)->baseValue(0)->Clone();
-			variableSet.add(std::move(variableName3),
-				VariableSetValue(std::move(val), prop.first, entity.first),
-				std::move(type), std::move(metaVar));
+	if (variableSet.used(variableId)) {
+		if (variableSet.used(variableId2)) {
+			if (variableSet.used(variableId3)) {
+				ScanUUU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+			else {
+				ScanUUV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+		}
+		else {
+			if (variableSet.used(variableId3)) {
+				ScanUVU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+			else {
+				ScanUVV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
 		}
 	}
+	else {
+		if (variableSet.used(variableId2)) {
+			if (variableSet.used(variableId3)) {
+				ScanVUU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+			else {
+				ScanVUV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+		}
+		else {
+			if (variableSet.used(variableId3)) {
+				ScanVVU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+			else {
+				ScanVVV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar));
+			}
+		}
+	}
+	
 }
 
 //entity <predicate> $c
-void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const {
-	if (variableSet.used(variableName)) {
-		ScanEPU(std::move(variableSet), std::move(subject), std::move(predicate), variableName, std::move(metaVar));
+void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, unsigned int variableId, const std::string&& metaVar) const {
+	if (variableSet.used(variableId)) {
+		ScanEPU(std::move(variableSet), std::move(subject), std::move(predicate), variableId, std::move(metaVar));
 	}
 	else {
-		ScanEPV(std::move(variableSet), std::move(subject), std::move(predicate), variableName, std::move(metaVar));
+		ScanEPV(std::move(variableSet), std::move(subject), std::move(predicate), variableId, std::move(metaVar));
 	}
 }
 
 // entity $b value
-void EntityManager::Scan6(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object, const std::string&& metaVar) const {
-	if (variableSet.used(variableName)) {
-		ScanEUR(std::move(variableSet), std::move(subject), variableName, std::move(object), std::move(metaVar));
+void EntityManager::Scan6(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, const model::Object&& object, const std::string&& metaVar) const {
+	if (variableSet.used(variableId)) {
+		ScanEUR(std::move(variableSet), std::move(subject), variableId, std::move(object), std::move(metaVar));
 	}
 	else {
-		ScanEVR(std::move(variableSet), std::move(subject), variableName, std::move(object), std::move(metaVar));
+		ScanEVR(std::move(variableSet), std::move(subject), variableId, std::move(object), std::move(metaVar));
 	}
 }
 
 // entity $b $c
-void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, unsigned int variableId2, const std::string&& metaVar) const {
 
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 
 	if (EntityExists(entityRef)) {
-		if (variableSet.used(variableName)) {
-			if (variableSet.used(variableName2)) {
-				ScanEUU(std::move(variableSet), std::move(subject), variableName, variableName2, std::move(metaVar));
+		if (variableSet.used(variableId)) {
+			if (variableSet.used(variableId2)) {
+				ScanEUU(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar));
 			}
 			else {
-				ScanEUV(std::move(variableSet), std::move(subject), variableName, variableName2, std::move(metaVar));
+				ScanEUV(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar));
 			}
 		}
 		else {
-			if (variableSet.used(variableName2)) {
-				ScanEVU(std::move(variableSet), std::move(subject), variableName, variableName2, std::move(metaVar));
+			if (variableSet.used(variableId2)) {
+				ScanEVU(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar));
 			}
 			else {
-				ScanEVV(std::move(variableSet), std::move(subject), variableName, variableName2, std::move(metaVar));
+				ScanEVV(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar));
 			}
 		}
 	}
 
 }
 
+// $a $b $c
+void EntityManager::ScanVVV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+	for (auto entity : _entities) {
+		for (auto prop : entity.second->properties()) {
+
+			auto rowId = variableSet.add(std::move(variableId),
+				VariableSetValue(std::make_shared<model::types::EntityRef>(entity.first, 0), prop.first, entity.first),
+				model::types::SubType::TypeEntityRef, std::move(metaVar));
+
+			variableSet.add(std::move(variableId2),
+				VariableSetValue(std::make_shared<model::types::Property>(prop.first, this, 0), prop.first, entity.first),
+				model::types::SubType::PropertyReference, std::move(metaVar), rowId);
+
+			auto type = _propertyTypes.at(prop.first);
+			std::shared_ptr<model::types::Base> val = entity.second->getProperty(prop.first)->baseValue(0)->Clone();
+			variableSet.add(std::move(variableId3),
+				VariableSetValue(std::move(val), prop.first, entity.first),
+				std::move(type), std::move(metaVar), rowId);
+		}
+	}
+}
+
+void EntityManager::ScanVVU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+	/*auto varId = variableSet.indexOf(variableName);
+	auto varId2 = variableSet.indexOf(variableName2);
+	auto varId3 = variableSet.indexOf(variableName3);
+	//only properties are restricted
+
+	for (auto iter = variableSet.getData()->cbegin(), end = variableSet.getData()->cend(); iter != end; iter++) {
+		if (iter->at(varId3).empty()) continue;
+
+		auto newObject = model::Object(model::Object::Type::STRING, iter->at(varId3).dataPointer()->toString());
+
+		for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
+
+			for (auto propertyPair : properties) {
+				auto vals = propertyPair.second->baseValues();
+				for (auto value : vals) {
+					if (value->Equals(object)) {
+						rowsAdded.push_back(variableSet.add(std::move(variableName),
+							VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
+							model::types::SubType::PropertyReference, std::move(metaVar)));
+					}
+				}
+			}
+		}
+
+		bool a = true;
+	}*/
+}
+
+void EntityManager::ScanVUV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanVUU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanUVV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanUVU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanUUV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanUUU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+	// does nothing!
+}
+
+
+
+void EntityManager::ScanMVV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanMVU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanMUV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+void EntityManager::ScanMUU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
+
+}
+
+
+
 // $a $b Record
-void EntityManager::ScanVVR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanVVR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 	//no variables have been used
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 
 		auto rows = ScanHelp1(std::move(variableSet),
-			std::move(iter->second), std::move(iter->second->properties()), variableName2, std::move(object), std::move(metaVar));
+			std::move(iter->second), std::move(iter->second->properties()), variableId2, std::move(object), std::move(metaVar));
 
 		for (auto row : rows) {
-			variableSet.add(std::move(variableName),
+			variableSet.add(std::move(variableId),
 				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), 0, iter->second->_handle),
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
 	}
 }
 
-void EntityManager::ScanVUR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
-	auto varId = variableSet.indexOf(variableName);
-	auto varId2 = variableSet.indexOf(variableName2);
+void EntityManager::ScanVUR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
+	
 	//only properties are restricted
 
-	auto rows = variableSet.extractRowsWith(variableName2);
-	variableSet.removeRowsWith(variableName2);
+	auto rows = variableSet.extractRowsWith(variableId2);
+	variableSet.removeRowsWith(variableId2);
 
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
 		for (auto row : rows) {
 
-			unsigned int propId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[varId2].dataPointer())->value();
+			unsigned int propId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[variableId2].dataPointer())->value();
 			if (!iter->second->hasProperty(propId)) continue;
 			auto vals = iter->second->getProperty(propId)->baseValues();
 			for (auto value : vals) {
 				if (value->Equals(object)) {
 					auto newRow = std::vector<VariableSetValue>(row);
-					newRow[varId] = VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), 0, iter->second->_handle);
+					newRow[variableId] = VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), 0, iter->second->_handle);
 					variableSet.add(std::move(newRow));
 				}
 			}
@@ -255,39 +356,35 @@ void EntityManager::ScanVUR(VariableSet&& variableSet, const std::string variabl
 	}
 }
 
-void EntityManager::ScanUVR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
-	auto varId = variableSet.indexOf(variableName);
+void EntityManager::ScanUVR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
 	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if ((*iter)[varId].empty()) continue;
-		Entity::EHandle_t entityId = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[varId].dataPointer())->value();
+		if ((*iter)[variableId].empty()) continue;
+		Entity::EHandle_t entityId = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto entity = _entities.at(entityId);
 
-		auto rows = ScanHelp1(std::move(variableSet), std::move(entity), std::move(entity->properties()), variableName2, std::move(object), std::move(metaVar));
+		auto rows = ScanHelp1(std::move(variableSet), std::move(entity), std::move(entity->properties()), variableId2, std::move(object), std::move(metaVar));
 
 		for (auto row : rows) {
-			variableSet.add(std::move(variableName),
+			variableSet.add(std::move(variableId),
 				VariableSetValue(std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId),
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
 	}
 }
 
-void EntityManager::ScanUUR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
-
-	unsigned char varIndex = variableSet.indexOf(variableName);
-	unsigned char varIndex2 = variableSet.indexOf(variableName2);
+void EntityManager::ScanUUR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
 	// Only delete rows that match the pattern perfectly... does this make sense?
 	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, varIndex](std::vector<VariableSetValue> row) {
-		if (row[varIndex].empty()) return false;
-		if (row[varIndex2].empty()) return false;
+		[&, this, variableId](std::vector<VariableSetValue> row) {
+		if (row[variableId].empty()) return false;
+		if (row[variableId2].empty()) return false;
 
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
 		auto currentEntity = _entities.at(entityHandle);
 
-		unsigned int propertyId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[varIndex2].dataPointer())->value();
+		unsigned int propertyId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[variableId2].dataPointer())->value();
 
 		if (!currentEntity->hasProperty(propertyId)) return true;
 		if (currentEntity->meetsCondition(propertyId, std::move(object)).size() > 0) {
@@ -300,17 +397,17 @@ void EntityManager::ScanUUR(VariableSet&& variableSet, const std::string variabl
 }
 
 
-void EntityManager::ScanMVR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanMVR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
 }
 
-void EntityManager::ScanMUR(VariableSet&& variableSet, const std::string variableName, const std::string variableName2, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanMUR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
 }
 
 
 // $a Property $c
-void EntityManager::ScanVPV(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanVPV(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
@@ -319,10 +416,10 @@ void EntityManager::ScanVPV(VariableSet&& variableSet, const std::string variabl
 
 		auto rows = ScanHelp2(std::move(variableSet),
 			model::Subject(model::Subject::Type::ENTITYREF,
-				std::to_string(iter->first)), std::move(predicate), variableName2, std::move(metaVar));
+				std::to_string(iter->first)), std::move(predicate), variableId2, std::move(metaVar));
 
 		for (auto row : rows) {
-			variableSet.add(std::move(variableName),
+			variableSet.add(std::move(variableId),
 				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), propertyId, iter->second->_handle),
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
@@ -330,16 +427,13 @@ void EntityManager::ScanVPV(VariableSet&& variableSet, const std::string variabl
 	}
 }
 
-void EntityManager::ScanVPU(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanVPU(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 	
-	auto varIndex = variableSet.indexOf(variableName);
-	auto varIndex2 = variableSet.indexOf(variableName2);
-
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
 	for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
-		if (iter->at(varIndex2).empty()) continue;
-		auto val = iter->at(varIndex2).dataPointer();
+		if (iter->at(variableId2).empty()) continue;
+		auto val = iter->at(variableId2).dataPointer();
 
 		bool removeRow = true;
 		for (auto entityIter = _entities.cbegin(); entityIter != _entities.cend(); entityIter++) {
@@ -351,15 +445,15 @@ void EntityManager::ScanVPU(VariableSet&& variableSet, const std::string variabl
 
 				auto entityRef = std::make_shared<model::types::EntityRef>(entityIter->second->getHandle(), 0);
 
-				(*iter)[varIndex] = VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle());
+				(*iter)[variableId] = VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle());
 
 				for (auto matchIter = matchValues.begin() + 1; matchIter < matchValues.end(); matchIter++) {
 
-					auto newRow = variableSet.add(std::move(variableName), VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle()),
+					auto newRow = variableSet.add(std::move(variableId), VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle()),
 						model::types::SubType::TypeEntityRef, std::move(metaVar));
 
-					variableSet.add(std::move(variableName2), VariableSetValue(iter->at(varIndex2).dataPointer()->Clone(), propertyId,
-						entityIter->second->getHandle()), iter->at(varIndex2).dataPointer()->subtype(), std::move(metaVar), newRow);
+					variableSet.add(std::move(variableId2), VariableSetValue(iter->at(variableId2).dataPointer()->Clone(), propertyId,
+						entityIter->second->getHandle()), iter->at(variableId2).dataPointer()->subtype(), std::move(metaVar), newRow);
 				}
 			}
 		}
@@ -370,15 +464,13 @@ void EntityManager::ScanVPU(VariableSet&& variableSet, const std::string variabl
 	}
 }
 
-void EntityManager::ScanUPV(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
-	unsigned char varIndex = variableSet.indexOf(variableName),
-		varIndex2 = variableSet.indexOf(variableName2);
 
 	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, varIndex](std::vector<VariableSetValue> row) {
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+		[&, this, variableId](std::vector<VariableSetValue> row) {
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
 		std::shared_ptr<Entity> currentEntity;
 		if (currentEntityIter != _entities.end()) {
@@ -395,7 +487,7 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, const std::string variabl
 	for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
 		auto iter = (variableSet.getData()->begin() + i);
 
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[varIndex].dataPointer())->value();
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
 		std::shared_ptr<Entity> currentEntity;
 
@@ -408,12 +500,12 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, const std::string variabl
 
 		auto values = currentEntity->getProperty(propertyId)->baseValues();
 
-		*(iter->begin() + varIndex2) = VariableSetValue(values[0]->Clone(), 0, 0);
+		*(iter->begin() + variableId2) = VariableSetValue(values[0]->Clone(), 0, 0);
 
 		for (size_t valId = 1; valId < values.size(); valId++) {
 			std::vector<VariableSetValue> newVec;
 			for (size_t j = 0; j < iter->size(); j++) {
-				if (j != varIndex2) {
+				if (j != variableId2) {
 					newVec.push_back((*iter)[j]);
 				}
 				else {
@@ -425,19 +517,17 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, const std::string variabl
 	}
 }
 
-void EntityManager::ScanUPU(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanUPU(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
-	unsigned char varIndex = variableSet.indexOf(variableName),
-		varIndex2 = variableSet.indexOf(variableName2);
 
-	if (variableSet.typeOf(variableName) != model::types::SubType::TypeEntityRef) {
+	if (variableSet.typeOf(variableId) != model::types::SubType::TypeEntityRef) {
 		throw std::runtime_error("Not yet implemented :/");
 	}
 
 	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, varIndex](std::vector<VariableSetValue> row) {
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+		[&, this, variableId](std::vector<VariableSetValue> row) {
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
 		std::shared_ptr<Entity> currentEntity;
 		if (currentEntityIter != _entities.end()) {
@@ -447,20 +537,18 @@ void EntityManager::ScanUPU(VariableSet&& variableSet, const std::string variabl
 			throw std::runtime_error("Attempted to look up a non-existent entity");
 		}
 
-		return currentEntity->meetsCondition(propertyId, model::Object(model::Object::Type::STRING, row[varIndex2].dataPointer()->toString())).size() == 0;
+		return currentEntity->meetsCondition(propertyId, model::Object(model::Object::Type::STRING, row[variableId2].dataPointer()->toString())).size() == 0;
 	}), variableSet.getData()->end());
 }
 
 
-void EntityManager::ScanMPV(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanMPV(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
-	unsigned char varIndex = variableSet.indexOf(variableName),
-		varIndex2 = variableSet.indexOf(variableName2);
 
 	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if (!(*iter)[varIndex].dataPointer()) continue;
-		auto vsv = (*iter)[varIndex];
+		if (!(*iter)[variableId].dataPointer()) continue;
+		auto vsv = (*iter)[variableId];
 		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
 		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
 		//check if val meets the property
@@ -468,19 +556,19 @@ void EntityManager::ScanMPV(VariableSet&& variableSet, const std::string variabl
 			auto subprop = val->getProperty(propertyId);
 			//TODO: should be all values
 			auto valueToStore = subprop->baseTop()->Clone();
-			variableSet.addToMetaRefRow(vsv.metaRef(), varIndex2, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
+			variableSet.addToMetaRefRow(vsv.metaRef(), variableId2, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
 		}
 	}
 }
 
-void EntityManager::ScanMPU(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanMPU(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
 
 }
 
 
 
 // $a Property Value
-void EntityManager::ScanVPR(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanVPR(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 
 	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
@@ -494,33 +582,31 @@ void EntityManager::ScanVPR(VariableSet&& variableSet, const std::string variabl
 			auto newValue = std::make_shared<model::types::EntityRef>(currentEntity->getHandle(), 0);
 			newValue->OrderingId(match->OrderingId());
 			VariableSetValue vsv = VariableSetValue(newValue, propertyId, currentEntity->getHandle());
-			variableSet.add(std::move(variableName), std::move(vsv), model::types::SubType::TypeEntityRef, std::move(metaVar));
+			variableSet.add(std::move(variableId), std::move(vsv), model::types::SubType::TypeEntityRef, std::move(metaVar));
 		}
 	}
 }
 
-void EntityManager::ScanUPR(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanUPR(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 
 	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
-	unsigned char varIndex = variableSet.indexOf(variableName);
 
 	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, varIndex](std::vector<VariableSetValue> row) {
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[varIndex].dataPointer())->value();
+		[&, this, variableId](std::vector<VariableSetValue> row) {
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
 		auto currentEntity = _entities.at(entityHandle);
 		auto matches = currentEntity->meetsCondition(propertyId, std::move(object));
 		return matches.size() == 0;
 	}), variableSet.getData()->end());
 }
 
-void EntityManager::ScanMPR(VariableSet&& variableSet, const std::string variableName, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanMPR(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 
 	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
-	unsigned char varIndex = variableSet.indexOf(variableName);
 
 	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if (!(*iter)[varIndex].dataPointer()) continue;
-		auto vsv = (*iter)[varIndex];
+		if (!(*iter)[variableId].dataPointer()) continue;
+		auto vsv = (*iter)[variableId];
 		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
 		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
 		//check if val meets the property
@@ -533,7 +619,7 @@ void EntityManager::ScanMPR(VariableSet&& variableSet, const std::string variabl
 }
 
 // Entity $b $c
-void EntityManager::ScanEVV(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanEVV(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, unsigned int variableId2, const std::string&& metaVar) const {
 
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 	auto currentEntity = _entities.at(entityRef);
@@ -543,34 +629,33 @@ void EntityManager::ScanEVV(VariableSet&& variableSet, const model::Subject&& su
 
 		for (auto value : vals) {
 
-			auto rowId = variableSet.add(std::move(variableName),
+			auto rowId = variableSet.add(std::move(variableId),
 				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
-			variableSet.add(std::move(variableName2),
+			variableSet.add(std::move(variableId2),
 				VariableSetValue(value->Clone(), 0, 0),
 				std::move(_propertyTypes.at(propertyPair.first)), std::move(metaVar), rowId);
 		}
 	}
 }
 
-void EntityManager::ScanEVU(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2, const std::string&& metaVar) const {
-	auto varNameId = variableSet.indexOf(variableName);
-	auto varName2Id = variableSet.indexOf(variableName2);
+void EntityManager::ScanEVU(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, unsigned int variableId2, const std::string&& metaVar) const {
+
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 	auto currentEntity = _entities.at(entityRef);
 
 	for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
 		auto iter = (variableSet.getData()->begin() + i);
 
-		if ((*iter)[varName2Id].empty()) continue;
+		if ((*iter)[variableId2].empty()) continue;
 
 		bool found = false;
 
 		for (auto propertyPair : currentEntity->properties()) {
-			auto met = currentEntity->meetsCondition(propertyPair.first, model::Object(model::Object::Type::STRING, (*iter)[varName2Id].dataPointer()->toString()));
+			auto met = currentEntity->meetsCondition(propertyPair.first, model::Object(model::Object::Type::STRING, (*iter)[variableId2].dataPointer()->toString()));
 			if (met.size() > 0) {
-				(*iter)[varNameId] = VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0);
+				(*iter)[variableId] = VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0);
 				found = true;
 			}
 		}
@@ -581,13 +666,13 @@ void EntityManager::ScanEVU(VariableSet&& variableSet, const model::Subject&& su
 	}
 }
 
-void EntityManager::ScanEUV(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2, const std::string&& metaVar) const {
+void EntityManager::ScanEUV(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, unsigned int variableId2, const std::string&& metaVar) const {
 
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 	auto currentEntity = _entities.at(entityRef);
 
 	std::map<unsigned int, std::shared_ptr<EntityProperty>> iterableProperties;
-	auto data = variableSet.getData(variableName);
+	auto data = variableSet.getData(variableId);
 	std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](VariableSetValue b) {
 		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(b.dataPointer());
 		return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), currentEntity->getProperty(prop->value()));
@@ -598,25 +683,24 @@ void EntityManager::ScanEUV(VariableSet&& variableSet, const model::Subject&& su
 
 		for (auto value : vals) {
 
-			auto rowId = variableSet.add(std::move(variableName),
+			auto rowId = variableSet.add(std::move(variableId),
 				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
-			variableSet.add(std::move(variableName2),
+			variableSet.add(std::move(variableId2),
 				VariableSetValue(value->Clone(), 0, 0),
 				std::move(_propertyTypes.at(propertyPair.first)), std::move(metaVar), rowId);
 		}
 	}
 }
 
-void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const std::string variableName2, const std::string&& metaVar) const {
-	auto varNameId = variableSet.indexOf(variableName);
-	auto varName2Id = variableSet.indexOf(variableName2);
+void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, unsigned int variableId2, const std::string&& metaVar) const {
+
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 	auto currentEntity = _entities.at(entityRef);
 
 	std::map<unsigned int, std::shared_ptr<EntityProperty>> iterableProperties;
-	auto data = variableSet.getData(variableName);
+	auto data = variableSet.getData(variableId);
 	std::transform(data.begin(), data.end(), std::inserter(iterableProperties, iterableProperties.begin()), [&](VariableSetValue b) {
 		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(b.dataPointer());
 		return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), currentEntity->getProperty(prop->value()));
@@ -625,14 +709,14 @@ void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& su
 	for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
 		auto iter = (variableSet.getData()->begin() + i);
 
-		if ((*iter)[varName2Id].empty()) continue;
+		if ((*iter)[variableId2].empty()) continue;
 
 		bool found = false;
 
 		for (auto propertyPair : iterableProperties) {
-			auto met = currentEntity->meetsCondition(propertyPair.first, model::Object(model::Object::Type::STRING, (*iter)[varName2Id].dataPointer()->toString()));
+			auto met = currentEntity->meetsCondition(propertyPair.first, model::Object(model::Object::Type::STRING, (*iter)[variableId2].dataPointer()->toString()));
 			if (met.size() > 0) {
-				(*iter)[varNameId] = VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0);
+				(*iter)[variableId] = VariableSetValue(std::make_shared<model::types::Int>(propertyPair.first, 0), 0, 0);
 				found = true;
 			}
 		}
@@ -644,37 +728,35 @@ void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& su
 }
 
 // Entity $b Value - Scan 6
-void EntityManager::ScanEVR(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanEVR(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, const model::Object&& object, const std::string&& metaVar) const {
 
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 
 	if (EntityExists(entityRef)) {
 		auto entity = _entities.at(entityRef);
-		ScanHelp1(std::move(variableSet), std::move(entity), std::move(entity->properties()), variableName, std::move(object), std::move(metaVar));
+		ScanHelp1(std::move(variableSet), std::move(entity), std::move(entity->properties()), variableId, std::move(object), std::move(metaVar));
 	}
 }
 
-void EntityManager::ScanEUR(VariableSet&& variableSet, const model::Subject&& subject, const std::string variableName, const model::Object&& object, const std::string&& metaVar) const {
+void EntityManager::ScanEUR(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, const model::Object&& object, const std::string&& metaVar) const {
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
-
-	unsigned char varIndex = variableSet.indexOf(variableName);
 
 	auto currentEntity = _entities.at(entityRef);
 
 	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, varIndex](std::vector<VariableSetValue> row) {
-		if (row[varIndex].empty()) return false;
-		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[varIndex].dataPointer());
+		[&, this, variableId](std::vector<VariableSetValue> row) {
+		if (row[variableId].empty()) return false;
+		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[variableId].dataPointer());
 		return currentEntity->meetsCondition(prop->value(), std::move(object)).size() == 0;
 	}), variableSet.getData()->end());
 }
 
 // Entity Property $c - Scan 5
-void EntityManager::ScanEPV(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const {
-	ScanHelp2(std::move(variableSet), std::move(subject), std::move(predicate), variableName, std::move(metaVar));
+void EntityManager::ScanEPV(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, unsigned int variableId, const std::string&& metaVar) const {
+	ScanHelp2(std::move(variableSet), std::move(subject), std::move(predicate), variableId, std::move(metaVar));
 }
 
-void EntityManager::ScanEPU(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const {
+void EntityManager::ScanEPU(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, unsigned int variableId, const std::string&& metaVar) const {
 	
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 
@@ -682,15 +764,15 @@ void EntityManager::ScanEPU(VariableSet&& variableSet, const model::Subject&& su
 	// Jonathat: Passing TypeUndefined to ckip type checking, since we don't know
 	// what the type is yet.
 	const unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
-	unsigned char varIndex = variableSet.indexOf(variableName);
+
 	if (EntityExists(entityRef)) {
 		auto currentEntity = _entities.at(entityRef);
 
 		variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-			[&, this, varIndex](std::vector<VariableSetValue> row) {
-			if (row[varIndex].empty()) return false;
+			[&, this, variableId](std::vector<VariableSetValue> row) {
+			if (row[variableId].empty()) return false;
 			if (!currentEntity->hasProperty(propertyId)) return true;
-			if (currentEntity->meetsCondition(propertyId, std::move(row[varIndex].dataPointer())).size() > 0) {
+			if (currentEntity->meetsCondition(propertyId, std::move(row[variableId].dataPointer())).size() > 0) {
 				return false;
 			}
 			else {
@@ -706,31 +788,27 @@ void EntityManager::ScanEPR(VariableSet&& variableSet, const model::Subject&& su
 }
 
 std::vector<unsigned int> EntityManager::ScanHelp1(VariableSet&& variableSet, const std::shared_ptr<Entity>&& entity,
-	const std::map<unsigned int, std::shared_ptr<EntityProperty>>&& properties, const std::string variableName,
+	const std::map<unsigned int, std::shared_ptr<EntityProperty>>&& properties, unsigned int variableId,
 	const model::Object&& object, const std::string&& metaVar) const {
 	//get the entity handle
 	//Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 	std::vector<unsigned int> rowsAdded;
 
-	//if (EntityExists(entityRef)) {
-	//	auto entity = _entities.at(entityRef);
-	//iterate through properties
 	for (auto propertyPair : properties) {
 		auto vals = propertyPair.second->baseValues();
 		for (auto value : vals) {
 			if (value->Equals(object)) {
-				rowsAdded.push_back(variableSet.add(std::move(variableName),
+				rowsAdded.push_back(variableSet.add(std::move(variableId),
 					VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
 					model::types::SubType::PropertyReference, std::move(metaVar)));
 			}
 		}
 	}
-	//}
 
 	return rowsAdded;
 }
 
-std::vector<unsigned int> EntityManager::ScanHelp2(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const std::string variableName, const std::string&& metaVar) const {
+std::vector<unsigned int> EntityManager::ScanHelp2(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, unsigned int variableId, const std::string&& metaVar) const {
 	//TODO: Check variable types
 	//TODO : Linkify
 
@@ -749,7 +827,7 @@ std::vector<unsigned int> EntityManager::ScanHelp2(VariableSet&& variableSet, co
 			for (auto value : currentEntity->getProperty(propertyId)->baseValues()) {
 
 				auto vsv = VariableSetValue(value->Clone(), propertyId, entityRef);
-				rowsAdded.push_back(variableSet.add(std::move(variableName), std::move(vsv), std::move(_propertyTypes.at(propertyId)), std::move(metaVar)));
+				rowsAdded.push_back(variableSet.add(std::move(variableId), std::move(vsv), std::move(_propertyTypes.at(propertyId)), std::move(metaVar)));
 			}
 		}
 	}

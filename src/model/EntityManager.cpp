@@ -74,21 +74,24 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
             if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 1 - $a <prop> value
-                    this->Scan1(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+                    this->Scan1(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
                 }
                 else {
                     //option 2 - $a <prop> $b
-                    this->Scan2(std::move(result), conditionsIter->subject.value, std::move(conditionsIter->predicate), conditionsIter->object.value, std::move(conditionsIter->meta_variable));
+                    this->Scan2(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate),
+						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
             }
             else {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option3 - $a $b value
-                    this->Scan3(std::move(result), conditionsIter->subject.value, conditionsIter->predicate.value, std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+                    this->Scan3(std::move(result), result.indexOf(conditionsIter->subject.value),
+						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
                 }
                 else {
                     //option 4 - $a $b $c
-                    this->Scan4(std::move(result), conditionsIter->subject.value, conditionsIter->predicate.value, conditionsIter->object.value, std::move(conditionsIter->meta_variable));
+                    this->Scan4(std::move(result), result.indexOf(conditionsIter->subject.value), 
+						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
             }
         }
@@ -100,17 +103,20 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
                 }
                 else {
                     //option 5 - entity <prop> $c
-                    this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate), conditionsIter->object.value, std::move(conditionsIter->meta_variable));
+                    this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate),
+						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
             }
              else {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 7 - entity $b value
-                    this->Scan6(std::move(result), std::move(conditionsIter->subject), conditionsIter->predicate.value, std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+                    this->Scan6(std::move(result), std::move(conditionsIter->subject),
+						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
                 }
                 else {
                     //option 8 - entity $b $c
-                    this->Scan7(std::move(result), std::move(conditionsIter->subject), conditionsIter->predicate.value, conditionsIter->object.value, std::move(conditionsIter->meta_variable));
+                    this->Scan7(std::move(result), std::move(conditionsIter->subject),
+						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
             }
         }
@@ -154,7 +160,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 		auto newEntity = createEntity(newVar.second);
 		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
 		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
-		whereVars.add(std::move(newVar.first), VariableSetValue(entityPointer, 0, 0), VariableType::TypeEntityRef, "");
+		whereVars.add(whereVars.indexOf(newVar.first), VariableSetValue(entityPointer, 0, 0), VariableType::TypeEntityRef, "");
 	}
 	
 	//sort by entropy
@@ -245,7 +251,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
                     if (triple.meta_variable != "")
                     {
-						variableSet.add(std::move(triple.meta_variable),
+						variableSet.add(variableSet.indexOf(triple.meta_variable),
 							VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
 							model::types::SubType::ValueReference, "");
 					}
@@ -289,7 +295,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 								currentEntity->insertProperty(propertyId, clonedRecord);
 						
 								if (triple.meta_variable != "") {
-									variableSet.add(std::move(triple.meta_variable),
+									variableSet.add(variableSet.indexOf(triple.meta_variable),
 										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, clonedRecord->OrderingId()), propertyId, entityHandle),
 										model::types::SubType::ValueReference, "");
 								}
@@ -300,7 +306,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 else
                 {
 
-					auto values = variableSet.getData(triple.subject.value);
+					auto values = variableSet.getData(variableSet.indexOf(triple.subject.value));
 
                     for (auto val : values)
                     {

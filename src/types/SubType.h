@@ -1,5 +1,8 @@
 #ifndef FUZZY_MODEL_TYPES_SUBTYPE
-#define    FUZZY_MODEL_TYPES_SUBTYPE
+#define FUZZY_MODEL_TYPES_SUBTYPE
+
+#define SUBTYPE_VALUE_MASK 0b100000
+#define SUBTYPE_REFERENCE_MASK 0b010000
 
 namespace model {
     namespace types {
@@ -7,17 +10,16 @@ namespace model {
         // Enum for the different subtypes that are defined.
         enum class SubType
         {
-            TypeUndefined = 0,
-            TypeInt32,
-            TypeString,
-            TypeEntityRef,
-            TypeDate,
+            TypeUndefined = 0x0,
+			SUBTYPE_COUNT = 0x1,
 
-            //Used in query processing but cannot be stored
-            PropertyReference,
-            ValueReference,
-
-            SUBTYPE_COUNT
+			PropertyReference = SUBTYPE_REFERENCE_MASK | 0x0,
+			ValueReference = SUBTYPE_REFERENCE_MASK | 0x1,
+			
+			TypeInt32 = SUBTYPE_VALUE_MASK | 0x0,
+            TypeString = SUBTYPE_VALUE_MASK | 0x1,
+            TypeEntityRef = SUBTYPE_VALUE_MASK | 0x2,
+            TypeDate = SUBTYPE_VALUE_MASK | 0x3
         };
 
         // Strings corresponding to the enum entries.

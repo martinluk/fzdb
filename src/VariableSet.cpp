@@ -21,7 +21,8 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) {
     unsigned char count = 0;
     for (auto variableName : variableNames) {
         _variablesUsed[count] = false;
-        _metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, count++);            
+		_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, count++));
+		_typeMap.push_back(VariableType::TypeUndefined);       
     }
     
 }
@@ -29,8 +30,8 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) {
 void VariableSet::extend(std::string variableName) {
 	
 	_variablesUsed.push_back(false);
-	_metaData[variableName] = std::pair<VariableType, unsigned char>(VariableType::TypeUndefined, _size);
-	_size++;
+	_typeMap.push_back(VariableType::TypeUndefined);
+	_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, _size++));
 }
 
 unsigned int VariableSet::add(const std::vector<VariableSetValue>&& row) {
@@ -39,35 +40,34 @@ unsigned int VariableSet::add(const std::vector<VariableSetValue>&& row) {
 	return _values.size() - 1;
 }
 
-unsigned int VariableSet::add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar) {
+unsigned int VariableSet::add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar) {
 	std::vector<VariableSetValue> newRow(_size);
 	_values.push_back(newRow);
 	add(std::move(var), std::move(value), std::move(type), std::move(metaVar), _values.size() - 1);
 	return _values.size() - 1;
 }
 
-void VariableSet::add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row) {
+void VariableSet::add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row) {
 
     if (row >= _values.size()) {
         throw std::runtime_error("Attempting to add to a non-existent row");
     }
 
-    if (_metaData.find(var) == _metaData.cend()) {
+    if (_nameMap.right.find(var) == _nameMap.right.end()) {
         throw std::runtime_error("Unexpected variable");
     }
     else {
-
-		if (type != _metaData[var].first) {
-			if (_metaData[var].first == VariableType::TypeUndefined) {
-				_metaData[var].first = type;
+		
+		if (type != _typeMap[var]) {
+			if (_typeMap[var] == VariableType::TypeUndefined) {
+				_typeMap[var] = type;
 			}
 			else {
 				throw std::runtime_error("Attempted to mix variable types!");
 			}
 		}
 
-        unsigned char offset = _metaData[var].second;
-        _variablesUsed[offset] = true;
+        _variablesUsed[var] = true;
 
 		if (metaVar != "") {
 			unsigned int metaRef = getMetaRef();
@@ -77,20 +77,20 @@ void VariableSet::add(const std::string&& var, VariableSetValue&& value, const V
 			value.metaRef(metaRef);
 			vsv2.metaRef(metaRef);
 
-			add(std::move(metaVar), std::move(vsv2), model::types::SubType::ValueReference, "");
+			add(indexOf(metaVar), std::move(vsv2), model::types::SubType::ValueReference, "");
 		}
 
         //_values[row][_metaData[var].second] = value;
-        _values[row].erase(_values[row].begin() + offset);
-        _values[row].emplace(_values[row].begin() + offset, value);
+        _values[row].erase(_values[row].begin() + var);
+        _values[row].emplace(_values[row].begin() + var, value);
     }
 }
 
-std::vector<unsigned int> VariableSet::find(const std::string varName, const std::string value) {
-    auto col = _metaData[varName].second;
+std::vector<unsigned int> VariableSet::find(const unsigned int varId, const std::string value) {
+
     std::vector<unsigned int> output;
     for (unsigned int i = 0; i < _values.size(); i++) {
-        if (_values[i][col].dataPointer()->Equals(value)) output.push_back(i);
+        if (_values[i][varId].dataPointer()->Equals(value)) output.push_back(i);
     }
     return output;
 }
@@ -99,40 +99,46 @@ std::vector<std::vector<VariableSetValue>>* VariableSet::getData() {
     return &_values;
 }
 
-std::vector<VariableSetValue> VariableSet::getData(const std::string varName) {
-    auto col = _metaData[varName].second;
+std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) {
+
     std::vector<VariableSetValue> output;
     std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::vector<VariableSetValue> row) {
-        return row[col];
+        return row[varId];
     });
     return output;
 }
+//
+//std::map<std::string, std::pair<VariableType, unsigned char>> VariableSet::getMetaData() {
+//    return _metaData;
+//}
 
-std::map<std::string, std::pair<VariableType, unsigned char>> VariableSet::getMetaData() {
-    return _metaData;
+const bool VariableSet::contains(const std::string name) const {
+	return _nameMap.left.find(name) != _nameMap.left.end();
 }
 
-const bool VariableSet::contains(std::string name) {
-    return _metaData.find(name) != _metaData.cend();
+const bool VariableSet::contains(const unsigned int id) const {
+	return _nameMap.right.find(id) != _nameMap.right.end();
 }
 
-const bool VariableSet::used(std::string name) {
-    return _variablesUsed[_metaData[name].second];
+const bool VariableSet::used(const std::string name) const {
+    return _variablesUsed[_nameMap.left.at(name)];
 }
 
-const VariableType VariableSet::typeOf(std::string name) {
-    return _metaData[name].first;
+const bool VariableSet::used(unsigned int id) const
+{
+	return _variablesUsed[id];
 }
 
-const VariableType VariableSet::typeOf(unsigned char id) {
-	for (auto md : _metaData) {
-		if (md.second.second == id)return md.second.first;
-	}
-	return VariableType::TypeUndefined;
+const VariableType VariableSet::typeOf(const std::string name) const {
+	return _typeMap.at(_nameMap.left.at(name));
 }
 
-const unsigned char VariableSet::indexOf(std::string name) {
-    return _metaData[name].second;
+const VariableType VariableSet::typeOf(const unsigned char id) const {
+	return _typeMap.at(id);
+}
+
+const unsigned char VariableSet::indexOf(const std::string name) const {
+	return _nameMap.left.at(name);
 }
 
 const unsigned int VariableSet::getMetaRef() {
@@ -177,28 +183,28 @@ void VariableSet::trimEmptyRows() {
     }), _values.end());
 }
 
-std::vector<std::vector<VariableSetValue>> VariableSet::extractRowsWith(std::string variable, std::string value) {
+std::vector<std::vector<VariableSetValue>> VariableSet::extractRowsWith(const unsigned int variable, const std::string value) const {
 	std::vector<std::vector<VariableSetValue>> results;
 	for (auto row : _values) {
-		if (!row[_metaData[variable].second].empty() && row[_metaData[value].second].dataPointer()->Equals(value)) {
+		if (!row[variable].empty() && row[variable].dataPointer()->Equals(value)) {
 			results.emplace_back(row);
 		}
 	}
 	return results;
 }
 
-std::vector<std::vector<VariableSetValue>> VariableSet::extractRowsWith(std::string variable) {
+std::vector<std::vector<VariableSetValue>> VariableSet::extractRowsWith(const unsigned int variable) const {
 	std::vector<std::vector<VariableSetValue>> results;
 	for (auto row : _values) {
-		if (!row[_metaData[variable].second].empty()) {
+		if (!row[variable].empty()) {
 			results.emplace_back(row);
 		}
 	}
 	return results;
 }
 
-void VariableSet::removeRowsWith(std::string variable) {
+void VariableSet::removeRowsWith(const unsigned int variable) {
 	_values.erase(std::remove_if(_values.begin(), _values.end(), [&, this, variable](std::vector<VariableSetValue> row) {
-		return !row[_metaData[variable].second].empty();
+		return !row[variable].empty();
 	}), _values.end());
 }

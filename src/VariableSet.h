@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <iterator>
 #include <algorithm>
+#include <boost/bimap.hpp>
 
 #include "./types/Base.h"
 
@@ -68,27 +69,28 @@ public:
 
 	unsigned int add(const std::vector<VariableSetValue>&& row);
     
-    unsigned int add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar);
+    unsigned int add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar);
 
-    void add(const std::string&& var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row);
+    void add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row);
 
-    std::vector<unsigned int> find(const std::string varName, const std::string value);
+    std::vector<unsigned int> find(const unsigned int varId, const std::string value);
 
     std::vector<std::vector<VariableSetValue>>* getData();
 
-    std::vector<VariableSetValue> getData(const std::string varName);
+    std::vector<VariableSetValue> getData(const unsigned int varId);
 
-    std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData();
+    //std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData();
 
-    const bool contains(std::string name);
+    const bool contains(const std::string name) const;
+	const bool contains(const unsigned int id) const;
 
-    const bool used(std::string name);
+    const bool used(const std::string name) const;
+	const bool used(unsigned int id) const;
 
-    const VariableType typeOf(std::string name);
+    const VariableType typeOf(const std::string name) const;
+	const VariableType typeOf(const unsigned char id) const;
 
-	const VariableType typeOf(unsigned char id);
-
-    const unsigned char indexOf(std::string name);
+    const unsigned char indexOf(const std::string name) const;
 
     const unsigned int getMetaRef();
 
@@ -99,14 +101,15 @@ public:
     //this doesn't seem to work
     void trimEmptyRows();
 
-	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable, std::string value);
+	std::vector<std::vector<VariableSetValue>> extractRowsWith(const unsigned int variable, const std::string value) const;
 
-	std::vector<std::vector<VariableSetValue>> extractRowsWith(std::string variable);
+	std::vector<std::vector<VariableSetValue>> extractRowsWith(const unsigned int variable) const;
 
-	void removeRowsWith(std::string variable);
+	void removeRowsWith(const unsigned int variable);
 
 private:
-    std::map<std::string, std::pair<VariableType, unsigned char>> _metaData;
+	boost::bimap<std::string, unsigned int> _nameMap;
+	std::vector<model::types::SubType> _typeMap;
     std::vector<std::vector<VariableSetValue>> _values;
     std::vector<bool> _variablesUsed;
     unsigned int _size;
