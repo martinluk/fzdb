@@ -4,7 +4,8 @@
 #include "../user/Permission.h"
 #include "../user/UserOperation.h"
 
-UserLoginJob::UserLoginJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password) : Job(session) {
+UserLoginJob::UserLoginJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password)
+    : Job(session,PermType::ViewDB) {
     _username=username;
     _password=password;
     _session=session;

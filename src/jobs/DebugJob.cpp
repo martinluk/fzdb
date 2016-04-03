@@ -6,7 +6,7 @@
 #include "DebugLoadFile.h"
 #include "DebugDumpEntities.h"
 
-DebugJob::DebugJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session)
+DebugJob::DebugJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
 {
     _message = message;
 }

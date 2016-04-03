@@ -4,15 +4,18 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
-Job::Job(std::shared_ptr<ISession> session)
+Job::Job(std::shared_ptr<ISession> session, PermType permtype)
 {
     _session = session;
     _database = NULL;
+    _permtype = permtype;
 }
 
 QueryResult Job::execute()
 {
     QueryResult result;
+
+    //TODO(Martin) Check session permission matches with the the session
     
     // Jonathan: This is a bit of a hack, really. Listen for any uncaught exceptions and return a generic error.
     // Really we should define a base exception class that allows the query result error code to be

@@ -1,6 +1,6 @@
 #include "Ping.h"
 
-PingJob::PingJob(std::shared_ptr<ISession> session) : Job(session)
+PingJob::PingJob(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp)
 {
 }
 

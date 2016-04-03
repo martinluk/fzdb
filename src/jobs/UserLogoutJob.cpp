@@ -4,7 +4,8 @@
 #include "../user/Permission.h"
 #include "../user/UserOperation.h"
 
-UserLogoutJob::UserLogoutJob(std::shared_ptr<ISession> session) : Job(session) {
+UserLogoutJob::UserLogoutJob(std::shared_ptr<ISession> session) 
+    : Job(session,PermType::ViewDB) {
     _session=session;
 }
 

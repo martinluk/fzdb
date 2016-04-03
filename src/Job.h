@@ -7,13 +7,14 @@
 
 //class Database;
 #include "./model/Database.h"
+#include "./user/Permission.h"
 
 class Job 
 {
 public:
-    Job(std::shared_ptr<ISession> session) ;
+    typedef Permission::PermissionType PermType;
+    Job(std::shared_ptr<ISession> session, PermType permtype) ;
     virtual ~Job() {}
-
     // Called to execute the functionality of the job.
     QueryResult execute();
     
@@ -23,6 +24,7 @@ public:
     // - If the operation is not const, override executeNonConst().
     // - When accessing the database, ONLY use the _database protected member, not Singletons!
     // - If you need to modify one of your member variables in executeConst(), declare it as mutable.
+    // - Construtor includes PermissionType {ViewDB, ModifyDB, UserOp}
     
     // Executed if a job does not modify data.
     virtual QueryResult executeConst() const 
@@ -47,6 +49,7 @@ public:
         return _session;
     }
 protected:
+    Permission::PermissionType _permtype;
     std::shared_ptr<ISession> _session;
     Database* _database;
 };

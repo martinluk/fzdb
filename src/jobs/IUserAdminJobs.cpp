@@ -1,6 +1,6 @@
 #include "IUserAdminJobs.h"
 
-IUserAdminJobs::IUserAdminJobs(std::shared_ptr<ISession> session):Job(session) {
+IUserAdminJobs::IUserAdminJobs(std::shared_ptr<ISession> session):Job(session, PermType::UserOp) {
 }
 
 bool IUserAdminJobs::hasAdminPermissions() const

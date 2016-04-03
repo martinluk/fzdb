@@ -4,7 +4,7 @@
 
 #include "../Exceptions.h"
 
-Flush::Flush(std::shared_ptr<ISession> session) : Job(session)
+Flush::Flush(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp)
 {
 }
 
