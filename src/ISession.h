@@ -20,9 +20,8 @@ public:
     virtual ~ISession() {}    
     std::string username() const { return _username; }
     unsigned int userId() const { return _userId; }
-    Permission::UserGroup getUserGroup() {
-        UserOperation uo;
-        return uo.getUserGroup(_username);
+    Permission::UserGroup const getUserGroup() {
+        return _usergroup;
     }
 
 protected:
@@ -30,6 +29,7 @@ protected:
     virtual void handle_write(const boost::system::error_code& error) = 0;
 
 private:
+    Permission::UserGroup _usergroup = Permission::UserGroup::GUEST;
     std::string _username = ""; //Empty string as guest
     unsigned int _userId = 0;
 
@@ -41,6 +41,7 @@ private:
     void setCurrentUserName(const std::string &username) {
         _username = username;
     }
+    void setUserGroup(Permission::UserGroup ug) {_usergroup=ug;}
     void clearCurrentUserName() { _username.clear(); }
 };
 

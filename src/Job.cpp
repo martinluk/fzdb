@@ -22,16 +22,17 @@ QueryResult Job::execute()
     // Still, better to return a generic error code than for the database to crash out.
     try
     {
-        //TODO(Martin) Check session permission matches with the the session using Permission::CheckPermission
-        Permission::UserGroup usergroup = _session->getUserGroup();
-        bool hasPermission=Permission::checkPermission(usergroup, _permtype);
+        //Check session permission matches with the the session
+        std::string username = _session->username();
+        //Read user group
+        Permission::UserGroup currentUsergroup= _session->getUserGroup();
+        bool hasPermission= Permission::checkPermission(currentUsergroup, _permtype);
 
         if(!hasPermission) {
             result.setErrorCode(QueryResult::ErrorCode::InsufficientPermissions);
             result.setInfo("Insufficient permission to run the job");
             //TODO Make more informative information, 
             //Perhaps including job name(?), current perm and least perm (?)
-            spdlog::get("main")->warn("[{:<}] {:<30}", _uuid, "Blocked a job execution as insufficient permission.");
             return result;
         }
 

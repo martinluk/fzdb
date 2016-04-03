@@ -38,6 +38,7 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
 
     session->userId(_userFileCache[userName].id);
     session->setCurrentUserName(userName);
+    session->setUserGroup(currUserAttr.userGroup);
 
     return currUserAttr.userGroup;
 }
