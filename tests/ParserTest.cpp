@@ -67,7 +67,6 @@ TEST_F(ParserTestIdentifyToken, UserPromoteQueryParseTest) {
     assertQueryThrow("USER PROMOTE username username2 username3");
 }
 
-/*
 TEST_F(ParserTestIdentifyToken, UserLoginQueryParseTest) {
     assertQueryParse("USER LOGIN username password", QueryType::USER_LOGIN,
             "username", "password");
@@ -78,6 +77,7 @@ TEST_F(ParserTestIdentifyToken, UserLoginQueryParseTest) {
     //XXX Format string should also be tested.
 }
 
+/*
 TEST_F(ParserTestIdentifyToken, UserAddQueryParseTest) {
     assertQueryParse("USER ADD username password", QueryType::USER_ADD,
             "username", "password");

@@ -648,6 +648,8 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                     iter++;
                     //iter now=arg1
                     data0 = iter->second; //Retrieve data from first argument
+                    //FIXME iter++ here creates segfault,
+                    //but leaving here iter!=tokens.end()
                     break;
                 case 2:
                     iter++;
@@ -656,12 +658,15 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                     iter++;
                     //iter now=arg2
                     data1 = iter->second; //Retrieve data from second argument
+                    //FIXME iter++ here creates segfault,
+                    //but leaving here iter!=tokens.end()
                     break;
                 default:
                     assert(numberOfArg>=0 /*Make sure numberOfArg is assigned*/);
                     assert(numberOfArg<=2 /*Query class only accept two args at most, implement otherwise if nessasary*/);
             }
             //Should be finish parsing USER
+            /*
             if (iter != tokens.end()) {
                 std::string leftover = iter->second;
                 int numberMore = 0;
@@ -674,6 +679,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                         "Number of tokens to go:" + std::to_string(numberMore)
                         );
             }
+            */
             break;
         }
 
