@@ -1,7 +1,7 @@
 #include "Echo.h"
 
 EchoJob::EchoJob(std::shared_ptr<ISession> session, const std::string &message) : 
-    Job(session, PermType::UserOp) {
+    Job(session, PermType::ViewDB) {
     _message = message;
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "../ISession.h"
 #include "../session.h"
 #include "../Job.h"
 

@@ -1,7 +1,7 @@
-#include "./IUserAdminJobs.h"
+#include "../Job.h"
 
 // Promotes an editor to an admin. Requires admin privileges.
-class PromoteEditorJob : public IUserAdminJobs {
+class PromoteEditorJob : public Job {
     public:
         PromoteEditorJob(std::shared_ptr<ISession> session, const std::string &username);
         

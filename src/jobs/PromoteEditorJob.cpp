@@ -5,15 +5,11 @@
 #include <stdexcept>
 
 PromoteEditorJob::PromoteEditorJob(std::shared_ptr<ISession> session, const std::string &username):
-    IUserAdminJobs(session) {
+    Job(session, PermType::UserOp) {
     _username = username;
 }
 
-QueryResult PromoteEditorJob::executeNonConst()
-{
-    if ( !hasAdminPermissions() )
-        return errorNoAdminPermissions();
-    
+QueryResult PromoteEditorJob::executeNonConst() {
     try {
         Permission::UserGroup group = _database->users().getUserGroup(_username); //Throws user not exist exception
         if (group != Permission::UserGroup::EDITOR) {

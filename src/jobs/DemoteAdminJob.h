@@ -1,7 +1,7 @@
-#include "./IUserAdminJobs.h"
+#include "../Job.h"
 
 // Demotes an admin back to an editor. Requires admin privileges.
-class DemoteAdminJob : public IUserAdminJobs {
+class DemoteAdminJob : public Job {
     public:
         DemoteAdminJob(std::shared_ptr<ISession> session, const std::string &username);
         
