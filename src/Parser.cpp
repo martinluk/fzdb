@@ -93,6 +93,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     else if (str == "FINAL") tokenType = ParsedTokenType::KEYWORD_FINAL;
     else if (str == "FLUSH") tokenType = ParsedTokenType::KEYWORD_FLUSH;
     else if (str == "CANON") tokenType = ParsedTokenType::KEYWORD_CANON;
+    else if (str == "USER") tokenType = ParsedTokenType::KEYWORD_USER;
 
     return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
