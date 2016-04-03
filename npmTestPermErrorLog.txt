@@ -1,0 +1,880 @@
+[15:49 matann@matann-LIFEBOOK-LH772 fzdb] > npm test
+
+> fuzzy_database@0.5.0 test /home/matann/fzdb
+> jasmine
+
+Started
+F.FFFFFFFF..FFFFFFFF..FFFFFFFF.FF..FF.FF.FF...FFFF.FFFFFFFFFFFFF.FFF...FFF..F..FF.FFFFF
+
+Failures:
+1) Fuzzy Database NANA
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+2) Fuzzy Database NANA
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+3) Fuzzy Database sends the command over TCP Inserting entities with a subsetOf
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: 'Inserted 3 triples.', result: Object({ type: 'fsparql', data: Object({ a: '2', b: '3' }) }
+) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: 'Inserted 3 triples.', result: Object({ type: 'fsparql', data: Object({ a: '2', b: '
+3' }) }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+4) Fuzzy Database sends the command over TCP Retrieving entities entities with a subsetOf
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ id: '3', other: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ id: '3', other: '2' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+5) Fuzzy Database sends the command over TCP with the simpsons data loaded retrieving all forena
+mes and surnames
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ forename: 'Homer', surname: 'Simpson' }), Object({ forename: 'Homer',
+surname: 'Power' }), Object({ forename: 'Max', surname: 'Simpson' }), Object({ forename: 'Max',
+surname: 'Power' }), Object({ forename: 'Marge', surname: 'Simpson' }), Object({ forename: 'Marg
+e', surname: 'Bouvier' }), Object({ forename: 'Ned', surname: 'Flanders' }), Object({ forename:
+'Moe', surname: 'Szyslak' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ forename: 'Homer', surname: 'Simpson' }), Object({ forename: 'H
+omer', surname: 'Power' }), Object({ forename: 'Max', surname: 'Simpson' }), Object({ forename:
+'Max', surname: 'Power' }), Object({ forename: 'Marge', surname: 'Simpson' }), Object({ forename
+: 'Marge', surname: 'Bouvier' }), Object({ forename: 'Ned', surname: 'Flanders' }), Object({ for
+ename: 'Moe', surname: 'Szyslak' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+6) Fuzzy Database sends the command over TCP with the simpsons data loaded killer query 1
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Simpson', b: '10' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Simpson', b: '10' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+7) Fuzzy Database sends the command over TCP Adding 150 entities
+  Message:
+    Expected 'Insufficient permission to run the job' to equal 'Inserted 350 triples.'.
+  Stack:
+    Error: Expected 'Insufficient permission to run the job' to equal 'Inserted 350 triples.'.
+        at /home/matann/fzdb/spec/largeQuerySpec.js:28:86
+        at /home/matann/fzdb/spec/support/helper.js:50:9
+        at process._tickCallback (node.js:369:9)
+
+8) Fuzzy Database sends the command over TCP Retrieving entities which have a profession set - 5
+0 entities
+  Message:
+    Error: Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_
+TIMEOUT_INTERVAL.
+  Stack:
+    Error: Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_
+TIMEOUT_INTERVAL.
+        at Timer.listOnTimeout (timers.js:92:15)
+
+9) Fuzzy Database sends the command over TCP Retrieving entities which have the forename set - 1
+50 entities
+  Message:
+    Error: Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_
+TIMEOUT_INTERVAL.
+  Stack:
+    Error: Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_
+TIMEOUT_INTERVAL.
+        at Timer.listOnTimeout (timers.js:92:15)
+
+10) Fuzzy Database sends the command over TCP getting the forename of entity:1
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:54:22
+        at process._tickCallback (node.js:369:9)
+
+11) Fuzzy Database sends the command over TCP getting the surname of entity:2
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:63:22
+        at process._tickCallback (node.js:369:9)
+
+12) Fuzzy Database sends the command over TCP link entity 1 and entity 2
+  Message:
+    Expected Object({ status: false, errorCode: 2, info: 'Parse error: Invalid arguments to link
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Entities undefined and undefined linked successfu
+lly.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 2, info: 'Parse error: Invalid arguments
+to link', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Entities undefined and undefined linked su
+ccessfully.' }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:72:22
+        at process._tickCallback (node.js:369:9)
+
+13) Fuzzy Database sends the command over TCP getting the forename of entity:1 after link
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:81:22
+        at process._tickCallback (node.js:369:9)
+
+14) Fuzzy Database sends the command over TCP getting the surname of entity:2 after link
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:90:22
+        at process._tickCallback (node.js:369:9)
+
+15) Fuzzy Database sends the command over TCP unlink entity 1 and entity 2
+  Message:
+    Expected Object({ status: false, errorCode: 2, info: 'Parse error: Invalid arguments to unli
+nk', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0,
+ info: '', result: Object({ type: 'text', data: 'Entities undefined and undefined unlinked succe
+ssfully.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 2, info: 'Parse error: Invalid arguments
+to unlink', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorC
+ode: 0, info: '', result: Object({ type: 'text', data: 'Entities undefined and undefined unlinke
+d successfully.' }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:99:22
+        at process._tickCallback (node.js:369:9)
+
+16) Fuzzy Database sends the command over TCP getting the forename of entity:1 after unlink
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:108:22
+        at process._tickCallback (node.js:369:9)
+
+17) Fuzzy Database sends the command over TCP getting the surname of entity:2 after unlink
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/linkQuerySpec.js:117:22
+        at process._tickCallback (node.js:369:9)
+
+18) Fuzzy Database sends the command over TCP getting the forename of entity:1
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/mergeQuerySpec.js:54:22
+        at process._tickCallback (node.js:369:9)
+
+19) Fuzzy Database sends the command over TCP getting the surname of entity:2
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/mergeQuerySpec.js:63:22
+        at process._tickCallback (node.js:369:9)
+
+20) Fuzzy Database sends the command over TCP merge entity 1 and entity 2
+  Message:
+    Expected Object({ status: false, errorCode: 2, info: 'Parse error: Invalid arguments to link
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Entities undefined and undefined merged successfu
+lly.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 2, info: 'Parse error: Invalid arguments
+to link', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Entities undefined and undefined merged su
+ccessfully.' }) }).
+        at /home/matann/fzdb/spec/mergeQuerySpec.js:72:22
+        at process._tickCallback (node.js:369:9)
+
+21) Fuzzy Database sends the command over TCP getting the forename of entity:1 after merge
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/mergeQuerySpec.js:81:22
+        at process._tickCallback (node.js:369:9)
+
+22) Fuzzy Database sends the command over TCP getting the surname of entity:2 after merge
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+        at /home/matann/fzdb/spec/mergeQuerySpec.js:90:22
+        at process._tickCallback (node.js:369:9)
+
+23) Fuzzy Database sends the command over TCP getting properties of entity:2
+  Message:
+    Expected Object({ status: false, errorCode: 2, info: 'Parse error: Unknown symbol: entity:un
+defined', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'fsparql', data: [  ] }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 2, info: 'Parse error: Unknown symbol: en
+tity:undefined', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, e
+rrorCode: 0, info: '', result: Object({ type: 'fsparql', data: [  ] }) }).
+        at /home/matann/fzdb/spec/mergeQuerySpec.js:99:22
+        at process._tickCallback (node.js:369:9)
+
+24) Fuzzy Database with simpsons data loaded has meta data functionality :  simple test :  sanit
+y check
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+25) Fuzzy Database with simpsons data loaded has meta data functionality :  simple test :  no re
+strictions on meta value
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+26) Fuzzy Database with simpsons data loaded has meta data functionality :  simple test :  meta
+value restricted and true
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+27) Fuzzy Database with simpsons data loaded has meta data functionality :  retrieving meta valu
+es source
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '0', c: 'Homer' }), Object({ a: '0', c: 'Max' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '0', c: 'Homer' }), Object({ a: '0', c: 'Max' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+28) Fuzzy Database sends the command over TCP with the simpsons data loaded retrieving all entit
+ies with the same forename and surname 2
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at /home/matann/fzdb/spec/support/helper.js:52:22
+        at process._tickCallback (node.js:369:9)
+
+29) Fuzzy Database sends the command over TCP 'PONG'
+  Message:
+    Expected Object({ type: 'text', data: '' }) to equal Object({ type: 'text', data: 'PONG' }).
+  Stack:
+    Error: Expected Object({ type: 'text', data: '' }) to equal Object({ type: 'text', data: 'PO
+NG' }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:26:35)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+30) Fuzzy Database sends the command over TCP getting the forename of entity:2
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Fred' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Fred' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:45:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+31) Fuzzy Database sends the command over TCP getting entities with forename 'Fred'
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:54:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+32) Fuzzy Database sends the command over TCP getting the surname of entity:3
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Flanders' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Flanders' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:72:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+33) Fuzzy Database sends the command over TCP flush everything
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:82:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+34) Fuzzy Database sends the command over TCP getting entities with forename Marco
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }), Object({ a: '4' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }), Object({ a: '4' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:116:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+35) Fuzzy Database sends the command over TCP getting entities with forename Marco and surname R
+eus
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:126:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+36) Fuzzy Database sends the command over TCP getting entities with age 34
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '3' }), Object({ a: '4' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '3' }), Object({ a: '4' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:136:29)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+37) Fuzzy Database sends the command over TCP getting entities with surname Polo and age 34 - no
+ entities
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '4' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '4' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:146:29)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+38) Fuzzy Database sends the command over TCP In this case, select option 2, should retrieve all
+ three entities, as all three have the drinks property set
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }), Object({ a: '3' }), Object({ a: '4' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }), Object({ a: '3' }), Object({ a: '4' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:166:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+39) Fuzzy Database sends the command over TCP In this case, select option 2, should retrieve the
+ drinks value and the profession value
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ b: 'Beer', c: 'Bartender' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ b: 'Beer', c: 'Bartender' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:197:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+40) Fuzzy Database sends the command over TCP In this case, select option 2, should retrieve ent
+ity 3, as it is the only one which has both the drinks and profession properties set
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '3' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '3' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:207:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+41) Fuzzy Database sends the command over TCP Testing select option 2, should retrieve the profe
+ssion of entity 3, which is a Bartender
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ b: 'Bartender' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ b: 'Bartender' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:217:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+42) Fuzzy Database sends the command over TCP Testing select option 2, should retrieve only enti
+ty 3, which has a profession property set
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '3' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '3' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:227:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+43) Fuzzy Database sends the command over TCP Testing select option 2, should retrieve only enti
+ties 2, 3 and 4, which have a drinks property set
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }), Object({ a: '3' }), Object({ a: '4' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }), Object({ a: '3' }), Object({ a: '4' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:236:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+44) Fuzzy Database sends the command over TCP Select entities which contain Marco
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }), Object({ a: '4' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }), Object({ a: '4' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:246:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+45) Fuzzy Database sends the command over TCP Retrieving the surname of entity 2
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:286:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+46) Fuzzy Database sends the command over TCP Retrieving the surnames of entities 2 and 3
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }), Object({ b: 'Szyslak' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }), Object({ b: 'Szyslak' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:296:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+47) Fuzzy Database sends the command over TCP This test should retrieve nothing
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }), Object({ a: 'Szyslak' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }), Object({ a: 'Szyslak' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:306:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+48) Fuzzy Database sends the command over TCP Retrieving drinks property of entity 2
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Water' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Water' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:316:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+49) Fuzzy Database sends the command over TCP Retrieving the surname of entity 3
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Szyslak' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Szyslak' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:326:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+50) Fuzzy Database sends the command over TCP Retrieving the profession property of entity 3
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Bartender' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Bartender' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:336:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+51) Fuzzy Database sends the command over TCP Checking if option 7 returns the property that has
+ Marco as a value
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'forename' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'forename' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:356:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+52) Fuzzy Database sends the command over TCP Checking if option 7 returns for entity 2, the pro
+perty that has Marco as a value and that it returns for entity 3 the property that has 34 as a v
+alue
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'forename' }), Object({ b: 'age' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'forename' }), Object({ b: 'age' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:366:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+53) Fuzzy Database sends the command over TCP flush everything
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:376:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+54) Fuzzy Database sends the command over TCP Checking if option 5 works - if the entity exists
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:409:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+55) Fuzzy Database sends the command over TCP Checking if option 5 works - if the entity exists
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }), Object({ b: 'Moe' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }), Object({ b: 'Moe' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:419:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+56) Fuzzy Database sends the command over TCP Checking if option 5 works - if the entity exists
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }), Object({ b: 'Moe' }), Object({ c: '34' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }), Object({ b: 'Moe' }), Object({ c: '34' }) ] }) })
+.
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:429:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+57) Fuzzy Database sends the command over TCP flush everything
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:459:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+58) Fuzzy Database sends the command over TCP Retrieving the wife of entity:2 which is entity:3
+  Message:
+    Expected Object({ status: false, errorCode: 2, info: 'Parse error: Unknown symbol: entity:un
+defined', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'fsparql', data: [ Object({ a: undefined }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 2, info: 'Parse error: Unknown symbol: en
+tity:undefined', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, e
+rrorCode: 0, info: '', result: Object({ type: 'fsparql', data: [ Object({ a: undefined }) ] }) }
+).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:489:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+59) Fuzzy Database sends the command over TCP flush everything
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:499:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+60) Fuzzy Database sends the command over TCP Checking if option 5 works - if the entity exists
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: 'Reus' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: 'Reus' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:518:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+61) Fuzzy Database sends the command over TCP NANA
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: '', result: Object({ type: 'text', data: 'Database cleared.' }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:529:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+62) Fuzzy Database sends the command over TCP Creating a simple hierarchy
+  Message:
+    Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run the job
+', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCode: 0, i
+nfo: 'Inserted 3 triples.', result: Object({ type: 'fsparql', data: Object({ eng: '2', lon: '3'
+}) }) }).
+  Stack:
+    Error: Expected Object({ status: false, errorCode: 6, info: 'Insufficient permission to run
+the job', result: Object({ type: 'text', data: '' }) }) to equal Object({ status: true, errorCod
+e: 0, info: 'Inserted 3 triples.', result: Object({ type: 'fsparql', data: Object({ eng: '2', lo
+n: '3' }) }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:539:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+63) Fuzzy Database sends the command over TCP Querying the hierarchy for superset link
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '2' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '2' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:548:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+64) Fuzzy Database sends the command over TCP Querying the hierarchy for subset link
+  Message:
+    Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fsparql', da
+ta: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'f
+sparql', data: [ Object({ a: '3' }) ] }) }).
+  Stack:
+    Error: Expected Object({ status: true, errorCode: 0, info: '', result: Object({ type: 'fspar
+ql', data: [  ] }) }) to equal Object({ status: true, errorCode: 0, info: '', result: Object({ t
+ype: 'fsparql', data: [ Object({ a: '3' }) ] }) }).
+        at Socket.<anonymous> (/home/matann/fzdb/spec/sampleQuerySpec.js:557:28)
+        at Socket.g (events.js:260:16)
+        at emitOne (events.js:77:13)
+        at Socket.emit (events.js:169:7)
+
+87 specs, 64 failures
+Finished in 21.677 seconds
+npm ERR! Test failed.  See above for more details.
+[15:50 matann@matann-LIFEBOOK-LH772 fzdb] >

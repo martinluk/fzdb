@@ -15,8 +15,6 @@ QueryResult Job::execute()
 {
     QueryResult result;
 
-    //TODO(Martin) Check session permission matches with the the session
-    
     // Jonathan: This is a bit of a hack, really. Listen for any uncaught exceptions and return a generic error.
     // Really we should define a base exception class that allows the query result error code to be
     // propagated back, and then not do any exception handling at all in any of the job subclasses
@@ -24,6 +22,19 @@ QueryResult Job::execute()
     // Still, better to return a generic error code than for the database to crash out.
     try
     {
+        //TODO(Martin) Check session permission matches with the the session using Permission::CheckPermission
+        Permission::UserGroup usergroup = _session->getUserGroup();
+        bool hasPermission=Permission::checkPermission(usergroup, _permtype);
+
+        if(!hasPermission) {
+            result.setErrorCode(QueryResult::ErrorCode::InsufficientPermissions);
+            result.setInfo("Insufficient permission to run the job");
+            //TODO Make more informative information, 
+            //Perhaps including job name(?), current perm and least perm (?)
+            spdlog::get("main")->warn("[{:<}] {:<30}", _uuid, "Blocked a job execution as insufficient permission.");
+            return result;
+        }
+
         if ( constOperation() )
         {
             // Get a shared lock - no limit on these.

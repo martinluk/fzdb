@@ -1,6 +1,8 @@
 #ifndef FUZZYDB_ISESSION
 #define FUZZYDB_ISESSION
 
+#include <user/Permission.h>
+#include <user/UserOperation.h>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -18,6 +20,10 @@ public:
     virtual ~ISession() {}    
     std::string username() const { return _username; }
     unsigned int userId() const { return _userId; }
+    Permission::UserGroup getUserGroup() {
+        UserOperation uo;
+        return uo.getUserGroup(_username);
+    }
 
 protected:
     virtual void handle_read(const boost::system::error_code& error, size_t bytes_transferred) = 0;
