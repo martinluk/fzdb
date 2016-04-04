@@ -46,7 +46,7 @@ describe("Fuzzy Database", function() {
       "login_to_admin" : "USER LOGIN"+space+admin_username+space+admin_pwd
   };
 
-  fdescribe("User Queries:", function() {
+  describe("User Queries:", function() {
     describe("Guests not allowed to", function() {
         it("run insert query", function(done) {
             assertNotEnoughPermission(sampleQuery.insert,done);
