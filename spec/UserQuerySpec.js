@@ -71,49 +71,44 @@ describe("Fuzzy Database", function() {
         });
         //TODO Load query
     });
-    var createEditorAccount = function(login, done) {
-        sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
-        addQ='USER ADD '+login.name+' '+login.password;
-        sendCmd(addQ).then(function(data) { done(); });
-        //Logout
-        sendCmd(sampleQuery.logout).then(function(data) { done(); });
-        done();
-    }
-    var removeEditorAccount = function(login, done) {
-        sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
-        dQ='USER DELETE '+login.name;
-        sendCmd(dQ).then(function(data) { done(); });
-        //Logout
-        sendCmd(sampleQuery.logout).then(function(data) { done(); });
-        done();
-    }
-    var login = function(l, done) {
-        q='USER LOGIN '+l.name+' '+l.password;
-        sendCmd(q).then(function(data) { 
-            expect(data.info).toBe('Logged in successfully');
-            done();
-        });
-        done();
-    }
+
     fdescribe("editor not allowed to", function() {
-        var l={name:'editorAcc', password:'password'};
-        //Login as editor
-        beforeEach( function(done) {
-            createEditorAccount(l, done);
-            login(l,done);
-            done();
-        });
-        afterEach( function(done) {
-            removeEditorAccount(l,done);
-            done();
-        });
-        it("run flush query", function(done) {
-            assertNotEnoughPermission(sampleQuery.flush,done);
-            done();
+        var login={name:'editorAcc', password:'password'};
+        describe("run flush query", function() {
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Add User", function(done) {
+                addQ='USER ADD '+login.name+' '+login.password;
+                sendCmd(addQ).then(function(data) { done(); });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            it("Login to user", function(done) {
+                q='USER LOGIN '+login.name+' '+login.password;
+                sendCmd(q).then(function(data) { done(); });
+            });
+            it("Execute the command", function(done) {
+                assertNotEnoughPermission(sampleQuery.user_add,done);
+            });
+            it("Logout from user", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Delete the user", function(done) {
+                dQ='USER DELETE '+login.name;
+                sendCmd(dQ).then(function(data) { done(); });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            
         });
         /*
         it("run user add query", function(done) { 
-            assertNotEnoughPermission(sampleQuery.user_add,done);
         });
         it("run user promote query", function(done) { 
             assertNotEnoughPermission(sampleQuery.user_promote,done);
