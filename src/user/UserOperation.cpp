@@ -69,3 +69,24 @@ void UserOperation::removeUser(const std::string &userName)
     _idGen.addDeleted(oldUserId);
     UserFileOperations::removeUser(userName);
 }
+
+void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session,
+        const std::string &oldpassword, const std::string &newpassword) {
+    assert(session->getUserGroup()!=Permission::UserGroup::GUEST);
+    std::string userName = session->username();
+    UserAttributes a = getUserAttributes(userName);
+    //Check old password
+    std::string actualHash = a.passwordHash;
+    std::string currSalt = a.salt;
+    std::string ourHash =
+        Hashing::hashPassword(userName, currSalt , oldpassword);
+    if (ourHash != actualHash) {
+        throw LoginUnsuccessfulException();
+    }
+    //Get new salt
+    a.salt=Hashing::genSalt();
+    //gen new hash
+    a.passwordHash=Hashing::hashPassword(userName,a.salt,newpassword);
+    //hash new password
+    updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
+}
