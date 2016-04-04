@@ -75,7 +75,7 @@ namespace Permission
             case PermissionType::ViewDB:
                 return true;
             case PermissionType::ModifyDB:
-                return false;
+                return true;
             case PermissionType::UserOp:
                 return true;
             case PermissionType::LoggedInUser:
