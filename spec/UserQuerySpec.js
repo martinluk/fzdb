@@ -99,15 +99,16 @@ describe("Fuzzy Database", function() {
         var l={name:'editorAcc', password:'password'};
         //Login as editor
         beforeEach( function(done) {
+            createEditorAccount(l, done);
+            login(l,done);
             done();
         });
         afterEach( function(done) {
+            removeEditorAccount(l,done);
+            done();
         });
-        it("run flush query", function() {
-            createEditorAccount(l);
-            login(l);
+        it("run flush query", function(done) {
             assertNotEnoughPermission(sampleQuery.flush,done);
-            removeEditorAccount(l);
             done();
         });
         /*
