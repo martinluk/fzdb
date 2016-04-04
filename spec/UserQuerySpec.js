@@ -72,7 +72,7 @@ describe("Fuzzy Database", function() {
         //TODO Load query
     });
     
-    executeEditorFunction=function(name, command) {
+    assertEditorNotPermissiveFunction=function(name, command) {
         var login={name:'editorAcc', password:'password'};
         describe(name, function() {
             it("Log into Admin", function(done) {
@@ -109,9 +109,9 @@ describe("Fuzzy Database", function() {
     }
 
     describe("editor not allowed to", function() {
-        executeEditorFunction('flush command', 'FLUSH');
-        executeEditorFunction('promote command', sampleQuery.user_promote);
-        executeEditorFunction('demote command', sampleQuery.user_demote);
+        assertEditorNotPermissiveFunction('flush command', 'FLUSH');
+        assertEditorNotPermissiveFunction('promote command', sampleQuery.user_promote);
+        assertEditorNotPermissiveFunction('demote command', sampleQuery.user_demote);
 
     });
   });
