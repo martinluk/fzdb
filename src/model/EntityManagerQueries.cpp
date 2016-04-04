@@ -227,17 +227,17 @@ void EntityManager::ScanVVV(VariableSet&& variableSet, unsigned int variableId, 
 		for (auto prop : entity.second->properties()) {
 
 			auto rowId = variableSet.add(std::move(variableId),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(entity.first, 0), prop.first, entity.first),
+				std::make_shared<model::types::EntityRef>(entity.first, 0), prop.first, entity.first,
 				model::types::SubType::TypeEntityRef, std::move(metaVar));
 
 			variableSet.add(std::move(variableId2),
-				VariableSetValue(std::make_shared<model::types::Property>(prop.first, this, 0), prop.first, entity.first),
+				std::make_shared<model::types::Property>(prop.first, this, 0), prop.first, entity.first,
 				model::types::SubType::PropertyReference, std::move(metaVar), rowId);
 
 			auto type = _propertyTypes.at(prop.first);
 			std::shared_ptr<model::types::Base> val = entity.second->getProperty(prop.first)->baseValue(0)->Clone();
 			variableSet.add(std::move(variableId3),
-				VariableSetValue(std::move(val), prop.first, entity.first),
+				std::move(val), prop.first, entity.first,
 				std::move(type), std::move(metaVar), rowId);
 		}
 	}
@@ -326,7 +326,7 @@ void EntityManager::ScanVVR(VariableSet&& variableSet, unsigned int variableId, 
 
 		for (auto row : rows) {
 			variableSet.add(std::move(variableId),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), 0, iter->second->_handle),
+				std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), 0, iter->second->_handle,
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
 	}
@@ -367,7 +367,7 @@ void EntityManager::ScanUVR(VariableSet&& variableSet, unsigned int variableId, 
 
 		for (auto row : rows) {
 			variableSet.add(std::move(variableId),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId),
+				std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId,
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
 	}
@@ -420,7 +420,7 @@ void EntityManager::ScanVPV(VariableSet&& variableSet, unsigned int variableId, 
 
 		for (auto row : rows) {
 			variableSet.add(std::move(variableId),
-				VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), propertyId, iter->second->_handle),
+				std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), propertyId, iter->second->_handle,
 				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
 		}
 
@@ -449,11 +449,11 @@ void EntityManager::ScanVPU(VariableSet&& variableSet, unsigned int variableId, 
 
 				for (auto matchIter = matchValues.begin() + 1; matchIter < matchValues.end(); matchIter++) {
 
-					auto newRow = variableSet.add(std::move(variableId), VariableSetValue(entityRef->Clone(), propertyId, entityIter->second->getHandle()),
+					auto newRow = variableSet.add(std::move(variableId), entityRef->Clone(), propertyId, entityIter->second->getHandle(),
 						model::types::SubType::TypeEntityRef, std::move(metaVar));
 
-					variableSet.add(std::move(variableId2), VariableSetValue(iter->at(variableId2).dataPointer()->Clone(), propertyId,
-						entityIter->second->getHandle()), iter->at(variableId2).dataPointer()->subtype(), std::move(metaVar), newRow);
+					variableSet.add(std::move(variableId2), iter->at(variableId2).dataPointer()->Clone(), propertyId,
+						entityIter->second->getHandle(), iter->at(variableId2).dataPointer()->subtype(), std::move(metaVar), newRow);
 				}
 			}
 		}
@@ -581,8 +581,7 @@ void EntityManager::ScanVPR(VariableSet&& variableSet, unsigned int variableId, 
 		for (auto match : matches) {
 			auto newValue = std::make_shared<model::types::EntityRef>(currentEntity->getHandle(), 0);
 			newValue->OrderingId(match->OrderingId());
-			VariableSetValue vsv = VariableSetValue(newValue, propertyId, currentEntity->getHandle());
-			variableSet.add(std::move(variableId), std::move(vsv), model::types::SubType::TypeEntityRef, std::move(metaVar));
+			variableSet.add(std::move(variableId), newValue, propertyId, currentEntity->getHandle(), model::types::SubType::TypeEntityRef, std::move(metaVar));
 		}
 	}
 }
@@ -630,12 +629,11 @@ void EntityManager::ScanEVV(VariableSet&& variableSet, const model::Subject&& su
 		for (auto value : vals) {
 
 			auto rowId = variableSet.add(std::move(variableId),
-				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
+				std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0,
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
 			variableSet.add(std::move(variableId2),
-				VariableSetValue(value->Clone(), 0, 0),
-				std::move(_propertyTypes.at(propertyPair.first)), std::move(metaVar), rowId);
+				value->Clone(), 0, 0, std::move(_propertyTypes.at(propertyPair.first)), std::move(metaVar), rowId);
 		}
 	}
 }
@@ -684,12 +682,11 @@ void EntityManager::ScanEUV(VariableSet&& variableSet, const model::Subject&& su
 		for (auto value : vals) {
 
 			auto rowId = variableSet.add(std::move(variableId),
-				VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
+				std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0,
 				model::types::SubType::PropertyReference, std::move(metaVar));
 
 			variableSet.add(std::move(variableId2),
-				VariableSetValue(value->Clone(), 0, 0),
-				std::move(_propertyTypes.at(propertyPair.first)), std::move(metaVar), rowId);
+				value->Clone(), 0, 0, std::move(_propertyTypes.at(propertyPair.first)), std::move(metaVar), rowId);
 		}
 	}
 }
@@ -799,7 +796,7 @@ std::vector<unsigned int> EntityManager::ScanHelp1(VariableSet&& variableSet, co
 		for (auto value : vals) {
 			if (value->Equals(object)) {
 				rowsAdded.push_back(variableSet.add(std::move(variableId),
-					VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
+					std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0,
 					model::types::SubType::PropertyReference, std::move(metaVar)));
 			}
 		}
@@ -825,9 +822,7 @@ std::vector<unsigned int> EntityManager::ScanHelp2(VariableSet&& variableSet, co
 		auto currentEntity = _entities.at(entityRef);
 		if (currentEntity->hasProperty(propertyId)) {
 			for (auto value : currentEntity->getProperty(propertyId)->baseValues()) {
-
-				auto vsv = VariableSetValue(value->Clone(), propertyId, entityRef);
-				rowsAdded.push_back(variableSet.add(std::move(variableId), std::move(vsv), std::move(_propertyTypes.at(propertyId)), std::move(metaVar)));
+				rowsAdded.push_back(variableSet.add(std::move(variableId), value->Clone(), propertyId, entityRef, std::move(_propertyTypes.at(propertyId)), std::move(metaVar)));
 			}
 		}
 	}

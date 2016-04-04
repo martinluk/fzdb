@@ -84,7 +84,7 @@ namespace model {
 
             Property(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _value()
             {
-                initMemberSerialiser();
+               initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };

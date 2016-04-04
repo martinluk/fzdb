@@ -106,8 +106,8 @@ namespace model {
                 _cSecCreated(0),
                 _cFracSecCreated(0)
             {
-                initMemberSerialiser();
-                initConvenienceMembers();
+               initMemberSerialiser();
+                //initConvenienceMembers();
                 if (confidence > 100) confidence = 100;
                 _confidence = confidence;
             }

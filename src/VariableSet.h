@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <boost/bimap.hpp>
 
+#include "./model/Entity.h"
 #include "./types/Base.h"
 
 using VariableType = model::types::SubType;
@@ -37,10 +38,24 @@ private:
 public:
 
     VariableSetValue(std::shared_ptr<model::types::Base> ptr, unsigned int propertyId, unsigned long long entityId) :
-        _ptr(ptr), _propertyId(propertyId), _entityId(entityId) {}
+        _ptr(ptr), _propertyId(propertyId), _entityId(entityId), _metaRef(0) {}
 
     VariableSetValue() :
-        _ptr(), _propertyId(0), _entityId(0) {}
+        _ptr(), _propertyId(0), _entityId(0), _metaRef(0) {}
+
+	void reset() {
+		_ptr.reset();
+		_propertyId = 0;
+		_entityId = 0;
+		_metaRef = 0;
+	}
+
+	void reset(std::shared_ptr<model::types::Base> newDataPtr, Entity::EHandle_t entityId, unsigned int propertyId) {
+		_ptr = newDataPtr;
+		_propertyId = propertyId;
+		_entityId = entityId;
+		_metaRef = 0;
+	}
 
     std::shared_ptr<model::types::Base> dataPointer() const { return _ptr; }
     unsigned int property() const { return _propertyId; }
@@ -69,17 +84,17 @@ public:
 
 	unsigned int add(const std::vector<VariableSetValue>&& row);
     
-    unsigned int add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar);
+    unsigned int add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
+		const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar);
 
-    void add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row);
+    void add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value, 
+		const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar, unsigned int row);
 
     std::vector<unsigned int> find(const unsigned int varId, const std::string value);
 
     std::vector<std::vector<VariableSetValue>>* getData();
 
     std::vector<VariableSetValue> getData(const unsigned int varId);
-
-    //std::map<std::string, std::pair<VariableType, unsigned char>> getMetaData();
 
     const bool contains(const std::string name) const;
 	const bool contains(const unsigned int id) const;

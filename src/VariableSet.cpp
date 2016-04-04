@@ -9,6 +9,7 @@
 #include <iterator>
 #include <algorithm>
 
+#include "./model/Entity.h"
 #include "./types/Base.h"
 #include "./types/ValueRef.h"
 
@@ -16,7 +17,7 @@ using VariableType = model::types::SubType;
 
 VariableSet::VariableSet(const std::set<std::string> &variableNames) {
     _size = variableNames.size();
-    _nextMetaRef = 0;
+    _nextMetaRef = 1;
     _variablesUsed = std::vector<bool>(_size);
     unsigned char count = 0;
     for (auto variableName : variableNames) {
@@ -40,14 +41,17 @@ unsigned int VariableSet::add(const std::vector<VariableSetValue>&& row) {
 	return _values.size() - 1;
 }
 
-unsigned int VariableSet::add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar) {
+unsigned int VariableSet::add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
+	const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar) {
+
 	std::vector<VariableSetValue> newRow(_size);
 	_values.push_back(newRow);
-	add(std::move(var), std::move(value), std::move(type), std::move(metaVar), _values.size() - 1);
+	add(std::move(var), std::move(value), propertyId, entityId, std::move(type), std::move(metaVar), _values.size() - 1);
 	return _values.size() - 1;
 }
 
-void VariableSet::add(const unsigned int var, VariableSetValue&& value, const VariableType&& type, const std::string&& metaVar, unsigned int row) {
+void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
+	const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar, unsigned int row) {
 
     if (row >= _values.size()) {
         throw std::runtime_error("Attempting to add to a non-existent row");
@@ -69,20 +73,17 @@ void VariableSet::add(const unsigned int var, VariableSetValue&& value, const Va
 
         _variablesUsed[var] = true;
 
+		_values[row][var].reset(value, entityId, propertyId);
+
 		if (metaVar != "") {
 			unsigned int metaRef = getMetaRef();
-			auto valueRef = std::make_shared<model::types::ValueRef>(value.entity(), value.property(), value.dataPointer()->OrderingId());
-			auto vsv2 = VariableSetValue(valueRef, value.property(), value.entity());
+			auto valueRef = std::make_shared<model::types::ValueRef>(entityId, propertyId, value->OrderingId());
 
-			value.metaRef(metaRef);
-			vsv2.metaRef(metaRef);
+			_values[row][var].metaRef(metaRef);
 
-			add(indexOf(metaVar), std::move(vsv2), model::types::SubType::ValueReference, "");
+			auto metaRowId = add(indexOf(metaVar), valueRef, entityId, propertyId, model::types::SubType::ValueReference, "");
+			_values[metaRowId][indexOf(metaVar)].metaRef(metaRef);
 		}
-
-        //_values[row][_metaData[var].second] = value;
-        _values[row].erase(_values[row].begin() + var);
-        _values[row].emplace(_values[row].begin() + var, value);
     }
 }
 
@@ -107,10 +108,6 @@ std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) {
     });
     return output;
 }
-//
-//std::map<std::string, std::pair<VariableType, unsigned char>> VariableSet::getMetaData() {
-//    return _metaData;
-//}
 
 const bool VariableSet::contains(const std::string name) const {
 	return _nameMap.left.find(name) != _nameMap.left.end();
@@ -146,16 +143,18 @@ const unsigned int VariableSet::getMetaRef() {
 }
 
 void VariableSet::removeMetaRefs(unsigned int metaRef) {
+	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
     for(int i = 0; i < _values.size(); i++) {
         for (int j = 0; j < _values[i].size(); j++) {
             if (_values[i][j].metaRef() == metaRef) {
-                _values[i][j] = VariableSetValue();
+				_values[i][j].reset();
             }
         }
     }
 }
 
 void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
+	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
     bool found = false;
     for (int i = 0; i < _values.size(); i++) {
         for (unsigned char j = 0; j < _values[i].size(); j++) {

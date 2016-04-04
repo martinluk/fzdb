@@ -160,7 +160,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 		auto newEntity = createEntity(newVar.second);
 		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
 		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
-		whereVars.add(whereVars.indexOf(newVar.first), VariableSetValue(entityPointer, 0, 0), VariableType::TypeEntityRef, "");
+		whereVars.add(whereVars.indexOf(newVar.first), entityPointer, 0, 0, VariableType::TypeEntityRef, "");
 	}
 	
 	//sort by entropy
@@ -252,7 +252,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                     if (triple.meta_variable != "")
                     {
 						variableSet.add(variableSet.indexOf(triple.meta_variable),
-							VariableSetValue(std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id),
+							std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id,
 							model::types::SubType::ValueReference, "");
 					}
 				}
@@ -296,7 +296,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 						
 								if (triple.meta_variable != "") {
 									variableSet.add(variableSet.indexOf(triple.meta_variable),
-										VariableSetValue(std::make_shared<model::types::ValueRef>(entityHandle, propertyId, clonedRecord->OrderingId()), propertyId, entityHandle),
+										std::make_shared<model::types::ValueRef>(entityHandle, propertyId, clonedRecord->OrderingId()), propertyId, entityHandle,
 										model::types::SubType::ValueReference, "");
 								}
 							}

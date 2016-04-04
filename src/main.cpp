@@ -143,12 +143,15 @@ int main(int argc, char* argv[]) {
   /*
   *   INITIALISE LOGGING
   */
-
+  
   try
   {
+	  size_t q_size = 1048576; //queue size must be power of 2
+	  spdlog::set_async_mode(q_size);
+
       std::vector<spdlog::sink_ptr> sinks;
-      sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
-      if(loggingLevel == 1) sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_st>("logfile", "txt", 23, 59, true));
+      sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+      if(loggingLevel == 1) sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_mt>("logfile", "txt", 23, 59, true));
       auto combined_logger = std::make_shared<spdlog::logger>("main", begin(sinks), end(sinks));
       spdlog::register_logger(combined_logger);
       combined_logger.get()->set_level(spdlog::level::trace);
