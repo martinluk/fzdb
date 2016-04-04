@@ -71,10 +71,9 @@ describe("Fuzzy Database", function() {
         });
         //TODO Load query
     });
-
-    fdescribe("editor not allowed to", function() {
-        var login={name:'editorAcc', password:'password'};
-        describe("run flush query", function() {
+    
+    var executeEditorFunction = functon(name, login, command) {
+        describe(name, function() {
             it("Log into Admin", function(done) {
                 sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
             });
@@ -89,8 +88,8 @@ describe("Fuzzy Database", function() {
                 q='USER LOGIN '+login.name+' '+login.password;
                 sendCmd(q).then(function(data) { done(); });
             });
-            it("Execute the command", function(done) {
-                assertNotEnoughPermission(sampleQuery.user_add,done);
+            it(name, function(done) {
+                command;
             });
             it("Logout from user", function(done) {
                 sendCmd('USER LOGOUT').then(function(data) { done(); });
@@ -105,8 +104,13 @@ describe("Fuzzy Database", function() {
             it("Logout from Admin", function(done) {
                 sendCmd('USER LOGOUT').then(function(data) { done(); });
             });
-            
         });
+    }
+
+    fdescribe("editor not allowed to", function() {
+        var login={name:'editorAcc', password:'password'};
+        executeEditorFuncion('flush command',login, 'FLUSH');
+
         /*
         it("run user add query", function(done) { 
         });
