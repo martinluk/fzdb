@@ -97,6 +97,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     else if (str == "ADD") tokenType      = ParsedTokenType ::KEYWORD_ADD;
     else if (str == "PASSWORD") tokenType = ParsedTokenType ::KEYWORD_PASSWORD;
     else if (str == "PROMOTE") tokenType  = ParsedTokenType ::KEYWORD_PROMOTE;
+    else if (str == "DEMOTE") tokenType   = ParsedTokenType ::KEYWORD_DEMOTE;
     else if (str == "LOGIN") tokenType    = ParsedTokenType ::KEYWORD_LOGIN;
     else if (str == "LOGOUT") tokenType   = ParsedTokenType ::KEYWORD_LOGOUT;
 

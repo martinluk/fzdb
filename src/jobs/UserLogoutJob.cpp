@@ -5,13 +5,11 @@
 #include "../user/UserOperation.h"
 
 UserLogoutJob::UserLogoutJob(std::shared_ptr<ISession> session) 
-    : Job(session,PermType::ViewDB) {
+    : Job(session,PermType::LoggedInUser) {
     _session=session;
 }
 
-QueryResult UserLogoutJob::executeConst() const
-{
-    //TODO Some kind of exception of user is not already logged in?
+QueryResult UserLogoutJob::executeConst() const {
     _session->clearCurrentUserName();
     _session->_userId=0;
     _session->setUserGroup(Permission::UserGroup::GUEST);

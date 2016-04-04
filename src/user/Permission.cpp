@@ -44,6 +44,8 @@ namespace Permission
                 return false;
             case PermissionType::UserOp:
                 return false;
+            case PermissionType::LoggedInUser:
+                return false;
             default:
                 //A new user group was added, but permission is not updated here.
                 assert(false);
@@ -59,6 +61,8 @@ namespace Permission
                 return true;
             case PermissionType::UserOp:
                 return false;
+            case PermissionType::LoggedInUser:
+                return true;
             default:
                 //A new user group was added, but permission is not updated here.
                 assert(false);
@@ -73,6 +77,8 @@ namespace Permission
             case PermissionType::ModifyDB:
                 return false;
             case PermissionType::UserOp:
+                return true;
+            case PermissionType::LoggedInUser:
                 return true;
             default:
                 //A new user group was added, but permission is not updated here.

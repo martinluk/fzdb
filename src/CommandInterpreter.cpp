@@ -19,6 +19,7 @@
 #include "jobs/PromoteEditorJob.h"
 #include "jobs/UserLoginJob.h"
 #include "jobs/UserLogoutJob.h"
+#include "jobs/UserPasswordJob.h"
 
 #include "Parser.h"
 
@@ -73,7 +74,7 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
             JobQueue::AddJob(new DeleteUserJob(session, query.data0));
             break;
         case QueryType::USER_PASSWORD:
-            JobQueue::AddJob(new UnknownJob(session, command)); //FIXME Need to implement the job
+            JobQueue::AddJob(new UserPasswordJob(session, query.data0, query.data1)); 
             break;
         case QueryType::USER_PROMOTE:
             JobQueue::AddJob(new PromoteEditorJob(session, query.data0));

@@ -15,9 +15,9 @@ namespace Permission
         ADMIN
     };
     
-    enum class PermissionType
-    {
+    enum class PermissionType {
         ViewDB,
+        LoggedInUser,
         ModifyDB,
         UserOp
     };
@@ -32,6 +32,7 @@ namespace Permission
     bool guestPermission(PermissionType permType);
     bool editorPermission(PermissionType permType);
     bool adminPermission(PermissionType permType);
+    bool loggedinUserPermission(PermissionType permType);
     
     class UserPermissionException : public std::runtime_error
     {
