@@ -23,6 +23,9 @@
 
 #include "./platform.h"
 
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+
 // windows specific to handle ctrl-c call
 #if PLATFORM == PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -63,82 +66,62 @@ int main(int argc, char* argv[]) {
     /*
     *   DEFAULT SETTINGS
     */
-    unsigned int port = 1407;
-    int loggingLevel = 0;
+	unsigned int port;
+	int loggingLevel;
+	std::string dataFilePath;
+	std::string configFilePath;
 
- /*
-  *   HANDLE COMMAND LINE ARGUMENTS
-  */
-  for (int i = 1; i < argc; ++i)
-  {
-    std::string arg(argv[i]);
-    if (arg == "--log" || arg == "-l")
-    {
-      // Make sure we aren't at the end of argv!
-      if (i + 1 < argc)
-      {
-        auto loggingVar = argv[++i];
-        if(std::string(loggingVar) == "file")
-        {
-          loggingLevel = 1;
-        }
-        else
-        {
-          std::cerr << "ERROR: Unknown logging option" << std::endl;
-        }          
-        continue;
-      }
-      else
-      {
-        std::cerr << argv[i] <<" option requires one argument." << std::endl;
-        return 1;
-      }  
-    }
+	/*
+	*	GET COMMANDLINE ARGUMENTS / READ CONFIG FILE
+	*/
+	try {
 
-    if (arg == "--port" || arg == "-p")
-    {
-      // Make sure we aren't at the end of argv!
-      if (i + 1 < argc)
-      {
-        try
-        {
-          port = std::stoul(argv[++i]);
-        }
-        catch(std::invalid_argument e)
-        {
-          std::cerr << "Error: Port must be a valid unsigned integer" << std::endl;
-          return 1;
-        }
-        continue;
-      }
-      else
-      {
-        std::cerr << argv[i] <<" option requires one argument." << std::endl;
-        return 1;
-      }
-    }
+		boost::program_options::options_description genericOptions("generic");
+		genericOptions.add_options()			
+			("port", boost::program_options::value<unsigned int>(&port)->default_value(1407), "set database port")
+			("log", boost::program_options::value<int>(&loggingLevel)->default_value(0), "set logging level")
+			("file", boost::program_options::value<std::string>(&dataFilePath), "set data file path");
 
-    if (arg == "--file" || arg == "-f")
-    {
-      if ( i+1 < argc )
-      {
-        Singletons::setDataFilePath(std::string(argv[i+1]));
-        continue;
-      }
-      else
-      {
-        std::cerr << argv[i] <<" option requires one argument." << std::endl;
-        return 1;
-      }
-    }
-  }
+		boost::program_options::options_description cmdLineOptions("cmdLineOnly");
+		cmdLineOptions.add_options()
+			("help", "produce help message")
+			("config", boost::program_options::value<std::string>(&configFilePath)->default_value("fzdb.cfg"), "set config file");
+		cmdLineOptions.add(genericOptions);
+
+		boost::program_options::variables_map vm;
+		boost::program_options::store(boost::program_options::parse_command_line(argc, argv, cmdLineOptions), vm);
+		boost::program_options::notify(vm);
+
+		if (vm.count("help")) {
+			std::cout << cmdLineOptions << std::endl;
+			return 1;
+		}
+
+		if (vm.count("config")) {
+			configFilePath = vm.at("config").as<std::string>();
+		}
+
+		if (!boost::filesystem::exists(configFilePath))
+		{
+			std::cout << "No config file found" << std::endl;
+		}
+		else {
+			std::ifstream configFile(configFilePath);
+			boost::program_options::store(boost::program_options::parse_config_file(configFile, genericOptions), vm);
+			boost::program_options::notify(vm);
+		}
+
+		if (vm.count("file")) {
+			std::cout << "Loading from datafile " << dataFilePath << std::endl;
+			Singletons::setDataFilePath(dataFilePath);
+		}
+	}
+	catch (boost::program_options::error& e) {
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
 
   Singletons::initialise();
-
-  //Testing
- /* Singletons::entityManager()->linkEntities(0, 1);
-  Singletons::entityManager()->linkEntities(1, 2);
-  auto bleh = Singletons::entityManager()->getLinkGraph(0, std::set<Entity::EHandle_t>());*/
 
   /*
   *   INITIALISE LOGGING
