@@ -23,7 +23,7 @@ QueryResult BGP::executeConst() const
       for(auto filter : _query.whereClause.filters) {
           variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), 
               [&, this](std::vector<VariableSetValue> row) {
-              return !filter->Test(std::move(row), variables.getMetaData());
+              return !filter->Test(std::move(variables), std::move(row));
           }), variables.getData()->end());
       }
 

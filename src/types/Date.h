@@ -67,7 +67,7 @@ namespace model
             
             Date() : Base(), _value(0), _order(Ordering::EqualTo)
             {
-                initMemberSerialiser();
+               initMemberSerialiser();
             }
             
             Date(Date_t value, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
@@ -79,7 +79,7 @@ namespace model
             Date(const StructuredDate &sd, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(encode(sd)), _order(order)
             {
-                initMemberSerialiser();
+               initMemberSerialiser();
             }
             
             virtual bool valuesEqualOnly(const Base *other) const
