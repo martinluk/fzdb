@@ -6,6 +6,7 @@
 #include <vedis.h>
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <cassert>
 #include <string>
