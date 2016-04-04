@@ -41,8 +41,15 @@ helper.sendCmd = function(cmd) {
   });     
 };
 
+//Assuming each requires admin 
 helper.testCase = function(name, command, expected, timeout) {
   if(timeout == undefined) timeout = 1000;
+  it(name+' -logging in as admin', function(done) {
+      helper.sendCmd(helper.loginToAdminQuery).then(function(data) {
+          expect(data.status).toBe(true);
+          done();
+      });
+  });
   it(name, function(done) {
      helper.sendCmd(command)
     .then(function(data) {
@@ -54,6 +61,12 @@ helper.testCase = function(name, command, expected, timeout) {
       }            
     }); 
   }, timeout);    
+  it(name+' - logout from admin', function(done) {
+      helper.sendCmd('USER LOGOUT').then(function(data) {
+          expect(data.status).toBe(true);
+          done();
+      });
+  });
 };
 
 helper.resultTemplate = function(results) {
