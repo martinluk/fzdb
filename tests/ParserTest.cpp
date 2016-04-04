@@ -58,26 +58,21 @@ TEST_F(ParserTestIdentifyToken, UserLogoutQueryParseTest) {
 }
 
 TEST_F(ParserTestIdentifyToken, UserPromoteQueryParseTest) {
-    assertQueryParse("USER PROMOTE username", QueryType::USER_PROMOTE,
-            "username");
-    assertQueryParse("USER PROMOTE USER", QueryType::USER_PROMOTE,
-            "USER");
+    assertQueryParse("USER PROMOTE username", QueryType::USER_PROMOTE, "username");
+    assertQueryParse("USER PROMOTE USER", QueryType::USER_PROMOTE, "USER");
     assertQueryThrow("USER PROMOTE");
     assertQueryThrow("USER PROMOTE username username2");
     assertQueryThrow("USER PROMOTE username username2 username3");
 }
 
 TEST_F(ParserTestIdentifyToken, UserLoginQueryParseTest) {
-    assertQueryParse("USER LOGIN username password", QueryType::USER_LOGIN,
-            "username", "password");
-    assertQueryParse("USER LOGIN USER DELETE", QueryType::USER_LOGIN,
-            "USER", "DELETE");
+    assertQueryParse("USER LOGIN username password", QueryType::USER_LOGIN, "username", "password");
+    assertQueryParse("USER LOGIN USER DELETE", QueryType::USER_LOGIN, "USER", "DELETE");
     assertQueryThrow("USER LOGIN username");
     assertQueryThrow("USER LOGIN username password type");
     //XXX Format string should also be tested.
 }
 
-/*
 TEST_F(ParserTestIdentifyToken, UserAddQueryParseTest) {
     assertQueryParse("USER ADD username password", QueryType::USER_ADD,
             "username", "password");
@@ -97,16 +92,13 @@ TEST_F(ParserTestIdentifyToken, UserPasswordQueryParseTest) {
 }
 
 TEST_F(ParserTestIdentifyToken, UserDeleteQueryParseTest) {
-    assertQueryParse("USER DELETE username", QueryType::USER_DELETE,
-            "username", "npw");
-    assertQueryParse("USER DELETE USER", QueryType::USER_PASSWORD,
-            "USER");
-    assertQueryThrow("USER PASSWORD");
-    assertQueryThrow("USER PASSWORD username username2");
-    assertQueryThrow("USER PASSWORD username username2 username3");
-    assertQueryThrow("USER PASSWORD username username2 username3 username4");
+    assertQueryParse("USER DELETE username", QueryType::USER_DELETE, "username");
+    assertQueryParse("USER DELETE USER", QueryType::USER_DELETE, "USER");
+    assertQueryThrow("USER DELETE");
+    assertQueryThrow("USER DELETE username username2");
+    assertQueryThrow("USER DELETE username username2 username3");
+    assertQueryThrow("USER DELETE username username2 username3 username4");
 }
-*/
 //tests for $
 TEST_F(ParserTestIdentifyToken, testVariable) {
 	std::string str = "$abc";

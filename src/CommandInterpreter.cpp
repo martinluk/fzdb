@@ -60,6 +60,8 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
         case QueryType::FLUSH:
             JobQueue::AddJob(new Flush(session));
             break;
+        case QueryType::USER_PROMOTE:
+            break;
         default:
             JobQueue::AddJob(new UnknownJob(session, command));
         }

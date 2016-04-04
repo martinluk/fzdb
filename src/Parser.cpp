@@ -646,20 +646,26 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                     break;
                 case 1:
                     iter++;
-                    //iter now=arg1
-                    data0 = iter->second; //Retrieve data from first argument
-                    //FIXME iter++ here creates segfault,
-                    //but leaving here iter!=tokens.end()
+                    if (iter!=tokens.end()) {
+                        data0 = iter->second; //Retrieve data from first argument
+                        iter++; 
+                    } else {
+                        throw ParseException("Expected 1 argument but receieved 0.");
+                    }
                     break;
                 case 2:
                     iter++;
                     //iter now=arg1
-                    data0 = iter->second; //Retrieve data from first argument
-                    iter++;
-                    //iter now=arg2
-                    data1 = iter->second; //Retrieve data from second argument
-                    //FIXME iter++ here creates segfault,
-                    //but leaving here iter!=tokens.end()
+                    if (iter != tokens.end()) {
+                        data0 = iter->second; //Retrieve data from first argument
+                        iter++;
+                        //iter now=arg2
+                        if (iter == tokens.end()) { throw ParseException("Expected 2 argument but receieved 1."); }
+                        data1 = iter->second; //Retrieve data from second argument
+                        iter++;
+                    } else {
+                        throw ParseException("Expected 1 argument but receieved 0.");
+                    }
                     break;
                 default:
                     assert(numberOfArg>=0 /*Make sure numberOfArg is assigned*/);
