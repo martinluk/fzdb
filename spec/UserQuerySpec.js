@@ -90,7 +90,7 @@ describe("Fuzzy Database", function() {
                 sendCmd(q).then(function(data) { done(); });
             });
             it(name, function(done) {
-                sendCmd(command).then(function(data) { done(); });
+                assertNotEnoughPermission(command,done);
             });
             it("Logout from user", function(done) {
                 sendCmd('USER LOGOUT').then(function(data) { done(); });
