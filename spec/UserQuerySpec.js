@@ -1,4 +1,5 @@
 var net = require('net');
+var h = require('./support/helper.js');
 
 describe("Fuzzy Database", function() {
   var client;
@@ -30,9 +31,7 @@ describe("Fuzzy Database", function() {
         done();
     });    
   }
-    var admin_username = 'fzydb_admin';
-    var admin_pwd = 'password';
-    var space = ' ';
+  var space = ' ';
   var sampleQuery = {
       'insert'         : "INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }",
       'flush'          : "FLUSH",
@@ -43,7 +42,7 @@ describe("Fuzzy Database", function() {
       "user_password"  : "USER PASSWORD verybadpassword betterpassword",
       "user_promote"   : "USER PROMOTE creativeUserName",
       "user_demote"    : "USER DEMOTE creativeUserName",
-      "login_to_admin" : "USER LOGIN"+space+admin_username+space+admin_pwd
+      "login_to_admin" : h.loginToAdminQuery
   };
 
   describe("User Queries:", function() {
