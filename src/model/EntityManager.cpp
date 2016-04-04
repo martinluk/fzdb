@@ -202,6 +202,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 // TODO: Ordering?
                 newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value),
                                                                           0, model::types::Date::Ordering::EqualTo, confidence));
+                break;
             case model::Object::Type::VARIABLE:
             {
                 auto varId = whereVars.indexOf(triple.object.value);
@@ -298,6 +299,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                             for (auto newRecord : newRecords)
                             {
                                 // Insert the current record into the current entity.
+                                std::cout << "Inserting " << model::types::getSubTypeString(newRecordType) << " as " << _propertyNames.right.at(propertyId) << std::endl;
 								currentEntity->insertProperty(propertyId, newRecord);
 
                                 if (triple.meta_variable != "")

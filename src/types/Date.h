@@ -33,6 +33,15 @@ namespace model
                     year(y), month(m), day(d)
                 {
                 }
+
+                std::string toString() const
+                {
+                    return (day < 9 ? "0" : "") + std::to_string(day)
+                            + (month < 9 ? "0" : "") + std::to_string(month)
+                            + (year < 999 ? "0" : "")
+                            + (year < 99 ? "0" : "")
+                            + (year < 9 ? "0" : "") + std::to_string(year);
+                }
                 
                 int year;
                 int month;
@@ -178,7 +187,7 @@ namespace model
 
             virtual std::string toString() const override
             {
-                return std::to_string(_value);
+                return date().toString();
             }
 
             virtual bool Equals(const std::string &val) const override
