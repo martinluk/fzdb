@@ -5,6 +5,7 @@ var _ = require('lodash');
 var client;
 var helper = {};
 
+helper.loginToAdminQuery= "USER LOGIN fzydb_admin password";
 helper.sendCmd = function(cmd) {
   client.write(cmd);
   var beforeBytes = client.bytesRead;
@@ -91,6 +92,5 @@ var admin_username = 'fzydb_admin';
 var admin_pwd = 'password';
 var space = ' ';
 
-helper.loginToAdminQuery= "USER LOGIN"+space+admin_username+space+admin_pwd;
 
 module.exports = helper;

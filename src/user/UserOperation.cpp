@@ -3,6 +3,7 @@
 #include "UserAttributes.h"
 #include "UserExceptions.h"
 #include "Hashing.h"
+#include "spdlog/spdlog.h"
 
 #include "../ISession.h"
 
@@ -32,14 +33,16 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
     std::string actualHash = currUserAttr.passwordHash;
     std::string currSalt = currUserAttr.salt;
     std::string ourHash = Hashing::hashPassword(userName, currSalt , password);
+    boost::uuids::uuid _uuid= session->uuid();
     if (ourHash != actualHash) {
+        spdlog::get("main")->warn("[{:<}] {} {}", _uuid, userName , " logged in unsuccessfully.");
         throw LoginUnsuccessfulException();
     }
-
     session->userId(_userFileCache[userName].id);
     session->setCurrentUserName(userName);
     session->setUserGroup(currUserAttr.userGroup);
 
+    spdlog::get("main")->warn("[{:<}] {} {}", _uuid, userName , " logged in successfully.");
     return currUserAttr.userGroup;
 }
 

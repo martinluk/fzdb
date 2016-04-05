@@ -208,6 +208,7 @@ void UserFileOperations::saveCacheToFile() const
         Value idVal;
         idVal.SetUint(attr.id); //FIXME This line is potentially causing the program to crash, investigate tomorrow morning.
         /*
+            Output from Valgrind:
             ==25180== Conditional jump or move depends on uninitialised value(s)
             ==25180==    at 0x8210CAF: rapidjson::GenericValue<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> >::GenericValue(unsigned int) (document.h:506)
             ==25180==    by 0x820FA50: rapidjson::GenericValue<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> >::SetUint(unsigned int) (in /home/matann/fzdb/build/fuzzy-dat

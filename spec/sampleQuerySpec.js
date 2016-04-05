@@ -1,4 +1,5 @@
 var net = require('net');
+var h = require('./support/helper.js');
 
 describe("Fuzzy Database", function() {
   var client;
@@ -14,8 +15,14 @@ describe("Fuzzy Database", function() {
     });
   });
   
-  describe("sends the command over TCP", function() {
+  fdescribe("sends the command over TCP", function() {
 
+    it("Sample query - logging into admin", function(done) {
+      client.write(h.loginToAdminQuery);
+      client.once('data', function(data) {
+        done();
+        });
+    });
     //tests are run sequentially
 
     //test pong
@@ -558,6 +565,11 @@ describe("Fuzzy Database", function() {
         done();
       });      
     });
-	
-	});
+  });
+    it("Sample query - logging out from admin", function(done) {
+        client.write('USER LOGOUT');
+        client.once('data', function(data) {
+        done();
+        });
+    });
 });
