@@ -26,9 +26,9 @@ public:
        return false;
    }
 
-   bool Test(const VariableSet&& variableSet, const std::vector<VariableSetValue>&& values) override {
+   bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) override {
 	   unsigned char aa = variableSet.indexOf(_variable);
-       std::string str = std::dynamic_pointer_cast<model::types::String, model::types::Base>(values[aa].dataPointer())->value();
+       std::string str = std::dynamic_pointer_cast<model::types::String, model::types::Base>(values.at(aa).dataPointer())->value();
        return boost::regex_match(str, _pattern);
    }
 

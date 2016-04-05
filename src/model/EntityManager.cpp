@@ -202,7 +202,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             break;
 		case model::Object::Type::VARIABLE: {
 				auto varId = whereVars.indexOf(triple.object.value);
-				for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+				for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++) {
 					if ((*whereVarIter)[varId].empty()) continue;
 	    			newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
 				}
@@ -273,7 +273,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
 						auto varId = whereVars.indexOf(triple.subject.value);
 
-                        for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++)
+                        for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++)
                         {
 							if ((*whereVarIter)[varId].empty()) continue;
 

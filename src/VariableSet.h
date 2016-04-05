@@ -74,6 +74,51 @@ public:
     }
 };
 
+class VariableSetRow {
+private:
+	const unsigned char _size;
+	std::vector<VariableSetValue> _values;
+
+public:
+	VariableSetRow(const unsigned char size) : _size(size), _values(_size) {}
+	VariableSetRow(const unsigned char size, const std::vector<VariableSetValue>&& values) : _size(size), _values(values) {}
+
+	VariableSetRow(const VariableSetRow& rhs) : _size(rhs._size), _values(rhs._values) {}
+	VariableSetRow(VariableSetRow&& rhs) : _size(rhs._size), _values(rhs._values) {}
+
+	VariableSetValue& operator[](unsigned char index) {
+		return _values[index];
+	}
+
+	VariableSetValue at(unsigned char index) const {
+		return _values[index];
+	}
+	unsigned char size() const {
+		return _size;
+	}
+
+	std::vector<VariableSetValue>::iterator begin() {
+		return _values.begin();
+	}
+	std::vector<VariableSetValue>::iterator end() {
+		return _values.end();
+	}
+
+	std::vector<VariableSetValue>::const_iterator cbegin() const {
+		return _values.cbegin();
+	}
+	std::vector<VariableSetValue>::const_iterator cend() const {
+		return _values.cend();
+	}
+
+	VariableSetRow& operator=(const VariableSetRow& row) {
+		// moooove
+		if (row._size != _size) throw std::runtime_error("Attempt to assign a row of a different size!");
+		_values = row._values;
+		return *this;
+	}
+};
+
 class VariableSet {
 
 public:
@@ -82,7 +127,7 @@ public:
 
 	void extend(std::string variableName);
 
-	unsigned int add(const std::vector<VariableSetValue>&& row);
+	unsigned int add(const VariableSetRow&& row);
     
     unsigned int add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
 		const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar);
@@ -92,9 +137,16 @@ public:
 
     std::vector<unsigned int> find(const unsigned int varId, const std::string value);
 
-    std::vector<std::vector<VariableSetValue>>* getData();
+   // std::vector<VariableSetRow>* getData();
+	std::vector<VariableSetRow>::iterator begin() { return _values.begin(); }
+	std::vector<VariableSetRow>::iterator end() { return _values.end(); }
 
-    std::vector<VariableSetValue> getData(const unsigned int varId);
+	std::vector<VariableSetRow>::const_iterator cbegin() const { return _values.cbegin(); } 
+	std::vector<VariableSetRow>::const_iterator cend() const { return _values.cend(); }
+	
+	std::vector<VariableSetRow>::iterator erase(std::vector<VariableSetRow>::iterator iter);
+
+	std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId);
 
     const bool contains(const std::string name) const;
 	const bool contains(const unsigned int id) const;
@@ -116,16 +168,24 @@ public:
     //this doesn't seem to work
     void trimEmptyRows();
 
-	std::vector<std::vector<VariableSetValue>> extractRowsWith(const unsigned int variable, const std::string value) const;
+	std::vector<VariableSetRow> extractRowsWith(const unsigned int variable, const std::string value) const;
 
-	std::vector<std::vector<VariableSetValue>> extractRowsWith(const unsigned int variable) const;
+	std::vector<VariableSetRow> extractRowsWith(const unsigned int variable) const;
 
 	void removeRowsWith(const unsigned int variable);
+
+	unsigned char width() const {
+		return _size;
+	}
+
+	unsigned int height() const {
+		return _values.size();
+	}
 
 private:
 	boost::bimap<std::string, unsigned int> _nameMap;
 	std::vector<model::types::SubType> _typeMap;
-    std::vector<std::vector<VariableSetValue>> _values;
+    std::vector<VariableSetRow> _values;
     std::vector<bool> _variablesUsed;
     unsigned int _size;
     unsigned int _nextMetaRef;
