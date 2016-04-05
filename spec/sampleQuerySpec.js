@@ -15,7 +15,7 @@ describe("Fuzzy Database", function() {
     });
   });
   
-  fdescribe("sends the command over TCP", function() {
+  describe("sends the command over TCP", function() {
 
     it("Sample query - logging into admin", function(done) {
       client.write(h.loginToAdminQuery);
