@@ -78,6 +78,7 @@ class VariableSetRow {
 private:
 	const unsigned char _size;
 	std::vector<VariableSetValue> _values;
+	int _ranking;
 
 public:
 	VariableSetRow(const unsigned char size) : _size(size), _values(_size) {}
@@ -116,6 +117,14 @@ public:
 		if (row._size != _size) throw std::runtime_error("Attempt to assign a row of a different size!");
 		_values = row._values;
 		return *this;
+	}
+
+	int ranking() const {
+		return _ranking;
+	}
+
+	void ranking(const int ranking) {
+		_ranking = ranking;
 	}
 };
 

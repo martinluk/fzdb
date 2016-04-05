@@ -62,6 +62,9 @@ public:
 	bool hasProperty(const unsigned int &key, bool linked = false) const override;
 	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 
+	void insertProperty(std::shared_ptr<EntityProperty> prop, bool linked = false) override;
+	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, bool linked = false) override;
+
 private:
     void initMemberSerialiser();
 

@@ -27,9 +27,9 @@ public:
 	// Returns the property with the given key, or a null property if this is not found.
 	virtual std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const;
 
-	void insertProperty(std::shared_ptr<EntityProperty> prop);
+	virtual void insertProperty(std::shared_ptr<EntityProperty> prop, bool linked = false);
 
-    void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object);
+    virtual void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, bool linked = false);
 
     // Removes the property with the given key.
     void removeProperty(const unsigned int &key);

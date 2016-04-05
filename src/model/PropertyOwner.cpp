@@ -85,7 +85,7 @@ std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &k
   return std::shared_ptr<EntityProperty>();
 }
 
-void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop) {
+void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, bool linked) {
 
   checkLock();
 
@@ -106,7 +106,7 @@ void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop) {
   }
 }
 
-void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object) {
+void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, bool linked) {
 
   checkLock();
   object->_manager = _manager;
