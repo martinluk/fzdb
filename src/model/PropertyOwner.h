@@ -35,13 +35,14 @@ public:
     void removeProperty(const unsigned int &key);
 
     // Tests if the entity has a property
-    virtual bool hasProperty(const unsigned int &key) const;
+    virtual bool hasProperty(const unsigned int &key, bool linked = false) const;
 
     // Returns read only reference to the property table
     const std::map<unsigned int, std::shared_ptr<EntityProperty>>& properties() const;
 
     // Tests if the entity meets the condition
-    virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
+    virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked = false);
+	virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked = false);
 
     // Clears all properties on the entity.
     void clearProperties();

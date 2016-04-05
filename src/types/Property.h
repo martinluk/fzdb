@@ -58,7 +58,9 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::shared_ptr<Base>(new Property(_value, _manager, _confidence));
+                auto cloned = std::make_shared<Property>(_value, _manager, _originalAuthorId, _confidence);
+				cloned->_orderingId = _orderingId;
+				return cloned;
             }
 
             virtual std::string logString(const Database* db = NULL) const override
@@ -82,7 +84,7 @@ namespace model {
 
             Property(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _value()
             {
-                initMemberSerialiser();
+               initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };

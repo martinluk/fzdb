@@ -70,16 +70,18 @@ helper.xtestCase = function(name, command, expected, timeout) {
   });
 };
 
-//Assuming each requires admin 
-helper.testCase = function(name, command, expected, timeout) {
+helper.testCase = function(name, command, expected, timeout, focus) {
   if(timeout == undefined) timeout = 1000;
+  if(focus == undefined) focus = false;
+  var specFunc = it;
+  if(focus) specFunc = fit;
   it(name+' -logging in as admin', function(done) {
       helper.sendCmd(helper.loginToAdminQuery).then(function(data) {
           expect(data.status).toBe(true);
           done();
       });
   });
-  it(name, function(done) {
+  specFunc(name, function(done) {
      helper.sendCmd(command)
     .then(function(data) {
       if(_.isFunction(expected)) {
@@ -116,9 +118,7 @@ helper.getData = function(name) {
   return fs.readFileSync("./spec/data/" + name, "utf8");
 }
 
-var admin_username = 'fzydb_admin';
-var admin_pwd = 'password';
-var space = ' ';
 
+helper.defaultTimeout = 1000;
 
 module.exports = helper;

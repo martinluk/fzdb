@@ -64,14 +64,28 @@
     jQuery(function($, undefined) {
         $('#term_demo').terminal(function(command, term) {
             if(command === "CONNECT") {
-              if(!connected) connected = true;
-              term.echo("Connected");
-              return;
+              if(!connected) {              
+                 $.ajax({
+                    url:"/connect",
+                    type:"POST",
+                    success: function(result){
+                      term.echo("connected");
+                      connected = true;
+                    }});
+                return;
+              }
             }
             if(command === "DISCONNECT") {
-              if(connected) connected = false;
-              term.echo("Disconnected");
-              return;
+              if(connected) {              
+                 $.ajax({
+                    url:"/disconnect",
+                    type:"POST",
+                    success: function(result){
+                      term.echo("disconnected");
+                      connected = false;
+                    }});
+                return;
+              }
             }
             if (command !== '') {
                 if (!connected) {

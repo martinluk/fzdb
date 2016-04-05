@@ -106,8 +106,8 @@ namespace model {
                 _cSecCreated(0),
                 _cFracSecCreated(0)
             {
-                initMemberSerialiser();
-                initConvenienceMembers();
+               initMemberSerialiser();
+                //initConvenienceMembers();
                 if (confidence > 100) confidence = 100;
                 _confidence = confidence;
             }
@@ -117,7 +117,9 @@ namespace model {
             virtual ~Base() {}
 
             virtual std::shared_ptr<Base> Clone() {
-                return std::make_shared<Base>(_confidence, _originalAuthorId, _comment);
+				auto cloned = std::make_shared<Base>(_confidence, _originalAuthorId, _comment);
+				cloned->_orderingId = _orderingId;
+                return cloned;
             }
 
             virtual bool Equals(const std::string &val) const {
@@ -195,7 +197,8 @@ namespace model {
                         _sourceEntityId == other->_sourceEntityId &&
                         _timeCreated == other->_timeCreated;
             }
-			bool hasProperty(const unsigned int &key) const override {
+
+			bool hasProperty(const unsigned int &key, bool linked = false) const override {
 				if (key == 5) return true;
 				if (key == 6) return true;
 				if (key == 7) return true;

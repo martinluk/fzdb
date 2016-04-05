@@ -5,6 +5,8 @@
 # fuzzy-database
 A graph-based fuzzy data store.
 
+https://www.overleaf.com/4529443gzjrqn#/13617797/
+
 ## Changes to directory structure
 All code for the database now goes in the `src` directory. Using sub-directories works fine and is a good idea to help keep the codebase
 more managable. The build system will search the `src` directory recursively to find all *.c and *.cpp files.

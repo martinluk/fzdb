@@ -63,7 +63,9 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::make_shared<Int>(_value, 0, _confidence);
+                auto cloned = std::make_shared<Int>(_value, _originalAuthorId, _confidence);
+				cloned->_orderingId = _orderingId;
+				return cloned;
             }
 
             virtual std::string logString(const Database* db = NULL) const override

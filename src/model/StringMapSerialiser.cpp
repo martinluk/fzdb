@@ -16,24 +16,21 @@ struct EntryHeader
     std::size_t stringSize;    // Serialised size of the string.
 };
 
-StringMapSerialiser::StringMapSerialiser(std::map<std::string, unsigned int> *map) : _map(map), _bimap(NULL)
-{
-}
 
-StringMapSerialiser::StringMapSerialiser(boost::bimap<std::string, unsigned int> *bimap) : _map(NULL), _bimap(bimap)
+StringMapSerialiser::StringMapSerialiser(boost::bimap<std::string, unsigned int> *bimap) : _bimap(bimap)
 {
 }
 
 std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 {
-    assert(_map || _bimap);
+    assert( _bimap);
     std::size_t origSize = serialiser.size();
 
     // Create a header.
     SerialHeader header;
     Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
     header.size = 0;    // We don't know this yet.
-    header.count = _map ? _map->size() : _bimap->size();
+    header.count = _bimap->size();
 
     std::vector<Serialiser::SerialProperty> propList;
     propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
@@ -76,23 +73,9 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
         i++;
     };
 
-    if ( _map )
+    for( auto it = _bimap->left.begin(); it != _bimap->left.end(); ++it )
     {
-        for ( auto it = _map->cbegin(); it != _map->cend(); ++it )
-        {
-            lambda(it->first, it->second);
-        }
-    }
-    else if ( _bimap )
-    {
-        for( auto it = _bimap->left.begin(); it != _bimap->left.end(); ++it )
-        {
-            lambda(it->first, it->second);
-        }
-    }
-    else
-    {
-        assert(false);
+        lambda(it->first, it->second);
     }
 
     SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
@@ -131,11 +114,6 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);
         data += sizeof(unsigned int);
 
-        if ( _map )
-            _map->insert(std::pair<std::string, unsigned int>(std::string(data), *id));
-        else if ( _bimap )
-            _bimap->insert(boost::bimap<std::string, unsigned int>::value_type(std::string(data), *id));
-        else
-            assert(false);
+        _bimap->insert(boost::bimap<std::string, unsigned int>::value_type(std::string(data), *id));
     }
 }
