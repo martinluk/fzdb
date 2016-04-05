@@ -114,10 +114,10 @@ std::vector<VariableSetRow>::iterator VariableSet::erase(std::vector<VariableSet
 	}
 }
 
-std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) {
+std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) const {
 
     std::vector<VariableSetValue> output;
-    std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](VariableSetRow row) {
+    std::transform(_values.cbegin(), _values.cend(), std::inserter(output, output.begin()), [&](VariableSetRow row) {
         return row[varId];
     });
     return output;

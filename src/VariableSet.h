@@ -146,7 +146,7 @@ public:
 	
 	std::vector<VariableSetRow>::iterator erase(std::vector<VariableSetRow>::iterator iter);
 
-	std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId);
+	std::vector<VariableSetValue> getData(const unsigned int varId) const;
 
     const bool contains(const std::string name) const;
 	const bool contains(const unsigned int id) const;
