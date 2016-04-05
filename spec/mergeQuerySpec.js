@@ -1,4 +1,5 @@
 var net = require('net');
+var h = require('./support/helper.js');
 
 describe("Fuzzy Database", function() {
   var client;
@@ -26,6 +27,12 @@ describe("Fuzzy Database", function() {
   describe("sends the command over TCP", function() {
 
     //tests are run sequentially
+    it("Merge query spec - logging into admin", function(done) {
+      client.write(h.loginToAdminQuery);
+      client.once('data', function(data) {
+        done();
+        });
+    });
 
     //test insert
     var fredId;
@@ -100,6 +107,12 @@ describe("Fuzzy Database", function() {
         done();
       });     
     });   
+    it("MergeQuerySpec - logging out from admin", function(done) {
+        client.write('USER LOGOUT');
+        client.once('data', function(data) {
+            done();
+        });
+    });
 
   });
 });

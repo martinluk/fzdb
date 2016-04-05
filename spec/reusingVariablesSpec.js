@@ -31,7 +31,7 @@ describe("Fuzzy Database", function() {
         )
       );
 
-      h.testCase("adding surname 'Homer' to 'Homer'",  
+      h.xtestCase("adding surname 'Homer' to 'Homer'",  
 
         `INSERT DATA { $a <surname> "Homer" } WHERE { $a <forename> "Homer" }`,
 

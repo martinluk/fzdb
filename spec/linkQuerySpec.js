@@ -26,7 +26,7 @@ describe("Fuzzy Database", function() {
   
   describe("sends the command over TCP", function() {
 
-    it("Link query speci - logging into admin", function(done) {
+    it("Link query spec - logging into admin", function(done) {
       client.write(h.loginToAdminQuery);
       client.once('data', function(data) {
         done();
