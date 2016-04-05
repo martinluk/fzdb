@@ -41,7 +41,8 @@ describe("Fuzzy Database", function() {
         }
       );
 
-      h.testCase("retrieving all entities with the same forename and surname 2",  
+      //Skipping, since is an assertion to above skipped test case.
+      h.xtestCase("retrieving all entities with the same forename and surname 2",  
 
         "SELECT $a WHERE { $a <forename> $b ; <surname> $b }",
 
