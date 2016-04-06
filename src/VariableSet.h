@@ -81,11 +81,11 @@ private:
 	int _ranking;
 
 public:
-	VariableSetRow(const unsigned char size) : _size(size), _values(_size) {}
-	VariableSetRow(const unsigned char size, const std::vector<VariableSetValue>&& values) : _size(size), _values(values) {}
+	VariableSetRow(const unsigned char size) : _size(size), _values(_size), _ranking(0) {}
+	VariableSetRow(const unsigned char size, const std::vector<VariableSetValue>&& values) : _size(size), _values(values), _ranking(0) {}
 
-	VariableSetRow(const VariableSetRow& rhs) : _size(rhs._size), _values(rhs._values) {}
-	VariableSetRow(VariableSetRow&& rhs) : _size(rhs._size), _values(rhs._values) {}
+	VariableSetRow(const VariableSetRow& rhs) : _size(rhs._size), _values(rhs._values), _ranking(rhs._ranking) {}
+	VariableSetRow(VariableSetRow&& rhs) : _size(rhs._size), _values(rhs._values), _ranking(rhs._ranking) {}
 
 	VariableSetValue& operator[](unsigned char index) {
 		return _values[index];
@@ -115,6 +115,7 @@ public:
 	VariableSetRow& operator=(const VariableSetRow& row) {
 		// moooove
 		if (row._size != _size) throw std::runtime_error("Attempt to assign a row of a different size!");
+		_ranking = row._ranking;
 		_values = row._values;
 		return *this;
 	}
@@ -190,6 +191,8 @@ public:
 	unsigned int height() const {
 		return _values.size();
 	}
+
+	void sort();
 
 private:
 	boost::bimap<std::string, unsigned int> _nameMap;

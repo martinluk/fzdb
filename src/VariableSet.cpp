@@ -74,6 +74,7 @@ void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types
         _variablesUsed[var] = true;
 
 		_values[row][var].reset(value, entityId, propertyId);
+		_values[row].ranking(_values[row].ranking() + value->confidence());
 
 		if (metaVar != "") {
 			unsigned int metaRef = getMetaRef();
@@ -221,4 +222,12 @@ void VariableSet::removeRowsWith(const unsigned int variable) {
 	_values.erase(std::remove_if(_values.begin(), _values.end(), [&, this, variable](VariableSetRow row) {
 		return !row[variable].empty();
 	}), _values.end());
+}
+
+void VariableSet::sort()
+{
+	std::sort(_values.begin(), _values.end(), [](const VariableSetRow& row1, const VariableSetRow& row2)
+	{
+		return (row1.ranking() > row2.ranking());
+	});
 }

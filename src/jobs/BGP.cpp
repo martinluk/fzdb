@@ -19,6 +19,8 @@ QueryResult BGP::executeConst() const
 
         variables.trimEmptyRows();
 
+		
+
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
 		  for (auto iter = variables.begin(); iter != variables.end();) {
@@ -30,6 +32,8 @@ QueryResult BGP::executeConst() const
 			  }
 		  }
       }
+
+	  variables.sort();
 
       //encode result as JSON
         rapidjson::Value val;

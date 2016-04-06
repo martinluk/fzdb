@@ -66,10 +66,15 @@ helper.resultTemplate = function(results) {
 helper.setupClient = function(done) {
   client = new net.Socket();
   client.connect(1407, '127.0.0.1', function() {
-    client.write("FLUSH");
+    client.write("USER LOGIN THING");
     client.once('data', function(data) {
-      done();
-    });   
+      process.nextTick(function() {
+        client.write("FLUSH");
+          client.once('data', function(data) {
+          done();
+        }); 
+      });
+    });  
   });
 }
 

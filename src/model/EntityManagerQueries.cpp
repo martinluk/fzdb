@@ -514,19 +514,15 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, 
 
 		auto values = currentEntity->getProperty(propertyId)->baseValues();
 
-		*(iter->begin() + variableId2) = VariableSetValue(values[0]->Clone(), 0, 0);
+		//*(iter->begin() + variableId2) = VariableSetValue(values[0]->Clone(), 0, 0);
+		variableSet.add(variableId2, values[0]->Clone(), propertyId, entityHandle, values[0]->subtype(), std::move(metaVar), i);
 
 		for (size_t valId = 1; valId < values.size(); valId++) {
-			VariableSetRow newVec(variableSet.width());
-			for (size_t j = 0; j < iter->size(); j++) {
-				if (j != variableId2) {
-					newVec[j] = (*iter)[j];
-				}
-				else {
-					newVec[j] = VariableSetValue(values[valId]->Clone(), 0, 0);
-				}
-			}
-			variableSet.add(std::move(newVec));
+
+			VariableSetRow newVec(*iter);
+			newVec.ranking(newVec.ranking()-newVec.at(valId).dataPointer()->confidence());
+			unsigned int newRowId = variableSet.add(std::move(newVec));
+			variableSet.add(variableId2, values[valId]->Clone(), propertyId, entityHandle, values[valId]->subtype(), std::move(metaVar), newRowId);
 		}
 	}
 }
