@@ -37,7 +37,7 @@ void PropertyOwner::removeProperty(const unsigned int &key) {
 }
 
 // Tests if the entity has a property
-bool PropertyOwner::hasProperty(const unsigned int &key, bool linked) const {
+bool PropertyOwner::hasProperty(const unsigned int &key, MatchState state) const {
     return _propertyTable.find(key) != _propertyTable.cend();
 }
 
@@ -47,28 +47,46 @@ const std::map<unsigned int, std::shared_ptr<EntityProperty>>& PropertyOwner::pr
 }
 
 // Tests if the entity meets the condition
-std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked) {
+std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, const model::Object&& obj, MatchState state) {
     if (!hasProperty(propertyId)) return std::vector<BasePointer>();
     std::vector<BasePointer> values = getProperty(propertyId)->baseValues();
 	if (obj.type == model::Object::Type::ENTITYREF) {
-		values.erase(std::remove_if(values.begin(), values.end(), [&, obj, this](BasePointer ptr) { 
 
+		for (auto iter = values.begin(); iter != values.end(); ) {
+			
 			// if it is an exact match, return don't remove
-			if (ptr->Equals(obj)) return false;
-
+			if ((*iter)->Equals(obj)) {
+				iter++;
+				continue;
+			}
+			
 			auto entity = Singletons::cDatabase()->entityManager().getEntity(std::stoul(obj.value));
 
-			if (entity->hasProperty(4)) {
+			if (state != MatchState::UpTree && entity->hasProperty(4)) {
 				auto subSets = entity->getProperty(4)->baseValues();
+				bool met = false;
 				for (auto subSet : subSets) {
-					if (this->meetsCondition(propertyId, std::move(subSet), linked).size() > 0) {
-						return false;
+					if (this->meetsCondition(propertyId, std::move(subSet), MatchState::DownTree).size() > 0) {
+						met = true;
+						break;
 					}
+				}
+				if (met) {
+					iter++;
+					continue;
+				}
+			}
+			
+			if (state != MatchState::DownTree && entity->hasProperty(3)) {
+				auto subSet = entity->getProperty(3)->baseTop();
+				if (this->meetsCondition(propertyId, std::move(subSet), MatchState::UpTree).size() > 0) {
+					iter++;
+					continue;
 				}
 			}
 
-			return true;
-		}), values.end());
+			iter = values.erase(iter);
+		}
 	}
 	else {
 		values.erase(std::remove_if(values.begin(), values.end(), [obj](BasePointer ptr) { return !ptr->Equals(obj); }), values.end());
@@ -76,10 +94,10 @@ std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, 
     return values;
 }
 
-std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked)
+std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state)
 {
-	if(value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), linked);
-	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), linked);
+	if(value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
+	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), state);
 }
 
 // Clears all properties on the entity.
@@ -110,7 +128,7 @@ std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &k
   return std::shared_ptr<EntityProperty>();
 }
 
-void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, bool linked) {
+void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state) {
 
   checkLock();
 
@@ -131,7 +149,7 @@ void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, bool li
   }
 }
 
-void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, bool linked) {
+void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state) {
 
   checkLock();
   object->_manager = _manager;

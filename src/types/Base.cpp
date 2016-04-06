@@ -5,7 +5,7 @@
 
 using namespace model::types;
 
-bool model::types::Base::hasProperty(const unsigned int & key, bool linked) const
+bool model::types::Base::hasProperty(const unsigned int & key, MatchState state) const
 {
 	if (key == 5) return true;
 	if (key == 6) return true;

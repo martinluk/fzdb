@@ -37,24 +37,36 @@ describe("Fuzzy Database", function() {
       {"status":true,"errorCode":0,"info":"Inserted 2 triples.","result":{"type":"fsparql","data":{"per": "5"}}}
     );
 
+    h.testCase("Inserting an entity with hierarchy data", 
+      "INSERT DATA { $per <name> \"George\" ; <lives> entity:2 } WHERE { NEW($per, \"Person\") }",
+      {"status":true,"errorCode":0,"info":"Inserted 2 triples.","result":{"type":"fsparql","data":{"per": "6"}}}
+    );
+
     h.testCase("Getting entities with exact match", 
       "SELECT $a WHERE { $a <lives> entity:4 }",
       h.resultTemplate(
-            [{"a":"5"}]
+            [{"a":"5"}, {"a":"6"}]
       )
     );
 
     h.testCase("Getting entities with superset match", 
       "SELECT $a WHERE { $a <lives> entity:2 }",
       h.resultTemplate(
-            [{"a":"5"}]
+            [{"a":"5"}, {"a":"6"}]
       )
     );
 
     h.testCase("Getting entities with superset match", 
       "SELECT $a WHERE { $a <lives> entity:3 }",
       h.resultTemplate(
-            [{"a":"5"}]
+            [{"a":"5"}, {"a":"6"}]
+      )
+    );
+
+    h.testCase("Getting entities with subset match", 
+      "SELECT $a WHERE { $a <lives> entity:3 }",
+      h.resultTemplate(
+            [{"a":"5"}, {"a":"6"}]
       )
     );
  

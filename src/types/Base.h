@@ -198,7 +198,7 @@ namespace model {
                         _timeCreated == other->_timeCreated;
             }
 
-			bool hasProperty(const unsigned int &key, bool linked = false) const override;
+			bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const override;
 
 			std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 
