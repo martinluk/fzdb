@@ -40,8 +40,12 @@ describe("Fuzzy Database", function() {
     describe("with the simpsons data loaded", function() {
 
       beforeAll(function(done) {
-        h.sendCmd("FLUSH").then(function() {
-          h.sendCmd(simpsonsTestData).then(done);
+        h.sendCmd(h.loginToAdminQuery).then(function() {
+          h.sendCmd('FLUSH').then(function() {
+            h.sendCmd(simpsonsTestData).then(function() {
+              h.sendCmd('USER LOGOUT').then(done());
+            });
+          });
         });
       });
 

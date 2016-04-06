@@ -1,29 +1,41 @@
 var net = require('net');
 var h = require('./support/helper.js');
 
-describe("Fuzzy Database", function() {
+fdescribe("Fuzzy Database", function() {
   var client;
 
   //connects to the database
   beforeAll(function(done) { 
     client = new net.Socket();
     client.connect(1407, '127.0.0.1', function() {
-      client.write("FLUSH");
-      client.once('data', function(data) {
-        done();
-      });   
+        client.write(h.loginToAdminQuery);
+        client.once('data', function(data) {
+            var resultJSON = JSON.parse(data);
+            expect(resultJSON.result.data).toEqual('Logged in successfully.');
+            client.write("FLUSH");
+            client.once('data', function(data) {
+                var resultJSON = JSON.parse(data);
+                client.write('USER LOGOUT');
+                client.once('data', function(data) {
+                    var resultJSON = JSON.parse(data);
+                    done();
+                });
+            });   
+        });
+      });
     });
-  });
   
   describe("sends the command over TCP", function() {
 
+    //tests are run sequentially
     it("Sample query - logging into admin", function(done) {
       client.write(h.loginToAdminQuery);
       client.once('data', function(data) {
-        done();
+            var resultJSON = JSON.parse(data);
+            expect(resultJSON.result.data).toEqual('Logged in successfully.');
+            done();
         });
     });
-    //tests are run sequentially
 
     //test pong
     it("'PONG'", function(done) {
@@ -255,7 +267,7 @@ describe("Fuzzy Database", function() {
       });      
     });
 
-	//test select - Option 3 $a $b value 
+	//test select - Option 3 $a $b value  FIXME
     it("Select entities which have a property which is equal to both Marco and 34", function(done) {
       client.write("SELECT $a WHERE { $a $b \"Marco\" . $a $b \"34\"}");
       client.once('data', function(data) {
@@ -558,6 +570,8 @@ describe("Fuzzy Database", function() {
     it("Sample query - logging out from admin", function(done) {
         client.write('USER LOGOUT');
         client.once('data', function(data) {
+            var resultJSON = JSON.parse(data);
+
         done();
         });
     });

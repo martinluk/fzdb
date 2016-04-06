@@ -78,6 +78,8 @@ helper.testCase = function(name, command, expected, timeout, focus) {
   it(name+' -logging in as admin', function(done) {
       helper.sendCmd(helper.loginToAdminQuery).then(function(data) {
           expect(data.status).toBe(true);
+          expect(data.result.type).toBe('text');
+          expect(data.result.data).toBe('Logged in successfully.');
           done();
       });
   });
@@ -95,6 +97,8 @@ helper.testCase = function(name, command, expected, timeout, focus) {
   it(name+' - logout from admin', function(done) {
       helper.sendCmd('USER LOGOUT').then(function(data) {
           expect(data.status).toBe(true);
+          expect(data.result.type).toBe('text');
+          expect(data.result.data).toBe('Logged out successfully.');
           done();
       });
   });
@@ -107,10 +111,20 @@ helper.resultTemplate = function(results) {
 helper.setupClient = function(done) {
   client = new net.Socket();
   client.connect(1407, '127.0.0.1', function() {
-    client.write("FLUSH");
+    client.write(helper.loginToAdminQuery);
     client.once('data', function(data) {
-      done();
-    });   
+      process.nextTick(function() {
+        client.write('FLUSH');
+        client.once('data', function(data) {
+          process.nextTick(function() {
+            client.write('USER LOGOUT');
+            client.once('data', function(data) {
+                done();
+            });
+          });
+        });
+      });   
+    });
   });
 }
 
