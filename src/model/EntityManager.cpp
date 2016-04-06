@@ -468,6 +468,9 @@ void EntityManager::clearAll()
 
 	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:created", _lastProperty)); // 7
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:certainty", _lastProperty)); // 7
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeInt32));
 }
 
 std::size_t EntityManager::entityCount() const
