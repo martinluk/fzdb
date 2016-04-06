@@ -14,23 +14,47 @@ describe("Fuzzy Database", function() {
 
    // Jonathan: Testing hierarchies.
     h.testCase("Creating a simple hierarchy", 
-      "INSERT DATA { $eng <name> \"England\" . $lon <name> \"London\"; <subsetOf> $eng } WHERE { NEW($eng, \"Location\") . NEW($lon, \"Location\") }",
-      {"status":true,"errorCode":0,"info":"Inserted 3 triples.","result":{"type":"fsparql","data":{"eng":"2","lon":"3"}}}
+      "INSERT DATA { $eng <name> \"England\" . $lon <name> \"London\"; <subsetOf> $eng . $eur <name> \"Europe\"; <supersetOf> $eng } WHERE { NEW($eng, \"Location\") . NEW($lon, \"Location\") . NEW($eur, \"Location\") }",
+      {"status":true,"errorCode":0,"info":"Inserted 5 triples.","result":{"type":"fsparql","data":{"eng":"2","eur":"3", "lon":"4"}}}
     );
 
     h.testCase("Querying the hierarchy for superset link", 
       "SELECT $a WHERE { $a <supersetOf> $b }",
       h.resultTemplate(
-            // generate results using lodash - a very very useful js library for pretty much everything
-            [{"a":"2"}]
+            [{"a":"2"}, {"a":"3"}]
       )
     );
 
     h.testCase("Querying the hierarchy for subset link", 
       "SELECT $a WHERE { $a <subsetOf> $b }",
       h.resultTemplate(
-            // generate results using lodash - a very very useful js library for pretty much everything
-            [{"a":"3"}]
+            [{"a":"2"}, {"a":"4"}]
+      )
+    );
+
+    h.testCase("Inserting an entity with hierarchy data", 
+      "INSERT DATA { $per <name> \"Fred\" ; <lives> entity:4 } WHERE { NEW($per, \"Person\") }",
+      {"status":true,"errorCode":0,"info":"Inserted 2 triples.","result":{"type":"fsparql","data":{"per": "5"}}}
+    );
+
+    h.testCase("Getting entities with exact match", 
+      "SELECT $a WHERE { $a <lives> entity:4 }",
+      h.resultTemplate(
+            [{"a":"5"}]
+      )
+    );
+
+    h.testCase("Getting entities with superset match", 
+      "SELECT $a WHERE { $a <lives> entity:2 }",
+      h.resultTemplate(
+            [{"a":"5"}]
+      )
+    );
+
+    h.testCase("Getting entities with superset match", 
+      "SELECT $a WHERE { $a <lives> entity:3 }",
+      h.resultTemplate(
+            [{"a":"5"}]
       )
     );
  

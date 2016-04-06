@@ -63,6 +63,7 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 
 std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked)
 {
+	if (value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), linked);
 	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), linked);
 }
 

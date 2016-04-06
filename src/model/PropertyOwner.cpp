@@ -1,6 +1,8 @@
 #include "./PropertyOwner.h"
 
 #include "./types/Base.h"
+#include "./EntityManager.h"
+#include "../singletons.h"
 
 PropertyOwner::PropertyOwner() : _locked(false), _manager(NULL)
 {
@@ -48,12 +50,35 @@ const std::map<unsigned int, std::shared_ptr<EntityProperty>>& PropertyOwner::pr
 std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, const model::Object&& obj, bool linked) {
     if (!hasProperty(propertyId)) return std::vector<BasePointer>();
     std::vector<BasePointer> values = getProperty(propertyId)->baseValues();
-    values.erase(std::remove_if(values.begin(), values.end(), [obj](BasePointer ptr) { return !ptr->Equals(obj); }), values.end());
+	if (obj.type == model::Object::Type::ENTITYREF) {
+		values.erase(std::remove_if(values.begin(), values.end(), [&, obj, this](BasePointer ptr) { 
+
+			// if it is an exact match, return don't remove
+			if (ptr->Equals(obj)) return false;
+
+			auto entity = Singletons::cDatabase()->entityManager().getEntity(std::stoul(obj.value));
+
+			if (entity->hasProperty(4)) {
+				auto subSets = entity->getProperty(4)->baseValues();
+				for (auto subSet : subSets) {
+					if (this->meetsCondition(propertyId, std::move(subSet), linked).size() > 0) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}), values.end());
+	}
+	else {
+		values.erase(std::remove_if(values.begin(), values.end(), [obj](BasePointer ptr) { return !ptr->Equals(obj); }), values.end());
+	}    
     return values;
 }
 
 std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked)
 {
+	if(value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), linked);
 	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), linked);
 }
 
