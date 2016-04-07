@@ -98,8 +98,9 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
         else {
             if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
-                    //doesn't contain any variables.. is meaningless
-                    //TODO: UNLESS IN A META BLOCK
+                    //meanlingless unless in a meta block!
+					this->ScanEPR(std::move(result), std::move(conditionsIter->subject), 
+						std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
                 }
                 else {
                     //option 5 - entity <prop> $c

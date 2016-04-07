@@ -168,13 +168,14 @@ void VariableSet::removeMetaRefs(unsigned int metaRef) {
     }
 }
 
-void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
+void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, const std::shared_ptr<model::types::Base>&& value,
+	const unsigned int propertyId, const Entity::EHandle_t entityId) {
 	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
     bool found = false;
     for (int i = 0; i < _values.size(); i++) {
         for (unsigned char j = 0; j < _values[i].size(); j++) {
             if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
-                _values[i][position] = val;
+                _values[i][position].reset(value, entityId, propertyId);
                 found = true;
                 break;
             }

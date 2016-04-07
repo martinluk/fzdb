@@ -410,11 +410,48 @@ void EntityManager::ScanUUR(VariableSet&& variableSet, unsigned int variableId, 
 
 
 void EntityManager::ScanMVR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
-
+	//TODO: does this work if two properties match?
+	for (auto iter = variableSet.cbegin(); iter != variableSet.cend(); iter++) {
+		if (!(*iter).at(variableId).dataPointer()) continue;
+		auto vsv = (*iter).at(variableId);
+		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
+		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+		//check if val meets the property
+		for(auto prop : val->properties()) {
+			for (auto val : prop.second->baseValues()) {
+				if (val->Equals(object)) {
+					variableSet.addToMetaRefRow(vsv.metaRef(), variableId2, std::make_shared<model::types::Property>(prop.first, this, 0), prop.first, vsv.entity());
+					break;
+				}
+			}
+		}
+	}
 }
 
 void EntityManager::ScanMUR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
+	
+	//TODO what if there are multiple values against the property?
 
+	for (int i = variableSet.height() - 1; i >= 0; i--) {
+		auto iter = (variableSet.begin() + i);
+
+		if (!(*iter).at(variableId).dataPointer()) continue;
+		auto vsv = (*iter).at(variableId);
+		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
+		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+		//check if val meets the property
+		bool found = false;
+		for (auto prop : val->properties()) {
+			for (auto val : prop.second->baseValues()) {
+				if (val->Equals(object)) {
+					found = true;
+					break;
+				}
+				if(found)break;
+			}
+		}
+		if (!found)variableSet.erase(iter);
+	}
 }
 
 
@@ -579,13 +616,31 @@ void EntityManager::ScanMPV(VariableSet&& variableSet, unsigned int variableId, 
 			auto subprop = val->getProperty(propertyId);
 			//TODO: should be all values
 			auto valueToStore = subprop->baseTop()->Clone();
-			variableSet.addToMetaRefRow(vsv.metaRef(), variableId2, VariableSetValue(subprop->baseTop()->Clone(), propertyId, vsv.entity()));
+			variableSet.addToMetaRefRow(vsv.metaRef(), variableId2, subprop->baseTop()->Clone(), propertyId, vsv.entity());
 		}
 	}
 }
 
 void EntityManager::ScanMPU(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, unsigned int variableId2, const std::string&& metaVar) const {
+	
+	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
+	for (int i = variableSet.height() - 1; i >= 0; i--) {
+		auto iter = (variableSet.begin() + i);
+
+		if (!(*iter).at(variableId).dataPointer()) continue;
+		auto vsv = (*iter).at(variableId);
+		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
+		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+		//check if val meets the property
+		if (val->hasProperty(propertyId)) {
+			auto subprop = val->getProperty(propertyId);
+			if (val->meetsCondition(propertyId, (*iter).at(variableId2).dataPointer()).size() > 0) {
+				continue;
+			}
+		}
+		variableSet.erase(iter);
+	}
 }
 
 
@@ -820,7 +875,26 @@ void EntityManager::ScanEPU(VariableSet&& variableSet, const model::Subject&& su
 
 // Entity Property Value - No scan :(
 void EntityManager::ScanEPR(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
+	
+	if (metaVar == "") return;
+	
+	Entity::EHandle_t entityId = std::stoull(subject.value);
+	unsigned int propertyId = std::stoul(subject.value);
+	if (EntityExists(entityId)) {
+		auto entity = _entities.at(entityId);
+		if (entity->hasProperty(propertyId)) {
 
+			//TODO: what if more than 1 result?
+
+			auto results = entity->meetsCondition(propertyId, std::move(object));
+			if (results.size() > 0) {
+				//yay matches
+				variableSet.add(variableSet.indexOf(metaVar),
+					std::make_shared<model::types::ValueRef>(entityId, propertyId, results[0]->OrderingId()), 
+					propertyId, entityId, model::types::SubType::ValueReference, "");
+			}
+		}
+	}
 }
 
 std::vector<unsigned int> EntityManager::ScanHelp1(VariableSet&& variableSet, const std::shared_ptr<Entity>&& entity,

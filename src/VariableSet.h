@@ -173,7 +173,8 @@ public:
 
     void removeMetaRefs(unsigned int metaRef);
 
-    void addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val);
+    void addToMetaRefRow(unsigned int metaRef, unsigned char position, const std::shared_ptr<model::types::Base>&& value,
+		const unsigned int propertyId, const Entity::EHandle_t entityId);
 
     //this doesn't seem to work
     void trimEmptyRows();
