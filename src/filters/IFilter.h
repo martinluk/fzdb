@@ -9,7 +9,7 @@
 
 class IFilter {
 public:
-   virtual bool Test(const VariableSet&& variableSet, const std::vector<VariableSetValue>&& values) = 0;
+   virtual bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) = 0;
 
    virtual ~IFilter() {}
 };

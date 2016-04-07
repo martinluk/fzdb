@@ -347,7 +347,7 @@ void EntityManager::ScanVUR(VariableSet&& variableSet, unsigned int variableId, 
 			auto vals = iter->second->getProperty(propId)->baseValues();
 			for (auto value : vals) {
 				if (value->Equals(object)) {
-					auto newRow = std::vector<VariableSetValue>(row);
+					auto newRow = VariableSetRow(row);
 					newRow[variableId] = VariableSetValue(std::make_shared<model::types::EntityRef>(iter->second->getHandle(), 0), 0, iter->second->_handle);
 					variableSet.add(std::move(newRow));
 				}
@@ -358,9 +358,9 @@ void EntityManager::ScanVUR(VariableSet&& variableSet, unsigned int variableId, 
 
 void EntityManager::ScanUVR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
-	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if ((*iter)[variableId].empty()) continue;
-		Entity::EHandle_t entityId = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
+	for (auto iter = variableSet.cbegin(); iter != variableSet.cend(); iter++) {
+		if ((*iter).at(variableId).empty()) continue;
+		Entity::EHandle_t entityId = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter).at(variableId).dataPointer())->value();
 		auto entity = _entities.at(entityId);
 
 		auto rows = ScanHelp1(std::move(variableSet), std::move(entity), std::move(entity->properties()), variableId2, std::move(object), std::move(metaVar));
@@ -376,24 +376,27 @@ void EntityManager::ScanUVR(VariableSet&& variableSet, unsigned int variableId, 
 void EntityManager::ScanUUR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
 	// Only delete rows that match the pattern perfectly... does this make sense?
-	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, variableId](std::vector<VariableSetValue> row) {
-		if (row[variableId].empty()) return false;
-		if (row[variableId2].empty()) return false;
+	for (auto iter = variableSet.begin(); iter != variableSet.end();) {
+		
+		if ((*iter)[variableId].empty() || (*iter)[variableId2].empty()) {
+			iter++;
+			continue;
+		}
 
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntity = _entities.at(entityHandle);
 
-		unsigned int propertyId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[variableId2].dataPointer())->value();
+		unsigned int propertyId = std::dynamic_pointer_cast<model::types::Property, model::types::Base>((*iter)[variableId2].dataPointer())->value();
 
-		if (!currentEntity->hasProperty(propertyId)) return true;
-		if (currentEntity->meetsCondition(propertyId, std::move(object)).size() > 0) {
-			return false;
+		if (currentEntity->hasProperty(propertyId)) {
+			if (currentEntity->meetsCondition(propertyId, std::move(object)).size() > 0) {
+				iter++;
+				continue;
+			}
 		}
-		else {
-			return true;
-		}
-	}), variableSet.getData()->end());
+		
+		iter = variableSet.erase(iter);
+	}
 }
 
 
@@ -431,8 +434,12 @@ void EntityManager::ScanVPU(VariableSet&& variableSet, unsigned int variableId, 
 	
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
-	for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
-		if (iter->at(variableId2).empty()) continue;
+	for (auto iter = variableSet.begin(); iter != variableSet.end();) {
+		if (iter->at(variableId2).empty()) {
+			iter++;
+			continue;
+		}
+
 		auto val = iter->at(variableId2).dataPointer();
 
 		bool removeRow = true;
@@ -459,7 +466,10 @@ void EntityManager::ScanVPU(VariableSet&& variableSet, unsigned int variableId, 
 		}
 
 		if (removeRow) {
-			iter = variableSet.getData()->erase(iter);
+			iter = variableSet.erase(iter);
+		}
+		else {
+			iter++;
 		}
 	}
 }
@@ -468,9 +478,8 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, 
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
-	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, variableId](std::vector<VariableSetValue> row) {
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
+	for (auto iter = variableSet.begin(); iter != variableSet.end(); ) {
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
 		std::shared_ptr<Entity> currentEntity;
 		if (currentEntityIter != _entities.end()) {
@@ -479,13 +488,18 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, 
 		else {
 			throw std::runtime_error("Attempted to look up a non-existent entity");
 		}
-		return !currentEntity->hasProperty(propertyId);
-	}), variableSet.getData()->end());
+		if (!currentEntity->hasProperty(propertyId)) {
+			iter = variableSet.erase(iter);
+		}
+		else {
+			iter++;
+		}
+	}
 
 	//TODO: but what about the type of the new data being added? :/
-	//for (auto iter = variableSet.getData()->begin(); iter != variableSet.getData()->end(); iter++) {
-	for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
-		auto iter = (variableSet.getData()->begin() + i);
+	//for (auto iter = variableSet.begin(); iter != variableSet.end(); iter++) {
+	for (int i = variableSet.height() - 1; i >= 0; i--) {
+		auto iter = (variableSet.begin() + i);
 
 		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
@@ -500,19 +514,15 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, 
 
 		auto values = currentEntity->getProperty(propertyId)->baseValues();
 
-		*(iter->begin() + variableId2) = VariableSetValue(values[0]->Clone(), 0, 0);
+		//*(iter->begin() + variableId2) = VariableSetValue(values[0]->Clone(), 0, 0);
+		variableSet.add(variableId2, values[0]->Clone(), propertyId, entityHandle, values[0]->subtype(), std::move(metaVar), i);
 
 		for (size_t valId = 1; valId < values.size(); valId++) {
-			std::vector<VariableSetValue> newVec;
-			for (size_t j = 0; j < iter->size(); j++) {
-				if (j != variableId2) {
-					newVec.push_back((*iter)[j]);
-				}
-				else {
-					newVec.push_back(VariableSetValue(values[valId]->Clone(), 0, 0));
-				}
-			}
-			variableSet.getData()->emplace(iter + 1, newVec);
+
+			VariableSetRow newVec(*iter);
+			newVec.ranking(newVec.ranking()-newVec.at(valId).dataPointer()->confidence());
+			unsigned int newRowId = variableSet.add(std::move(newVec));
+			variableSet.add(variableId2, values[valId]->Clone(), propertyId, entityHandle, values[valId]->subtype(), std::move(metaVar), newRowId);
 		}
 	}
 }
@@ -524,10 +534,9 @@ void EntityManager::ScanUPU(VariableSet&& variableSet, unsigned int variableId, 
 	if (variableSet.typeOf(variableId) != model::types::SubType::TypeEntityRef) {
 		throw std::runtime_error("Not yet implemented :/");
 	}
+	for (auto iter = variableSet.begin(); iter != variableSet.end(); ) {
 
-	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, variableId](std::vector<VariableSetValue> row) {
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
 		std::shared_ptr<Entity> currentEntity;
 		if (currentEntityIter != _entities.end()) {
@@ -537,8 +546,13 @@ void EntityManager::ScanUPU(VariableSet&& variableSet, unsigned int variableId, 
 			throw std::runtime_error("Attempted to look up a non-existent entity");
 		}
 
-		return currentEntity->meetsCondition(propertyId, model::Object(model::Object::Type::STRING, row[variableId2].dataPointer()->toString())).size() == 0;
-	}), variableSet.getData()->end());
+		if (currentEntity->meetsCondition(propertyId, model::Object(model::Object::Type::STRING, (*iter)[variableId2].dataPointer()->toString())).size() == 0) {
+			iter = variableSet.erase(iter);
+		}
+		else {
+			iter++;
+		}
+	}
 }
 
 
@@ -546,9 +560,9 @@ void EntityManager::ScanMPV(VariableSet&& variableSet, unsigned int variableId, 
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
-	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if (!(*iter)[variableId].dataPointer()) continue;
-		auto vsv = (*iter)[variableId];
+	for (auto iter = variableSet.cbegin(); iter != variableSet.cend(); iter++) {
+		if (!(*iter).at(variableId).dataPointer()) continue;
+		auto vsv = (*iter).at(variableId);
 		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
 		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
 		//check if val meets the property
@@ -590,22 +604,26 @@ void EntityManager::ScanUPR(VariableSet&& variableSet, unsigned int variableId, 
 
 	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
-	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, variableId](std::vector<VariableSetValue> row) {
-		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>(row[variableId].dataPointer())->value();
+	for (auto iter = variableSet.begin(); iter != variableSet.end(); ) {
+		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntity = _entities.at(entityHandle);
 		auto matches = currentEntity->meetsCondition(propertyId, std::move(object));
-		return matches.size() == 0;
-	}), variableSet.getData()->end());
+		if (matches.size() == 0) {
+			iter = variableSet.erase(iter);
+		}
+		else {
+			iter++;
+		}
+	}
 }
 
 void EntityManager::ScanMPR(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 
 	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::TypeUndefined);
 
-	for (auto iter = variableSet.getData()->cbegin(); iter != variableSet.getData()->cend(); iter++) {
-		if (!(*iter)[variableId].dataPointer()) continue;
-		auto vsv = (*iter)[variableId];
+	for (auto iter = variableSet.cbegin(); iter != variableSet.cend(); iter++) {
+		if (!(*iter).at(variableId).dataPointer()) continue;
+		auto vsv = (*iter).at(variableId);
 		std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(vsv.dataPointer());
 		auto val = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
 		//check if val meets the property
@@ -643,8 +661,8 @@ void EntityManager::ScanEVU(VariableSet&& variableSet, const model::Subject&& su
 	Entity::EHandle_t entityRef = std::atoll(subject.value.c_str());
 	auto currentEntity = _entities.at(entityRef);
 
-	for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
-		auto iter = (variableSet.getData()->begin() + i);
+	for (int i = variableSet.height() - 1; i >= 0; i--) {
+		auto iter = (variableSet.begin() + i);
 
 		if ((*iter)[variableId2].empty()) continue;
 
@@ -659,7 +677,7 @@ void EntityManager::ScanEVU(VariableSet&& variableSet, const model::Subject&& su
 		}
 
 		if (!found) {
-			variableSet.getData()->erase(iter);
+			variableSet.erase(iter);
 		}
 	}
 }
@@ -703,8 +721,8 @@ void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& su
 		return std::pair<unsigned int, std::shared_ptr<EntityProperty>>(prop->value(), currentEntity->getProperty(prop->value()));
 	});
 
-	for (int i = variableSet.getData()->size() - 1; i >= 0; i--) {
-		auto iter = (variableSet.getData()->begin() + i);
+	for (int i = variableSet.height() - 1; i >= 0; i--) {
+		auto iter = (variableSet.begin() + i);
 
 		if ((*iter)[variableId2].empty()) continue;
 
@@ -719,7 +737,7 @@ void EntityManager::ScanEUU(VariableSet&& variableSet, const model::Subject&& su
 		}
 
 		if (!found) {
-			variableSet.getData()->erase(iter);
+			variableSet.erase(iter);
 		}
 	}
 }
@@ -740,12 +758,19 @@ void EntityManager::ScanEUR(VariableSet&& variableSet, const model::Subject&& su
 
 	auto currentEntity = _entities.at(entityRef);
 
-	variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-		[&, this, variableId](std::vector<VariableSetValue> row) {
-		if (row[variableId].empty()) return false;
-		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>(row[variableId].dataPointer());
-		return currentEntity->meetsCondition(prop->value(), std::move(object)).size() == 0;
-	}), variableSet.getData()->end());
+	for (auto iter = variableSet.begin(); iter != variableSet.end();) {
+		if ((*iter)[variableId].empty()) {
+			iter++;
+			continue;
+		}
+		std::shared_ptr<model::types::Property> prop = std::dynamic_pointer_cast<model::types::Property, model::types::Base>((*iter)[variableId].dataPointer());
+		if (currentEntity->meetsCondition(prop->value(), std::move(object)).size() == 0) {
+			iter = variableSet.erase(iter);
+		}
+		else {
+			iter++;
+		}
+	}
 }
 
 // Entity Property $c - Scan 5
@@ -765,17 +790,22 @@ void EntityManager::ScanEPU(VariableSet&& variableSet, const model::Subject&& su
 	if (EntityExists(entityRef)) {
 		auto currentEntity = _entities.at(entityRef);
 
-		variableSet.getData()->erase(std::remove_if(variableSet.getData()->begin(), variableSet.getData()->end(),
-			[&, this, variableId](std::vector<VariableSetValue> row) {
-			if (row[variableId].empty()) return false;
-			if (!currentEntity->hasProperty(propertyId)) return true;
-			if (currentEntity->meetsCondition(propertyId, std::move(row[variableId].dataPointer())).size() > 0) {
-				return false;
+		for (auto iter = variableSet.begin(); iter != variableSet.end();) {
+		
+			if ((*iter)[variableId].empty()) {
+				iter++;
+				continue;
 			}
-			else {
-				return true;
+
+			if (currentEntity->hasProperty(propertyId)) {
+				if (currentEntity->meetsCondition(propertyId, std::move((*iter)[variableId].dataPointer())).size() > 0) {
+					iter++;
+					continue;
+				}
 			}
-		}), variableSet.getData()->end());
+			
+			iter = variableSet.erase(iter);
+		}
 	}
 }
 
