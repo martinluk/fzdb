@@ -87,6 +87,10 @@ public:
     std::size_t unserialiseAll(const char* serialisedData, std::size_t length);
 
     void setInitialised();
+
+	bool initialised() const {
+		return _initialised;
+	}
     
 private:
     typedef std::pair<void*, std::size_t> PrimitivePair;

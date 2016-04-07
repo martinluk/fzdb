@@ -21,10 +21,10 @@ namespace model {
         // Base value type class. All other types inherit from this.
         class Base : public ILogString, public PropertyOwner
         {
-        private:
+		private:
             MemberSerialiser _memberSerialiser;
 
-            void initMemberSerialiser()
+            virtual void initMemberSerialiser()
             {
                 _memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
                 _memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
@@ -105,9 +105,7 @@ namespace model {
                 _cMinCreated(0),
                 _cSecCreated(0),
                 _cFracSecCreated(0)
-            {
-               initMemberSerialiser();
-                //initConvenienceMembers();
+            {             
                 if (confidence > 100) confidence = 100;
                 _confidence = confidence;
             }
@@ -204,14 +202,16 @@ namespace model {
 
         protected:
             // Called when serialising.
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {        
+				if(!_memberSerialiser.initialised()) Base::initMemberSerialiser();				
                 return _memberSerialiser.serialiseAll(serialiser);
             }
 
             // Called to construct from serialised data.
             Base(const char* &serialisedData, std::size_t length) : Base(0, 0, "")
             {
+				initMemberSerialiser();
                 initConvenienceMembers();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
