@@ -17,12 +17,14 @@ using BasePointer = std::shared_ptr<model::types::Base>;
 EntityProperty::EntityProperty() : _subtype(model::types::SubType::TypeUndefined)
 {
     _count = 0;
+	_type = Type::FUZZY;
 }
 
 EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType subtype) :
     _key(key), _subtype(subtype)
 {
     _count = 0;
+	_type = Type::FUZZY;
 }
 
 EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType subtype,
@@ -30,6 +32,7 @@ EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType su
 {
     _count = 0;
     append(values);
+	_type = Type::FUZZY;
 }
 
 EntityProperty::~EntityProperty()
@@ -68,40 +71,60 @@ unsigned int EntityProperty::count() const
 
 void EntityProperty::append(BasePointer value)
 {
-    if (value->subtype() != _subtype)
-    {
-        throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(value->subtype())
-            + std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
-    }
+	switch (_type) {
+	case Type::FUZZY: {
+		if (value->subtype() != _subtype)
+		{
+			throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(value->subtype())
+				+ std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
+		}
 
-    _count += 1;
-    _valuesList.emplace_front(value);
-    _valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
-    unsigned int count = 0;
-    for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
-        (*iter)->OrderingId(count++);
-    }
+		_count += 1;
+		_valuesList.emplace_front(value);
+		_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
+		unsigned int count = 0;
+		for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
+			(*iter)->OrderingId(count++);
+		}
+		break;
+	}
+	case Type::LOCKED:
+		throw std::runtime_error("Attempt to add to locked property");
+	default:
+		break;
+	}
+  
 }
 
 void EntityProperty::append(const std::vector<BasePointer> &list)
 {
-    for (auto it = list.cbegin(); it != list.cend(); ++it)
-    {
-        model::types::SubType st = (*it)->subtype();
-        if (st != _subtype)
-        {
-            throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(st)
-                + std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
-        }
-    }
+	switch (_type) {
+		case Type::FUZZY: {
+			for (auto it = list.cbegin(); it != list.cend(); ++it)
+			{
+				model::types::SubType st = (*it)->subtype();
+				if (st != _subtype)
+				{
+					throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(st)
+						+ std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
+				}
+			}
 
-    _count += list.size();
-    _valuesList.insert_after(_valuesList.cbefore_begin(), list.begin(), list.end());
-    _valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
-    unsigned int count = 0;
-    for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
-        (*iter)->OrderingId(count++);
-    }
+			_count += list.size();
+			_valuesList.insert_after(_valuesList.cbefore_begin(), list.begin(), list.end());
+			_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
+			unsigned int count = 0;
+			for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
+				(*iter)->OrderingId(count++);
+			}
+			break;
+		}
+		case Type::LOCKED: {
+			throw std::runtime_error("Attempt to add to locked property");
+		}
+		default:
+		break;
+	}
 }
 
 void EntityProperty::clear()
@@ -161,6 +184,7 @@ std::string EntityProperty::logString(const Database* db) const
 
 void EntityProperty::remove(const model::types::Base &value)
 {
+	if (_type == Type::LOCKED) throw std::runtime_error("Attempt to remove locked property");
     _valuesList.remove_if(model::types::ValuesEqualOnly(&value));
     _count = std::distance(_valuesList.cbegin(), _valuesList.cend());
 }
@@ -188,4 +212,9 @@ bool EntityProperty::memberwiseEqual(const EntityProperty *other) const
     }
 
     return otherIt == other->_valuesList.end();
+}
+
+void EntityProperty::lock()
+{
+	_type == Type::LOCKED;
 }

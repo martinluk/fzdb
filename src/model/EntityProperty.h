@@ -31,6 +31,13 @@ class EntityProperty : public ILogString
 {
     friend class EntitySerialiser;
 public:
+
+	enum class Type {
+		FUZZY,
+		LOCKED,
+		CONCRETESINGLE,
+		CONCRETEMULTI
+	};
     // Constructs a null property. This can be used for returning 'null',
     // for example if no property matches a given search.
     // isNull() will return true.
@@ -87,7 +94,10 @@ public:
 
     bool memberwiseEqual(const EntityProperty* other) const;
 
+	void lock();
+
 private:
+	Type _type;
     unsigned int _key;
     unsigned int _count;
     model::types::SubType _subtype;
