@@ -166,7 +166,7 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         data += advance;
     }
 
-    ent->insertProperty(std::shared_ptr<EntityProperty>(new EntityProperty(header->key, header->subtype, values)));
+    ent->insertProperty(std::shared_ptr<EntityProperty>(new EntityProperty(EntityProperty::Type::FUZZY, header->key, header->subtype, values)));
 }
 
 std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, std::size_t length)

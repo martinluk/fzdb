@@ -41,10 +41,11 @@ public:
     // Constructs a null property. This can be used for returning 'null',
     // for example if no property matches a given search.
     // isNull() will return true.
-    EntityProperty();
-    EntityProperty(const unsigned int &key, model::types::SubType subtype);
-    ~EntityProperty();
-    EntityProperty(const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
+    EntityProperty(Type type);
+    EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype);
+	EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
+
+    ~EntityProperty();   
 
     // Returns true if this is a null property (ie. default-constructed).
     // Internally, a property is null if its key is an empty string.

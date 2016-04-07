@@ -17,22 +17,22 @@ bool model::types::Base::hasProperty(const unsigned int & key, MatchState state)
 std::shared_ptr<EntityProperty> Base::getProperty(const unsigned int &key) const {
 	 switch (key) {
 		 case 5: {
-		 auto output = std::make_shared<EntityProperty>(5, model::types::SubType::TypeString);
+		 auto output = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, 5, model::types::SubType::TypeString);
 		 output->append(std::make_shared<model::types::String>(std::to_string(_originalAuthorId), 0));
 		 return output;
 		 }
 		 case 6: {
-		 auto output = std::make_shared<EntityProperty>(6, model::types::SubType::TypeEntityRef);
+		 auto output = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, 6, model::types::SubType::TypeEntityRef);
 		 output->append(std::make_shared<model::types::EntityRef>(_sourceEntityId, 0));
 		 return output;
 		 }
 		 case 7: {
-		 auto output = std::make_shared<EntityProperty>(7, model::types::SubType::TypeString);
+		 auto output = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, 7, model::types::SubType::TypeString);
 		 output->append(std::make_shared<model::types::String>(boost::posix_time::to_simple_string(_timeCreated), 0));
 		 return output;
 		 }
 		 case 8: {
-			 auto output = std::make_shared<EntityProperty>(8, model::types::SubType::TypeInt32);
+			 auto output = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, 8, model::types::SubType::TypeInt32);
 			 output->append(std::make_shared<model::types::Int>(_confidence, 0));
 			 return output;
 		 }

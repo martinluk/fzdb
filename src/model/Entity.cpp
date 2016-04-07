@@ -2,6 +2,7 @@
 #include "./EntityManager.h"
 #include "../singletons.h"
 #include "./types/String.h"
+#include "./types/UInt.h"
 #include "./types/EntityRef.h"
 
 #include "spdlog/spdlog.h"
@@ -13,35 +14,20 @@ const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 
 Entity::Entity(unsigned int type) : _handle(Entity::INVALID_EHANDLE), _type(type), _linkStatus(Entity::LinkStatus::None)
 {
+	insertProperty(2, std::make_shared<model::types::UInt>(type, 0));
+	_propertyTable.at(2)->lock();
     initMemberSerialiser();
 }
 
 Entity::Entity(unsigned int type, EHandle_t handle) : _handle(handle), _type(type), _linkStatus(Entity::LinkStatus::None)
 {
+	insertProperty(2, std::make_shared<model::types::UInt>(type, 0));
+	_propertyTable.at(2)->lock();
     initMemberSerialiser();
 }
 
 std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const model::Object && obj, MatchState state)
 {
-	//handle type comparison
-	if (propertyId == 2) {
-        if (obj.type == model::Object::Type::STRING)
-        {
-            if ( !_manager )
-                throw std::runtime_error("Cannot return entity type string: manager does not exist.");
-
-            if ( _manager->getTypeID(obj.value) == _type )
-            {
-                return std::vector<std::shared_ptr<model::types::Base>>{
-                    std::make_shared<model::types::String>(obj.value, 0)
-                };
-            }
-		}
-		else {
-			return std::vector<std::shared_ptr<model::types::Base>>();
-		}
-	}
-
 	//handle linking
 	switch (_linkStatus) {
 	case LinkStatus::Master: {
@@ -69,56 +55,18 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 
 bool Entity::hasProperty(const unsigned int & key, MatchState state) const
 {
-	if (key == 2) return true; //return true if it's type
-							   //handle linking
-	/*switch (_linkStatus) {
-	case LinkStatus::Master: {
-		if (PropertyOwner::hasProperty(key)) return true;
-		auto graph = Singletons::database()->entityManager().getLinkGraph(_handle, std::set<Entity::EHandle_t>());
-		for (auto entId : graph) {
-			if (entId == _handle) continue;
-			if (Singletons::database()->entityManager().getEntity(entId)->hasProperty(key, true)) return true;
-		}
-		return false;
-	}
-	case LinkStatus::Slave:
-		if (!linked) return false;
-	case LinkStatus::None:
-		return PropertyOwner::hasProperty(key);
-	}*/
 	return PropertyOwner::hasProperty(key);
 }
 
 std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) const
 {
-	if (key == 2) {
-		auto output = std::make_shared<EntityProperty>(2, model::types::SubType::TypeString);
-
-        if ( !_manager )
-            throw std::runtime_error("Cannot return entity type string: manager does not exist.");
-
-        output->append(std::make_shared<model::types::String>(_manager->getTypeName(_type), 0));
-
-		return output;
-	}
-
 	//this needs to be linkified too
 	return PropertyOwner::getProperty(key);	
 }
 
-void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state)
+void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state, EntityProperty::Type propType)
 {
 	switch (prop->key()) {
-	case 2: //type
-		if (prop->subtype() != model::types::SubType::TypeString) {
-			throw std::runtime_error("Entity types must be specified as strings.");
-		}
-		if (!prop->isConcrete()) {
-			throw std::runtime_error("Type must be a concrete value");
-		}
-		_type = Singletons::database()->entityManager().getTypeID(prop->baseTop()->toString());
-		spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", _handle, prop->baseTop()->toString(), _type);
-		break;
 	case 3: //subset
 		if(prop->subtype() != model::types::SubType::TypeEntityRef) {
 			throw std::runtime_error("subset must be an entity");
@@ -127,7 +75,7 @@ void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState sta
 		if (state == MatchState::None) {
 			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(prop->baseTop());
 			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
-			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef> (_handle, 0), MatchState::Linked);
+			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef> (_handle, 0), MatchState::Linked, EntityProperty::Type::CONCRETEMULTI);
 		}
 		PropertyOwner::insertProperty(prop);
 		break;
@@ -138,30 +86,18 @@ void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState sta
 		if (state == MatchState::None) {
 			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(prop->baseTop());
 			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
-			otherEntity->insertProperty(3, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked);
+			otherEntity->insertProperty(3, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked, EntityProperty::Type::CONCRETESINGLE);
 		}
-		PropertyOwner::insertProperty(prop, state);
+		PropertyOwner::insertProperty(prop, state, EntityProperty::Type::CONCRETEMULTI);
 		break;
 	default:
 		PropertyOwner::insertProperty(prop, state);
 	}	
 }
 
-void Entity::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state)
+void Entity::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state, EntityProperty::Type propType)
 {
 	switch (key) {
-	case 2: { //type
-		auto typeString = std::dynamic_pointer_cast<model::types::String>(object);
-		if (!typeString) {
-			throw std::runtime_error("Entity types must be specified as strings.");
-		}
-		if (typeString->confidence() != 100) {
-			throw std::runtime_error("Type must be a concrete value");
-		}
-		_type = Singletons::database()->entityManager().getTypeID(typeString->value());
-		spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", _handle, typeString->value(), _type);
-		break;
-	}
 	case 3: { //subset 
 		auto entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
 		if (!entityRef) {

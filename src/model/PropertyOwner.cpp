@@ -128,7 +128,7 @@ std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &k
   return std::shared_ptr<EntityProperty>();
 }
 
-void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state) {
+void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state, EntityProperty::Type propType) {
 
   checkLock();
 
@@ -149,14 +149,14 @@ void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchSt
   }
 }
 
-void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state) {
+void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state, EntityProperty::Type propType) {
 
   checkLock();
   object->_manager = _manager;
 
   if (!hasProperty(key)) {
 
-    auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key, object->subtype()));
+    auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(propType, key, object->subtype()));
     pair.second->append(object);
     _propertyTable.insert(pair);
   }

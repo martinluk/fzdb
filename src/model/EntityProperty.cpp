@@ -14,25 +14,22 @@
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
-EntityProperty::EntityProperty() : _subtype(model::types::SubType::TypeUndefined)
+EntityProperty::EntityProperty(Type type) : _type(type), _subtype(model::types::SubType::TypeUndefined)
 {
     _count = 0;
-	_type = Type::FUZZY;
 }
 
-EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType subtype) :
-    _key(key), _subtype(subtype)
+EntityProperty::EntityProperty(Type type, const unsigned int& key, model::types::SubType subtype) :
+	_type(type), _key(key), _subtype(subtype)
 {
     _count = 0;
-	_type = Type::FUZZY;
 }
 
-EntityProperty::EntityProperty(const unsigned int& key, model::types::SubType subtype,
-    const std::vector<BasePointer> &values) : _key(key), _subtype(subtype)
+EntityProperty::EntityProperty(Type type, const unsigned int& key, model::types::SubType subtype,
+    const std::vector<BasePointer> &values) : _type(type), _key(key), _subtype(subtype)
 {
     _count = 0;
     append(values);
-	_type = Type::FUZZY;
 }
 
 EntityProperty::~EntityProperty()

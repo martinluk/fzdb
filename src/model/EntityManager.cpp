@@ -775,8 +775,8 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     {
         std::vector<BasePointer> vals;
         vals.push_back(EntRefPtr(new EntityRef(h, author, 100, comment)));
-        EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::TypeEntityRef, vals));
-        e->insertProperty(p);
+        //EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::TypeEntityRef, vals));
+        //e->insertProperty(p);
     };
     
     auto propPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
