@@ -461,16 +461,6 @@ describe("Fuzzy Database", function() {
       });      
     });
 	
-	//test select - Option 8 entity $b $c 
-    it("Retrieving the property values of entity 2", function(done) {
-      client.write("SELECT $b WHERE { entity:2 $b $c . entity:3 $b $c }");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({c: 'Marco'})]})}));
-        done();
-      });      
-    });
-	
 	//discard current data
 	it("flush everything", function(done) {
       client.write("FLUSH");
@@ -483,8 +473,8 @@ describe("Fuzzy Database", function() {
 
 	var assignedIds = {};
 
-  //Multiple insert working
-  it("having multiple inserts'", function(done) {
+    //Multiple insert working
+	it("having multiple inserts'", function(done) {
       client.write("INSERT DATA { $per1 <forename> \"Homer\", [60] \"Max\"; <surname> \"Simpson\", [60] \"Power\"; <age> 38 ; <wife> $per2; <drinks> \"Beer\" . $per2 <forename> \"Marge\"; <surname> \"Simpson\", [40] \"Bouvier\"; <age> 34 . $per3 <forename> \"Ned\"; <surname> \"Flanders\" . $per4 <forename> \"Moe\"; <surname> \"Szyslak\"; <occupation> \"Bartender\" }  WHERE { NEW($per1,\"person\") .  NEW($per2,\"person\") . NEW($per3,\"person\") . NEW($per4,\"person\") }");
       client.once('data', function(data) {
         var resultJSON = JSON.parse(data);
@@ -493,15 +483,15 @@ describe("Fuzzy Database", function() {
       });      
     });
   
-  //Multiple insert working
-  it("having multiple inserts'", function(done) {
+	//Multiple insert working
+	it("having multiple inserts'", function(done) {
       client.write("INSERT DATA { $per1 <forename> \"Phil\", [60] \"Max\"; <surname> \"Travis\", [60] \"Power\"; <age> 38 ; <wife> $per2; <drinks> \"Beer\" . $per2 <forename> \"Marge\"; <surname> \"Sinclair\", [40] \"Dentist\"; <age> 37 . $per3 <forename> \"Barney\"; <surname> \"Stinson\"; <profession> \"magician\" . $per4 <forename> \"Moe\"; <surname> \"Szyslak\"; <occupation> \"Bartender\" } WHERE { NEW($per1,\"person\") . NEW($per2,\"person\") . NEW($per3,\"person\") . NEW($per4,\"person\") }");
       client.once('data', function(data) {
         done();
       });      
     });
   
-  //testing if entity is returned as output
+	//testing if entity is returned as output
     it("Retrieving the wife of entity:2 which is entity:3", function(done) {
       client.write("SELECT $a WHERE { entity:" + assignedIds["per1"] + " <wife> $a}");
       client.once('data', function(data) {
