@@ -36,11 +36,11 @@ namespace model
 
                 std::string toString() const
                 {
-                    return (day < 9 ? "0" : "") + std::to_string(day)
-                            + (month < 9 ? "0" : "") + std::to_string(month)
-                            + (year < 999 ? "0" : "")
-                            + (year < 99 ? "0" : "")
-                            + (year < 9 ? "0" : "") + std::to_string(year);
+                    return (day < 9 ? std::string("0") : std::string("")) + std::to_string(day)
+                            + (month < 9 ? std::string("/0") : std::string("/")) + std::to_string(month)
+                            + (year < 999 ? std::string("/0") : std::string("/"))
+                            + (year < 99 ? std::string("0") : std::string(""))
+                            + (year < 9 ? std::string("0") : std::string("")) + std::to_string(year);
                 }
                 
                 int year;
@@ -144,6 +144,11 @@ namespace model
             {
                 initMemberSerialiser();
             }
+
+						virtual std::shared_ptr<Base> Clone() override
+						{
+							return std::make_shared<Date>(_value, _originalAuthorId, _order, _confidence, _comment);
+						}
             
             Date(const StructuredDate &sd, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(encode(sd)), _order(order)
