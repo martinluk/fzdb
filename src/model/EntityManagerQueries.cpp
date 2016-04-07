@@ -358,17 +358,26 @@ void EntityManager::ScanVUR(VariableSet&& variableSet, unsigned int variableId, 
 
 void EntityManager::ScanUVR(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, const model::Object&& object, const std::string&& metaVar) const {
 
-	for (auto iter = variableSet.cbegin(); iter != variableSet.cend(); iter++) {
+	//for (auto iter = variableSet.cbegin(); iter != variableSet.cend(); iter++) {
+	for (int i = variableSet.height() - 1; i >= 0; i--) {
+		auto iter = (variableSet.begin() + i);
+
 		if ((*iter).at(variableId).empty()) continue;
 		Entity::EHandle_t entityId = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter).at(variableId).dataPointer())->value();
 		auto entity = _entities.at(entityId);
 
 		auto rows = ScanHelp1(std::move(variableSet), std::move(entity), std::move(entity->properties()), variableId2, std::move(object), std::move(metaVar));
 
-		for (auto row : rows) {
-			variableSet.add(std::move(variableId),
-				std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId,
-				model::types::SubType::TypeEntityRef, std::move(metaVar), row);
+		//if rows.size() == 0 then no properties matched, remove the row?
+		if (rows.size() == 0) {
+			variableSet.erase(iter);
+		}
+		else {
+			for (auto row : rows) {
+				variableSet.add(std::move(variableId),
+					std::make_shared<model::types::EntityRef>(entityId, 0), 0, entityId,
+					model::types::SubType::TypeEntityRef, std::move(metaVar), row);
+			}
 		}
 	}
 }
