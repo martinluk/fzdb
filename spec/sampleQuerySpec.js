@@ -138,7 +138,7 @@ describe("Fuzzy Database", function() {
        });      
     });
 	
-	//test select - Option 2 $a <prop> $b
+	//test select - Option 1 $a <prop> value
 	it("getting entities with surname Polo and age 34 - no entities", function(done) {
        client.write("SELECT $a WHERE { $a <age> \"34\" . $a <surname> \"Polo\"}");
        client.once('data', function(data) {
@@ -148,7 +148,7 @@ describe("Fuzzy Database", function() {
        });      
     });
 	
-	//test select - Option 2 $a <prop> $b
+	//test select - Option 1 $a <prop> value
 	it("getting entities with surname Reus and age 34", function(done) {
        client.write("SELECT $a WHERE { $a <age> \"34\" . $a <surname> \"Reus\"}");
        client.once('data', function(data) {
@@ -168,7 +168,7 @@ describe("Fuzzy Database", function() {
       });      
     });
 	
-	//test select - Option 2 $a <prop> $b - FAULTY, SHOULD RETURN NOTHING
+	//test select - Option 2 $a <prop> $b
     it("In this case, select option 2, should retrieve entity 3, as it is the only one which has both the drinks and profession properties set", function(done) {
       client.write("SELECT $a WHERE { $a <drinks> $b . $a <profession> $c}");
       client.once('data', function(data) {
@@ -229,15 +229,6 @@ describe("Fuzzy Database", function() {
       });      
     });
 	
-	it("Testing select option 2, should retrieve only entities 2, 3 and 4, which have a drinks property set", function(done) {
-      client.write("SELECT $a WHERE { $a <drinks> $b}");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: '2'}), ({a: '3'}), ({a: '4'})]})}));
-        done();
-      });      
-    });
-	
 	//test select - Option 3 $a $b value 
     it("Select entities which contain Marco ", function(done) {
       client.write("SELECT $a WHERE { $a $b \"Marco\"}");
@@ -249,6 +240,16 @@ describe("Fuzzy Database", function() {
     });
 
 	//test select - Option 3 $a $b value 
+    it("Retrieve property names that have Marco as a value ", function(done) {
+      client.write("SELECT $b WHERE { $a $b \"Marco\"}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({b: 'forename'}), ({b: 'forename'})]})}));
+        done();
+      });      
+    });
+	
+	//test select - Option 3 $a $b value 
     it("Select entities which have a property which is equal to both Marco and 34", function(done) {
       client.write("SELECT $a WHERE { $a $b \"Marco\" . $a $b \"34\"}");
       client.once('data', function(data) {
@@ -258,16 +259,37 @@ describe("Fuzzy Database", function() {
       });      
     });
 	
+    /*
 	//test select - Option 3 $a $b value 
     it("Select properties which are equal to both Marco and 34 for the same entity", function(done) {
-      client.write("SELECT $b WHERE { $a $b \"Marco\" . $a $b \"34\"}");
+      client.write("SELECT $b $c WHERE { $a $b \"Marco\" . $a $c \"34\"}");
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
         expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[]}});
         done();
       });      
     });
-    
+	
+	//test select - Option 3 $a $b value 
+    it("Select properties which are equal to both Marco and 34 for the same entity", function(done) {
+      client.write("SELECT $a WHERE { $a $b \"Marco\" . $a $c \"34\"}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[]}});
+        done();
+      });      
+    });
+*/	
+	//test select - Option 4 $a $b $c
+    it("Retrieving all triples", function(done) {
+      client.write("SELECT $a $c $b WHERE { $a $b $c}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({"a": "1", "c": "Unknown Source", "b": "name"}), ({"a": "2", "c": "Marco", "b": "forename"}), ({"a": "2", "c": "Reus", "b": "surname"}), ({"a": "2", "c": "28", "b": "age"}), ({"a": "2", "c": "Water", "b": "drinks"}), ({"a": "3", "c": "Moe", "b": "forename"}), ({"a": "3", "c": "Szyslak", "b": "surname"}), ({"a": "3", "c": "34", "b": "age"}), ({"a": "3", "c": "Beer", "b": "drinks"}), ({"a": "3", "c": "Bartender", "b": "profession"}),({"a": "4", "c": "Marco", "b": "forename"}), ({"a": "4", "c": "Polo", "b": "surname"}), ({"a": "4", "c": "34", "b": "age"}), ({"a": "4", "c": "Wine", "b": "drinks"})]})}));
+        done();
+      });      
+    });
+	
 	//test select - Option 6 entity <prop> $c
     it("Retrieving the surname of entity 2", function(done) {
       client.write("SELECT $a WHERE { entity:2 <surname> $a}");
@@ -441,6 +463,16 @@ describe("Fuzzy Database", function() {
       });      
     });
 	
+	//test select - Option 8 entity $b $c
+    it("Retrieving the surname of entity 2", function(done) {
+      client.write("SELECT $c $b WHERE { entity:2 $b $c}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({"c": "Marco", "b": "forename"}), ({"c": "Reus", "b": "surname"}), ({"c": "28", "b": "age"}), ({"c": "Water", "b": "drinks"})]})}));
+        done();
+      });      
+    });
+	
 	//discard current data
 	it("flush everything", function(done) {
       client.write("FLUSH");
@@ -450,7 +482,7 @@ describe("Fuzzy Database", function() {
         done();
       });      
     });
-	
+
 	var assignedIds = {};
 
   //Multiple insert working
