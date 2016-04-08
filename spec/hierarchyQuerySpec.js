@@ -4,11 +4,20 @@ var _ = require('lodash');
 
 // load test data
 
-describe("Fuzzy Database", function() { 
+fdescribe("Fuzzy Database: Hierarchy", function() { 
 
-  beforeAll(h.setupClient);
   
   describe("sends the command over TCP", function() {
+
+  beforeAll(function(done) {
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
+      });
+    });
+
 
     //tests are run sequentially
 
