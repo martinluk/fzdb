@@ -1,8 +1,7 @@
 #include "Parser.h"
 
 #include <boost/algorithm/string.hpp>
-//#include <boost/regex.hpp>
-#include <regex>
+#include <boost/regex.hpp>
 
 #include <iostream>
 
@@ -12,57 +11,57 @@
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 
-    static const std::regex variableRegex("\\$([a-zA-Z0-9]+)", std::regex_constants::optimize);
-    static const std::regex stringRegex("\"([^\"]*)\"", std::regex_constants::optimize);
-    static const std::regex propertyRegex("<([^>]*)>", std::regex_constants::optimize);
-    static const std::regex entityRefRegex("entity:([0-9]+)", std::regex_constants::optimize);
-    static const std::regex intRegex("[0-9]+", std::regex_constants::optimize);
-    static const std::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]", std::regex_constants::optimize);
-    static const std::regex filterRegex("FILTER *([a-zA-Z]*)\\( *([^)]+) *\\)", std::regex_constants::optimize);
-    static const std::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *(\"[a-zA-Z0-9]+\") *\\)", std::regex_constants::optimize);
+    static const boost::regex variableRegex("\\$(.+)");
+    static const boost::regex stringRegex("\"(.*)\"");
+    static const boost::regex propertyRegex("<(.*)>");
+    static const boost::regex entityRefRegex("entity:([0-9]+)");
+    static const boost::regex intRegex("[0-9]+");
+    static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
+    static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
+    static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *(\"[a-zA-Z0-9]+\") *\\)");
 
-	std::smatch matches;
-    std::string data0 = "";
+   boost::smatch matches;
+   std::string data0 = "";
 
     ParsedTokenType tokenType = ParsedTokenType::NOTIMPLEMENTED;
 
-    if (std::regex_match(str, matches, variableRegex)) {
+    if (boost::regex_match(str, matches, variableRegex)) {
         tokenType = ParsedTokenType::VARIABLE;
         str = matches[1];
     }
 
-    else if (std::regex_match(str, matches, stringRegex)) {
+    else if (boost::regex_match(str, matches, stringRegex)) {
         tokenType = ParsedTokenType::STRING;
       str = matches[1];
     }
 
-    else if (std::regex_match(str, matches, propertyRegex)) {
+    else if (boost::regex_match(str, matches, propertyRegex)) {
         tokenType = ParsedTokenType::PROPERTY;
       str = matches[1];
     }
 
-    else if (std::regex_match(str, matches, entityRefRegex)) {
+    else if (boost::regex_match(str, matches, entityRefRegex)) {
         tokenType = ParsedTokenType::ENTITYREF;
       str = matches[1];
     }
 
-    else if (std::regex_match(str, intRegex)) {
+    else if (boost::regex_match(str, intRegex)) {
         tokenType = ParsedTokenType::INT;
     }
 
-   else if (std::regex_match(str, matches, filterRegex)) {
+   else if (boost::regex_match(str, matches, filterRegex)) {
         tokenType = ParsedTokenType::FILTER;
         data0 = matches[1];
       str = matches[2];
     }
 
-   else if (std::regex_match(str, matches, newEntityRegex)) {
+   else if (boost::regex_match(str, matches, newEntityRegex)) {
 	   tokenType = ParsedTokenType::NEWENTITY;	   
 	   data0 = matches[2];
 	   str = matches[1];
    }
 
-    else if (std::regex_match(str, matches, simpleConfidenceRatingRegex)) {
+    else if (boost::regex_match(str, matches, simpleConfidenceRatingRegex)) {
         tokenType = ParsedTokenType::CONFIDENCE_RATING;
       str = matches[1];
     }
@@ -189,7 +188,7 @@ TokenList FSparqlParser::Tokenize(std::string str) {
     }
 
     if (buffer.length() > 0) {
-        results.emplace_back(identifyToken(buffer, lineNo, charNo - buffer.length()));
+        results.push_back(identifyToken(buffer, lineNo, charNo - buffer.length()));
         buffer.clear();
     }
 
