@@ -2,15 +2,22 @@ var h = require('./support/helper.js');
 
 var simpsonsTestData = h.getData("simpsons_meta.fuz");
 
-describe("Fuzzy Database", function() { 
+describe("Fuzzy Database:MetadataSpec", function() { 
 
-  beforeAll(h.setupClient);
   
   describe("with simpsons data loaded has meta data functionality : ", function() {
 
-    beforeAll(function(done) {
-      h.sendCmd(simpsonsTestData).then(done);
+
+  beforeAll(function(done) {
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+        h.sendCmd(simpsonsTestData).then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
+      });
     });
+  });
 
     //simple check of basic meta functionality
     describe("simple test : ", function() {

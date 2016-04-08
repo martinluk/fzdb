@@ -41,6 +41,22 @@ helper.sendCmd = function(cmd) {
     client.on('data', onDataFunc); 
   });     
 };
+
+helper.sendAdminCmd = function(cmd) {
+    //XXX Does not support the fancy long parsing as sendCmd above
+    client.write(helper.loginToAdminQuery);
+    return new Promise(function(resolve, reject) {
+        client.once('data',function() {
+        client.write(cmd);
+            client.once('data',function() {
+                client.write('USER LOGOUT');
+                    client.once('data',function() {
+                    });
+            });
+        });
+    });
+}
+
 //
 //Skips test case.
 helper.xtestCase = function(name, command, expected, timeout) {
@@ -111,20 +127,19 @@ helper.resultTemplate = function(results) {
 helper.setupClient = function(done) {
   client = new net.Socket();
   client.connect(1407, '127.0.0.1', function() {
-    client.write(helper.loginToAdminQuery);
-    client.once('data', function(data) {
-      process.nextTick(function() {
-        client.write('FLUSH');
-        client.once('data', function(data) {
-          process.nextTick(function() {
-            client.write('USER LOGOUT');
-            client.once('data', function(data) {
-                done();
-            });
+  });
+}
+
+helper.flush = function(client, done) {
+  client.write(helper.loginToAdminQuery);
+  client.once('data', function(data) {
+      client.write('FLUSH');
+      client.once('data', function(data) {
+          client.write('USER LOGOUT');
+          client.once('data', function(data) {
+              done();
           });
-        });
-      });   
-    });
+      });
   });
 }
 

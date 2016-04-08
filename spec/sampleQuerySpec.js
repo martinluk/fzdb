@@ -1,7 +1,8 @@
 var net = require('net');
 var h = require('./support/helper.js');
 
-fdescribe("Fuzzy Database", function() {
+
+describe("Fuzzy Database", function() {
   var client;
 
   //connects to the database
