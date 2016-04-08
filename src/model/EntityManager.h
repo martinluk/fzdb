@@ -108,7 +108,7 @@ private:
     
     void insertEntity(std::shared_ptr<Entity> ent);
 
-    // Pass TypeUndefined to skip type checking.
+    // Pass Undefined to skip type checking.
     unsigned int getPropertyName(const std::string &str, model::types::SubType type) const;
     unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
 

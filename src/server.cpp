@@ -48,7 +48,6 @@ void TCPServer::handle_accept(std::shared_ptr<ISession> session, const boost::sy
 void TCPServer::listenForNewConnection()
 {
     auto s = std::make_shared<TCPSession>(_io_service, this, _uuidGenerator());
-
     // Set up the server's acceptor to call the function
     // below whenever a client tries to connect.
     _acceptor.async_accept(s->socket(),

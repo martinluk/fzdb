@@ -95,7 +95,7 @@ namespace model
 
             SubType subtype() const
             {
-                return SubType::TypeDate;
+                return SubType::Date;
             }
             
             StructuredDate date() const

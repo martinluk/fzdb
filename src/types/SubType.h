@@ -10,37 +10,39 @@ namespace model {
         // Enum for the different subtypes that are defined.
         enum class SubType
         {
-            TypeUndefined = 0x0,
+            Undefined = 0x0,
 			SUBTYPE_COUNT = 0x1,
 
 			PropertyReference = SUBTYPE_REFERENCE_MASK | 0x0,
 			ValueReference = SUBTYPE_REFERENCE_MASK | 0x1,
 			
-			TypeInt32 = SUBTYPE_VALUE_MASK | 0x0,
-            TypeString = SUBTYPE_VALUE_MASK | 0x1,
-            TypeEntityRef = SUBTYPE_VALUE_MASK | 0x2,
-            TypeDate = SUBTYPE_VALUE_MASK | 0x3
+			Int32 = SUBTYPE_VALUE_MASK | 0x0,
+            String = SUBTYPE_VALUE_MASK | 0x1,
+            EntityRef = SUBTYPE_VALUE_MASK | 0x2,
+            Date = SUBTYPE_VALUE_MASK | 0x3,
+			UInt32 = SUBTYPE_VALUE_MASK | 0x4,
+			TimeStamp = SUBTYPE_VALUE_MASK | 0x5
         };
 
         // Strings corresponding to the enum entries.
-        static const char* SubTypeString[] =
+        static const char* SubString[] =
         {
-            "TypeUndefined",
-            "TypeInt32",
-            "TypeString",
-            "TypeEntityRef",
-            "TypeDate",
+            "Undefined",
+            "Int32",
+            "String",
+            "EntityRef",
+            "Date",
 
             "PropertyReference",
             "ValueReference"
         };
 
         // Convenience function to get a string for a given subtype.
-        static const char* getSubTypeString(SubType t)
+        static const char* getSubString(SubType t)
         {
-            return ( t < SubType::TypeUndefined || t >= SubType::SUBTYPE_COUNT )
-                ? SubTypeString[(int)SubType::TypeUndefined]
-                : SubTypeString[(int)t];
+            return ( t < SubType::Undefined || t >= SubType::SUBTYPE_COUNT )
+                ? SubString[(int)SubType::Undefined]
+                : SubString[(int)t];
         }
 
         class Base;

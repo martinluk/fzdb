@@ -157,9 +157,9 @@ void populate(std::shared_ptr<Entity> ent, const PropertyHeader* header, const c
         {
             throw EntitySerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
                                                                 + " of entity " + std::to_string(ent->getHandle())
-                                                                + ": subtype \"" + model::types::getSubTypeString(val->subtype())
+                                                                + ": subtype \"" + model::types::getSubString(val->subtype())
                                                                 + "\" does not match expected subtype \""
-                                                                + model::types::getSubTypeString(header->subtype) + "\".");
+                                                                + model::types::getSubString(header->subtype) + "\".");
         }
 
         values.push_back(val);
@@ -227,17 +227,17 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
 
         switch (p->subtype)
         {
-        case SubType::TypeInt32:
-        case SubType::TypeString:
-        case SubType::TypeEntityRef:
-        case SubType::TypeDate:
+        case SubType::Int32:
+        case SubType::String:
+        case SubType::EntityRef:
+        case SubType::Date:
             populate(ent, p, data);\
             break;
 
         default:
             throw InvalidInputEntityException("Error unserialising property " + std::to_string(p->key)
                                               + " of entity " + std::to_string(ent->getHandle())
-                                              + ": subtype \"" + model::types::getSubTypeString(p->subtype)
+                                              + ": subtype \"" + model::types::getSubString(p->subtype)
                                               + "\" is invalid.");
         }
     }

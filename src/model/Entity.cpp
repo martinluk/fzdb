@@ -49,7 +49,7 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 
 std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state)
 {
-	if (value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
+	if (value->subtype() == model::types::SubType::EntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
 	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), state);
 }
 
@@ -68,7 +68,7 @@ void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState sta
 {
 	switch (prop->key()) {
 	case 3: //subset
-		if(prop->subtype() != model::types::SubType::TypeEntityRef) {
+		if(prop->subtype() != model::types::SubType::EntityRef) {
 			throw std::runtime_error("subset must be an entity");
 		}
 
@@ -77,10 +77,10 @@ void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState sta
 			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
 			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef> (_handle, 0), MatchState::Linked, EntityProperty::Type::CONCRETEMULTI);
 		}
-		PropertyOwner::insertProperty(prop);
+		PropertyOwner::insertProperty(prop, state, EntityProperty::Type::CONCRETESINGLE);
 		break;
 	case 4: //superset
-		if (prop->subtype() != model::types::SubType::TypeEntityRef) {
+		if (prop->subtype() != model::types::SubType::EntityRef) {
 			throw std::runtime_error("superset must be an entity");
 		}
 		if (state == MatchState::None) {
@@ -107,9 +107,9 @@ void Entity::insertProperty(unsigned int key, std::shared_ptr<model::types::Base
 		if (state == MatchState::None) {
 			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
 			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
-			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked);
+			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked, EntityProperty::Type::CONCRETEMULTI);
 		}
-		PropertyOwner::insertProperty(key, object);
+		PropertyOwner::insertProperty(key, object, state, EntityProperty::Type::CONCRETESINGLE);
 
 		break;
 	}
@@ -122,9 +122,9 @@ void Entity::insertProperty(unsigned int key, std::shared_ptr<model::types::Base
 		if (state == MatchState::None) {
 			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
 			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
-			otherEntity->insertProperty(3, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked);
+			otherEntity->insertProperty(3, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked, EntityProperty::Type::CONCRETESINGLE);
 		}
-		PropertyOwner::insertProperty(key, object);
+		PropertyOwner::insertProperty(key, object, state, EntityProperty::Type::CONCRETEMULTI);
 
 		break;
 	}

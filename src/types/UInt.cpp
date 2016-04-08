@@ -1,6 +1,3 @@
-#include "./Base.h"
-#include "./String.h"
-#include "./Int.h"
 #include "./UInt.h"
 #include "./TimeStamp.h"
 #include "./EntityRef.h"
@@ -8,9 +5,7 @@
 #include "./Confidence.h"
 #include "./AuthorID.h"
 
-using namespace model::types;
-
-void model::types::Base::setupDefaultMetaData()
+void model::types::UInt::setupDefaultMetaData()
 {
 	insertProperty(5, std::make_shared<model::types::AuthorID>(0, 0), MatchState::None, EntityProperty::Type::LOCKED);
 	insertProperty(6, std::make_shared<model::types::SourceRef>(0, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);

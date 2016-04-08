@@ -1,5 +1,5 @@
-#ifndef FUZZY_MODEL_TYPES_INT
-#define FUZZY_MODEL_TYPES_INT
+#ifndef FUZZY_MODEL_TYPES_UINT
+#define FUZZY_MODEL_TYPES_UINT
 
 #include <string>
 
@@ -11,7 +11,7 @@ namespace model {
 
         // Stores an integer value.
         class UInt : public Base {
-        private:
+        protected:
             friend class TypeSerialiser;
             uint32_t _value;
             MemberSerialiser _memberSerialiser;
@@ -24,6 +24,7 @@ namespace model {
             }
 
         public:
+
             UInt() : Base(100, 0, std::string()), _value(0)
             {
             }
@@ -33,12 +34,9 @@ namespace model {
             {
             }
             
-            UInt(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                UInt(std::atoi(value.c_str()), author, confidence, comment)
-            {
-                // Already initialised
-            }
-            
+
+			virtual void setupDefaultMetaData() override;
+
             virtual bool valuesEqualOnly(const Base *other) const
             {
                 const UInt* i = dynamic_cast<const UInt*>(other);
@@ -57,7 +55,7 @@ namespace model {
 
             virtual SubType subtype() const
             {
-                return SubType::TypeInt32;
+                return SubType::UInt32;
             }
 
             virtual std::shared_ptr<Base> Clone() override {
@@ -105,4 +103,4 @@ namespace model {
 }
 
 
-#endif // !FUZZY_MODEL_TYPES_INT
+#endif // !FUZZY_MODEL_TYPES_UINT

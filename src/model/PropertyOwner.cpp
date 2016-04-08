@@ -96,7 +96,7 @@ std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, 
 
 std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state)
 {
-	if(value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
+	if(value->subtype() == model::types::SubType::EntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
 	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), state);
 }
 
@@ -153,12 +153,21 @@ void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::type
 
   checkLock();
   object->_manager = _manager;
+  object->Init();
 
   if (!hasProperty(key)) {
 
-    auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(propType, key, object->subtype()));
-    pair.second->append(object);
-    _propertyTable.insert(pair);
+	  if (propType == EntityProperty::Type::LOCKED) {
+		  auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(EntityProperty::Type::CONCRETESINGLE, key, object->subtype()));
+		  pair.second->append(object);
+		  pair.second->lock();
+		  _propertyTable.insert(pair);
+	  }
+	  else {
+		  auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(propType, key, object->subtype()));
+		  pair.second->append(object);
+		  _propertyTable.insert(pair);
+	  }   
   }
   else {
     auto prop = getProperty(key);

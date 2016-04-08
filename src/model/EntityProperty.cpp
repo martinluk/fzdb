@@ -14,7 +14,7 @@
 
 using BasePointer = std::shared_ptr<model::types::Base>;
 
-EntityProperty::EntityProperty(Type type) : _type(type), _subtype(model::types::SubType::TypeUndefined)
+EntityProperty::EntityProperty(Type type) : _type(type), _subtype(model::types::SubType::Undefined)
 {
     _count = 0;
 }
@@ -69,11 +69,13 @@ unsigned int EntityProperty::count() const
 void EntityProperty::append(BasePointer value)
 {
 	switch (_type) {
+	case Type::CONCRETEMULTI:
+	case Type::CONCRETESINGLE:
 	case Type::FUZZY: {
 		if (value->subtype() != _subtype)
 		{
-			throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(value->subtype())
-				+ std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
+			throw std::invalid_argument(std::string("Type ") + model::types::getSubString(value->subtype())
+				+ std::string(" does not match property type ") + model::types::getSubString(_subtype));
 		}
 
 		_count += 1;
@@ -102,8 +104,8 @@ void EntityProperty::append(const std::vector<BasePointer> &list)
 				model::types::SubType st = (*it)->subtype();
 				if (st != _subtype)
 				{
-					throw std::invalid_argument(std::string("Type ") + model::types::getSubTypeString(st)
-						+ std::string(" does not match property type ") + model::types::getSubTypeString(_subtype));
+					throw std::invalid_argument(std::string("Type ") + model::types::getSubString(st)
+						+ std::string(" does not match property type ") + model::types::getSubString(_subtype));
 				}
 			}
 
@@ -171,7 +173,7 @@ std::string EntityProperty::logString(const Database* db) const
     }
 
     return std::string("EntityProperty<")
-            + std::string(getSubTypeString(_subtype))
+            + std::string(getSubString(_subtype))
             + std::string(">(k=")
             + keyStr
             + std::string(", [")

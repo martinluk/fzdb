@@ -22,6 +22,7 @@ namespace model {
         class Base : public ILogString, public PropertyOwner
         {
 		private:
+			bool _initialised;
             MemberSerialiser _memberSerialiser;
 
             virtual void initMemberSerialiser()
@@ -108,9 +109,21 @@ namespace model {
             {             
                 if (confidence > 100) confidence = 100;
                 _confidence = confidence;
+				_initialised = false;
             }
 
-            Base() : Base(100, 0, std::string()) {}
+            Base() : Base(100, 0, std::string()) {
+				_initialised = false;
+			}
+
+			void Init() {
+				if (!_initialised) {
+					setupDefaultMetaData();
+					_initialised = true;
+				}
+			}
+
+			virtual void setupDefaultMetaData();
             
             virtual ~Base() {}
 
@@ -133,9 +146,9 @@ namespace model {
             // Returns whether this value is equal to the given object.
             bool Equals(const model::Object &object) {
                 if (object.type == model::Object::Type::VARIABLE) return false;
-                if (object.type == model::Object::Type::INT && subtype() != SubType::TypeInt32) return false;
-                if (object.type == model::Object::Type::STRING && subtype() != SubType::TypeString) return false;
-                if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::TypeEntityRef) return false;
+                if (object.type == model::Object::Type::INT && subtype() != SubType::Int32) return false;
+                if (object.type == model::Object::Type::STRING && subtype() != SubType::String) return false;
+                if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::EntityRef) return false;
                 return Equals(object.value);
             }
 
@@ -168,7 +181,7 @@ namespace model {
             // As a base class, our type is undefined.
             virtual SubType subtype() const
             {
-                return SubType::TypeUndefined;
+                return SubType::Undefined;
             }
 
             virtual std::string logString(const Database* db = NULL) const
@@ -196,10 +209,6 @@ namespace model {
                         _timeCreated == other->_timeCreated;
             }
 
-			bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const override;
-
-			std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
-
         protected:
             // Called when serialising.
             virtual std::size_t serialiseSubclass(Serialiser &serialiser)
@@ -214,6 +223,7 @@ namespace model {
 				initMemberSerialiser();
                 initConvenienceMembers();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
+				_initialised = true;
             }
         };
 

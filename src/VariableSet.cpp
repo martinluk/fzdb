@@ -23,7 +23,7 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) {
     for (auto variableName : variableNames) {
         _variablesUsed[count] = false;
 		_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, count++));
-		_typeMap.push_back(VariableType::TypeUndefined);       
+		_typeMap.push_back(VariableType::Undefined);       
     }
     
 }
@@ -31,7 +31,7 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) {
 void VariableSet::extend(std::string variableName) {
 	
 	_variablesUsed.push_back(false);
-	_typeMap.push_back(VariableType::TypeUndefined);
+	_typeMap.push_back(VariableType::Undefined);
 	_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, _size++));
 }
 
@@ -63,7 +63,7 @@ void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types
     else {
 		
 		if (type != _typeMap[var]) {
-			if (_typeMap[var] == VariableType::TypeUndefined) {
+			if (_typeMap[var] == VariableType::Undefined) {
 				_typeMap[var] = type;
 			}
 			else {

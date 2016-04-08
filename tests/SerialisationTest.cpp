@@ -46,10 +46,10 @@ void createSampleEntity(std::shared_ptr<Entity> &ent, unsigned int idBase)
 {
     using namespace model::types;
 
-    EntityProperty* propInt = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::TypeInt32);
-    EntityProperty* propString = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::TypeString);
-    EntityProperty* propDate = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::TypeDate);
-    EntityProperty* propEntityRef = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::TypeEntityRef);
+    EntityProperty* propInt = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Int32);
+    EntityProperty* propString = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::String);
+    EntityProperty* propDate = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Date);
+    EntityProperty* propEntityRef = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::EntityRef);
 
     propInt->append(BasePointer(new Int(1234, 42, 98, "Integer comment")));
     propInt->append(BasePointer(new Int(5678, 24, 89, "Integer comment")));

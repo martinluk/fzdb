@@ -15,7 +15,7 @@ namespace model {
         // There is no guarantee that this handle will still be valid
         // when it is used - the caller needs to check!
         class EntityRef : public Base {
-        private:
+        protected:
             friend class TypeSerialiser;
             EHandle_t _value;
             MemberSerialiser _memberSerialiser;
@@ -67,7 +67,7 @@ namespace model {
 
             virtual SubType subtype() const
             {
-                return SubType::TypeEntityRef;
+                return SubType::EntityRef;
             }
 
             virtual std::string logString(const Database* db = NULL) const override

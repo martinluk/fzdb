@@ -52,7 +52,7 @@ namespace model {
 
             virtual SubType subtype() const
             {
-                return SubType::TypeString;
+                return SubType::String;
             }
 
             virtual std::shared_ptr<Base> Clone() override {
