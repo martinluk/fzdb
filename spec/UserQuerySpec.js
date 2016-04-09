@@ -113,5 +113,31 @@ describe("Fuzzy Database", function() {
         assertEditorNotPermissiveFunction('demote command', sampleQuery.user_demote);
 
     });
+
+    describe("admin can", function() {
+        describe("promote demote admin to editor",function() {
+             pending("to be implemented");
+        });
+        describe("promote editor to admin",function() {
+             pending("to be implemented");
+        });
+        describe("delete other editor",function() {
+             pending("to be implemented");
+        });
+        describe("delete other admin",function() {
+             pending("to be implemented");
+        });
+    });
+    describe("can change password", function() {
+        describe("on editor",function() {
+             pending("to be implemented");
+        });
+        describe("on admin",function() {
+             pending("to be implemented");
+        });
+        describe("but not on guest",function() {
+             pending("to be implemented");
+        });
+    });
   });
 });
