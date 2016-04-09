@@ -3,15 +3,13 @@
 #include "../user/Hashing.h"
 #include "../user/UserOperation.h"
 
-DemoteAdminJob::DemoteAdminJob(std::shared_ptr<ISession> session, const std::string &username):IUserAdminJobs(session) {
+DemoteAdminJob::DemoteAdminJob(std::shared_ptr<ISession> session, const std::string &username)
+    :Job(session,PermType::UserOp) {
     _username = username;
 }
 
 QueryResult DemoteAdminJob::executeNonConst()
 {
-    if ( !hasAdminPermissions() )
-        return errorNoAdminPermissions();
-    
     try {
         Permission::UserGroup group = _database->users().getUserGroup(_username); //Throws user not exist exception
 

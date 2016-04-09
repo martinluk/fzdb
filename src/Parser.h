@@ -17,37 +17,45 @@
 
 // Specifiers for tokens.
 enum class ParsedTokenType {
-        VARIABLE       = 0x0,       // Variable: $abc
-        STRING         = 0x1,       // String: "dog"
-        INT            = 0x2,       // Integer: 146
-        NOTIMPLEMENTED = 0x3,       // Placeholder. Something that's not implemented yet.
-        PROPERTY       = 0x4,       // Property: <forename>
-        ENTITYREF      = 0x5,       // Entity handle: entity:1
+        VARIABLE          = 0x0,       // Variable: $abc
+        STRING            = 0x1,       // String: "dog"
+        INT               = 0x2,       // Integer: 146
+        NOTIMPLEMENTED    = 0x3,       // Placeholder. Something that's not implemented yet.
+        PROPERTY          = 0x4,       // Property: <forename>
+        ENTITYREF         = 0x5,       // Entity handle: entity:1
         CONFIDENCE_RATING = 0x8,    // Confidence for a value: [80]
 
     //structural
         OPEN_CURLBRACE  = 0x6,      // {
         CLOSE_CURLBRACE = 0x7,      // }
-        FILTER = 0x9,               // FILTER: For filtering values.
-	    NEWENTITY = 0xa,            // NEWENTITY: For creating new entities
+        FILTER          = 0x9,               // FILTER: For filtering values.
+	    NEWENTITY       = 0xa,            // NEWENTITY: For creating new entities
     
     //keywords
-        KEYWORD_SELECT = TOKEN_KEYWORD_MASK | 0x0,
-        KEYWORD_WHERE  = TOKEN_KEYWORD_MASK | 0x1,
-        KEYWORD_INSERT = TOKEN_KEYWORD_MASK | 0x2,
-        KEYWORD_DELETE = TOKEN_KEYWORD_MASK | 0x3,
-        KEYWORD_PING   = TOKEN_KEYWORD_MASK | 0x4,
-        KEYWORD_ECHO   = TOKEN_KEYWORD_MASK | 0x5,
-        KEYWORD_META   = TOKEN_KEYWORD_MASK | 0x6,
-        KEYWORD_DATA   = TOKEN_KEYWORD_MASK | 0x7,
-        KEYWORD_DEBUG  = TOKEN_KEYWORD_MASK | 0x8,
-        KEYWORD_LOAD   = TOKEN_KEYWORD_MASK | 0x9,
-        KEYWORD_SAVE   = TOKEN_KEYWORD_MASK | 0xA,
-        KEYWORD_LINK   = TOKEN_KEYWORD_MASK | 0xB,
-        KEYWORD_UNLINK = TOKEN_KEYWORD_MASK | 0xC,
-        KEYWORD_FINAL  = TOKEN_KEYWORD_MASK | 0xD,
-        KEYWORD_FLUSH  = TOKEN_KEYWORD_MASK | 0xE,
-        KEYWORD_CANON  = TOKEN_KEYWORD_MASK | 0xF,  // And we're full! Extend the splitter/keyword masks before adding any more keywords.
+        KEYWORD_SELECT   = TOKEN_KEYWORD_MASK | 0x00,
+        KEYWORD_WHERE    = TOKEN_KEYWORD_MASK | 0x01,
+        KEYWORD_INSERT   = TOKEN_KEYWORD_MASK | 0x02,
+        KEYWORD_DELETE   = TOKEN_KEYWORD_MASK | 0x03,
+        KEYWORD_PING     = TOKEN_KEYWORD_MASK | 0x04,
+        KEYWORD_ECHO     = TOKEN_KEYWORD_MASK | 0x05,
+        KEYWORD_META     = TOKEN_KEYWORD_MASK | 0x06,
+        KEYWORD_DATA     = TOKEN_KEYWORD_MASK | 0x07,
+        KEYWORD_DEBUG    = TOKEN_KEYWORD_MASK | 0x08,
+        KEYWORD_LOAD     = TOKEN_KEYWORD_MASK | 0x09,
+        KEYWORD_SAVE     = TOKEN_KEYWORD_MASK | 0x0A,
+        KEYWORD_LINK     = TOKEN_KEYWORD_MASK | 0x0B,
+        KEYWORD_UNLINK   = TOKEN_KEYWORD_MASK | 0x0C,
+        KEYWORD_FINAL    = TOKEN_KEYWORD_MASK | 0x0D,
+        KEYWORD_FLUSH    = TOKEN_KEYWORD_MASK | 0x0E,
+        KEYWORD_CANON    = TOKEN_KEYWORD_MASK | 0x0F,
+        KEYWORD_USER     = TOKEN_KEYWORD_MASK | 0x10,
+        KEYWORD_ADD      = TOKEN_KEYWORD_MASK | 0x11,
+        KEYWORD_PASSWORD = TOKEN_KEYWORD_MASK | 0x12,
+        KEYWORD_PROMOTE  = TOKEN_KEYWORD_MASK | 0x13,
+        KEYWORD_DEMOTE   = TOKEN_KEYWORD_MASK | 0x14,
+        KEYWORD_LOGIN    = TOKEN_KEYWORD_MASK | 0x15,
+        KEYWORD_LOGOUT   = TOKEN_KEYWORD_MASK | 0x16,
+
     
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
         SPLITTER2 = TOKEN_SPLITTER_MASK | 0x1,
@@ -157,11 +165,17 @@ enum class QueryType {
     DEBUGOTHER, // DEBUG
     LOAD,
     SAVE,
-    USER,
     LINK,
     UNLINK,
     MERGE,
-    FLUSH
+    FLUSH,
+    USER_ADD,
+    USER_DELETE,
+    USER_PROMOTE,
+    USER_DEMOTE,
+    USER_PASSWORD,
+    USER_LOGIN,
+    USER_LOGOUT
 };
 
 //Aggregate query object - this should contain all info required to do a query
@@ -173,19 +187,21 @@ public:
     TriplesBlock conditions;
     TriplesBlock whereClause;
     std::string data0;
+    std::string data1;
     std::vector<std::string> selectLine;
     std::vector<long long int> entities;
     QuerySettings settings;
 
-    Query(QueryType type_, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::vector<std::string> selectline, std::vector<long long int> ents, QuerySettings settings_) {
-        type = type_;
-        sources = s;
-        conditions = cond;
+    Query(QueryType type_, StringMap s, TriplesBlock cond, TriplesBlock wh, std::string dat0, std::string dat1, std::vector<std::string> selectline, std::vector<long long int> ents, QuerySettings settings_) {
+        type        = type_;
+        sources     = s;
+        conditions  = cond;
         whereClause = wh;
-        data0 = dat0;
-        selectLine = selectline;
-        entities = ents;
-        settings = settings_;
+        data0       = dat0;
+        data1       = dat1;
+        selectLine  = selectline;
+        entities    = ents;
+        settings    = settings_;
     }
 };
 

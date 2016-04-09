@@ -1,4 +1,5 @@
 var net = require('net');
+var h = require('./support/helper.js');
 
 describe("Fuzzy Database", function() {
   var client;
@@ -24,6 +25,13 @@ describe("Fuzzy Database", function() {
   }
   
   describe("sends the command over TCP", function() {
+
+    it("Link query spec - logging into admin", function(done) {
+      client.write(h.loginToAdminQuery);
+      client.once('data', function(data) {
+        done();
+        });
+    });
 
     //tests are run sequentially
 
@@ -117,6 +125,13 @@ describe("Fuzzy Database", function() {
         expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: smithId})]})}));
         done();
       });
+    });
+
+    it("LinkQuerySpec - logging out from admin", function(done) {
+        client.write('USER LOGOUT');
+        client.once('data', function(data) {
+            done();
+        });
     });
 
   });

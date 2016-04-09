@@ -4,15 +4,13 @@
 #include "../user/UserOperation.h"
 #include "../user/UserExceptions.h"
 
-DeleteUserJob::DeleteUserJob(std::shared_ptr<ISession> session, const std::string &username):IUserAdminJobs(session) {
+DeleteUserJob::DeleteUserJob(std::shared_ptr<ISession> session, const std::string &username)
+    :Job(session, PermType::UserOp ) {
     _username = username;
 }
 
 QueryResult DeleteUserJob::executeNonConst()
 {
-    if ( !hasAdminPermissions() )
-        return errorNoAdminPermissions();
-    
     try {
         _database->users().removeUser(_username);
     } catch (const std::exception &ex) {
