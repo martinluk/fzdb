@@ -15,7 +15,7 @@ void model::types::Base::setupDefaultMetaData()
 	insertProperty(5, std::make_shared<model::types::AuthorID>(0, 0), MatchState::None, EntityProperty::Type::LOCKED);
 	insertProperty(6, std::make_shared<model::types::SourceRef>(0, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 	insertProperty(7, std::make_shared<model::types::TimeStamp>(0), MatchState::None, EntityProperty::Type::LOCKED);
-	insertProperty(8, std::make_shared<model::types::Confidence>(0, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+	insertProperty(8, std::make_shared<model::types::Confidence>(100, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 }
 
 
@@ -43,8 +43,8 @@ std::shared_ptr<Base> Base::Clone() {
 	cloned->_initialised = true;
 	cloned->_locked = _locked;
 	cloned->_manager = _manager;
-	cloned->_propertyTable = _propertyTable;
 	cloned->_orderingId = _orderingId;
+	cloned->insertProperty(8, getProperty(8)->baseTop()->Clone(), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 	return cloned;
 }
 
@@ -117,7 +117,7 @@ std::size_t Base::serialiseSubclass(Serialiser &serialiser)
 Base::Base(const char* &serialisedData, std::size_t length)
 {
 	initMemberSerialiser();
-	initConvenienceMembers();
+//	initConvenienceMembers();
 	serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
 	_initialised = true;
 }

@@ -30,10 +30,17 @@ namespace model {
             virtual ~Confidence() {}
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Confidence>(_value, _originalAuthorId, _confidence);
+                auto cloned = std::make_shared<Confidence>();
+				cloned->_value = _value;
+				cloned->_locked = _locked;
+				cloned->_manager = _manager;
 				cloned->_orderingId = _orderingId;
 				return cloned;
-            }           
+            }          
+
+			unsigned char confidence() const override {
+				return 100;
+			}
 
         protected:
 

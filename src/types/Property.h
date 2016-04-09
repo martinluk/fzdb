@@ -23,13 +23,13 @@ namespace model {
             }
             
         public:
-			Property() : Base(100, 0, std::string()), _value()
+			Property() : Base(), _value()
             {
                 _manager = NULL;
             }
             
             Property(const unsigned int value, const EntityManager* manager, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value)
+                Base(), _value(value)
             {
                 _manager = manager;
             }
@@ -56,7 +56,10 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Property>(_value, _manager, _originalAuthorId, _confidence);
+                auto cloned = std::make_shared<Property>();
+				cloned->_value = _value;
+				cloned->_locked = _locked;
+				cloned->_manager = _manager;
 				cloned->_orderingId = _orderingId;
 				return cloned;
             }

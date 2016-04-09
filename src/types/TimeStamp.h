@@ -38,7 +38,7 @@ namespace model {
             }
 
         public:
-			TimeStamp() : Base(100, 0, std::string()), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
+			TimeStamp() : Base(), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
 				_cMonthCreated(1),
 				_cDayCreated(1),
 				_cHourCreated(0),
@@ -49,7 +49,7 @@ namespace model {
             }
             
 			TimeStamp(unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
+                Base(), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
 				_cMonthCreated(1),
 				_cDayCreated(1),
 				_cHourCreated(0),
@@ -81,7 +81,10 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<TimeStamp>(_originalAuthorId, _confidence);
+                auto cloned = std::make_shared<TimeStamp>();
+				cloned->_value = _value;
+				cloned->_locked = _locked;
+				cloned->_manager = _manager;
 				cloned->_orderingId = _orderingId;
 				return cloned;
             }
@@ -107,6 +110,10 @@ namespace model {
                 return Base::memberwiseEqual(other) && cOther &&
                         _value == cOther->_value;
             }
+
+			unsigned char confidence() const override {
+				return 100;
+			}
 
 			//timestamps don't have any metadata
 			void setupDefaultMetaData() override {}

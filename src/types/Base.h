@@ -27,8 +27,6 @@ namespace model {
 
 			virtual void initMemberSerialiser();
 
-			void initConvenienceMembers();
-
         protected:
             friend class TypeSerialiser;			
 
@@ -58,7 +56,7 @@ namespace model {
             // What's the string representation of this value?
 			virtual std::string toString() const;
 
-			unsigned char confidence() const;
+			virtual unsigned char confidence() const;
 
             // Subclasses reimplement this.
             // As a base class, our type is undefined.

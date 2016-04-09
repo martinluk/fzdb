@@ -24,12 +24,12 @@ namespace model {
             }
 
         public:
-            Int() : Base(100, 0, std::string()), _value(0)
+            Int() : Base(), _value(0)
             {
             }
             
             Int(int32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value)
+                Base(), _value(value)
             {
             }
             
@@ -61,8 +61,12 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Int>(_value, _originalAuthorId, _confidence);
+                auto cloned = std::make_shared<Int>();
+				cloned->_value = _value;
+				cloned->_locked = _locked;
+				cloned->_manager = _manager;
 				cloned->_orderingId = _orderingId;
+				cloned->insertProperty(8, getProperty(8)->baseTop()->Clone(), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 				return cloned;
             }
 

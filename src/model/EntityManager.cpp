@@ -162,6 +162,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 		auto newEntity = createEntity(newVar.second);
 		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
 		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
+		entityPointer->Init();
 		whereVars.add(whereVars.indexOf(newVar.first), entityPointer, 0, 0, VariableType::EntityRef, "");
 	}
 	
@@ -215,6 +216,10 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 			}
 
         }
+
+		for (auto record : newRecords) {
+			record->Init();
+		}
 
         // Get the ID of the property with the given name.
         unsigned int propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);

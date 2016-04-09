@@ -23,7 +23,7 @@ namespace model {
             unsigned int _value;
             
         public:
-            ValueRef(unsigned long long entity, unsigned int prop, unsigned int value) : Base(100, 0, std::string()), 
+            ValueRef(unsigned long long entity, unsigned int prop, unsigned int value) : Base(), 
                 _value(value), _entity(entity), _property(prop) {}
     
             virtual ~ValueRef() {}
@@ -34,6 +34,8 @@ namespace model {
 
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<ValueRef>(_entity, _property, _value);
+				cloned->_locked = _locked;
+				cloned->_manager = _manager;
 				cloned->_orderingId = _orderingId;
 				return cloned;
             }
@@ -66,6 +68,11 @@ namespace model {
             virtual std::string toString() const override {
                 return std::to_string(_value);
             }
+
+
+			unsigned char confidence() const override {
+				return 100;
+			}
 
             virtual bool memberwiseEqual(const Base* other) const
             {

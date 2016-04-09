@@ -20,22 +20,12 @@ namespace model {
             EHandle_t _value;
             MemberSerialiser _memberSerialiser;
             
-            void initMemberSerialiser()
-            {
-                _memberSerialiser.addPrimitive(&_value, sizeof(_value));
-
-                _memberSerialiser.setInitialised();
-            }
+			void initMemberSerialiser();
             
         public:
-            EntityRef() : Base(100, 0, std::string()), _value(0)
-            {        
-            }
+			EntityRef();
 
-            EntityRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value)
-            {
-            }
+			EntityRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string());
             
             EntityRef(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 EntityRef(std::atoll(value.c_str()), author, confidence, comment)
@@ -60,8 +50,12 @@ namespace model {
             EHandle_t value() const { return _value; }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<EntityRef>(_value, _originalAuthorId, _confidence);
+                auto cloned = std::make_shared<EntityRef>();
+				cloned->_value = _value;
+				cloned->_locked = _locked;
+				cloned->_manager = _manager;
 				cloned->_orderingId = _orderingId;
+				cloned->insertProperty(8, getProperty(8)->baseTop()->Clone(), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 				return cloned;
             }
 

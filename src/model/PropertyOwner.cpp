@@ -112,20 +112,7 @@ int PropertyOwner::propertyCount() const {
 }
 
 std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &key) const {
-  auto it = _propertyTable.find(key);
-  if (it == _propertyTable.cend()) {
-    return std::shared_ptr<EntityProperty>();
-  }
-
-  // TODO: Add error messages
-  try {
-    std::shared_ptr<EntityProperty> prop = std::dynamic_pointer_cast<EntityProperty, EntityProperty>(it->second);
-    return prop;
-  }
-  catch (std::bad_cast ex) {
-    return std::shared_ptr<EntityProperty>();
-  }
-  return std::shared_ptr<EntityProperty>();
+  return _propertyTable.at(key);
 }
 
 void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state, EntityProperty::Type propType) {

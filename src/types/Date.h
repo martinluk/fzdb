@@ -69,11 +69,11 @@ namespace model
             { }
             
             Date(Date_t value, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value), _order(order)
+                Base(), _value(value), _order(order)
             { }
             
             Date(const StructuredDate &sd, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(encode(sd)), _order(order)
+                Base(), _value(encode(sd)), _order(order)
             { }
             
             virtual bool valuesEqualOnly(const Base *other) const
