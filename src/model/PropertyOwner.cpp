@@ -115,7 +115,7 @@ std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &k
   return _propertyTable.at(key);
 }
 
-void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state, EntityProperty::Type propType) {
+void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state) {
 
   checkLock();
 
@@ -140,7 +140,8 @@ void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::type
 
   checkLock();
   object->_manager = _manager;
-  object->Init();
+  //should this be 100?
+ // object->Init(object->confidence());
 
   if (!hasProperty(key)) {
 

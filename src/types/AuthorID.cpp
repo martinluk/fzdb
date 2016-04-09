@@ -1,5 +1,5 @@
 #include "AuthorID.h"
 
-void model::types::AuthorID::setupDefaultMetaData()
+void model::types::AuthorID::setupDefaultMetaData(const unsigned char confidence)
 {
 }

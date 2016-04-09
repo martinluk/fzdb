@@ -19,22 +19,20 @@ namespace model {
             }
             
 			Confidence(uint32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                UInt(value, confidence, author, comment)
+                UInt()
             {
 				if (value > 100) value = 100;
 				_value = value;
             }       
 
-			void setupDefaultMetaData() override;           
+			void setupDefaultMetaData(const unsigned char confidence) override;
             
             virtual ~Confidence() {}
 
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<Confidence>();
 				cloned->_value = _value;
-				cloned->_locked = _locked;
-				cloned->_manager = _manager;
-				cloned->_orderingId = _orderingId;
+				copyValues(cloned);
 				return cloned;
             }          
 

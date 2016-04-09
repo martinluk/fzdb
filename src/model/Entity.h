@@ -62,8 +62,7 @@ public:
 	bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const override;
 	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 
-	void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None,
-		EntityProperty::Type propType = EntityProperty::Type::FUZZY) override;
+	void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None) override;
 
 	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None,
 		EntityProperty::Type propType = EntityProperty::Type::FUZZY) override;

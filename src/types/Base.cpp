@@ -7,15 +7,17 @@
 #include "./SourceRef.h"
 #include "./Confidence.h"
 #include "./AuthorID.h"
+#include "../JobQueue.h"
 
 using namespace model::types;
 
-void model::types::Base::setupDefaultMetaData()
+void model::types::Base::setupDefaultMetaData(const unsigned char confidence)
 {
-	insertProperty(5, std::make_shared<model::types::AuthorID>(0, 0), MatchState::None, EntityProperty::Type::LOCKED);
-	insertProperty(6, std::make_shared<model::types::SourceRef>(0, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
-	insertProperty(7, std::make_shared<model::types::TimeStamp>(0), MatchState::None, EntityProperty::Type::LOCKED);
-	insertProperty(8, std::make_shared<model::types::Confidence>(100, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+	unsigned int authorId = JobQueue::CurrentSession().lock() ? JobQueue::CurrentSession().lock()->userId() : 0;
+	insertProperty(5, std::make_shared<model::types::AuthorID>(authorId), MatchState::None, EntityProperty::Type::LOCKED);
+	insertProperty(6, std::make_shared<model::types::SourceRef>(0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+	insertProperty(7, std::make_shared<model::types::TimeStamp>(), MatchState::None, EntityProperty::Type::LOCKED);
+	insertProperty(8, std::make_shared<model::types::Confidence>(confidence, authorId), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 }
 
 
@@ -25,13 +27,25 @@ void Base::initMemberSerialiser()
 	_memberSerialiser.setInitialised();
 }
 
+void model::types::Base::copyValues(const std::shared_ptr<model::types::Base> cloned)
+{
+	cloned->_initialised = true;
+	cloned->_locked = _locked;
+	cloned->_manager = _manager;
+	cloned->_orderingId = _orderingId;
+
+	for (auto prop : _propertyTable) {
+		cloned->insertProperty(prop.second);
+	}
+}
+
 Base::Base() {
 	_initialised = false;
 }
 
-void Base::Init() {
+void Base::Init(unsigned char confidence) {
 	if (!_initialised) {
-		setupDefaultMetaData();
+		setupDefaultMetaData(confidence);
 		_initialised = true;
 	}
 }
@@ -40,11 +54,7 @@ Base::~Base() {}
 
 std::shared_ptr<Base> Base::Clone() {
 	auto cloned = std::make_shared<Base>();
-	cloned->_initialised = true;
-	cloned->_locked = _locked;
-	cloned->_manager = _manager;
-	cloned->_orderingId = _orderingId;
-	cloned->insertProperty(8, getProperty(8)->baseTop()->Clone(), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+	copyValues(cloned);
 	return cloned;
 }
 

@@ -167,8 +167,8 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 	for (auto newVar : whereBlock.newEntities) {
 		auto newEntity = createEntity(newVar.second);
 		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
-		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
-		entityPointer->Init();
+		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle());
+		entityPointer->Init(100);
 		whereVars.add(whereVars.indexOf(newVar.first), entityPointer, 0, 0, VariableType::EntityRef, "");
 	}
 	
@@ -205,7 +205,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             break;
         case model::Object::Type::ENTITYREF:
             newRecordType = model::types::SubType::EntityRef;
-			newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value, authorID, confidence));
+			newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value));
             break;
         case model::Object::Type::INT:
             newRecordType = model::types::SubType::Int32;
@@ -224,7 +224,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
         }
 
 		for (auto record : newRecords) {
-			record->Init();
+			record->Init(triple.object.hasCertainty ? triple.object.certainty : 100);
 		}
 
         // Get the ID of the property with the given name.
@@ -468,7 +468,9 @@ void EntityManager::clearAll()
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(propertyIdName, model::types::SubType::String));
 
 	auto unknownSourceEntity = createEntity("source");
-	unknownSourceEntity->insertProperty(propertyIdName, std::make_shared<model::types::String>("Unknown Source", 0));
+	auto newRecord = std::make_shared<model::types::String>("Unknown Source", 0);
+	newRecord->Init(100);
+	unknownSourceEntity->insertProperty(propertyIdName, newRecord);
 	unknownSourceEntity->lock();
 
 	_propertyTypes.insert(std::make_pair(_propertyNames.add(ReservedProperties::TYPE), model::types::SubType::String));
@@ -753,7 +755,8 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
     //copy the properties of loseEntity to keepEntity
     for (auto prop : loseEntity->properties()) {
-        keepEntity->insertProperty(prop.second);
+		if(prop.second->type() != EntityProperty::Type::LOCKED)
+			keepEntity->insertProperty(prop.second);
     }
 
     //delete EntityManager's ownership of loseEntity (will be automatically deleted)
@@ -788,7 +791,7 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     auto propNotPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
     {
         std::vector<BasePointer> vals;
-        vals.push_back(EntRefPtr(new EntityRef(h, author, 100, comment)));
+        vals.push_back(EntRefPtr(new EntityRef(h)));
         //EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::EntityRef, vals));
         //e->insertProperty(p);
     };
@@ -806,7 +809,7 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
                 return;
         }
 
-        p->append(BasePointer(new EntityRef(h, author, 100, comment)));
+        p->append(BasePointer(new EntityRef(h)));
     };
     
     // This sets pHigh <supersetOf> entity:low

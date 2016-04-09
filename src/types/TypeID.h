@@ -1,5 +1,5 @@
-#ifndef FUZZY_MODEL_TYPES_AUTHORID
-#define FUZZY_MODEL_TYPES_AUTHORID
+#ifndef FUZZY_MODEL_TYPES_TYPEID
+#define FUZZY_MODEL_TYPES_TYPEID
 
 #include <string>
 
@@ -10,30 +10,33 @@ namespace model {
     namespace types {
 
         // Stores an integer value.
-        class AuthorID : public UInt {      
+        class TypeID : public UInt {      
 
         public:
 
-            AuthorID() : UInt()
+            TypeID() : UInt()
             {
 
             }
             
-            AuthorID(uint32_t value) :
+            TypeID(uint32_t value) :
                 UInt(value)
             {
             }            
            
-			void setupDefaultMetaData(const unsigned char confidence) override;
 
-            virtual ~AuthorID() {}            
+            virtual ~TypeID() {}            
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<AuthorID>();
+                auto cloned = std::make_shared<TypeID>();
 				cloned->_value = _value;
 				copyValues(cloned);
 				return cloned;
             }    
+
+			std::string toString() const override;
+
+			void setupDefaultMetaData(const unsigned char confidence) override;
 
 			unsigned char confidence() const override {
 				return 100;
@@ -41,7 +44,7 @@ namespace model {
 
         protected:
 
-            AuthorID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)
+            TypeID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)
             {
             }
         };
@@ -49,4 +52,4 @@ namespace model {
 }
 
 
-#endif // !FUZZY_MODEL_TYPES_AUTHORID
+#endif // !FUZZY_MODEL_TYPES_TYPEID

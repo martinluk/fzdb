@@ -20,21 +20,19 @@ namespace model {
             {        
             }
 
-            SourceRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                EntityRef(value, confidence, author, comment)
+            SourceRef(EHandle_t value) :
+                EntityRef(value)
             {
             }           
 
-			void setupDefaultMetaData() override;
+			void setupDefaultMetaData(const unsigned char confidence) override;
             
             virtual ~SourceRef() {}
 
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<SourceRef>();
 				cloned->_value = _value;
-				cloned->_locked = _locked;
-				cloned->_manager = _manager;
-				cloned->_orderingId = _orderingId;
+				copyValues(cloned);
 				return cloned;
             }
           

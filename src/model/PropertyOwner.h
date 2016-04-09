@@ -34,8 +34,7 @@ public:
 	// Returns the property with the given key, or a null property if this is not found.
 	virtual std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const;
 
-	virtual void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None,
-		EntityProperty::Type propType = EntityProperty::Type::FUZZY);
+	virtual void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None);
 
     virtual void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None,
 		EntityProperty::Type propType = EntityProperty::Type::FUZZY);

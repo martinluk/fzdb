@@ -58,9 +58,7 @@ namespace model {
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<Property>();
 				cloned->_value = _value;
-				cloned->_locked = _locked;
-				cloned->_manager = _manager;
-				cloned->_orderingId = _orderingId;
+				copyValues(cloned);
 				return cloned;
             }
 

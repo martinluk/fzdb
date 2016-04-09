@@ -48,17 +48,6 @@ namespace model {
             {
             }
             
-			TimeStamp(unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
-				_cMonthCreated(1),
-				_cDayCreated(1),
-				_cHourCreated(0),
-				_cMinCreated(0),
-				_cSecCreated(0),
-				_cFracSecCreated(0)
-            {
-            }
-
             virtual bool valuesEqualOnly(const Base *other) const
             {
                 const TimeStamp* i = dynamic_cast<const TimeStamp*>(other);
@@ -83,9 +72,7 @@ namespace model {
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<TimeStamp>();
 				cloned->_value = _value;
-				cloned->_locked = _locked;
-				cloned->_manager = _manager;
-				cloned->_orderingId = _orderingId;
+				copyValues(cloned);
 				return cloned;
             }
 
@@ -116,7 +103,7 @@ namespace model {
 			}
 
 			//timestamps don't have any metadata
-			void setupDefaultMetaData() override {}
+			void setupDefaultMetaData(const unsigned char confidence) override {}
 
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) 

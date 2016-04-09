@@ -97,6 +97,10 @@ public:
 
 	void lock();
 
+	std::shared_ptr<EntityProperty> Clone() const;
+
+	Type type() const;
+
 private:
 	Type _type;
     unsigned int _key;

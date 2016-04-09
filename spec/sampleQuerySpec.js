@@ -2,7 +2,7 @@ var net = require('net');
 var h = require('./support/helper.js');
 
 
-fdescribe("Fuzzy Database", function() {
+describe("Fuzzy Database", function() {
   var client;
 
   //connects to the database
@@ -307,22 +307,22 @@ fdescribe("Fuzzy Database", function() {
 		var resultJSON = JSON.parse(data);
         expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[
           {"a": "1", "c": "Unknown Source", "b": "name"},
-          {"a": "1", "c": "0", "b": "type"},
+          {"a": "1", "c": "source", "b": "type"},
 
-          {"a": "2", "c": "2", "b": "type"}, 
+          {"a": "2", "c": "person", "b": "type"}, 
           {"a": "2", "c": "Marco", "b": "forename"}, 
           {"a": "2", "c": "Reus", "b": "surname"}, 
           {"a": "2", "c": "28", "b": "age"}, 
           {"a": "2", "c": "Water", "b": "drinks"},
 
-          {"a": "3", "c": "2", "b": "type"}, 
+          {"a": "3", "c": "person", "b": "type"}, 
           {"a": "3", "c": "Moe", "b": "forename"}, 
           {"a": "3", "c": "Szyslak", "b": "surname"},
           {"a": "3", "c": "34", "b": "age"}, 
           {"a": "3", "c": "Beer", "b": "drinks"},
           {"a": "3", "c": "Bartender", "b": "profession"},
 
-          {"a": "4", "c": "2", "b": "type"},
+          {"a": "4", "c": "person", "b": "type"},
           {"a": "4", "c": "Marco", "b": "forename"},
           {"a": "4", "c": "Polo", "b": "surname"},
           {"a": "4", "c": "34", "b": "age"},
@@ -338,7 +338,7 @@ fdescribe("Fuzzy Database", function() {
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
         expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[
-          {"c": "2", "b": "type"}, 
+          {"c": "person", "b": "type"}, 
           {"c": "Marco", "b": "forename"}, 
           {"c": "Reus", "b": "surname"}, 
           {"c": "28", "b": "age"}, 
@@ -501,7 +501,7 @@ fdescribe("Fuzzy Database", function() {
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
         expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[
-          {c: '2'}, 
+          {c: 'person'}, 
           {c: 'Marco'}, 
           {c: 'Reus'}, 
           {c: '28'}, 
@@ -517,7 +517,7 @@ fdescribe("Fuzzy Database", function() {
       client.once('data', function(data) {
 		var resultJSON = JSON.parse(data);
         expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[
-          {"b": "type", "c": "2"}, 
+          {"b": "type", "c": "person"}, 
           {"b": "forename", "c": "Marco"}, 
           {"b": "surname", "c": "Reus"},
           {"b": "age", "c": "28"}, 

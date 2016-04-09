@@ -29,14 +29,10 @@ namespace model {
             {
             }
             
-            UInt(uint32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(), _value(value)
+            UInt(uint32_t value) :  Base(), _value(value)
             {
             }
             
-
-			virtual void setupDefaultMetaData() override;
-
             virtual bool valuesEqualOnly(const Base *other) const
             {
                 const UInt* i = dynamic_cast<const UInt*>(other);
@@ -61,10 +57,7 @@ namespace model {
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<UInt>();
 				cloned->_value = _value;
-				cloned->_locked = _locked;
-				cloned->_manager = _manager;
-				cloned->_orderingId = _orderingId;
-				cloned->insertProperty(8, getProperty(8)->baseTop()->Clone(), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+				copyValues(cloned);
 				return cloned;
             }
 

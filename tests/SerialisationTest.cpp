@@ -60,8 +60,8 @@ void createSampleEntity(std::shared_ptr<Entity> &ent, unsigned int idBase)
     propDate->append(BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::After, 12, "Date comment")));
     propDate->append(BasePointer(new Date(Date::StructuredDate(1210, 4, 4), 1, Date::Ordering::Before, 13, "Date comment")));
 
-    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)1, 123785, 99, "Entity ref comment")));
-    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)5674564, 2, 34, "Entity ref comment")));
+    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)1)));
+    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)5674564)));
 
     // Entity takes ownership of properties here.
     ent->insertProperty(std::shared_ptr<EntityProperty>(propInt));
@@ -78,7 +78,7 @@ TEST_F(SerialisationTest, testSerialiseValues)
     testSerialisation(BasePointer(new Int(1234, 42, 98, "Integer comment")));
     testSerialisation(BasePointer(new String("Serialise this! @#!@$@%", 32, 1, "String comment")));
     testSerialisation(BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::EqualTo, 12, "Date comment")));
-    testSerialisation(BasePointer(new EntityRef((EHandle_t)1, 123785, 99, "Entity ref comment")));
+    testSerialisation(BasePointer(new EntityRef((EHandle_t)1)));
 }
 
 // Test that entities with different numbers of properties serialise and unserialise correctly.

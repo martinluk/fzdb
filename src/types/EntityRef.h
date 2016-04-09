@@ -25,10 +25,10 @@ namespace model {
         public:
 			EntityRef();
 
-			EntityRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string());
+			EntityRef(EHandle_t value);
             
-            EntityRef(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                EntityRef(std::atoll(value.c_str()), author, confidence, comment)
+            EntityRef(const std::string &value) :
+                EntityRef(std::atoll(value.c_str()))
             {
                 // Already initialised
             }
@@ -52,10 +52,7 @@ namespace model {
             virtual std::shared_ptr<Base> Clone() override {
                 auto cloned = std::make_shared<EntityRef>();
 				cloned->_value = _value;
-				cloned->_locked = _locked;
-				cloned->_manager = _manager;
-				cloned->_orderingId = _orderingId;
-				cloned->insertProperty(8, getProperty(8)->baseTop()->Clone(), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+				copyValues(cloned);
 				return cloned;
             }
 

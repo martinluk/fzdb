@@ -27,7 +27,9 @@ namespace model {
 
 			virtual void initMemberSerialiser();
 
-        protected:
+		protected:
+			void copyValues(const std::shared_ptr<model::types::Base> ptr);
+
             friend class TypeSerialiser;			
 
             // id for this record - unique for entity/property/id - related to ordering
@@ -37,9 +39,9 @@ namespace model {
 
 			Base();
 
-			void Init();
+			void Init(const unsigned char confidence);
 
-			virtual void setupDefaultMetaData();
+			virtual void setupDefaultMetaData(unsigned char confidence);
             
 			virtual ~Base();
 

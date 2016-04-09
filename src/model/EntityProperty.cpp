@@ -239,5 +239,21 @@ bool EntityProperty::memberwiseEqual(const EntityProperty *other) const
 
 void EntityProperty::lock()
 {
-	_type == Type::LOCKED;
+	_type = Type::LOCKED;
+}
+
+std::shared_ptr<EntityProperty> EntityProperty::Clone() const
+{
+	auto cloned = std::make_shared<EntityProperty>(_type);
+	cloned->_key = _key;
+	cloned->_count = _count;
+	for (auto val : _valuesList) {
+		cloned->_valuesList.emplace_after(_valuesList.end(), val->Clone());
+	}	
+	return cloned;
+}
+
+EntityProperty::Type EntityProperty::type() const
+{
+	return _type;
 }
