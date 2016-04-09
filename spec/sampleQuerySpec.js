@@ -1,4 +1,6 @@
 var net = require('net');
+var h = require('./support/helper.js');
+
 
 describe("Fuzzy Database", function() {
   var client;
@@ -7,16 +9,34 @@ describe("Fuzzy Database", function() {
   beforeAll(function(done) { 
     client = new net.Socket();
     client.connect(1407, '127.0.0.1', function() {
-      client.write("FLUSH");
-      client.once('data', function(data) {
-        done();
-      });   
+        client.write(h.loginToAdminQuery);
+        client.once('data', function(data) {
+            var resultJSON = JSON.parse(data);
+            expect(resultJSON.result.data).toEqual('Logged in successfully.');
+            client.write("FLUSH");
+            client.once('data', function(data) {
+                var resultJSON = JSON.parse(data);
+                client.write('USER LOGOUT');
+                client.once('data', function(data) {
+                    var resultJSON = JSON.parse(data);
+                    done();
+                });
+            });   
+        });
+      });
     });
-  });
   
   describe("sends the command over TCP", function() {
 
     //tests are run sequentially
+    it("Sample query - logging into admin", function(done) {
+      client.write(h.loginToAdminQuery);
+      client.once('data', function(data) {
+            var resultJSON = JSON.parse(data);
+            expect(resultJSON.result.data).toEqual('Logged in successfully.');
+            done();
+        });
+    });
 
     //test pong
     it("'PONG'", function(done) {
@@ -248,7 +268,7 @@ describe("Fuzzy Database", function() {
         done();
       });      
     });
-	
+	//
 	//test select - Option 3 $a $b value 
     it("Select entities which have a property which is equal to both Marco and 34", function(done) {
       client.write("SELECT $a WHERE { $a $b \"Marco\" . $a $b \"34\"}");
@@ -509,7 +529,73 @@ describe("Fuzzy Database", function() {
         expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
         done();
       });      
-    }); 
+    });
 	
-	});
-});
+
+	//test insert with 4 properties
+	it("setting entity:2's forename to 'Marco' and surname to 'Reus', which is aged '28' and drinks 'Water'", function(done) {
+      client.write("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,\"person\") }");
+      client.once('data', function(data) {
+        done();
+      });      
+    });
+	
+	//test select - Option 5 entity <property> $c
+    it("Checking if option 5 works - if the entity exists ", function(done) {
+      client.write("SELECT $a WHERE { entity:2 <surname> $a}");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({a: 'Reus'})]})}));
+        done();
+      });      
+    });
+	
+	
+//need to flush everything at the start of the session to get rid of any previously stored data
+	it("NANA", function(done) {
+      client.write("FLUSH");
+      client.once('data', function(data) {
+        var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})}));
+        done();
+      });      
+    });
+
+    // Jonathan: Testing hierarchies.
+    it("Creating a simple hierarchy", function(done) {
+      client.write("INSERT DATA { $eng <name> \"England\" . $lon <name> \"London\"; <subsetOf> $eng } WHERE { NEW($eng, \"Location\") . NEW($lon, \"Location\") }");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"Inserted 3 triples.","result":{"type":"fsparql","data":{"eng":"2","lon":"3"}}}));
+        done();
+      });      
+    });
+
+    it("Querying the hierarchy for superset link", function(done) {
+      client.write("SELECT $a WHERE { $a <supersetOf> $b }");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":[{"a":"2"}]}}));
+        done();
+      });      
+    });
+
+    it("Querying the hierarchy for subset link", function(done) {
+      client.write("SELECT $a WHERE { $a <subsetOf> $b }");
+      client.once('data', function(data) {
+		var resultJSON = JSON.parse(data);
+        expect(resultJSON).toEqual(({"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":[{"a":"3"}]}}));
+        done();
+      });      
+    });
+    it("Sample query - logging out from admin", function(done) {
+        client.write('USER LOGOUT');
+        client.once('data', function(data) {
+            var resultJSON = JSON.parse(data);
+
+        done();
+        });
+    });
+ });   
+}); 
+	

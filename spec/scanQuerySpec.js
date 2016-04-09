@@ -8,13 +8,20 @@ var simpsonsTestData = h.getData("simpsons.fuz");
 
 describe("Fuzzy Database", function() { 
 
-  beforeAll(h.setupClient);
-  
   describe("sends the command over TCP", function() {
 
-    beforeAll(function(done) {
-      h.sendCmd(simpsonsTestData).then(done);
+  beforeAll(function(done) {
+    //Not pretty I know, will refactor later once everything is working,.
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+        h.sendCmd(simpsonsTestData).then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
+      });
+      });
     });
+
 
    // Jonathan: Testing hierarchies.
     h.testCase("Retrieve all entities with the same surname as entity 2", 

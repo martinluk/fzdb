@@ -1,7 +1,7 @@
-#include "./IUserAdminJobs.h"
+#include "../Job.h"
 
 // Adds a new user to the database. Requires admin privileges.
-class AddUserJob : public IUserAdminJobs {
+class AddUserJob : public Job {
     public:
         AddUserJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password);
         

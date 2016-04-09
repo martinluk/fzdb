@@ -20,14 +20,85 @@ protected:
 	virtual void TearDown() {
 
 	}
+
+public:
+
+    void assertQueryParse(std::string query, QueryType type, std::string data0, std::string data1) {
+        EXPECT_NO_THROW(FSparqlParser::ParseAll(FSparqlParser::Tokenize(query)));
+        Query q=FSparqlParser::ParseAll(FSparqlParser::Tokenize(query));
+        ASSERT_EQ(type,q.type);
+        ASSERT_EQ(data0,q.data0);
+        ASSERT_EQ(data1,q.data1);
+    }
+
+    void assertQueryParse(std::string query, QueryType type, std::string data0) {
+        assertQueryParse(query, type, data0, "");
+    }
+
+    void assertQueryParse(std::string query, QueryType type) {
+        assertQueryParse(query, type, "", "");
+    }
+
+    bool are_equal(TokenItem token, TokenItem token1) {
+        return ((token.first.type == token1.first.type) && (token.first.lineNumber == token1.first.lineNumber) && (token.first.charPosition== token1.first.charPosition) && (token.first.data0 == token1.first.data0) && (token.second == token1.second));
+    }
+    
+    void assertQueryThrow(std::string query) {
+        ASSERT_THROW(FSparqlParser::ParseAll(FSparqlParser::Tokenize(query)),ParseException);
+    }
+
 };
 
-
-bool are_equal(TokenItem token, TokenItem token1)
-{
-	return ((token.first.type == token1.first.type) && (token.first.lineNumber == token1.first.lineNumber) && (token.first.charPosition== token1.first.charPosition) && (token.first.data0 == token1.first.data0) && (token.second == token1.second));
+TEST_F(ParserTestIdentifyToken, UserLogoutQueryParseTest) {
+    assertQueryParse("USER LOGOUT", QueryType::USER_LOGOUT);
+    assertQueryParse("USER LOGOUT ", QueryType::USER_LOGOUT);
+    assertQueryThrow("USER LOGOUT username");
+    assertQueryThrow("USER LOGOUT username password");
+    assertQueryThrow("USER LOGOUT username password type");
 }
 
+TEST_F(ParserTestIdentifyToken, UserPromoteQueryParseTest) {
+    assertQueryParse("USER PROMOTE username", QueryType::USER_PROMOTE, "username");
+    assertQueryParse("USER PROMOTE USER", QueryType::USER_PROMOTE, "USER");
+    assertQueryThrow("USER PROMOTE");
+    assertQueryThrow("USER PROMOTE username username2");
+    assertQueryThrow("USER PROMOTE username username2 username3");
+}
+
+TEST_F(ParserTestIdentifyToken, UserLoginQueryParseTest) {
+    assertQueryParse("USER LOGIN username password", QueryType::USER_LOGIN, "username", "password");
+    assertQueryParse("USER LOGIN USER DELETE", QueryType::USER_LOGIN, "USER", "DELETE");
+    assertQueryThrow("USER LOGIN username");
+    assertQueryThrow("USER LOGIN username password type");
+    //XXX Format string should also be tested.
+}
+
+TEST_F(ParserTestIdentifyToken, UserAddQueryParseTest) {
+    assertQueryParse("USER ADD username password", QueryType::USER_ADD,
+            "username", "password");
+    assertQueryParse("USER ADD USER DELETE", QueryType::USER_ADD, "USER", "DELETE");
+    assertQueryThrow("USER ADD");
+    assertQueryThrow("USER ADD username");
+    assertQueryThrow("USER ADD username password type");
+}
+
+TEST_F(ParserTestIdentifyToken, UserPasswordQueryParseTest) {
+    assertQueryParse("USER PASSWORD opw npw", QueryType::USER_PASSWORD,
+            "opw", "npw");
+    assertQueryParse("USER PASSWORD USER DELETE", QueryType::USER_PASSWORD,
+            "USER", "DELETE");
+    assertQueryThrow("USER PASSWORD username");
+    assertQueryThrow("USER PASWORD username password type");
+}
+
+TEST_F(ParserTestIdentifyToken, UserDeleteQueryParseTest) {
+    assertQueryParse("USER DELETE username", QueryType::USER_DELETE, "username");
+    assertQueryParse("USER DELETE USER", QueryType::USER_DELETE, "USER");
+    assertQueryThrow("USER DELETE");
+    assertQueryThrow("USER DELETE username username2");
+    assertQueryThrow("USER DELETE username username2 username3");
+    assertQueryThrow("USER DELETE username username2 username3 username4");
+}
 //tests for $
 TEST_F(ParserTestIdentifyToken, testVariable) {
 	std::string str = "$abc";
@@ -48,12 +119,12 @@ TEST_F(ParserTestIdentifyToken, testVariable) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(0x0), 1, 1, ""), "{");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -77,12 +148,12 @@ TEST_F(ParserTestIdentifyToken, testOpenCurlbrace) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(0x6), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -106,12 +177,12 @@ TEST_F(ParserTestIdentifyToken, testClosedCurlbrace) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(0x7), 1, 1, ""), "{");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -135,12 +206,12 @@ TEST_F(ParserTestIdentifyToken, testFILTER) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(0x9), 1, 1, ""), "{");
 
-//	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+//	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -164,12 +235,12 @@ TEST_F(ParserTestIdentifyToken, testSplitter1) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x0), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -193,12 +264,12 @@ TEST_F(ParserTestIdentifyToken, testSplitter2) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x1), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -222,12 +293,12 @@ TEST_F(ParserTestIdentifyToken, testSplitter3) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x2), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 	bool test = are_equal(token, token1);
 
@@ -253,12 +324,12 @@ TEST_F(ParserTestIdentifyToken, testSELECT) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x0), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -282,12 +353,12 @@ TEST_F(ParserTestIdentifyToken, testWHERE) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x1), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -311,12 +382,12 @@ TEST_F(ParserTestIdentifyToken, testINSERT) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x2), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -340,12 +411,12 @@ TEST_F(ParserTestIdentifyToken, testDELETE) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x3), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -369,12 +440,12 @@ TEST_F(ParserTestIdentifyToken, testPING) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x4), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -399,12 +470,12 @@ TEST_F(ParserTestIdentifyToken, testECHO) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x5), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -428,12 +499,12 @@ TEST_F(ParserTestIdentifyToken, testECHO) {
 // 	//wrong string
 // 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x6), 1, 1, ""), "}");
 
-// 	EXPECT_EQ(true, are_equal(token, token1));
-// 	EXPECT_EQ(false, are_equal(token, token2));
-// 	EXPECT_EQ(false, are_equal(token, token3));
-// 	EXPECT_EQ(false, are_equal(token, token4));
-// 	EXPECT_EQ(false, are_equal(token, token5));
-// 	EXPECT_EQ(false, are_equal(token, token6));
+// 	EXPECT_TRUE(are_equal(token, token1));
+// 	EXPECT_FALSE(are_equal(token, token2));
+// 	EXPECT_FALSE(are_equal(token, token3));
+// 	EXPECT_FALSE(are_equal(token, token4));
+// 	EXPECT_FALSE(are_equal(token, token5));
+// 	EXPECT_FALSE(are_equal(token, token6));
 
 // }
 
@@ -458,12 +529,12 @@ TEST_F(ParserTestIdentifyToken, testDATA) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x7), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -487,12 +558,12 @@ TEST_F(ParserTestIdentifyToken, testDEBUG) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x8), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -516,12 +587,12 @@ TEST_F(ParserTestIdentifyToken, testLOAD) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0x9), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
@@ -545,12 +616,22 @@ TEST_F(ParserTestIdentifyToken, testSAVE) {
 	//wrong string
 	TokenItem token6 = std::pair<TokenInfo, std::string>(TokenInfo(ParsedTokenType(TOKEN_SPLITTER_MASK | 0xA), 1, 1, ""), "}");
 
-	EXPECT_EQ(true, are_equal(token, token1));
-	EXPECT_EQ(false, are_equal(token, token2));
-	EXPECT_EQ(false, are_equal(token, token3));
-	EXPECT_EQ(false, are_equal(token, token4));
-	EXPECT_EQ(false, are_equal(token, token5));
-	EXPECT_EQ(false, are_equal(token, token6));
+	EXPECT_TRUE(are_equal(token, token1));
+	EXPECT_FALSE(are_equal(token, token2));
+	EXPECT_FALSE(are_equal(token, token3));
+	EXPECT_FALSE(are_equal(token, token4));
+	EXPECT_FALSE(are_equal(token, token5));
+	EXPECT_FALSE(are_equal(token, token6));
 
 }
 
+
+
+    /*
+    Query q = FSparqlParser::ParseAll(FSparqlParser::Tokenize("USER LOGOUT"));
+    QueryType type = QueryType::USER_LOGOUT;
+    std::string data0 = ""; std::string data1="";
+    ASSERT_EQ(type,q.type);
+    ASSERT_EQ(data0,q.data0);
+    ASSERT_EQ(data1,q.data1);
+    */

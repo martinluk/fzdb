@@ -1,16 +1,14 @@
 var net = require('net');
+var h = require('./support/helper.js');
 
-describe("Fuzzy Database", function() {
+describe("Fuzzy Database test:mergeQuerySpec", function() {
   var client;
 
   //connects to the database
   beforeAll(function(done) { 
     client = new net.Socket();
     client.connect(1407, '127.0.0.1', function() {
-      client.write("FLUSH");
-      client.once('data', function(data) {
-        done();
-      });   
+      h.flush(client,done);
     });
   });
 
@@ -26,12 +24,23 @@ describe("Fuzzy Database", function() {
   describe("sends the command over TCP", function() {
 
     //tests are run sequentially
+    it("Merge query spec - logging into admin", function(done) {
+      client.write(h.loginToAdminQuery);
+      client.once('data', function(data) {
+        j=JSON.parse(data);
+        expect(j.errorCode).toBe(0);
+        expect(j.result.data).toEqual('Logged in successfully.');
+        done();
+        });
+    });
 
     //test insert
     var fredId;
     it("setting entity:1's forename to Fred", function(done) {
       sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }")
       .then(function(data) {
+        expect(data.errorCode).toBe(0);
+        expect(data.info).toEqual('Inserted 1 triples.');
         fredId = data.result.data.a;
         done();
       });    
@@ -42,6 +51,8 @@ describe("Fuzzy Database", function() {
     it("setting entity:2's surname to Smith", function(done) {
       sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,\"person\") }")
       .then(function(data) {
+        expect(data.errorCode).toBe(0);
+        expect(data.info).toEqual('Inserted 1 triples.');
         smithId = data.result.data.a;
         done();
       });       
@@ -100,6 +111,12 @@ describe("Fuzzy Database", function() {
         done();
       });     
     });   
+    it("MergeQuerySpec - logging out from admin", function(done) {
+        client.write('USER LOGOUT');
+        client.once('data', function(data) {
+            done();
+        });
+    });
 
   });
 });

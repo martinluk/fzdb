@@ -7,11 +7,15 @@ var largeData = gen([{
   template: `<forename> "Alexis#"; <surname> "Sanchez#"`
 }]);
 
-describe("Fuzzy Database", function() {
+describe("Fuzzy Database 125spec", function() {
   var client;
 
   //connects to the database
-  beforeAll(h.setupClient);
+  beforeAll(
+      function(done) {
+          h.setupClient();
+          done()
+      });
 
   h.testCase("NANA", "FLUSH",
     {status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Database cleared.'})});

@@ -5,11 +5,21 @@ var simpsonsTestData = h.getData("simpsons.fuz");
 
 // load test data
 
-describe("Fuzzy Database", function() { 
+describe("Fuzzy Database:JonsBugQuerySpec", function() { 
 
-  beforeAll(h.setupClient);
   
   describe("sends the command over TCP", function() {
+
+  beforeAll(function(done) {
+    //Not pretty I know, will refactor later once everything is working,.
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
+      });
+    });
+
 
     //tests are run sequentially
 
@@ -36,14 +46,22 @@ describe("Fuzzy Database", function() {
         [ { id: '3', other: '2' }]
       )
     );
+    });
 
     describe("with the simpsons data loaded", function() {
 
-      beforeAll(function(done) {
-        h.sendCmd("FLUSH").then(function() {
-          h.sendCmd(simpsonsTestData).then(done);
+    beforeAll(function(done) {
+        //Not pretty I know, will refactor later once everything is working,.
+        h.setupClient();
+        h.sendCmd(h.loginToAdminQuery).then(function() {
+            h.sendCmd('FLUSH').then(function() {
+                h.sendCmd(simpsonsTestData).then(function(){
+                    h.sendCmd('USER LOGOUT').then(function() {done();});
+            });
+            });
         });
-      });
+    });
+
 
       h.testCase("retrieving all forenames and surnames",  
 
@@ -74,5 +92,4 @@ describe("Fuzzy Database", function() {
 
     });
  
-  });
 });
