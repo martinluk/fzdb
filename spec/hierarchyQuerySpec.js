@@ -4,12 +4,13 @@ var _ = require('lodash');
 
 // load test data
 
-fdescribe("Fuzzy Database: Hierarchy", function() { 
+describe("Fuzzy Database: Hierarchy", function() { 
 
   
   describe("sends the command over TCP", function() {
 
   beforeAll(function(done) {
+    //Not pretty I know, will refactor later once everything is working,.
     h.setupClient();
     h.sendCmd(h.loginToAdminQuery).then(function() {
       h.sendCmd('FLUSH').then(function() {

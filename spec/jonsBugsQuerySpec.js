@@ -5,22 +5,21 @@ var simpsonsTestData = h.getData("simpsons.fuz");
 
 // load test data
 
-xdescribe("Fuzzy Database:JonsBugQuerySpec", function() { 
+describe("Fuzzy Database:JonsBugQuerySpec", function() { 
 
   
   describe("sends the command over TCP", function() {
 
+  beforeAll(function(done) {
+    //Not pretty I know, will refactor later once everything is working,.
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
+      });
+    });
 
-    //I know it is a bit hacky, but will refactor when everything is fixed
-    it('setUpClient', function(done) {
-        h.setupClient();
-        done();
-    });
-    //I know it is a bit hacky, but will refactor when everything is fixed
-    it('flush', function(done) {
-        h.sendAdminCmd('FLUSH');
-        done();
-    });
 
     //tests are run sequentially
 
@@ -47,21 +46,22 @@ xdescribe("Fuzzy Database:JonsBugQuerySpec", function() {
         [ { id: '3', other: '2' }]
       )
     );
+    });
 
     describe("with the simpsons data loaded", function() {
 
-    //I know it is a bit hacky, but will refactor when everything is fixed
-    it('setUpClient', function(done) {
-        done();
+    beforeAll(function(done) {
+        //Not pretty I know, will refactor later once everything is working,.
+        h.setupClient();
+        h.sendCmd(h.loginToAdminQuery).then(function() {
+            h.sendCmd('FLUSH').then(function() {
+                h.sendCmd(simpsonsTestData).then(function(){
+                    h.sendCmd('USER LOGOUT').then(function() {done();});
+            });
+            });
+        });
     });
-    //I know it is a bit hacky, but will refactor when everything is fixed
-    it('flush', function(done) {
-        h.sendAdminCmd('FLUSH',done);
-        done();
-    });
-    h.testCase('simpsonsdata',function() {
-        h.sendAdminCmd(simpsonsTestData).then(function() {done();});
-    });
+
 
       h.testCase("retrieving all forenames and surnames",  
 
@@ -92,5 +92,4 @@ xdescribe("Fuzzy Database:JonsBugQuerySpec", function() {
 
     });
  
-  });
 });
