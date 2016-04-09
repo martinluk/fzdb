@@ -2,6 +2,9 @@
 #include "./EntityManager.h"
 #include "../singletons.h"
 #include "./types/String.h"
+#include "./types/EntityRef.h"
+
+#include "spdlog/spdlog.h"
 
 #include <stdexcept>
 #include <string>
@@ -18,7 +21,7 @@ Entity::Entity(unsigned int type, EHandle_t handle) : _handle(handle), _type(typ
     initMemberSerialiser();
 }
 
-std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const model::Object && obj, bool linked)
+std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const model::Object && obj, MatchState state)
 {
 	//handle type comparison
 	if (propertyId == 2) {
@@ -46,24 +49,25 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 		auto graph = Singletons::database()->entityManager().getLinkGraph(_handle, std::set<Entity::EHandle_t>());
 		for (auto entId : graph) {
 			if (entId == _handle) continue;
-			auto subResult = Singletons::database()->entityManager().getEntity(entId)->meetsCondition(propertyId, std::move(obj), true);
+			auto subResult = Singletons::database()->entityManager().getEntity(entId)->meetsCondition(propertyId, std::move(obj), MatchState::Linked);
 			results.insert(results.end(), subResult.begin(), subResult.end());
 		}
 		return results;
 	}
 	case LinkStatus::Slave:
-		if(!linked) return std::vector<std::shared_ptr<model::types::Base>>();
+		if(state == MatchState::None) return std::vector<std::shared_ptr<model::types::Base>>();
 	case LinkStatus::None:
-		return PropertyOwner::meetsCondition(propertyId, std::move(obj));
+		return PropertyOwner::meetsCondition(propertyId, std::move(obj), state);
 	}	
 }
 
-std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, bool linked)
+std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state)
 {
-	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), linked);
+	if (value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
+	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), state);
 }
 
-bool Entity::hasProperty(const unsigned int & key, bool linked) const
+bool Entity::hasProperty(const unsigned int & key, MatchState state) const
 {
 	if (key == 2) return true; //return true if it's type
 							   //handle linking
@@ -100,6 +104,97 @@ std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) co
 
 	//this needs to be linkified too
 	return PropertyOwner::getProperty(key);	
+}
+
+void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state)
+{
+	switch (prop->key()) {
+	case 2: //type
+		if (prop->subtype() != model::types::SubType::TypeString) {
+			throw std::runtime_error("Entity types must be specified as strings.");
+		}
+		if (!prop->isConcrete()) {
+			throw std::runtime_error("Type must be a concrete value");
+		}
+		_type = Singletons::database()->entityManager().getTypeID(prop->baseTop()->toString());
+		spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", _handle, prop->baseTop()->toString(), _type);
+		break;
+	case 3: //subset
+		if(prop->subtype() != model::types::SubType::TypeEntityRef) {
+			throw std::runtime_error("subset must be an entity");
+		}
+
+		if (state == MatchState::None) {
+			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(prop->baseTop());
+			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
+			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef> (_handle, 0), MatchState::Linked);
+		}
+		PropertyOwner::insertProperty(prop);
+		break;
+	case 4: //superset
+		if (prop->subtype() != model::types::SubType::TypeEntityRef) {
+			throw std::runtime_error("superset must be an entity");
+		}
+		if (state == MatchState::None) {
+			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(prop->baseTop());
+			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
+			otherEntity->insertProperty(3, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked);
+		}
+		PropertyOwner::insertProperty(prop, state);
+		break;
+	default:
+		PropertyOwner::insertProperty(prop, state);
+	}	
+}
+
+void Entity::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state)
+{
+	switch (key) {
+	case 2: { //type
+		auto typeString = std::dynamic_pointer_cast<model::types::String>(object);
+		if (!typeString) {
+			throw std::runtime_error("Entity types must be specified as strings.");
+		}
+		if (typeString->confidence() != 100) {
+			throw std::runtime_error("Type must be a concrete value");
+		}
+		_type = Singletons::database()->entityManager().getTypeID(typeString->value());
+		spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", _handle, typeString->value(), _type);
+		break;
+	}
+	case 3: { //subset 
+		auto entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
+		if (!entityRef) {
+			throw std::runtime_error("subset must be an entity");
+		}
+
+		if (state == MatchState::None) {
+			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
+			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
+			otherEntity->insertProperty(4, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked);
+		}
+		PropertyOwner::insertProperty(key, object);
+
+		break;
+	}
+	case 4: { //superset
+		auto entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
+		if (!entityRef) {
+			throw std::runtime_error("superset must be an entity");
+		}
+
+		if (state == MatchState::None) {
+			std::shared_ptr<model::types::EntityRef> entityRef = std::dynamic_pointer_cast<model::types::EntityRef>(object);
+			std::shared_ptr<Entity> otherEntity = Singletons::database()->entityManager().getEntity(entityRef->value());
+			otherEntity->insertProperty(3, std::make_shared < model::types::EntityRef>(_handle, 0), MatchState::Linked);
+		}
+		PropertyOwner::insertProperty(key, object);
+
+		break;
+	}
+	default:
+		PropertyOwner::insertProperty(key, object);
+	}	
 }
 
 void Entity::initMemberSerialiser()

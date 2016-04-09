@@ -69,14 +69,14 @@ describe("Fuzzy Database:JonsBugQuerySpec", function() {
 
         // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
         h.resultTemplate(
-          [{"forename": "Homer", "surname": "Simpson"},
-          {"forename": "Homer", "surname": "Power"},
-          {"forename": "Max", "surname": "Simpson"}, 
-          {"forename": "Max", "surname": "Power"}, 
-          {"forename": "Marge", "surname": "Simpson"},
-          {"forename": "Marge", "surname": "Bouvier"}, 
+          [{"forename": "Homer", "surname": "Simpson"}, 
+          {"forename": "Marge", "surname": "Simpson"},         
           {"forename": "Ned", "surname": "Flanders"}, 
-          {"forename": "Moe", "surname": "Szyslak"}]
+          {"forename": "Moe", "surname": "Szyslak"},
+          {"forename": "Max", "surname": "Simpson"},    
+          {"forename": "Homer", "surname": "Power"},
+          {"forename": "Marge", "surname": "Bouvier"},        
+          {"forename": "Max", "surname": "Power"} ]
         )
       );
 
@@ -86,7 +86,7 @@ describe("Fuzzy Database:JonsBugQuerySpec", function() {
 
         // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
         h.resultTemplate(
-          [{"a":"Simpson","b":"10"}]
+          [{"a":"Simpson","b":"11"}]
         )
       );
 

@@ -29,14 +29,12 @@ namespace model {
             
         public:
             EntityRef() : Base(100, 0, std::string()), _value(0)
-            {
-                initMemberSerialiser();                
+            {        
             }
 
             EntityRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(value)
             {
-                initMemberSerialiser();
             }
             
             EntityRef(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
@@ -95,11 +93,11 @@ namespace model {
             }
 
         protected:
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {
                 //return Base::serialiseSubclass(serialiser)
                 //    + serialiser.serialise(Serialiser::SerialProperty(&_value, sizeof(EHandle_t)));
-                
+				if (!_memberSerialiser.initialised())initMemberSerialiser();
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 

@@ -8,7 +8,7 @@
 #include "../Util.h"
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
-#include <cassert>
+
 #include "../Parser.h"
 #include "spdlog/spdlog.h"
 #include "../Util.h"
@@ -98,8 +98,9 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
         else {
             if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
-                    //doesn't contain any variables.. is meaningless
-                    //TODO: UNLESS IN A META BLOCK
+                    //meanlingless unless in a meta block!
+					this->ScanEPR(std::move(result), std::move(conditionsIter->subject), 
+						std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
                 }
                 else {
                     //option 5 - entity <prop> $c
@@ -202,7 +203,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             break;
 		case model::Object::Type::VARIABLE: {
 				auto varId = whereVars.indexOf(triple.object.value);
-				for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++) {
+				for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++) {
 					if ((*whereVarIter)[varId].empty()) continue;
 	    			newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
 				}
@@ -239,8 +240,8 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 modifiedEntities.insert(currentEntity.get());
 
                 // TODO: Author and comment!
-                if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
-                    continue;
+                //if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
+                //    continue;
 
                 //note that the OrderingId attribute of a record is assigned as part of insertion
                 // For each value we need to insert:
@@ -273,7 +274,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
 						auto varId = whereVars.indexOf(triple.subject.value);
 
-                        for (auto whereVarIter = whereVars.getData()->begin(); whereVarIter != whereVars.getData()->end(); whereVarIter++)
+                        for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++)
                         {
 							if ((*whereVarIter)[varId].empty()) continue;
 
@@ -285,8 +286,8 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                              modifiedEntities.insert(currentEntity.get());
 
                             // TODO: Author and comment!
-                            if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
-                                continue;
+                            //if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
+                            //    continue;
 
 							for (auto newRecord : newRecords) {
 								// TODO : figure out why clone VariableRef doesn't work :/
@@ -451,23 +452,26 @@ void EntityManager::clearAll()
 	unknownSourceEntity->insertProperty(_lastProperty++, std::make_shared<model::types::String>("Unknown Source", 0));
 	unknownSourceEntity->lock();
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::TYPE, _lastProperty));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::TYPE, _lastProperty)); // 2
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUBSET_OF, _lastProperty));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUBSET_OF, _lastProperty)); // 3
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUPERSET_OF, _lastProperty));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUPERSET_OF, _lastProperty)); // 4
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:author", _lastProperty));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:author", _lastProperty)); // 5
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:source", _lastProperty));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:source", _lastProperty)); // 6
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:created", _lastProperty));
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:created", _lastProperty)); // 7
 	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+
+	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:certainty", _lastProperty)); // 7
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeInt32));
 }
 
 std::size_t EntityManager::entityCount() const

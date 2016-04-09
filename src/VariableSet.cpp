@@ -35,7 +35,7 @@ void VariableSet::extend(std::string variableName) {
 	_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, _size++));
 }
 
-unsigned int VariableSet::add(const std::vector<VariableSetValue>&& row) {
+unsigned int VariableSet::add(const VariableSetRow&& row) {
 	if (row.size() != _size) throw std::runtime_error("Attempted to insert a row of the wrong size");
 	_values.push_back(row);
 	return _values.size() - 1;
@@ -44,7 +44,7 @@ unsigned int VariableSet::add(const std::vector<VariableSetValue>&& row) {
 unsigned int VariableSet::add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
 	const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar) {
 
-	std::vector<VariableSetValue> newRow(_size);
+	VariableSetRow newRow(_size);
 	_values.push_back(newRow);
 	add(std::move(var), std::move(value), propertyId, entityId, std::move(type), std::move(metaVar), _values.size() - 1);
 	return _values.size() - 1;
@@ -74,6 +74,7 @@ void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types
         _variablesUsed[var] = true;
 
 		_values[row][var].reset(value, entityId, propertyId);
+		_values[row].ranking(_values[row].ranking() + value->confidence());
 
 		if (metaVar != "") {
 			unsigned int metaRef = getMetaRef();
@@ -96,14 +97,28 @@ std::vector<unsigned int> VariableSet::find(const unsigned int varId, const std:
     return output;
 }
 
-std::vector<std::vector<VariableSetValue>>* VariableSet::getData() {
-    return &_values;
+//std::vector<VariableSetRow>* VariableSet::getData() {
+//    return &_values;
+//}
+
+std::vector<VariableSetRow>::iterator VariableSet::erase(std::vector<VariableSetRow>::iterator iter) {
+
+	if (iter != _values.end() - 1) {
+		std::iter_swap(iter, _values.end() - 1);
+		_values.pop_back();
+		if (_values.size() == 0) return _values.end();
+		return iter;
+	}
+	else {
+		_values.pop_back();
+		return _values.end();
+	}
 }
 
-std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) {
+std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) const {
 
     std::vector<VariableSetValue> output;
-    std::transform(_values.begin(), _values.end(), std::inserter(output, output.begin()), [&](std::vector<VariableSetValue> row) {
+    std::transform(_values.cbegin(), _values.cend(), std::inserter(output, output.begin()), [&](VariableSetRow row) {
         return row[varId];
     });
     return output;
@@ -153,13 +168,14 @@ void VariableSet::removeMetaRefs(unsigned int metaRef) {
     }
 }
 
-void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, const VariableSetValue&& val) {
+void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, const std::shared_ptr<model::types::Base>&& value,
+	const unsigned int propertyId, const Entity::EHandle_t entityId) {
 	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
     bool found = false;
     for (int i = 0; i < _values.size(); i++) {
         for (unsigned char j = 0; j < _values[i].size(); j++) {
             if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
-                _values[i][position] = val;
+                _values[i][position].reset(value, entityId, propertyId);
                 found = true;
                 break;
             }
@@ -170,7 +186,7 @@ void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, 
 
 //this doesn't seem to work
 void VariableSet::trimEmptyRows() {
-    _values.erase(std::remove_if(_values.begin(), _values.end(), [](std::vector<VariableSetValue> row) {
+    _values.erase(std::remove_if(_values.begin(), _values.end(), [](VariableSetRow row) {
         bool allEmpty = true;
         for (auto val : row) {
             if (!val.empty()) {
@@ -182,28 +198,37 @@ void VariableSet::trimEmptyRows() {
     }), _values.end());
 }
 
-std::vector<std::vector<VariableSetValue>> VariableSet::extractRowsWith(const unsigned int variable, const std::string value) const {
-	std::vector<std::vector<VariableSetValue>> results;
-	for (auto row : _values) {
-		if (!row[variable].empty() && row[variable].dataPointer()->Equals(value)) {
-			results.emplace_back(row);
+std::vector<VariableSetRow> VariableSet::extractRowsWith(const unsigned int variable, const std::string value) const {
+	std::vector<VariableSetRow> results;
+	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
+		
+		if (!iter->at(variable).empty() && iter->at(variable).dataPointer()->Equals(value)) {
+			results.emplace_back(*iter);
 		}
 	}
 	return results;
 }
 
-std::vector<std::vector<VariableSetValue>> VariableSet::extractRowsWith(const unsigned int variable) const {
-	std::vector<std::vector<VariableSetValue>> results;
-	for (auto row : _values) {
-		if (!row[variable].empty()) {
-			results.emplace_back(row);
+std::vector<VariableSetRow> VariableSet::extractRowsWith(const unsigned int variable) const {
+	std::vector<VariableSetRow> results;
+	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
+		if (!iter->at(variable).empty()) {
+			results.emplace_back(*iter);
 		}
 	}
 	return results;
 }
 
 void VariableSet::removeRowsWith(const unsigned int variable) {
-	_values.erase(std::remove_if(_values.begin(), _values.end(), [&, this, variable](std::vector<VariableSetValue> row) {
+	_values.erase(std::remove_if(_values.begin(), _values.end(), [&, this, variable](VariableSetRow row) {
 		return !row[variable].empty();
 	}), _values.end());
+}
+
+void VariableSet::sort()
+{
+	std::sort(_values.begin(), _values.end(), [](const VariableSetRow& row1, const VariableSetRow& row2)
+	{
+		return (row1.ranking() > row2.ranking());
+	});
 }
