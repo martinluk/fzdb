@@ -22,7 +22,7 @@ Entity::Entity(unsigned int type, EHandle_t handle) : _handle(handle), _type(typ
     initMemberSerialiser();
 }
 
-Entity::Entity(unsigned int type) : Entity(Entity::INVALID_EHANDLE)
+Entity::Entity(unsigned int type) : Entity(type, Entity::INVALID_EHANDLE)
 {
 }
 
