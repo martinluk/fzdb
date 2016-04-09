@@ -17,3 +17,107 @@ void model::types::Base::setupDefaultMetaData()
 	insertProperty(7, std::make_shared<model::types::TimeStamp>(0), MatchState::None, EntityProperty::Type::LOCKED);
 	insertProperty(8, std::make_shared<model::types::Confidence>(0, 0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 }
+
+
+void Base::initMemberSerialiser()
+{
+	_memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
+	_memberSerialiser.setInitialised();
+}
+
+Base::Base() {
+	_initialised = false;
+}
+
+void Base::Init() {
+	if (!_initialised) {
+		setupDefaultMetaData();
+		_initialised = true;
+	}
+}
+
+Base::~Base() {}
+
+std::shared_ptr<Base> Base::Clone() {
+	auto cloned = std::make_shared<Base>();
+	cloned->_initialised = true;
+	cloned->_locked = _locked;
+	cloned->_manager = _manager;
+	cloned->_propertyTable = _propertyTable;
+	cloned->_orderingId = _orderingId;
+	return cloned;
+}
+
+bool Base::Equals(const std::string &val) const {
+	return false;
+}
+
+// This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
+bool Base::valuesEqualOnly(const Base *other) const
+{
+	return subtype() == other->subtype();
+}
+
+// Returns whether this value is equal to the given object.
+bool Base::Equals(const model::Object &object) {
+	if (object.type == model::Object::Type::VARIABLE) return false;
+	if (object.type == model::Object::Type::INT && subtype() != SubType::Int32) return false;
+	if (object.type == model::Object::Type::STRING && subtype() != SubType::String) return false;
+	if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::EntityRef) return false;
+	return Equals(object.value);
+}
+
+// What's the string representation of this value?
+std::string Base::toString() const
+{
+	return "";
+}
+
+unsigned char Base::confidence() const
+{
+	return std::dynamic_pointer_cast<model::types::Confidence>(getProperty(8)->baseTop())->value();
+}
+
+
+// Subclasses reimplement this.
+// As a base class, our type is undefined.
+SubType Base::subtype() const
+{
+	return SubType::Undefined;
+}
+
+std::string Base::logString(const Database* db) const
+{
+	return std::string("Base(") + std::to_string(confidence()) + std::string(")");
+}
+
+void Base::OrderingId(unsigned int id) {
+	_orderingId = id;
+}
+
+unsigned int Base::OrderingId() {
+	return _orderingId;
+}
+
+// For debugging - make sure we are -exactly- the same as the other type.
+bool Base::memberwiseEqual(const Base* other) const
+{
+	return subtype() == other->subtype() &&
+		_orderingId == other->_orderingId;		
+}
+
+// Called when serialising.
+std::size_t Base::serialiseSubclass(Serialiser &serialiser)
+{
+	if (!_memberSerialiser.initialised()) Base::initMemberSerialiser();
+	return _memberSerialiser.serialiseAll(serialiser);
+}
+
+// Called to construct from serialised data.
+Base::Base(const char* &serialisedData, std::size_t length)
+{
+	initMemberSerialiser();
+	initConvenienceMembers();
+	serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
+	_initialised = true;
+}

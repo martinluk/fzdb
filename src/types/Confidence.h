@@ -21,6 +21,8 @@ namespace model {
 			Confidence(uint32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 UInt(value, confidence, author, comment)
             {
+				if (value > 100) value = 100;
+				_value = value;
             }       
 
 			void setupDefaultMetaData() override;           

@@ -68,16 +68,40 @@ unsigned int EntityProperty::count() const
 
 void EntityProperty::append(BasePointer value)
 {
+	if (value->subtype() != _subtype)
+	{
+		throw std::invalid_argument(std::string("Type ") + model::types::getSubString(value->subtype())
+			+ std::string(" does not match property type ") + model::types::getSubString(_subtype));
+	}
+
 	switch (_type) {
-	case Type::CONCRETEMULTI:
-	case Type::CONCRETESINGLE:
-	case Type::FUZZY: {
-		if (value->subtype() != _subtype)
-		{
-			throw std::invalid_argument(std::string("Type ") + model::types::getSubString(value->subtype())
-				+ std::string(" does not match property type ") + model::types::getSubString(_subtype));
+	case Type::CONCRETEMULTI: {
+		_count += 1;
+
+		if (value->confidence() != 100) {
+			throw std::runtime_error("The property requires a concrete value");
 		}
 
+		_valuesList.emplace_front(value);
+		_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
+		unsigned int count = 0;
+		for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
+			(*iter)->OrderingId(count++);
+		}
+		break;
+	}
+	case Type::CONCRETESINGLE: {
+		if (value->confidence() != 100) {
+			throw std::runtime_error("The property requires a concrete value");
+		}
+		_count = 1;
+
+		_valuesList.clear();
+		value->OrderingId(0);
+		_valuesList.emplace_front(value);
+		break;
+	}
+	case Type::FUZZY: {
 		_count += 1;
 		_valuesList.emplace_front(value);
 		_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
@@ -87,6 +111,7 @@ void EntityProperty::append(BasePointer value)
 		}
 		break;
 	}
+
 	case Type::LOCKED:
 		throw std::runtime_error("Attempt to add to locked property");
 	default:
