@@ -7,7 +7,6 @@ var simpsonsTestData = h.getData("simpsons.fuz");
 
 describe("Fuzzy Database", function() { 
 
-  beforeAll(h.setupClient);
   
   describe("sends the command over TCP", function() {
 
@@ -15,11 +14,19 @@ describe("Fuzzy Database", function() {
 
     describe("with the simpsons data loaded", function() {
 
-      beforeAll(function(done) {
-        h.sendCmd("FLUSH").then(function() {
-          h.sendCmd(simpsonsTestData).then(done);
+
+    beforeAll(function(done) {
+      //Not pretty I know, will refactor later once everything is working,.
+      h.setupClient();
+      h.sendCmd(h.loginToAdminQuery).then(function() {
+        h.sendCmd('FLUSH').then(function() {
+          h.sendCmd(simpsonsTestData).then(function(){
+            h.sendCmd('USER LOGOUT').then(function() {done();});
+          });
+        });
         });
       });
+
 
       h.testCase("retrieving all entities with the same forename and surname",  
 
@@ -31,7 +38,7 @@ describe("Fuzzy Database", function() {
         )
       );
 
-      h.xtestCase("adding surname 'Homer' to 'Homer'",  
+      h.testCase("adding surname 'Homer' to 'Homer'",  
 
         `INSERT DATA { $a <surname> "Homer" } WHERE { $a <forename> "Homer" }`,
 
@@ -42,7 +49,7 @@ describe("Fuzzy Database", function() {
       );
 
       //Skipping, since is an assertion to above skipped test case.
-      h.xtestCase("retrieving all entities with the same forename and surname 2",  
+      h.testCase("retrieving all entities with the same forename and surname 2",  
 
         "SELECT $a WHERE { $a <forename> $b ; <surname> $b }",
 
