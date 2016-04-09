@@ -1,3 +1,5 @@
+#ifndef FUZZY_UTIL_ID_GENERATOR
+#define FUZZY_UTIL_ID_GENERATOR
 
 #include <stack>
 
@@ -12,7 +14,7 @@ private:
 public:
 
   IdGenerator(unsigned int startCount) : _count(startCount) {}
-  IdGenerator() : _count(0) {}
+  IdGenerator() : _count(1) {}
 
   void addDeleted(unsigned int deletedId) {
     _pool.push(deletedId);
@@ -28,4 +30,18 @@ public:
 
     return _count++;
   }
+
+  void clear() {
+	  _count = 1;
+	  while(!_pool.empty())_pool.pop();
+  }
+
+  bool operator ==(const IdGenerator &b) const {
+	  if (_count != b._count) return false;
+	  if (_pool.size() != b._pool.size()) return false;
+	  //TODO: item by item check
+	  return true;
+  }
 };
+
+#endif

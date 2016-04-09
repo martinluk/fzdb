@@ -192,9 +192,8 @@ std::string EntityProperty::logString(const Database* db) const
 
     if (db)
     {
-        auto strIt = db->entityManager().propertyNameMap().right.find(_key);
-        if (strIt != db->entityManager().propertyNameMap().right.end())
-            keyStr = "\"" + strIt->second + "\"";
+        auto strIt = db->entityManager().propertyNameMap().get(_key);
+        keyStr = "\"" + strIt + "\"";
     }
 
     return std::string("EntityProperty<")

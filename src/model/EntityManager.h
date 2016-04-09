@@ -17,6 +17,7 @@
 #include "../Exceptions.h"
 #include "../Util.h"
 #include "./QuerySettings.h"
+#include "./util/NameManager.h"
 
 // Management class that keeps track of entities and their associated metadata.
 class EntityManager
@@ -29,11 +30,6 @@ public:
 
     // Creates an entity on the heap and returns a pointer to it.
     std::shared_ptr<Entity> createEntity(const std::string &type);
-
-    void AddProperty(std::string name, unsigned int val) {
-        _propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(name, val));
-    }    
-
 
     VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
@@ -68,10 +64,10 @@ public:
 
 	const std::string getPropertyName(unsigned int propertyId) const;
 
-    const boost::bimap<std::string, unsigned int>& propertyNameMap() const;
+    const NameManager& propertyNameMap() const;
 
 	std::string getTypeName(const unsigned int id) const {
-		return _entityTypeNames.right.at(id);
+		return _entityTypeNames.get(id);
 	}
 
     bool memberwiseEqual(const EntityManager &other) const;
@@ -89,8 +85,12 @@ private:
     unsigned int _lastTypeID;
 
     // This maps string type names to entity type IDs.
-	boost::bimap<std::string, unsigned int> _entityTypeNames;
-    boost::bimap<std::string, unsigned int> _propertyNames;
+	//boost::bimap<std::string, unsigned int> _entityTypeNames;
+    //boost::bimap<std::string, unsigned int> _propertyNames;
+
+	NameManager _propertyNames;
+	NameManager _entityTypeNames;
+
     std::map<unsigned int, model::types::SubType> _propertyTypes;
     
     void changeEntityType(Entity* ent, const std::string &type);
@@ -110,14 +110,9 @@ private:
 
     // Pass Undefined to skip type checking.
     unsigned int getPropertyName(const std::string &str, model::types::SubType type) const;
-    unsigned int getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing);
 
-    unsigned int getPropertyId(std::string str) const {
-        auto iter = _propertyNames.left.find(str);
-        if (iter == _propertyNames.left.end()) {
-            return 0;
-        }
-        return iter->second;
+    unsigned int getPropertyId(const std::string str) const {
+		return _propertyNames.get(str);
     }
 
     // Basic Graph Processing - returns a list of the variables in conditions

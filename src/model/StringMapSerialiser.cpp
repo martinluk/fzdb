@@ -17,20 +17,20 @@ struct EntryHeader
 };
 
 
-StringMapSerialiser::StringMapSerialiser(boost::bimap<std::string, unsigned int> *bimap) : _bimap(bimap)
+StringMapSerialiser::StringMapSerialiser(NameManager* nameManager) : _nameManager(nameManager)
 {
 }
 
 std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 {
-    assert( _bimap);
+    assert( _nameManager);
     std::size_t origSize = serialiser.size();
 
     // Create a header.
     SerialHeader header;
     Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
     header.size = 0;    // We don't know this yet.
-    header.count = _bimap->size();
+    header.count = _nameManager->size();
 
     std::vector<Serialiser::SerialProperty> propList;
     propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
@@ -73,7 +73,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
         i++;
     };
 
-    for( auto it = _bimap->left.begin(); it != _bimap->left.end(); ++it )
+    for( auto it = _nameManager->_stringToIdMap.begin(); it != _nameManager->_stringToIdMap.end(); ++it )
     {
         lambda(it->first, it->second);
     }
@@ -114,6 +114,6 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);
         data += sizeof(unsigned int);
 
-        _bimap->insert(boost::bimap<std::string, unsigned int>::value_type(std::string(data), *id));
+		_nameManager->add(std::string(data));
     }
 }
