@@ -1,72 +1,52 @@
-var net = require('net');
-var fs = require('fs');
+var h = require('./support/helper.js');
 
-var simpsonsTestData = fs.readFileSync("./spec/data/simpsons_meta.fuz", "utf8");
+var simpsonsTestData = h.getData("simpsons_meta.fuz");
 
-describe("Fuzzy Database", function() {
-  var client;
+describe("Fuzzy Database:MetadataSpec", function() { 
 
-  var sendCmd = function(cmd) {
-    client.write(cmd);
-    return new Promise(function(resolve, reject) {
-      client.once('data', function(data) {
-        resolve(JSON.parse(data));
-      }); 
-    });     
-  };
+  
+  describe("with simpsons data loaded has meta data functionality : ", function() {
 
-  var testCase = function(name, command, expected) {
-    it(name, function(done) {
-       sendCmd(command)
-      .then(function(data) {
-        expect(data).toEqual(expected);
-        done();
-      }); 
-    });    
-  };
 
-  var resultTemplate = function(results) {
-    return {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":results}};
-  };
-
-  //connects to the database
-  beforeAll(function(done) { 
-    client = new net.Socket();
-    client.connect(1407, '127.0.0.1', function() {      
-     sendCmd("FLUSH").then(function() {
-      sendCmd(simpsonsTestData).then(function() {
-        done();
+  beforeAll(function(done) {
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+        h.sendCmd(simpsonsTestData).then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
       });
-     });
     });
   });
-  
-  describe("has meta data functionality : ", function() {
 
     //simple check of basic meta functionality
     describe("simple test : ", function() {
 
-      testCase("sanity check", 'SELECT $a WHERE { $a <forename> "Homer" }',
-        resultTemplate([
-          {"a":"1"}
+      h.testCase("sanity check", 'SELECT $a WHERE { $a <forename> "Homer" }',
+        h.resultTemplate([
+          {"a":"2"}
         ]));
 
-      testCase("no restrictions on meta value", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } }',
-        resultTemplate([
-          {"a":"1"}
+      h.testCase("no restrictions on meta value", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } }',
+        h.resultTemplate([
+          {"a":"2"}
         ]));
 
-      testCase("meta value restricted and false", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } . $b <test> "Kit" }',
-        resultTemplate([]));
+      h.testCase("meta value restricted and false", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } . $b <test> "Kit" }',
+        h.resultTemplate([]));
 
-      testCase("meta value restricted and true", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } . $b <test> "Cake" }',
-        resultTemplate([
-          {"a":"1"}
+      h.testCase("meta value restricted and true", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } . $b <test> "Cake" }',
+        h.resultTemplate([
+          {"a":"2"}
         ]));
     });
 
-    describe("retrieving meta values : ", function() {
-
+    describe("retrieving meta values", function() {
+      h.testCase("source",
+       'SELECT $a $c WHERE { META $b { entity:2 <forename> $c } . $b <fuz:source> $a }',
+        h.resultTemplate([
+          {"a":"0","c":"Homer"},{"a":"0","c":"Max"}
+        ]));
     });
 
   });

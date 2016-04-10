@@ -8,6 +8,7 @@
 
 #include <string>
 
+// Basic Graph Processing job. Traverses the entity graph and returns matches.
 class BGP : public Job
 {
 public:

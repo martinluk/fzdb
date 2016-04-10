@@ -1,19 +1,24 @@
 INSERT DATA {
 
-	entity:1 <forename> "Homer", [60] "Max";
+	$per1 <forename> "Homer", [60] "Max";
 	<surname> "Simpson", [60] "Power";
 	<age> 38 ;
-	<wife> entity:2;
+	<wife> $per2;
 	<drinks> "Beer" .
 
-	entity:2 <forename> "Marge";
+	$per2 <forename> "Marge";
 	<surname> "Simpson", [40] "Bouvier";
 	<age> 34 .
 
-	entity:3 <forename> "Ned";
+	$per3 <forename> "Ned";
 	<surname> "Flanders" .
 
-	entity:4 <forename> "Moe";
+	$per4 <forename> "Moe";
 	<surname> "Szyslak";
 	<occupation> "Bartender"
+} WHERE {
+        NEW($per1,"person") .
+        NEW($per2,"person") .
+        NEW($per3,"person") .
+        NEW($per4,"person")
 }

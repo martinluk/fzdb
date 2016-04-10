@@ -14,60 +14,71 @@
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.
 // An entity's handle cannot be changed once it is instanciated.
-// An entity owns all of its EntityProperties and will delete them as appropriate.
 class Entity : public ILogString, public PropertyOwner
 {
-	friend class EntitySerialiser;
-	friend class EntityManager;
+    friend class EntitySerialiser;
+    friend class EntityManager;
 public:
-	// Typedef for an entity handle. This should uniquely identify an entity.
-	typedef unsigned long long EHandle_t;
+    // Typedef for an entity handle. This should uniquely identify an entity.
+    typedef unsigned long long EHandle_t;
 
-	// Invalid entity handle. This implies that the entity is null.
-	static const EHandle_t INVALID_EHANDLE;
+    // Invalid entity handle. This implies that the entity is null.
+    static const EHandle_t INVALID_EHANDLE;
 
-	// Constructs a null entity.
-	Entity(unsigned int type);
+    // Constructs a null entity.
+    Entity(unsigned int type);
 
-	// Constructs an entity with the given handle.
-	Entity(unsigned int type, EHandle_t handle);
+    // Constructs an entity with the given handle.
+    Entity(unsigned int type, EHandle_t handle);
 
-	~Entity();
+    ~Entity();
 
-	// Returns whether this entity is null, ie. whether it has an invalid handle.
-	bool isNull() const;
-	
-	// Returns this entity's handle.
-	EHandle_t getHandle() const;
+    // Returns whether this entity is null, ie. whether it has an invalid handle.
+    bool isNull() const;
 
-	unsigned int getType() const;	
+    // Returns this entity's handle.
+    EHandle_t getHandle() const;
 
-	virtual std::string logString() const override;
+    unsigned int getType() const;    
 
-	enum class LinkStatus {
-		None,
-		Master,
-		Slave
-	};
+    virtual std::string logString(const Database* db = NULL) const override;
 
-	LinkStatus linkStatus() const {
-		return _linkStatus;
-	}
+    enum class LinkStatus {
+        None,
+        Master,
+        Slave
+    };
+
+    LinkStatus linkStatus() const {
+        return _linkStatus;
+    }
+
+	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, MatchState state = MatchState::None) override;
+	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state = MatchState::None) override;
+
+    bool memberwiseEqual(const Entity* other) const;
+
+
+	bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const override;
+	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
+
+	void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None) override;
+	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None) override;
 
 private:
-	void initMemberSerialiser();
+    void initMemberSerialiser();
 
-	void linkStatus(const LinkStatus linkStatus) {
-		_linkStatus = linkStatus;
-	}
+    void linkStatus(const LinkStatus linkStatus) {
+        _linkStatus = linkStatus;
+    }
 
 private:
-	EHandle_t	handle_;
-	unsigned int _type;
-	LinkStatus _linkStatus;
+    EHandle_t _handle;
+    unsigned int _type;
+    LinkStatus _linkStatus;
 
-	MemberSerialiser _memberSerialiser;
+    MemberSerialiser _memberSerialiser;
 
 };
 
-#endif	// MODEL_ENTITY_H
+#endif    // MODEL_ENTITY_H

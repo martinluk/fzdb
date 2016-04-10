@@ -12,9 +12,9 @@
 
 namespace Hashing
 {
-	std::string hashPassword(const std::string &userName, const std::string &salt, const std::string &password);
-	std::string sha1hash(const std::string &password);
-	std::string genSalt();
+    std::string hashPassword(const std::string &userName, const std::string &salt, const std::string &password);
+    std::string sha1hash(const std::string &password);
+    std::string genSalt();
 }
 
-#endif	// USER_HASHING_H
+#endif    // USER_HASHING_H

@@ -4,7 +4,7 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)  
 add_definitions(-DBOOST_ALL_NO_LIB)
 
-find_package(Boost 1.59.0 COMPONENTS thread date_time filesystem system regex) 
+find_package(Boost 1.59.0 COMPONENTS thread date_time filesystem system regex program_options) 
 
 if(Boost_FOUND)   
   message("Found a Boost system install!") 
@@ -51,7 +51,7 @@ else()
   else()
     message(FATAL_ERROR "Configuration for your target does not exist - on windows please use msvc12 or msvc14 compilers!")
   endif()
-  execute_process(COMMAND ./b2 toolset=${Boost_BUILD_TOOLSET} --with-system --with-thread --with-date_time --with-filesystem --with-regex WORKING_DIRECTORY ${BOOST_ROOT})
+  execute_process(COMMAND ./b2 toolset=${Boost_BUILD_TOOLSET} --with-system --with-thread --with-date_time --with-filesystem --with-regex --with-program_options WORKING_DIRECTORY ${BOOST_ROOT})
 
   set(Boost_INCLUDE_DIRS ${BOOST_ROOT})
   set(Boost_LIBRARY_DIRS "${BOOST_ROOT}/stage/lib")
@@ -61,6 +61,7 @@ else()
                          "${Boost_LIBRARY_DIRS}/libboost_system.a"
                          "${Boost_LIBRARY_DIRS}/libboost_date_time.a"
                          "${Boost_LIBRARY_DIRS}/libboost_filesystem.a"
+                         "${Boost_LIBRARY_DIRS}/libboost_program_options.a"
                          "${Boost_LIBRARY_DIRS}/libboost_regex.a")
   elseif(WIN32)
      #msvc is clever enough to work out the ordering itself, and has more annoying filenames

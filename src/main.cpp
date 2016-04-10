@@ -1,12 +1,16 @@
-
-#include <boost/asio.hpp>
-#include <spdlog/spdlog.h>
-
-#include <iostream>
-#include <vector>
+// Copyright 2015-2016: A Tad Fuzzy
 
 #include <signal.h>
+#include <boost/asio.hpp>
+#include <spdlog/spdlog.h>
+#include <vedis.h>
+
+#include <iostream>
+#include <fstream>
+#include <vector>
 #include <cassert>
+#include <string>
+
 
 #include "./server.h"
 #include "./singletons.h"
@@ -18,10 +22,12 @@
 #include "model/EntityManager.h"
 #include "model/Triple.h"
 
-#include "platform.h"
-#include <vedis.h>
+#include "./platform.h"
 
-//windows specific to handle ctrl-c call
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+
+// windows specific to handle ctrl-c call
 #if PLATFORM == PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -58,99 +64,81 @@ void sigHandler(int s)
  * @return Error code
  */
 int main(int argc, char* argv[]) {
+    /*
+    *   DEFAULT SETTINGS
+    */
+	unsigned int port;
+	int loggingLevel;
+	std::string dataFilePath;
+	std::string configFilePath;
 
 	/*
-	*   DEFAULT SETTINGS
+	*	GET COMMANDLINE ARGUMENTS / READ CONFIG FILE
 	*/
-	unsigned int port = 1407;
-	int loggingLevel = 0;
+	try {
 
- /*
-  *   HANDLE COMMAND LINE ARGUMENTS
-  */
-  for (int i = 1; i < argc; ++i)
-  {
-    std::string arg(argv[i]);
-    if (arg == "--log" || arg == "-l")
-    {
-      // Make sure we aren't at the end of argv!
-      if (i + 1 < argc)
-      {
-        auto loggingVar = argv[++i];
-        if(std::string(loggingVar) == "file")
-        {
-          loggingLevel = 1;
-        }
-        else
-        {
-          std::cerr << "ERROR: Unknown logging option" << std::endl;
-        }          
-        continue;
-      }
-      else
-      {
-        std::cerr << argv[i] <<" option requires one argument." << std::endl;
-        return 1;
-      }  
-    }
+		boost::program_options::options_description genericOptions("generic");
+		genericOptions.add_options()			
+			("port", boost::program_options::value<unsigned int>(&port)->default_value(1407), "set database port")
+			("log", boost::program_options::value<int>(&loggingLevel)->default_value(0), "set logging level")
+			("file", boost::program_options::value<std::string>(&dataFilePath), "set data file path");
 
-    if (arg == "--port" || arg == "-p")
-    {
-      // Make sure we aren't at the end of argv!
-      if (i + 1 < argc)
-      {
-        try
-        {
-          port = std::stoul(argv[++i]);
-        }
-        catch(std::invalid_argument e)
-        {
-          std::cerr << "Error: Port must be a valid unsigned integer" << std::endl;
-          return 1;
-        }
-        continue;
-      }
-      else
-      {
-        std::cerr << argv[i] <<" option requires one argument." << std::endl;
-        return 1;
-      }
-    }
+		boost::program_options::options_description cmdLineOptions("cmdLineOnly");
+		cmdLineOptions.add_options()
+			("help", "produce help message")
+			("config", boost::program_options::value<std::string>(&configFilePath)->default_value("fzdb.cfg"), "set config file");
+		cmdLineOptions.add(genericOptions);
 
-    if (arg == "--file" || arg == "-f")
-    {
-      if ( i+1 < argc )
-      {
-        Singletons::setDataFilePath(std::string(argv[i+1]));
-        continue;
-      }
-      else
-      {
-        std::cerr << argv[i] <<" option requires one argument." << std::endl;
-        return 1;
-      }
-    }
-  }
+		boost::program_options::variables_map vm;
+		boost::program_options::store(boost::program_options::parse_command_line(argc, argv, cmdLineOptions), vm);
+		boost::program_options::notify(vm);
+
+		if (vm.count("help")) {
+			std::cout << cmdLineOptions << std::endl;
+			return 1;
+		}
+
+		if (vm.count("config")) {
+			configFilePath = vm.at("config").as<std::string>();
+		}
+
+		if (!boost::filesystem::exists(configFilePath))
+		{
+			std::cout << "No config file found" << std::endl;
+		}
+		else {
+			std::ifstream configFile(configFilePath);
+			boost::program_options::store(boost::program_options::parse_config_file(configFile, genericOptions), vm);
+			boost::program_options::notify(vm);
+		}
+
+		if (vm.count("file")) {
+			std::cout << "Loading from datafile " << dataFilePath << std::endl;
+			Singletons::setDataFilePath(dataFilePath);
+		}
+	}
+	catch (boost::program_options::error& e) {
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
 
   Singletons::initialise();
-
-  //Testing
- /* Singletons::entityManager()->linkEntities(0, 1);
-  Singletons::entityManager()->linkEntities(1, 2);
-  auto bleh = Singletons::entityManager()->getLinkGraph(0, std::set<Entity::EHandle_t>());*/
 
   /*
   *   INITIALISE LOGGING
   */
-
+  
   try
   {
+	  size_t q_size = 1048576; //queue size must be power of 2
+	  spdlog::set_async_mode(q_size);
+
       std::vector<spdlog::sink_ptr> sinks;
-      sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_st>());
-      if(loggingLevel == 1) sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_st>("logfile", "txt", 23, 59, true));
+      sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
+      if(loggingLevel == 1) sinks.push_back(std::make_shared<spdlog::sinks::daily_file_sink_mt>("logfile", "txt", 23, 59, true));
       auto combined_logger = std::make_shared<spdlog::logger>("main", begin(sinks), end(sinks));
       spdlog::register_logger(combined_logger);
-	  combined_logger.get()->set_level(spdlog::level::trace);
+      combined_logger.get()->set_level(spdlog::level::trace);
   }
   catch (const spdlog::spdlog_ex& ex)
   {
@@ -165,8 +153,8 @@ int main(int argc, char* argv[]) {
   sigaction(SIGINT, &sigIntHandler, NULL);
 #else
   if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler, TRUE)) {
-	  fprintf(stderr, "Unable to install handler!\n");
-	  return EXIT_FAILURE;
+      fprintf(stderr, "Unable to install handler!\n");
+      return EXIT_FAILURE;
   }
 #endif
 
@@ -177,8 +165,8 @@ int main(int argc, char* argv[]) {
   try {
     std::cout << "Fuzzy Database v0.1" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
-	std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
-	std::cout << "CTRL-C to stop" << std::endl;
+    std::cout << "Listening on port " << port << "..." << std::endl << std::endl;
+    std::cout << "CTRL-C to stop" << std::endl;
 
     // Create the IO service.
     // This is essentially a link to the OS' IO system.
@@ -213,16 +201,11 @@ int main(int argc, char* argv[]) {
 #if PLATFORM == PLATFORM_WINDOWS
 BOOL WINAPI ConsoleHandler(DWORD dwType)
 {
-	switch (dwType) {
-	case CTRL_C_EVENT:
-		sigHandler(2);
-		break;
-	case CTRL_BREAK_EVENT:
-		printf("break\n");
-		break;
-	default:
-		printf("Some other event\n");
-	}
-	return TRUE;
+    switch (dwType) {
+    case CTRL_C_EVENT:
+        sigHandler(2);
+        break;
+    }
+    return TRUE;
 }
 #endif

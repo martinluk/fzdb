@@ -4,16 +4,17 @@
 #include "../user/Permission.h"
 #include "../user/UserOperation.h"
 
-UserLogoutJob::UserLogoutJob(std::shared_ptr<ISession> session) : Job(session) {
-	_session=session;
+UserLogoutJob::UserLogoutJob(std::shared_ptr<ISession> session) 
+    : Job(session,PermType::LoggedInUser) {
+    _session=session;
 }
 
-QueryResult UserLogoutJob::executeConst() const
-{
-	//TODO Some kind of exception of user is not already logged in?
-//	_session->clearCurrentUserName();
-	
-	QueryResult result;
-	result.setResultDataText("Logged out successfully.");
+QueryResult UserLogoutJob::executeConst() const {
+    _session->clearCurrentUserName();
+    _session->_userId=0;
+    _session->setUserGroup(Permission::UserGroup::GUEST);
+    
+    QueryResult result;
+    result.setResultDataText("Logged out successfully.");
     return result;
 }

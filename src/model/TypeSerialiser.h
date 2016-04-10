@@ -10,10 +10,11 @@ namespace model
 {
     namespace types
     {
+        // Convenience class for serialising value types.
         class TypeSerialiser
         {
         public:
-            TypeSerialiser(const std::shared_ptr<Base> type);
+            TypeSerialiser(const std::shared_ptr<Base> &type);
 
             std::size_t serialise(Serialiser &serialiser) const;
 

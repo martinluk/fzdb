@@ -4,15 +4,15 @@
 
 #include "../Exceptions.h"
 
-Flush::Flush(std::shared_ptr<ISession> session) : Job(session)
+Flush::Flush(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp)
 {
 }
 
 QueryResult Flush::executeNonConst()
 {
-	_database->entityManager().clearAll();
-	
-	QueryResult result;
+    _database->entityManager().clearAll();
+    
+    QueryResult result;
     result.setResultDataText("Database cleared.");
     return result;
 }
