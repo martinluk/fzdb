@@ -338,16 +338,17 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
 void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> selectLine) {
     /* 
-        * For each variable described in triple block
-        * delete it
+    * For each variable described in triple block
+    * delete it
     */
     using VariableType = model::types::SubType;
     //Get VariableSet from BGP
-    QuerySettings qs;
+    QuerySettings qs; //FIXME Get QuerySettings from online
     //Iterating over the returned variable set
-    auto data = BGP(block, qs).getData(); //std::vector<std::vector<VariableSetValue>>
+    VariableSet vs = BGP(block,qs);
+    //std::vector<VariableSetRow> data = vs.getData(); //FIXME Expecting varID
     //Find out row number that is entity
-    //
+    /*
     spdlog::get("main")->debug("Data has size {}",data->size());
     for(auto outIter=data->cbegin(); outIter!=data->cend(); outIter++){
         spdlog::get("main")->debug("Entered row of size {}",(*outIter).size());
@@ -361,6 +362,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
             //TODO Remove all properties that are link to the entity getting deleted
         }
     }
+    */
 }
 
 bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,

@@ -4,7 +4,7 @@
 
 #include "../Exceptions.h"
 
-Delete::Delete(std::shared_ptr<ISession> session, Query query) : Job(session), _query(query)
+Delete::Delete(std::shared_ptr<ISession> session, Query query) : Job(session, PermType::ModifyDB), _query(query)
 {
 }
 
