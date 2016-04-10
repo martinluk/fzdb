@@ -46,22 +46,38 @@ void createSampleEntity(std::shared_ptr<Entity> &ent, unsigned int idBase)
 {
     using namespace model::types;
 
-    EntityProperty* propInt = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Int32);
-    EntityProperty* propString = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::String);
-    EntityProperty* propDate = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Date);
-    EntityProperty* propEntityRef = new EntityProperty(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::EntityRef);
+    std::shared_ptr<EntityProperty> propInt = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Int32);
+	std::shared_ptr<EntityProperty> propString = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::String);
+	std::shared_ptr<EntityProperty> propDate = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Date);
+	std::shared_ptr<EntityProperty> propEntityRef = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::EntityRef);
 
-    propInt->append(BasePointer(new Int(1234, 42, 98, "Integer comment")));
-    propInt->append(BasePointer(new Int(5678, 24, 89, "Integer comment")));
+	auto intRecord1 = std::make_shared<Int>(1234, 42, 98, "Integer comment");
+	auto intRecord2 = std::make_shared<Int>(5678, 24, 89, "Integer comment");
+	intRecord1->Init(98);
+	intRecord2->Init(89);
+    propInt->append(intRecord1);
+    propInt->append(intRecord2);
 
-    propString->append(BasePointer(new String("Serialise this! @#!@$@%", 23, 1, "String comment")));
-    propString->append(BasePointer(new String("Mew Purrymore", 32, 2, "I for one welcome our new robot overlords.")));
+	auto stringRecord1 = std::make_shared<String>("Serialise this! @#!@$@%", 23, 1, "String comment");
+	auto stringRecord2 = std::make_shared<String>("Mew Purrymore", 32, 2, "I for one welcome our new robot overlords.");
+	stringRecord1->Init(1);
+	stringRecord2->Init(2);
+    propString->append(stringRecord1);
+    propString->append(stringRecord2);
 
-    propDate->append(BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::After, 12, "Date comment")));
-    propDate->append(BasePointer(new Date(Date::StructuredDate(1210, 4, 4), 1, Date::Ordering::Before, 13, "Date comment")));
+	auto dateRecord1 = std::make_shared<Date>(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::After, 12, "Date comment");
+	auto dateRecord2 = std::make_shared<Date>(Date::StructuredDate(1210, 4, 4), 1, Date::Ordering::Before, 13, "Date comment");
+	dateRecord1->Init(1);
+	dateRecord2->Init(1);
+    propDate->append(dateRecord1);
+    propDate->append(dateRecord2);
 
-    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)1)));
-    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)5674564)));
+	auto entityRecord1 = std::make_shared<EntityRef>(1);
+	auto entityRecord2 = std::make_shared<EntityRef>(5674564);
+	entityRecord1->Init(100);
+	entityRecord2->Init(80);
+    propEntityRef->append(entityRecord1);
+    propEntityRef->append(entityRecord2);
 
     // Entity takes ownership of properties here.
     ent->insertProperty(std::shared_ptr<EntityProperty>(propInt));

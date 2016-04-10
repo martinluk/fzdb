@@ -227,6 +227,7 @@ std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, st
 
         switch (p->subtype)
         {
+		case SubType::UInt32:
         case SubType::Int32:
         case SubType::String:
         case SubType::EntityRef:

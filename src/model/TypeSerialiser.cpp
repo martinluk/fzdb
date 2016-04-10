@@ -1,6 +1,7 @@
 #include "TypeSerialiser.h"
 #include "types/Base.h"
 #include "types/Int.h"
+#include "types/UInt.h"
 #include "types/String.h"
 #include "types/EntityRef.h"
 #include "types/Date.h"
@@ -61,6 +62,11 @@ std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, st
         //b = std::make_shared<Int>(d);
         b = std::shared_ptr<Int>(new Int(d, dataSize));
                 break;
+
+	case SubType::UInt32:
+		//b = std::make_shared<Int>(d);
+		b = std::shared_ptr<UInt>(new UInt(d, dataSize));
+		break;
 
     case SubType::String:
         //b = std::make_shared<String>(d);
