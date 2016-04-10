@@ -14,6 +14,21 @@ namespace Permission
     void assertUserOpPermission(UserGroup group) {
         assertPermission(group, PermissionType::UserOp);
     }
+
+    std::string userGroupName(UserGroup group) {
+        switch(group) {
+            case UserGroup::GUEST:
+                return "GUEST";
+            case UserGroup::EDITOR:
+                return "EDITOR";
+            case UserGroup::ADMIN:
+                return "ADMIN";
+            default:
+                //A new user group was added, but permission is not updated here.
+                assert(false);
+                return "";
+        }
+    }
     
     bool checkPermission(UserGroup group, PermissionType permType) {
         switch(group) {

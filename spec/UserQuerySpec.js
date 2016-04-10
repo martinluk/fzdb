@@ -115,8 +115,41 @@ describe("Fuzzy Database", function() {
     });
 
     describe("admin can", function() {
-        describe("promote demote admin to editor",function() {
-             pending("to be implemented");
+        fdescribe("demote admin to editor",function() {
+            var login={name:'editorAcc', password:'password'};
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Add User", function(done) {
+                addQ='USER ADD '+login.name+' '+login.password;
+                sendCmd(addQ).then(function(data) { done(); });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            it("Login to user", function(done) {
+                q='USER LOGIN '+login.name+' '+login.password;
+                sendCmd(q).then(function(data) { done(); });
+            });
+            it('Assert is editor', function(done) {
+                sendCmd('USER LEVEL').then(function(data) { 
+                    expect(data.result.data).toEqual('EDITOR');
+                    done();
+                });
+            });
+            it("Logout from user", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Delete the user", function(done) {
+                dQ='USER DELETE '+login.name;
+                sendCmd(dQ).then(function(data) { done(); });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
         });
         describe("promote editor to admin",function() {
              pending("to be implemented");
