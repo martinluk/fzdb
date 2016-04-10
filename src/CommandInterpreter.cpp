@@ -19,6 +19,7 @@
 #include "jobs/PromoteEditorJob.h"
 #include "jobs/UserLoginJob.h"
 #include "jobs/UserLogoutJob.h"
+#include "jobs/UserLevelJob.h"
 #include "jobs/UserPasswordJob.h"
 
 #include "Parser.h"
@@ -87,6 +88,9 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
             break;
         case QueryType::USER_LOGOUT:
             JobQueue::AddJob(new UserLogoutJob(session));
+            break;
+        case QueryType::USER_LEVEL:
+            JobQueue::AddJob(new UserLevelJob(session));
             break;
         default:
             JobQueue::AddJob(new UnknownJob(session, command));
