@@ -134,6 +134,13 @@ namespace model
                         _order == cOther->_order;
             }
 
+			virtual std::shared_ptr<Base> Clone() override {
+				auto cloned = std::make_shared<Date>();
+				cloned->_value = _value;
+				copyValues(cloned);
+				return cloned;
+			}
+
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {
