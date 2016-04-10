@@ -26,14 +26,12 @@ namespace model {
 			Property() : Base(100, 0, std::string()), _value()
             {
                 _manager = NULL;
-                initMemberSerialiser();
             }
             
             Property(const unsigned int value, const EntityManager* manager, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(value)
             {
                 _manager = manager;
-                initMemberSerialiser();
             }
             
             virtual bool valuesEqualOnly(const Base *other) const
@@ -58,7 +56,9 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::shared_ptr<Base>(new Property(_value, _manager, _confidence));
+                auto cloned = std::make_shared<Property>(_value, _manager, _originalAuthorId, _confidence);
+				cloned->_orderingId = _orderingId;
+				return cloned;
             }
 
             virtual std::string logString(const Database* db = NULL) const override
@@ -75,14 +75,15 @@ namespace model {
             }
 
         protected:
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {
+				if (!_memberSerialiser.initialised())initMemberSerialiser();
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
             Property(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _value()
             {
-                initMemberSerialiser();
+               initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };

@@ -1,6 +1,6 @@
 #include "Unknown.h"
 
-UnknownJob::UnknownJob(std::shared_ptr<ISession> session, std::string name) : Job(session)
+UnknownJob::UnknownJob(std::shared_ptr<ISession> session, std::string name) : Job(session, PermType::ViewDB)
 {
   _name = name;
 }

@@ -13,6 +13,14 @@
 #include "jobs/SaveFileJob.h"
 #include "jobs/Link.h"
 #include "jobs/Flush.h"
+#include "jobs/AddUserJob.h"
+#include "jobs/DeleteUserJob.h"
+#include "jobs/DemoteAdminJob.h"
+#include "jobs/PromoteEditorJob.h"
+#include "jobs/UserLoginJob.h"
+#include "jobs/UserLogoutJob.h"
+#include "jobs/UserLevelJob.h"
+#include "jobs/UserPasswordJob.h"
 
 #include "Parser.h"
 
@@ -59,6 +67,30 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
             break;
         case QueryType::FLUSH:
             JobQueue::AddJob(new Flush(session));
+            break;
+        case QueryType::USER_ADD:
+            JobQueue::AddJob(new AddUserJob(session, query.data0, query.data1));
+            break;
+        case QueryType::USER_DELETE:
+            JobQueue::AddJob(new DeleteUserJob(session, query.data0));
+            break;
+        case QueryType::USER_PASSWORD:
+            JobQueue::AddJob(new UserPasswordJob(session, query.data0, query.data1)); 
+            break;
+        case QueryType::USER_PROMOTE:
+            JobQueue::AddJob(new PromoteEditorJob(session, query.data0));
+            break;
+        case QueryType::USER_DEMOTE:
+            JobQueue::AddJob(new DemoteAdminJob(session, query.data0));
+            break;
+        case QueryType::USER_LOGIN:
+            JobQueue::AddJob(new UserLoginJob(session, query.data0, query.data1));
+            break;
+        case QueryType::USER_LOGOUT:
+            JobQueue::AddJob(new UserLogoutJob(session));
+            break;
+        case QueryType::USER_LEVEL:
+            JobQueue::AddJob(new UserLevelJob(session));
             break;
         default:
             JobQueue::AddJob(new UnknownJob(session, command));

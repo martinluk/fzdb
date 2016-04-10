@@ -5,11 +5,21 @@ var simpsonsTestData = h.getData("simpsons.fuz");
 
 // load test data
 
-describe("Fuzzy Database", function() { 
+describe("Fuzzy Database:JonsBugQuerySpec", function() { 
 
-  beforeAll(h.setupClient);
   
   describe("sends the command over TCP", function() {
+
+  beforeAll(function(done) {
+    //Not pretty I know, will refactor later once everything is working,.
+    h.setupClient();
+    h.sendCmd(h.loginToAdminQuery).then(function() {
+      h.sendCmd('FLUSH').then(function() {
+          h.sendCmd('USER LOGOUT').then(function() {done();});
+        });
+      });
+    });
+
 
     //tests are run sequentially
 
@@ -36,14 +46,22 @@ describe("Fuzzy Database", function() {
         [ { id: '3', other: '2' }]
       )
     );
+    });
 
     describe("with the simpsons data loaded", function() {
 
-      beforeAll(function(done) {
-        h.sendCmd("FLUSH").then(function() {
-          h.sendCmd(simpsonsTestData).then(done);
+    beforeAll(function(done) {
+        //Not pretty I know, will refactor later once everything is working,.
+        h.setupClient();
+        h.sendCmd(h.loginToAdminQuery).then(function() {
+            h.sendCmd('FLUSH').then(function() {
+                h.sendCmd(simpsonsTestData).then(function(){
+                    h.sendCmd('USER LOGOUT').then(function() {done();});
+            });
+            });
         });
-      });
+    });
+
 
       h.testCase("retrieving all forenames and surnames",  
 
@@ -51,14 +69,14 @@ describe("Fuzzy Database", function() {
 
         // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
         h.resultTemplate(
-          [{"forename": "Homer", "surname": "Simpson"},
-          {"forename": "Homer", "surname": "Power"}, 
-          {"forename": "Max", "surname": "Simpson"}, 
-          {"forename": "Max", "surname": "Power"}, 
-          {"forename": "Marge", "surname": "Simpson"},
-          {"forename": "Marge", "surname": "Bouvier"}, 
+          [{"forename": "Homer", "surname": "Simpson"}, 
+          {"forename": "Marge", "surname": "Simpson"},         
           {"forename": "Ned", "surname": "Flanders"}, 
-          {"forename": "Moe", "surname": "Szyslak"}]
+          {"forename": "Moe", "surname": "Szyslak"},
+          {"forename": "Max", "surname": "Simpson"},    
+          {"forename": "Homer", "surname": "Power"},
+          {"forename": "Marge", "surname": "Bouvier"},        
+          {"forename": "Max", "surname": "Power"} ]
         )
       );
 
@@ -68,11 +86,10 @@ describe("Fuzzy Database", function() {
 
         // result template just adds {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":DATA}} around the given DATA
         h.resultTemplate(
-          [{"a":"Simpson","b":"10"}]
+          [{"a":"Simpson","b":"11"}]
         )
       );
 
     });
  
-  });
 });

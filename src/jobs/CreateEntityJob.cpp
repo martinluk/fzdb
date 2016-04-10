@@ -2,7 +2,7 @@
 #include "../singletons.h"
 #include "../model/EntityManager.h"
 
-CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session, const std::string &type) : Job(session), _type(type)
+CreateEntityJob::CreateEntityJob(std::shared_ptr<ISession> session, const std::string &type) : Job(session, PermType::UserOp), _type(type)
 {
 }
 

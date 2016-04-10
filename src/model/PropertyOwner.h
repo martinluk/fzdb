@@ -13,6 +13,13 @@
 
 class EntityManager;
 
+enum class MatchState {
+	None,
+	Linked,
+	UpTree,
+	DownTree
+};
+
 // This is basically a stripped-down Entity class.
 // TODO: (Jonathan) Tim, you're probably better at explaining this one.
 class PropertyOwner
@@ -27,21 +34,22 @@ public:
 	// Returns the property with the given key, or a null property if this is not found.
 	virtual std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const;
 
-	void insertProperty(std::shared_ptr<EntityProperty> prop);
+	virtual void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None);
 
-    void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object);
+    virtual void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None);
 
     // Removes the property with the given key.
     void removeProperty(const unsigned int &key);
 
     // Tests if the entity has a property
-    virtual bool hasProperty(const unsigned int &key) const;
+    virtual bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const;
 
     // Returns read only reference to the property table
     const std::map<unsigned int, std::shared_ptr<EntityProperty>>& properties() const;
 
     // Tests if the entity meets the condition
-    virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj);
+    virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, MatchState state = MatchState::None);
+	virtual std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state = MatchState::None);
 
     // Clears all properties on the entity.
     void clearProperties();

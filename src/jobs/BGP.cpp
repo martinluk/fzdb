@@ -6,7 +6,8 @@
 
 #include <rapidjson/document.h>
 
-BGP::BGP(std::shared_ptr<ISession> session, Query query) : Job(session), _query(query)
+BGP::BGP(std::shared_ptr<ISession> session, Query query)
+    : Job(session, PermType::ViewDB ), _query(query)
 {
 }
 
@@ -19,20 +20,26 @@ QueryResult BGP::executeConst() const
 
         variables.trimEmptyRows();
 
+		
+
       //run filters against query
       for(auto filter : _query.whereClause.filters) {
-          variables.getData()->erase(std::remove_if(variables.getData()->begin(), variables.getData()->end(), 
-              [&, this](std::vector<VariableSetValue> row) {
-              return !filter->Test(std::move(row), variables.getMetaData());
-          }), variables.getData()->end());
+		  for (auto iter = variables.begin(); iter != variables.end();) {
+			  if (!filter->Test(std::move(variables), std::move(*iter))) {
+				  iter = variables.erase(iter);
+			  }
+			  else {
+				  iter++;
+			  }
+		  }
       }
 
-      //encode result as JSON
-        auto data = variables.getData();
+	  variables.sort();
 
+      //encode result as JSON
         rapidjson::Value val;
         val.SetArray();
-        for (auto iter = data->cbegin(); iter != data->cend(); iter++) {
+        for (auto iter = variables.cbegin(); iter != variables.cend(); iter++) {
 
             rapidjson::Value val2;
             val2.SetObject();
@@ -44,12 +51,12 @@ QueryResult BGP::executeConst() const
 
                 auto i = variables.indexOf(*iter2);
 
-                std::shared_ptr<model::types::Base> basePtr = (*iter)[i].dataPointer();
+                std::shared_ptr<model::types::Base> basePtr = (*iter).at(i).dataPointer();
                 
                 if (!(bool(basePtr))) continue;
 
                 rapidjson::Value val3;
-				val3.SetString((*iter)[i].dataPointer()->toString().c_str(), result.allocator());        
+				val3.SetString((*iter).at(i).dataPointer()->toString().c_str(), result.allocator());        
 
                 rapidjson::Value varName;
                 varName.SetString((*iter2).c_str(), result.allocator());

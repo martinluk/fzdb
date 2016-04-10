@@ -25,12 +25,7 @@ TEST_F(PermissionTest, assertModifyDBPermission) {
 
 	}
 	Permission::assertModifyDBPermission(Permission::UserGroup::EDITOR);
-	try {
-		Permission::assertModifyDBPermission(Permission::UserGroup::ADMIN);
-		FAIL();
-	} catch (Permission::UserPermissionException &e) {
-
-	}
+    Permission::assertModifyDBPermission(Permission::UserGroup::ADMIN);
 }
 
 TEST_F(PermissionTest, assertUserOpPermission) {

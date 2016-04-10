@@ -3,6 +3,7 @@
 #include "UserAttributes.h"
 #include "UserExceptions.h"
 #include "Hashing.h"
+#include "spdlog/spdlog.h"
 
 #include "../ISession.h"
 
@@ -32,13 +33,16 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
     std::string actualHash = currUserAttr.passwordHash;
     std::string currSalt = currUserAttr.salt;
     std::string ourHash = Hashing::hashPassword(userName, currSalt , password);
+    boost::uuids::uuid _uuid= session->uuid();
     if (ourHash != actualHash) {
+        spdlog::get("main")->warn("[{:<}] {} {}", _uuid, userName , " logged in unsuccessfully.");
         throw LoginUnsuccessfulException();
     }
-
     session->userId(_userFileCache[userName].id);
     session->setCurrentUserName(userName);
+    session->setUserGroup(currUserAttr.userGroup);
 
+    spdlog::get("main")->warn("[{:<}] {} {}", _uuid, userName , " logged in successfully.");
     return currUserAttr.userGroup;
 }
 
@@ -67,4 +71,25 @@ void UserOperation::removeUser(const std::string &userName)
     unsigned int oldUserId = _userFileCache[userName].id;
     _idGen.addDeleted(oldUserId);
     UserFileOperations::removeUser(userName);
+}
+
+void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session,
+        const std::string &oldpassword, const std::string &newpassword) {
+    assert(session->getUserGroup()!=Permission::UserGroup::GUEST);
+    std::string userName = session->username();
+    UserAttributes a = getUserAttributes(userName);
+    //Check old password
+    std::string actualHash = a.passwordHash;
+    std::string currSalt = a.salt;
+    std::string ourHash =
+        Hashing::hashPassword(userName, currSalt , oldpassword);
+    if (ourHash != actualHash) {
+        throw LoginUnsuccessfulException();
+    }
+    //Get new salt
+    a.salt=Hashing::genSalt();
+    //gen new hash
+    a.passwordHash=Hashing::hashPassword(userName,a.salt,newpassword);
+    //hash new password
+    updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
 }

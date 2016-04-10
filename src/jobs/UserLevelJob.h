@@ -5,10 +5,10 @@
 
 #include "QueryResult.h"
 
-// Logs a currently logged-in user out of the database.
-class UserLogoutJob : public Job {
+// Returns the current level of the user.
+class UserLevelJob : public Job {
 public:
-    UserLogoutJob(std::shared_ptr<ISession> session);
+    UserLevelJob(std::shared_ptr<ISession> session);
     
     virtual bool constOperation() const override { return true; }
     virtual QueryResult executeConst() const override;

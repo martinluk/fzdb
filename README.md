@@ -1,9 +1,11 @@
-[![Build Status](https://magnum.travis-ci.com/matann/fuzzy-database.svg?token=9y2FhEje8Gso8srsgnQj&branch=develop)](https://magnum.travis-ci.com/matann/fuzzy-database)
+[![Build Status](https://travis-ci.com/matann/fzdb.svg?token=GNPt1QoQ1MHs1MrnxbiE&branch=master)](https://travis-ci.com/matann/fzdb)
 [![Gitter](https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg)](https://gitter.im/matann/fuzzy-database)
 [![Waffle](https://badge.waffle.io/matann/fuzzy-database.png)](https://waffle.io/matann/fuzzy-database)
 
 # fuzzy-database
 A graph-based fuzzy data store.
+
+https://www.overleaf.com/4529443gzjrqn#/13617797/
 
 ## Changes to directory structure
 All code for the database now goes in the `src` directory. Using sub-directories works fine and is a good idea to help keep the codebase

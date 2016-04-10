@@ -84,22 +84,30 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     else if (str == ".") tokenType = ParsedTokenType::SPLITTER1;
 
     //keywords
-    else if (str == "SELECT") tokenType = ParsedTokenType::KEYWORD_SELECT;
-    else if (str == "INSERT") tokenType = ParsedTokenType::KEYWORD_INSERT;
-    else if (str == "DELETE") tokenType = ParsedTokenType::KEYWORD_DELETE;
-    else if (str == "WHERE") tokenType = ParsedTokenType::KEYWORD_WHERE;
-    else if (str == "PING") tokenType = ParsedTokenType::KEYWORD_PING;
-    else if (str == "ECHO") tokenType = ParsedTokenType::KEYWORD_ECHO;
-    else if (str == "META") tokenType = ParsedTokenType::KEYWORD_META;
-    else if (str == "DATA") tokenType = ParsedTokenType::KEYWORD_DATA;
-    else if (str == "DEBUG") tokenType = ParsedTokenType::KEYWORD_DEBUG;
-    else if (str == "LOAD") tokenType = ParsedTokenType::KEYWORD_LOAD;
-    else if (str == "SAVE") tokenType = ParsedTokenType::KEYWORD_SAVE;
-    else if (str == "LINK") tokenType = ParsedTokenType::KEYWORD_LINK;
-    else if (str == "UNLINK") tokenType = ParsedTokenType::KEYWORD_UNLINK;
-    else if (str == "FINAL") tokenType = ParsedTokenType::KEYWORD_FINAL;
-    else if (str == "FLUSH") tokenType = ParsedTokenType::KEYWORD_FLUSH;
-    else if (str == "CANON") tokenType = ParsedTokenType::KEYWORD_CANON;
+    else if (str == "SELECT") tokenType   = ParsedTokenType ::KEYWORD_SELECT;
+    else if (str == "INSERT") tokenType   = ParsedTokenType ::KEYWORD_INSERT;
+    else if (str == "DELETE") tokenType   = ParsedTokenType ::KEYWORD_DELETE;
+    else if (str == "WHERE") tokenType    = ParsedTokenType ::KEYWORD_WHERE;
+    else if (str == "PING") tokenType     = ParsedTokenType ::KEYWORD_PING;
+    else if (str == "ECHO") tokenType     = ParsedTokenType ::KEYWORD_ECHO;
+    else if (str == "META") tokenType     = ParsedTokenType ::KEYWORD_META;
+    else if (str == "DATA") tokenType     = ParsedTokenType ::KEYWORD_DATA;
+    else if (str == "DEBUG") tokenType    = ParsedTokenType ::KEYWORD_DEBUG;
+    else if (str == "LOAD") tokenType     = ParsedTokenType ::KEYWORD_LOAD;
+    else if (str == "SAVE") tokenType     = ParsedTokenType ::KEYWORD_SAVE;
+    else if (str == "LINK") tokenType     = ParsedTokenType ::KEYWORD_LINK;
+    else if (str == "UNLINK") tokenType   = ParsedTokenType ::KEYWORD_UNLINK;
+    else if (str == "FINAL") tokenType    = ParsedTokenType ::KEYWORD_FINAL;
+    else if (str == "FLUSH") tokenType    = ParsedTokenType ::KEYWORD_FLUSH;
+    else if (str == "CANON") tokenType    = ParsedTokenType ::KEYWORD_CANON;
+    else if (str == "USER") tokenType     = ParsedTokenType ::KEYWORD_USER;
+    else if (str == "ADD") tokenType      = ParsedTokenType ::KEYWORD_ADD;
+    else if (str == "PASSWORD") tokenType = ParsedTokenType ::KEYWORD_PASSWORD;
+    else if (str == "PROMOTE") tokenType  = ParsedTokenType ::KEYWORD_PROMOTE;
+    else if (str == "DEMOTE") tokenType   = ParsedTokenType ::KEYWORD_DEMOTE;
+    else if (str == "LOGIN") tokenType    = ParsedTokenType ::KEYWORD_LOGIN;
+    else if (str == "LOGOUT") tokenType   = ParsedTokenType ::KEYWORD_LOGOUT;
+    else if (str == "LEVEL") tokenType    = ParsedTokenType ::KEYWORD_LEVEL;
 
     return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -414,6 +422,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
     TriplesBlock whereClause;
     std::vector<std::string> selectLine;
     std::string data0;
+    std::string data1;
     std::vector<long long int> entities;
     QuerySettings canon;
 
@@ -603,8 +612,83 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
             break;
         }
 
+        if(iter->first.type == ParsedTokenType::KEYWORD_USER) {
+            iter++;
+            //Can either be UADD, UDELETE, UPASSWORD, UPROMOTE, UDEMOTE, ULOGIN, ULOGOUT, LEVEL
+            int numberOfArg=-1;
+            switch(iter->first.type) {
+                case ParsedTokenType::KEYWORD_ADD: 
+                    type = QueryType::USER_ADD;
+                    numberOfArg=2;
+                    break;
+                case ParsedTokenType::KEYWORD_DELETE: 
+                    type=QueryType::USER_DELETE;
+                    numberOfArg=1;
+                    break;
+                case ParsedTokenType::KEYWORD_PASSWORD: 
+                    type=QueryType::USER_PASSWORD;
+                    numberOfArg=2;
+                    break;
+                case ParsedTokenType::KEYWORD_PROMOTE: 
+                    type=QueryType::USER_PROMOTE;
+                    numberOfArg=1;
+                    break;
+                case ParsedTokenType::KEYWORD_DEMOTE: 
+                    type=QueryType::USER_DEMOTE;
+                    numberOfArg=1;
+                    break;
+                case ParsedTokenType::KEYWORD_LOGIN: 
+                    type=QueryType::USER_LOGIN;
+                    numberOfArg=2;
+                    break;
+                case ParsedTokenType::KEYWORD_LOGOUT: 
+                    type=QueryType::USER_LOGOUT;
+                    numberOfArg=0;
+                    break;
+                case ParsedTokenType::KEYWORD_LEVEL: 
+                    type=QueryType::USER_LEVEL;
+                    numberOfArg=0;
+                    break;
+                default:
+                    throw ParseException("Invalid arguments following USER");
+            }
+            //iter now=Keyword
+            switch(numberOfArg) {
+                case 0:
+                    //Finished
+                    iter++;
+                    break;
+                case 1:
+                    iter++;
+                    if (iter!=tokens.end()) {
+                        data0 = iter->second; //Retrieve data from first argument
+                        iter++; 
+                    } else {
+                        throw ParseException("Expected 1 argument but receieved 0.");
+                    }
+                    break;
+                case 2:
+                    iter++;
+                    //iter now=arg1
+                    if (iter != tokens.end()) {
+                        data0 = iter->second; //Retrieve data from first argument
+                        iter++;
+                        //iter now=arg2
+                        if (iter == tokens.end()) { throw ParseException("Expected 2 argument but receieved 1."); }
+                        data1 = iter->second; //Retrieve data from second argument
+                        iter++;
+                    } else {
+                        throw ParseException("Expected 1 argument but receieved 0.");
+                    }
+                    break;
+                default:
+                    assert(numberOfArg>=0 /*Make sure numberOfArg is assigned*/);
+                    assert(numberOfArg<=2 /*Query class only accept two args at most, implement otherwise if nessasary*/);
+            }
+            break;
+        }
+
         throw ParseException("Unknown symbol: " + iter->second);
-        //}
     } while(true);
 
     if (iter != tokens.end()) {
@@ -615,5 +699,5 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 		throw ParseException("The NEW keyword is only allowed in WHERE sections of INSERT queries");
 	}
 
-    return Query(type, sources, conditions, whereClause, data0, selectLine, entities, canon);
+    return Query(type, sources, conditions, whereClause, data0, data1, selectLine, entities, canon);
 }

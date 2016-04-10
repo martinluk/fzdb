@@ -27,13 +27,11 @@ namespace model {
         public:
             String() :Base(100, 0, std::string()), _value(), _valueWrapper(_value)
             {
-                initMemberSerialiser();
             }
             
             String(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(value), _valueWrapper(_value)
             {
-                initMemberSerialiser();
             }
             
             virtual bool valuesEqualOnly(const Base *other) const
@@ -58,7 +56,9 @@ namespace model {
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::make_shared<String>(_value, _confidence);
+                auto cloned = std::make_shared<String>(_value, _originalAuthorId, _confidence);
+				cloned->_orderingId = _orderingId;
+				return cloned;
             }
 
             virtual std::string logString(const Database* db = NULL) const override
@@ -84,8 +84,9 @@ namespace model {
             }
 
         protected:
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {
+				if (!_memberSerialiser.initialised())initMemberSerialiser();
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 

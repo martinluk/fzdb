@@ -135,26 +135,21 @@ namespace model
             }
             
             Date() : Base(), _value(0), _order(Ordering::EqualTo)
-            {
-                initMemberSerialiser();
-            }
+            { }
             
             Date(Date_t value, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(value), _order(order)
             {
-                initMemberSerialiser();
             }
 
-						virtual std::shared_ptr<Base> Clone() override
-						{
-							return std::make_shared<Date>(_value, _originalAuthorId, _order, _confidence, _comment);
-						}
+            virtual std::shared_ptr<Base> Clone() override
+            {
+                return std::make_shared<Date>(_value, _originalAuthorId, _order, _confidence, _comment);
+            }
             
             Date(const StructuredDate &sd, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
                 Base(confidence, author, comment), _value(encode(sd)), _order(order)
-            {
-                initMemberSerialiser();
-            }
+            { }
             
             virtual bool valuesEqualOnly(const Base *other) const
             {
@@ -215,8 +210,9 @@ namespace model
             }
 
         protected:
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser) const
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {
+				if (!_memberSerialiser.initialised())initMemberSerialiser();
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
@@ -229,10 +225,10 @@ namespace model
             Date_t _value;
             Ordering _order;
 
-        private:
+		private:
             MemberSerialiser _memberSerialiser;
 
-            void initMemberSerialiser()
+            void initMemberSerialiser() override
             {
                 _memberSerialiser.addPrimitive(&_value, sizeof(_value));
                 _memberSerialiser.addPrimitive(&_order, sizeof(_order));

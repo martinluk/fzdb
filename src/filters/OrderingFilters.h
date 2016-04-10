@@ -28,9 +28,9 @@ public:
 
    GreaterThanFilter(const std::string variable, const int value) : _variable(variable), _value(value) {}
 
-   bool Test(const std::vector<VariableSetValue>&& values, std::map<std::string, std::pair<model::types::SubType, unsigned char>>&& variables) override {
-       unsigned char aa = variables[_variable].second;
-       int val = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(values[aa].dataPointer())->value();
+   bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) override {
+       unsigned char aa = variableSet.indexOf(_variable);
+       int val = std::dynamic_pointer_cast<model::types::Int, model::types::Base>(values.at(aa).dataPointer())->value();
         return val > _value;
    }
 

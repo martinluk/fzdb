@@ -206,7 +206,29 @@ void UserFileOperations::saveCacheToFile() const
         userOV.AddMember(SALT, saltVal, jsonDoc.GetAllocator());
 
         Value idVal;
-        idVal.SetUint(attr.id);
+        idVal.SetUint(attr.id); //FIXME This line is potentially causing the program to crash, investigate tomorrow morning.
+        /*
+            Output from Valgrind:
+            ==25180== Conditional jump or move depends on uninitialised value(s)
+            ==25180==    at 0x8210CAF: rapidjson::GenericValue<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> >::GenericValue(unsigned int) (document.h:506)
+            ==25180==    by 0x820FA50: rapidjson::GenericValue<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> >::SetUint(unsigned int) (in /home/matann/fzdb/build/fuzzy-dat
+            abase)
+            ==25180==    by 0x820C1C8: UserFileOperations::saveCacheToFile() const (UserFileOperations.cpp:209)
+            ==25180==    by 0x820B5CB: UserFileOperations::removeUser(std::string const&) (UserFileOperations.cpp:77)
+            ==25180==    by 0x8207D64: UserOperation::removeUser(std::string const&) (UserOperation.cpp:70)
+            ==25180==    by 0x821BE66: DeleteUserJob::executeNonConst() (DeleteUserJob.cpp:15)
+            ==25180==    by 0x829B288: Job::execute() (Job.cpp:56)
+            ==25180==    by 0x8253098: JobQueue::ExecuteJob(Job*) (JobQueue.cpp:10)
+            ==25180==    by 0x8256C30: void boost::_bi::list1<boost::_bi::value<Job*> >::operator()<void (*)(Job*), boost::_bi::list0>(boost::_bi::type<void>, void (*&)(Job*), boost::_bi::list0&, int) (bi
+            nd.hpp:255)
+            ==25180==    by 0x8256B67: boost::_bi::bind_t<void, void (*)(Job*), boost::_bi::list1<boost::_bi::value<Job*> > >::operator()() (bind.hpp:895)
+            ==25180==    by 0x82569A2: void boost::asio::asio_handler_invoke<boost::_bi::bind_t<void, void (*)(Job*), boost::_bi::list1<boost::_bi::value<Job*> > > >(boost::_bi::bind_t<void, void (*)(Job*
+            ), boost::_bi::list1<boost::_bi::value<Job*> > >&, ...) (handler_invoke_hook.hpp:69)
+            ==25180==    by 0x825686F: void boost_asio_handler_invoke_helpers::invoke<boost::_bi::bind_t<void, void (*)(Job*), boost::_bi::list1<boost::_bi::value<Job*> > >, boost::_bi::bind_t<void, void 
+            (*)(Job*), boost::_bi::list1<boost::_bi::value<Job*> > > >(boost::_bi::bind_t<void, void (*)(Job*), boost::_bi::list1<boost::_bi::value<Job*> > >&, boost::_bi::bind_t<void, void (*)(Job*), boo
+            st::_bi::list1<boost::_bi::value<Job*> > >&) (handler_invoke_helpers.hpp:37)
+            ==25180== 
+        */
         userOV.AddMember(ID, idVal, jsonDoc.GetAllocator());
 
         //Casting usergroup to char

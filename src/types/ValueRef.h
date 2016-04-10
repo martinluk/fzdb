@@ -33,7 +33,9 @@ namespace model {
             unsigned int value() const { return _value; }
 
             virtual std::shared_ptr<Base> Clone() override {
-                return std::make_shared<ValueRef>(_entity, _property, _value);
+                auto cloned = std::make_shared<ValueRef>(_entity, _property, _value);
+				cloned->_orderingId = _orderingId;
+				return cloned;
             }
 
             virtual SubType subtype() const

@@ -53,11 +53,17 @@ public:
         return _linkStatus;
     }
 
-    bool memberwiseEqual(const Entity* other) const;
-	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj) override;
+	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const model::Object&& obj, MatchState state = MatchState::None) override;
+	std::vector<std::shared_ptr<model::types::Base>> meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state = MatchState::None) override;
 
-	bool hasProperty(const unsigned int &key) const override;
+    bool memberwiseEqual(const Entity* other) const;
+
+
+	bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const override;
 	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
+
+	void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None) override;
+	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None) override;
 
 private:
     void initMemberSerialiser();
@@ -67,7 +73,7 @@ private:
     }
 
 private:
-    EHandle_t    handle_;
+    EHandle_t _handle;
     unsigned int _type;
     LinkStatus _linkStatus;
 
