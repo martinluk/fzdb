@@ -15,7 +15,7 @@ public:
     PropertyOwnerSerialiser(const std::shared_ptr<PropertyOwner> po);
 
     std::size_t serialise(Serialiser &serialiser) const;
-    static std::shared_ptr<PropertyOwner> unserialise(const char* &serialData, std::size_t length);
+    std::shared_ptr<PropertyOwner> unserialise(const char* &serialData, std::size_t length);
 
     class InvalidInputEntityException : public std::runtime_error
     {

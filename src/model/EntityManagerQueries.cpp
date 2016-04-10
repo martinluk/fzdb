@@ -31,6 +31,7 @@ void EntityManager::Scan1(VariableSet&& variableSet, unsigned int variableId, co
 
 		//in this scan we can only remove variables from variableset
 		switch (variableSet.typeOf(variableId)) {
+		case model::types::SubType::SourceRef:
 		case model::types::SubType::EntityRef: {
 			ScanUPR(std::move(variableSet), variableId, std::move(predicate), std::move(object), std::move(metaVar));
 			break;
@@ -64,6 +65,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, unsigned int variableId, co
 		if (variableSet.used(variableId2)) {
 			// this cannot add any new data, only remove it			
 			switch (variableSet.typeOf(variableId)) {
+			case model::types::SubType::SourceRef:
 			case model::types::SubType::EntityRef:
 				ScanUPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 				break;
@@ -74,7 +76,7 @@ void EntityManager::Scan2(VariableSet&& variableSet, unsigned int variableId, co
 		}
 		else {
 			switch (variableSet.typeOf(variableId)) {
-
+			case model::types::SubType::SourceRef:
 			case model::types::SubType::EntityRef:
 				ScanUPV(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar));
 				break;
@@ -103,6 +105,7 @@ void EntityManager::Scan3(VariableSet&& variableSet, unsigned int variableId, un
 		if (variableSet.used(variableId2)) {
 			// this cannot add any new data, only remove it			
 			switch (variableSet.typeOf(variableId)) {
+			case model::types::SubType::SourceRef:
 			case model::types::SubType::EntityRef:
 				ScanUUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 				break;
@@ -113,6 +116,7 @@ void EntityManager::Scan3(VariableSet&& variableSet, unsigned int variableId, un
 		}
 		else {
 			switch (variableSet.typeOf(variableId)) {
+			case model::types::SubType::SourceRef:
 			case model::types::SubType::EntityRef:
 				ScanUVR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar));
 				break;
@@ -134,6 +138,7 @@ void EntityManager::Scan3(VariableSet&& variableSet, unsigned int variableId, un
 }
 
 //$a $b $c
+// TODO: where are the Ms?
 void EntityManager::Scan4(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar) const {
 
 	if (variableSet.used(variableId)) {

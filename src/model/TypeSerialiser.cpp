@@ -6,6 +6,11 @@
 #include "types/String.h"
 #include "types/EntityRef.h"
 #include "types/Date.h"
+#include "types/AuthorID.h"
+#include "types/TypeID.h"
+#include "types/Confidence.h"
+#include "types/TimeStamp.h"
+#include "types/SourceRef.h"
 #include "spdlog/spdlog.h"
 #include <cassert>
 #include <stdexcept>
@@ -29,6 +34,13 @@ std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
     Serialiser::zeroBuffer(&header, sizeof(TypeSerialHeader));
     header.memberVariablesSize = 0;
     header.subtype = baseType_->subtype();
+	if (header.subtype == model::types::SubType::Undefined) {
+		assert(false);
+	}
+
+	if (header.subtype == model::types::SubType::AuthorID) {
+		bool a = false;
+	}
 
     std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(TypeSerialHeader)));
     bytesSerialised += baseType_->serialiseSubclass(serialiser);
@@ -38,6 +50,10 @@ std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
 	bytesSerialised += pos.serialise(serialiser);
 	pHeader = serialiser.reinterpretCast<TypeSerialHeader*>(initialSize);
 	pHeader->totalSize = bytesSerialised;
+
+	if (pHeader->subtype == model::types::SubType::Undefined) {
+		assert(false);
+	}
 
     return pHeader->totalSize;
 }
@@ -65,29 +81,44 @@ std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, st
 //                break;
 
 	case SubType::Int32:
-		//b = std::make_shared<Int>(d);
 		b = std::shared_ptr<Int>(new Int(d, pHeader->memberVariablesSize));
 		break;
 
 	case SubType::UInt32:
-		//b = std::make_shared<Int>(d);
 		b = std::shared_ptr<UInt>(new UInt(d, dataSize));
 		break;
 
     case SubType::String:
-        //b = std::make_shared<String>(d);
         b = std::shared_ptr<String>(new String(d, dataSize));
                 break;
 
     case SubType::EntityRef:
-        //b = std::make_shared<EntityRef>(d);
         b = std::shared_ptr<EntityRef>(new EntityRef(d, dataSize));
                 break;
         
     case SubType::Date:
-        //b = std::make_shared<Date>(d);
         b = std::shared_ptr<Date>(new Date(d, dataSize));
         break;
+
+	case SubType::TimeStamp:
+		b = std::shared_ptr<TimeStamp>(new TimeStamp(d, dataSize));
+		break;
+
+	case SubType::AuthorID:
+		b = std::shared_ptr<AuthorID>(new AuthorID(d, dataSize));
+		break;
+
+	case SubType::Confidence:
+		b = std::shared_ptr<Confidence>(new Confidence(d, dataSize));
+		break;
+
+	case SubType::SourceRef:
+		b = std::shared_ptr<SourceRef>(new SourceRef(d, dataSize));
+		break;
+
+	case SubType::TypeID:
+		b = std::shared_ptr<TypeID>(new TypeID(d, dataSize));
+		break;
 
     default:
         assert(false);

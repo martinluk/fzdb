@@ -91,10 +91,20 @@ TEST_F(SerialisationTest, testSerialiseValues)
 {
     using namespace model::types;
 
-    testSerialisation(BasePointer(new Int(1234, 42, 98, "Integer comment")));
-    testSerialisation(BasePointer(new String("Serialise this! @#!@$@%", 32, 1, "String comment")));
-    testSerialisation(BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::EqualTo, 12, "Date comment")));
-    testSerialisation(BasePointer(new EntityRef((EHandle_t)1)));
+	auto intRecord = BasePointer(new Int(1234, 42, 98, "Integer comment"));
+	auto stringRecord = BasePointer(new String("Serialise this! @#!@$@%", 32, 1, "String comment"));
+	auto dateRecord = BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::EqualTo, 12, "Date comment"));
+	auto entityRefRecord = BasePointer(new EntityRef((EHandle_t)1));
+
+	intRecord->Init(98);
+	stringRecord->Init(1);
+	dateRecord->Init(1);
+	entityRefRecord->Init(100);
+
+    testSerialisation(intRecord);
+    testSerialisation(stringRecord);
+    testSerialisation(dateRecord);
+    testSerialisation(entityRefRecord);
 }
 
 // Test that entities with different numbers of properties serialise and unserialise correctly.

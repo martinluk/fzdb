@@ -21,7 +21,11 @@ namespace model {
             EntityRef = SUBTYPE_VALUE_MASK | 0x2,
             Date = SUBTYPE_VALUE_MASK | 0x3,
 			UInt32 = SUBTYPE_VALUE_MASK | 0x4,
-			TimeStamp = SUBTYPE_VALUE_MASK | 0x5
+			TimeStamp = SUBTYPE_VALUE_MASK | 0x5,
+			TypeID = SUBTYPE_VALUE_MASK | 0x6,
+			AuthorID = SUBTYPE_VALUE_MASK | 0x7,
+			SourceRef = SUBTYPE_VALUE_MASK | 0x8,
+			Confidence = SUBTYPE_VALUE_MASK | 0x9
         };
 
         // Strings corresponding to the enum entries.

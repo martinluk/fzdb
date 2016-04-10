@@ -109,9 +109,8 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const
         // Serialise each value.
         for ( int i = 0; i < prop->count(); i++ )
         {
-            //TypeSerialiser typeSerialiser(prop->baseValue(i));
-			PropertyOwnerSerialiser pos(prop->baseValue(i));
-            propSerialisedSize += pos.serialise(serialiser);
+            TypeSerialiser typeSerialiser(prop->baseValue(i));
+			propSerialisedSize += typeSerialiser.serialise(serialiser);
         }
 
         // Record results in the header.
@@ -198,16 +197,13 @@ std::shared_ptr<PropertyOwner> PropertyOwnerSerialiser::unserialise(const char* 
     if ( pHeader->propertyDataOffset < pHeader->memberDataOffset + pHeader->memberDataLength )
         throw InvalidInputEntityException("Member data and property data cannot overlap.");
 
-    // Create an entity shell.
-    std::shared_ptr<PropertyOwner> ent = std::make_shared<PropertyOwner>();
-
     // Unserialise the members.
     const char* memberData = serialData + pHeader->memberDataOffset;
-    ent->_memberSerialiser.unserialiseAll(memberData, pHeader->memberDataLength);
+    _entity->_memberSerialiser.unserialiseAll(memberData, pHeader->memberDataLength);
 
     // If we're locked, unlock temporarily.
-    bool wasLocked = ent->_locked;
-    ent->_locked = false;
+    bool wasLocked = _entity->_locked;
+    _entity->_locked = false;
 
     // Unserialise the properties.
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(PropertyOwnerSerialHeader));
@@ -233,7 +229,12 @@ std::shared_ptr<PropertyOwner> PropertyOwnerSerialiser::unserialise(const char* 
         case SubType::String:
         case SubType::EntityRef:
         case SubType::Date:
-            populate(ent, p, data);\
+		case SubType::AuthorID:
+		case SubType::TimeStamp:
+		case SubType::TypeID:
+		case SubType::SourceRef:
+		case SubType::Confidence:
+            populate(_entity, p, data);\
             break;
 
         default:
@@ -244,7 +245,7 @@ std::shared_ptr<PropertyOwner> PropertyOwnerSerialiser::unserialise(const char* 
         }
     }
 
-    ent->_locked = wasLocked;
+	_entity->_locked = wasLocked;
 	serialData = serialData + length;
-    return ent;
+    return _entity;
 }

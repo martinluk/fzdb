@@ -113,7 +113,8 @@ unsigned int Base::OrderingId() {
 bool Base::memberwiseEqual(const Base* other) const
 {
 	return subtype() == other->subtype() &&
-		_orderingId == other->_orderingId;		
+		_orderingId == other->_orderingId &&
+		confidence() == other->confidence();
 }
 
 // Called when serialising.

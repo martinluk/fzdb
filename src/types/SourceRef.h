@@ -15,6 +15,7 @@ namespace model {
         // There is no guarantee that this handle will still be valid
         // when it is used - the caller needs to check!
         class SourceRef : public EntityRef {
+			friend class TypeSerialiser;
         public:
             SourceRef() : EntityRef()
             {        
@@ -39,6 +40,11 @@ namespace model {
 
 			unsigned char confidence() const override {
 				return 100;
+			}
+
+			virtual SubType subtype() const
+			{
+				return SubType::SourceRef;
 			}
 
         protected:

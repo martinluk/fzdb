@@ -11,7 +11,7 @@ namespace model {
 
         // Stores an integer value.
         class AuthorID : public UInt {      
-
+			friend class TypeSerialiser;
         public:
 
             AuthorID() : UInt()
@@ -37,6 +37,11 @@ namespace model {
 
 			unsigned char confidence() const override {
 				return 100;
+			}
+
+			virtual SubType subtype() const
+			{
+				return SubType::AuthorID;
 			}
 
         protected:
