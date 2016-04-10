@@ -49,7 +49,6 @@ helper.sendAdminCmd = function(cmd) {
         client.once('data',function() {
         client.write(cmd);
             client.once('data',function(data) {
-                console.log(JSON.parse(data));
                 client.write('USER LOGOUT');
                     client.once('data',function() {
                     });
