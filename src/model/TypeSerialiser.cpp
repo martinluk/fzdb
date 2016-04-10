@@ -1,4 +1,5 @@
 #include "TypeSerialiser.h"
+#include "PropertyOwnerSerialiser.h"
 #include "types/Base.h"
 #include "types/Int.h"
 #include "types/UInt.h"
@@ -10,9 +11,10 @@
 #include <stdexcept>
 
 using namespace model::types;
-struct SerialHeader
+struct TypeSerialHeader
 {
-    std::size_t size;
+	std::size_t totalSize;
+    std::size_t memberVariablesSize;
     SubType subtype;
 };
 
@@ -23,27 +25,31 @@ TypeSerialiser::TypeSerialiser(const std::shared_ptr<Base> &type) : baseType_(ty
 std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const
 {
     std::size_t initialSize = serialiser.size();
-    SerialHeader header;
-    Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
-    header.size = 0;
+	TypeSerialHeader header;
+    Serialiser::zeroBuffer(&header, sizeof(TypeSerialHeader));
+    header.memberVariablesSize = 0;
     header.subtype = baseType_->subtype();
 
-    std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+    std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(TypeSerialHeader)));
     bytesSerialised += baseType_->serialiseSubclass(serialiser);
-    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(initialSize);
-    pHeader->size = bytesSerialised;
+	TypeSerialHeader* pHeader = serialiser.reinterpretCast<TypeSerialHeader*>(initialSize);
+    pHeader->memberVariablesSize = bytesSerialised - sizeof(TypeSerialHeader);
+	PropertyOwnerSerialiser pos(baseType_);
+	bytesSerialised += pos.serialise(serialiser);
+	pHeader = serialiser.reinterpretCast<TypeSerialHeader*>(initialSize);
+	pHeader->totalSize = bytesSerialised;
 
-    return bytesSerialised;
+    return pHeader->totalSize;
 }
 
 std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, std::size_t* advance)
 {
     const char* d = serialisedData;
 
-    const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(d);
-    d += sizeof(SerialHeader);
+    const TypeSerialHeader* pHeader = reinterpret_cast<const TypeSerialHeader*>(d);
+    d += sizeof(TypeSerialHeader);
     std::shared_ptr<Base> b;
-    std::size_t dataSize = pHeader->size - sizeof(SerialHeader);
+    std::size_t dataSize = pHeader->totalSize - sizeof(TypeSerialHeader);
 
     // Since TypeSerialiser is the friend class of the subtypes,
     // we need to use the shared_ptr constructor directly instead
@@ -58,10 +64,10 @@ std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, st
 //        b = std::shared_ptr<Base>(new Base(d, dataSize));
 //                break;
 
-    case SubType::Int32:
-        //b = std::make_shared<Int>(d);
-        b = std::shared_ptr<Int>(new Int(d, dataSize));
-                break;
+	case SubType::Int32:
+		//b = std::make_shared<Int>(d);
+		b = std::shared_ptr<Int>(new Int(d, pHeader->memberVariablesSize));
+		break;
 
 	case SubType::UInt32:
 		//b = std::make_shared<Int>(d);
@@ -87,6 +93,9 @@ std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, st
         assert(false);
         break;
     }
+
+	PropertyOwnerSerialiser pos(b);
+	pos.unserialise(d, dataSize - pHeader->memberVariablesSize);
 
     if ( (d - dBefore) != dataSize )
     {

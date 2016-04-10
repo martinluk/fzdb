@@ -6,6 +6,7 @@
 
 PropertyOwner::PropertyOwner() : _locked(false), _manager(NULL)
 {
+	initMemberSerialiser();
 }
 
 PropertyOwner::~PropertyOwner()
@@ -109,6 +110,17 @@ void PropertyOwner::clearProperties() {
 // Returns the number of properties present.
 int PropertyOwner::propertyCount() const {
     return _propertyTable.size();
+}
+
+void PropertyOwner::initMemberSerialiser()
+{
+	_memberSerialiser.addPrimitive(&_locked, sizeof(_locked));
+	_memberSerialiser.setInitialised();
+}
+
+MemberSerialiser & PropertyOwner::memberSerialiser()
+{
+	return _memberSerialiser;
 }
 
 std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &key) const {

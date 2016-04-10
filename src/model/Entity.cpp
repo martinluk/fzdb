@@ -13,13 +13,21 @@
 
 const Entity::EHandle_t Entity::INVALID_EHANDLE = 0;
 
-Entity::Entity(unsigned int type, EHandle_t handle) : _handle(handle), _type(type), _linkStatus(Entity::LinkStatus::None)
+Entity::Entity(unsigned int type, EHandle_t handle) : _handle(handle), _linkStatus(Entity::LinkStatus::None)
 {
 	auto newRecord = std::make_shared<model::types::TypeID>(type);
 	newRecord->Init(100);
-	insertProperty(2, newRecord);
-	_propertyTable.at(2)->lock();
+	insertProperty(2, newRecord, MatchState::None, EntityProperty::Type::CONCRETESINGLE);
     initMemberSerialiser();
+}
+
+Entity::Entity(unsigned int type, EHandle_t handle, const PropertyOwner && base) :  PropertyOwner(base)
+{
+	_handle = handle;
+	auto newRecord = std::make_shared<model::types::TypeID>(type);
+	newRecord->Init(100);
+	insertProperty(2, newRecord, MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+	initMemberSerialiser();
 }
 
 Entity::Entity(unsigned int type) : Entity(type, Entity::INVALID_EHANDLE)
@@ -137,16 +145,14 @@ void Entity::insertProperty(unsigned int key, std::shared_ptr<model::types::Base
 		break;
 	}
 	default:
-		PropertyOwner::insertProperty(key, object);
+		PropertyOwner::insertProperty(key, object, state, propType);
 	}	
 }
 
 void Entity::initMemberSerialiser()
 {
     _memberSerialiser.addPrimitive(&_handle, sizeof(_handle));
-    _memberSerialiser.addPrimitive(&_locked, sizeof(_locked));
 
-    _memberSerialiser.addPrimitive(&_type, sizeof(_type));
     _memberSerialiser.addPrimitive(&_linkStatus, sizeof(_linkStatus));
 
     _memberSerialiser.setInitialised();
@@ -168,12 +174,13 @@ Entity::EHandle_t Entity::getHandle() const
 
 unsigned int Entity::getType() const
 {
-    return _type;
+	return std::dynamic_pointer_cast<model::types::TypeID>(getProperty(2)->baseTop())->value();
 }
 
 std::string Entity::logString(const Database* db) const
 {
-    std::string typeStr = std::to_string(_type);
+	//todo - fix this
+	std::string typeStr = "type";// std::to_string("type");
 
     return std::string("Entity(t=")
         + typeStr
@@ -188,7 +195,6 @@ bool Entity::memberwiseEqual(const Entity *other) const
 {
     if (_locked != other->_locked ||
             _handle != other->_handle ||
-            _type != other->_type ||
             _linkStatus != other->_linkStatus ||
             _propertyTable.size() != other->_propertyTable.size() )
         return false;

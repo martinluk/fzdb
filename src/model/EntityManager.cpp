@@ -411,7 +411,8 @@ void EntityManager::changeEntityType(Entity *ent, const std::string &type)
 
     unsigned int typeID = getTypeID(type);
     spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", ent->getHandle(), type, typeID);
-    ent->_type = typeID;
+	//TODO: why was this here?
+    //ent->_type = typeID;
 }
 
 std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const

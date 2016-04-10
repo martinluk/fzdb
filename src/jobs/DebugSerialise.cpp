@@ -128,7 +128,7 @@ std::string testSerialise(const std::shared_ptr<Entity> ent)
 std::string printEntity(const std::shared_ptr<Entity> ent)
 {
     return std::string("Entity(")
-            + std::to_string(ent->getType()) + std::string(", ")
+            //+ std::to_string(ent->getType()) + std::string(", ")
             + std::to_string(ent->getHandle()) + std::string(", ")
             + std::to_string(ent->propertyCount())
             + std::string(")");

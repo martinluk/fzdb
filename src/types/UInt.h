@@ -47,7 +47,7 @@ namespace model {
             
             virtual ~UInt() {}
 
-            int32_t value() const { return _value; }
+            uint32_t value() const { return _value; }
 
             virtual SubType subtype() const
             {

@@ -30,6 +30,7 @@ public:
 
     // Constructs an entity with the given handle.
     Entity(unsigned int type, EHandle_t handle);
+	Entity(unsigned int type, EHandle_t handle, const PropertyOwner&& base);
 
     ~Entity();
 
@@ -74,9 +75,7 @@ private:
         _linkStatus = linkStatus;
     }
 
-private:
-    EHandle_t _handle;
-    unsigned int _type;
+	EHandle_t _handle;
     LinkStatus _linkStatus;
 
     MemberSerialiser _memberSerialiser;
