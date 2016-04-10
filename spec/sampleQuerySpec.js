@@ -588,6 +588,7 @@ describe("Fuzzy Database", function() {
         done();
       });      
     });
+
     it("Sample query - logging out from admin", function(done) {
         client.write('USER LOGOUT');
         client.once('data', function(data) {
