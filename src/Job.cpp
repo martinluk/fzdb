@@ -27,7 +27,7 @@ QueryResult Job::execute()
         //Read user group
         Permission::UserGroup currentUsergroup= _session->getUserGroup();
         bool hasPermission= Permission::checkPermission(currentUsergroup, _permtype);
-		hasPermission = true;
+
         if(!hasPermission) {
             result.setErrorCode(QueryResult::ErrorCode::InsufficientPermissions);
             result.setInfo("Insufficient permission to run the job");
