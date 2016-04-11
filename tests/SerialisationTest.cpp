@@ -65,12 +65,12 @@ void createSampleEntity(std::shared_ptr<Entity> &ent, unsigned int idBase)
     propString->append(stringRecord1);
     propString->append(stringRecord2);
 
-	//auto dateRecord1 = std::make_shared<Date>(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::After, 12, "Date comment");
-	//auto dateRecord2 = std::make_shared<Date>(Date::StructuredDate(1210, 4, 4), 1, Date::Ordering::Before, 13, "Date comment");
-	//dateRecord1->Init(1);
-	//dateRecord2->Init(1);
- //   propDate->append(dateRecord1);
- //   propDate->append(dateRecord2);
+	auto dateRecord1 = std::make_shared<Date>(Date::StructuredDate(1150, 3, 21), Date::Ordering::After);
+	auto dateRecord2 = std::make_shared<Date>(Date::StructuredDate(1210, 4, 4), Date::Ordering::Before);
+	dateRecord1->Init(1);
+	dateRecord2->Init(1);
+    propDate->append(dateRecord1);
+    propDate->append(dateRecord2);
 
 	auto entityRecord1 = std::make_shared<EntityRef>(1);
 	auto entityRecord2 = std::make_shared<EntityRef>(5674564);

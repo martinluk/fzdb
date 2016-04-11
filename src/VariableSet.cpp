@@ -227,7 +227,7 @@ void VariableSet::removeRowsWith(const unsigned int variable) {
 
 void VariableSet::sort()
 {
-	std::sort(_values.begin(), _values.end(), [](const VariableSetRow& row1, const VariableSetRow& row2)
+	std::stable_sort(_values.begin(), _values.end(), [](const VariableSetRow& row1, const VariableSetRow& row2)
 	{
 		return (row1.ranking() > row2.ranking());
 	});
