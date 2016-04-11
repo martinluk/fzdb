@@ -5,8 +5,10 @@
 boost::asio::io_service* JobQueue::_service;
 boost::thread_group JobQueue::_threads;
 
+thread_local std::weak_ptr<ISession> JobQueue::_currentSession;
 
 void JobQueue::ExecuteJob(Job* job) {
+	_currentSession = job->Session();
     QueryResult result = job->execute();
   job->Session()->respond(result.toJson());
     delete job;
@@ -24,4 +26,9 @@ void JobQueue::AddJob(Job* job) {
 
 void JobQueue::Shutdown() {
   _threads.join_all();
+}
+
+std::weak_ptr<ISession> JobQueue::CurrentSession()
+{
+	return _currentSession;
 }

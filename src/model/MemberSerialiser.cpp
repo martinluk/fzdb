@@ -44,6 +44,10 @@ void MemberSerialiser::addPrimitive(void *location, std::size_t size)
     _primitives.push_back(PrimitivePair(location, size));
 }
 
+void MemberSerialiser::addPropertyOwner(void * propertyOwner)
+{
+}
+
 void MemberSerialiser::clearPrimitives()
 {
     _primitives.clear();

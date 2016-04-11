@@ -17,7 +17,7 @@ namespace model
         class Date : public Base
         {
             friend class TypeSerialiser;
-            typedef unsigned long Date_t;
+            typedef uint64_t Date_t;
         public:
             enum class Ordering
             {
@@ -61,7 +61,7 @@ namespace model
             
             static StructuredDate decode(Date_t g)
             {
-                int y = ((10000*g + 14780)/3652425);
+                int y = (((10000*g + 14780)/3652425));
                 int ddd = g - (365*y + (y/4) - (y/100) + (y/400));
                 if (ddd < 0)
                 {
@@ -137,18 +137,14 @@ namespace model
             Date() : Base(), _value(0), _order(Ordering::EqualTo)
             { }
             
-            Date(Date_t value, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value), _order(order)
-            {
-            }
+            Date(Date_t value, Ordering order = Ordering::EqualTo) :
 
-            virtual std::shared_ptr<Base> Clone() override
-            {
-                return std::make_shared<Date>(_value, _originalAuthorId, _order, _confidence, _comment);
-            }
+            Base(), _value(value), _order(order)
+            { }
+
             
-            Date(const StructuredDate &sd, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(encode(sd)), _order(order)
+            Date(const StructuredDate &sd, Ordering order = Ordering::EqualTo) :
+                Base(), _value(encode(sd)), _order(order)
             { }
             
             virtual bool valuesEqualOnly(const Base *other) const
@@ -170,7 +166,7 @@ namespace model
 
             SubType subtype() const
             {
-                return SubType::TypeDate;
+                return SubType::Date;
             }
             
             StructuredDate date() const
@@ -208,6 +204,14 @@ namespace model
                         _value == cOther->_value &&
                         _order == cOther->_order;
             }
+
+			virtual std::shared_ptr<Base> Clone() override {
+				auto cloned = std::make_shared<Date>();
+				cloned->_value = _value;
+				cloned->_order = _order;
+				copyValues(cloned);
+				return cloned;
+			}
 
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser)

@@ -1,42 +1,135 @@
 #include "./Base.h"
 #include "./String.h"
 #include "./Int.h"
+#include "./UInt.h"
+#include "./TimeStamp.h"
 #include "./EntityRef.h"
+#include "./SourceRef.h"
+#include "./Confidence.h"
+#include "./AuthorID.h"
+#include "../JobQueue.h"
 
 using namespace model::types;
 
-bool model::types::Base::hasProperty(const unsigned int & key, MatchState state) const
+void model::types::Base::setupDefaultMetaData(const unsigned char confidence)
 {
-	if (key == 5) return true;
-	if (key == 6) return true;
-	if (key == 7) return true;
-	if (key == 8) return true;
-	return PropertyOwner::hasProperty(key);
+	unsigned int authorId = JobQueue::CurrentSession().lock() ? JobQueue::CurrentSession().lock()->userId() : 0;
+	insertProperty(5, std::make_shared<model::types::AuthorID>(authorId), MatchState::None, EntityProperty::Type::LOCKED);
+	insertProperty(6, std::make_shared<model::types::SourceRef>(0), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+	insertProperty(7, std::make_shared<model::types::TimeStamp>(), MatchState::None, EntityProperty::Type::LOCKED);
+	insertProperty(8, std::make_shared<model::types::Confidence>(confidence, authorId), MatchState::None, EntityProperty::Type::CONCRETESINGLE);
 }
 
-std::shared_ptr<EntityProperty> Base::getProperty(const unsigned int &key) const {
-	 switch (key) {
-		 case 5: {
-		 auto output = std::make_shared<EntityProperty>(5, model::types::SubType::TypeString);
-		 output->append(std::make_shared<model::types::String>(std::to_string(_originalAuthorId), 0));
-		 return output;
-		 }
-		 case 6: {
-		 auto output = std::make_shared<EntityProperty>(6, model::types::SubType::TypeEntityRef);
-		 output->append(std::make_shared<model::types::EntityRef>(_sourceEntityId, 0));
-		 return output;
-		 }
-		 case 7: {
-		 auto output = std::make_shared<EntityProperty>(7, model::types::SubType::TypeString);
-		 output->append(std::make_shared<model::types::String>(boost::posix_time::to_simple_string(_timeCreated), 0));
-		 return output;
-		 }
-		 case 8: {
-			 auto output = std::make_shared<EntityProperty>(8, model::types::SubType::TypeInt32);
-			 output->append(std::make_shared<model::types::Int>(_confidence, 0));
-			 return output;
-		 }
-	 default:
-		 return PropertyOwner::getProperty(key);
-	 }
+
+void Base::initMemberSerialiser()
+{
+	_memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
+	_memberSerialiser.setInitialised();
+}
+
+void model::types::Base::copyValues(const std::shared_ptr<model::types::Base> cloned)
+{
+	cloned->_initialised = true;
+	cloned->_locked = _locked;
+	cloned->_manager = _manager;
+	cloned->_orderingId = _orderingId;
+
+	for (auto prop : _propertyTable) {
+		cloned->insertProperty(prop.second);
+	}
+}
+
+Base::Base() {
+	_initialised = false;
+	_orderingId = 0;
+}
+
+void Base::Init(unsigned char confidence) {
+	if (!_initialised) {
+		setupDefaultMetaData(confidence);
+		_initialised = true;
+	}
+}
+
+Base::~Base() {}
+
+std::shared_ptr<Base> Base::Clone() {
+	auto cloned = std::make_shared<Base>();
+	copyValues(cloned);
+	return cloned;
+}
+
+bool Base::Equals(const std::string &val) const {
+	return false;
+}
+
+// This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
+bool Base::valuesEqualOnly(const Base *other) const
+{
+	return subtype() == other->subtype();
+}
+
+// Returns whether this value is equal to the given object.
+bool Base::Equals(const model::Object &object) {
+	if (object.type == model::Object::Type::VARIABLE) return false;
+	if (object.type == model::Object::Type::INT && subtype() != SubType::Int32) return false;
+	if (object.type == model::Object::Type::STRING && subtype() != SubType::String) return false;
+	if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::EntityRef) return false;
+	return Equals(object.value);
+}
+
+// What's the string representation of this value?
+std::string Base::toString() const
+{
+	return "";
+}
+
+unsigned char Base::confidence() const
+{
+	return std::dynamic_pointer_cast<model::types::Confidence>(getProperty(8)->baseTop())->value();
+}
+
+
+// Subclasses reimplement this.
+// As a base class, our type is undefined.
+SubType Base::subtype() const
+{
+	return SubType::Undefined;
+}
+
+std::string Base::logString(const Database* db) const
+{
+	return std::string("Base(") + std::to_string(confidence()) + std::string(")");
+}
+
+void Base::OrderingId(unsigned int id) {
+	_orderingId = id;
+}
+
+unsigned int Base::OrderingId() {
+	return _orderingId;
+}
+
+// For debugging - make sure we are -exactly- the same as the other type.
+bool Base::memberwiseEqual(const Base* other) const
+{
+	return subtype() == other->subtype() &&
+		_orderingId == other->_orderingId &&
+		confidence() == other->confidence();
+}
+
+// Called when serialising.
+std::size_t Base::serialiseSubclass(Serialiser &serialiser)
+{
+	if (!_memberSerialiser.initialised()) Base::initMemberSerialiser();
+	return _memberSerialiser.serialiseAll(serialiser);
+}
+
+// Called to construct from serialised data.
+Base::Base(const char* &serialisedData, std::size_t length)
+{
+	initMemberSerialiser();
+//	initConvenienceMembers();
+	serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
+	_initialised = true;
 }

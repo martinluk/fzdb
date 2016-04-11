@@ -15,30 +15,20 @@ namespace model {
         // There is no guarantee that this handle will still be valid
         // when it is used - the caller needs to check!
         class EntityRef : public Base {
-        private:
+        protected:
             friend class TypeSerialiser;
             EHandle_t _value;
             MemberSerialiser _memberSerialiser;
             
-            void initMemberSerialiser()
-            {
-                _memberSerialiser.addPrimitive(&_value, sizeof(_value));
-
-                _memberSerialiser.setInitialised();
-            }
+			void initMemberSerialiser();
             
         public:
-            EntityRef() : Base(100, 0, std::string()), _value(0)
-            {        
-            }
+			EntityRef();
 
-            EntityRef(EHandle_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value)
-            {
-            }
+			EntityRef(EHandle_t value);
             
-            EntityRef(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                EntityRef(std::atoll(value.c_str()), author, confidence, comment)
+            EntityRef(const std::string &value) :
+                EntityRef(std::atoll(value.c_str()))
             {
                 // Already initialised
             }
@@ -60,14 +50,15 @@ namespace model {
             EHandle_t value() const { return _value; }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<EntityRef>(_value, _originalAuthorId, _confidence);
-				cloned->_orderingId = _orderingId;
+                auto cloned = std::make_shared<EntityRef>();
+				cloned->_value = _value;
+				copyValues(cloned);
 				return cloned;
             }
 
             virtual SubType subtype() const
             {
-                return SubType::TypeEntityRef;
+                return SubType::EntityRef;
             }
 
             virtual std::string logString(const Database* db = NULL) const override

@@ -1,47 +1,56 @@
-#ifndef FUZZY_MODEL_TYPES_INT
-#define FUZZY_MODEL_TYPES_INT
+#ifndef FUZZY_MODEL_TYPES_TIMESTAMP
+#define FUZZY_MODEL_TYPES_TIMESTAMP
 
 #include <string>
 
 #include "./Base.h"
 #include <iostream>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 namespace model {
     namespace types {
 
         // Stores an integer value.
-        class Int : public Base {
+        class TimeStamp : public Base {
         private:
             friend class TypeSerialiser;
-            int32_t _value;
+
+			// Time record was created
+			boost::posix_time::ptime _value;
+
+			// Convenience for serialisation.
+			boost::gregorian::date::year_type _cYearCreated;
+			boost::gregorian::date::month_type _cMonthCreated;
+			boost::gregorian::date::day_type _cDayCreated;
+			boost::posix_time::time_duration::hour_type _cHourCreated;
+			boost::posix_time::time_duration::min_type _cMinCreated;
+			boost::posix_time::time_duration::sec_type _cSecCreated;
+			boost::posix_time::time_duration::fractional_seconds_type _cFracSecCreated;
+
             MemberSerialiser _memberSerialiser;
             
             void initMemberSerialiser()
             {
-                _memberSerialiser.addPrimitive(&_value, sizeof(_value));
+                //_memberSerialiser.addPrimitive(&_value, sizeof(_value));
 
                 _memberSerialiser.setInitialised();
             }
 
         public:
-            Int() : Base(), _value(0)
+			TimeStamp() : Base(), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
+				_cMonthCreated(1),
+				_cDayCreated(1),
+				_cHourCreated(0),
+				_cMinCreated(0),
+				_cSecCreated(0),
+				_cFracSecCreated(0)
             {
-            }
-            
-            Int(int32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(), _value(value)
-            {
-            }
-            
-            Int(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Int(std::atoi(value.c_str()), author, confidence, comment)
-            {
-                // Already initialised
             }
             
             virtual bool valuesEqualOnly(const Base *other) const
             {
-                const Int* i = dynamic_cast<const Int*>(other);
+                const TimeStamp* i = dynamic_cast<const TimeStamp*>(other);
                 assert(i);
                 
                 // If the subtypes are not the same then the base implementation
@@ -51,17 +60,17 @@ namespace model {
                         && _value == i->_value;
             }
             
-            virtual ~Int() {}
+            virtual ~TimeStamp() {}
 
-            int32_t value() const { return _value; }
+			boost::posix_time::ptime value() const { return _value; }
 
             virtual SubType subtype() const
             {
-                return SubType::Int32;
+                return SubType::TimeStamp;
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Int>();
+                auto cloned = std::make_shared<TimeStamp>();
 				cloned->_value = _value;
 				copyValues(cloned);
 				return cloned;
@@ -69,25 +78,32 @@ namespace model {
 
             virtual std::string logString(const Database* db = NULL) const override
             {
-                return std::string("Int(") + std::to_string(_value) + std::string(", ")
+                return std::string("Int(") + toString() + std::string(", ")
                     + std::to_string(confidence()) + std::string(")");
             }
 
             // Inherited via Base
-            virtual bool Equals(const std::string &val) const override {
-                return _value == std::stoi(val);
+            virtual bool Equals(const std::string &val) const override {				
+				return _value == boost::posix_time::time_from_string(val);
             }
 
             virtual std::string toString() const override {
-                return std::to_string(_value);
+				return boost::posix_time::to_simple_string(_value);
             }
 
             virtual bool memberwiseEqual(const Base* other) const
             {
-                const Int* cOther = dynamic_cast<const Int*>(other);
+                const TimeStamp* cOther = dynamic_cast<const TimeStamp*>(other);
                 return Base::memberwiseEqual(other) && cOther &&
                         _value == cOther->_value;
             }
+
+			unsigned char confidence() const override {
+				return 100;
+			}
+
+			//timestamps don't have any metadata
+			void setupDefaultMetaData(const unsigned char confidence) override {}
 
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) 
@@ -96,7 +112,13 @@ namespace model {
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
-            Int(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
+			TimeStamp(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _cYearCreated(1400),
+				_cMonthCreated(1),
+				_cDayCreated(1),
+				_cHourCreated(0),
+				_cMinCreated(0),
+				_cSecCreated(0),
+				_cFracSecCreated(0)
             {
                 initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
@@ -106,4 +128,4 @@ namespace model {
 }
 
 
-#endif // !FUZZY_MODEL_TYPES_INT
+#endif // !FUZZY_MODEL_TYPES_TIMESTAMP

@@ -4,10 +4,13 @@
 
 #include "spdlog/spdlog.h"
 
-struct SerialHeader
+struct NameManagerSerialHeader
 {
     std::size_t size;    // Total serialised size in bytes.
     std::size_t count;    // Number of headers to expect after this header.
+	unsigned int nameMapCount;
+	std::size_t poolSize;
+	std::size_t poolOffset;
 };
 
 struct EntryHeader
@@ -17,23 +20,24 @@ struct EntryHeader
 };
 
 
-StringMapSerialiser::StringMapSerialiser(boost::bimap<std::string, unsigned int> *bimap) : _bimap(bimap)
+StringMapSerialiser::StringMapSerialiser(NameManager* nameManager) : _nameManager(nameManager)
 {
 }
 
 std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
 {
-    assert( _bimap);
+    assert( _nameManager);
     std::size_t origSize = serialiser.size();
 
     // Create a header.
-    SerialHeader header;
-    Serialiser::zeroBuffer(&header, sizeof(SerialHeader));
+	NameManagerSerialHeader header;
+    Serialiser::zeroBuffer(&header, sizeof(NameManagerSerialHeader));
     header.size = 0;    // We don't know this yet.
-    header.count = _bimap->size();
+    header.count = _nameManager->size();
+	header.nameMapCount = _nameManager->_idGen._count;
 
     std::vector<Serialiser::SerialProperty> propList;
-    propList.push_back(Serialiser::SerialProperty(&header, sizeof(SerialHeader)));
+    propList.push_back(Serialiser::SerialProperty(&header, sizeof(NameManagerSerialHeader)));
 
     // Push back the appropriate amount of dummy entry headers.
     EntryHeader eHeader;
@@ -64,7 +68,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
         serialisedThisLoop += serialiser.serialise(Serialiser::SerialProperty(buffer, first.size()+1));
         delete buffer;
 
-        EntryHeader* pHeader = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(SerialHeader));
+        EntryHeader* pHeader = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(NameManagerSerialHeader));
         pHeader += i;
         pHeader->stringSize = first.size()+1;
         pHeader->offset = ourOffset;
@@ -73,28 +77,36 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
         i++;
     };
 
-    for( auto it = _bimap->left.begin(); it != _bimap->left.end(); ++it )
+    for( auto it = _nameManager->_stringToIdMap.begin(); it != _nameManager->_stringToIdMap.end(); ++it )
     {
         lambda(it->first, it->second);
     }
 
-    SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(origSize);
+	NameManagerSerialHeader* pHeader = serialiser.reinterpretCast<NameManagerSerialHeader*>(origSize);
     pHeader->size = headerChunkSize + bytesSerialised;
     assert(pHeader->size == serialiser.size() - origSize);
+
+	pHeader->poolOffset = pHeader->size;
+
+	for (auto iter = _nameManager->_idGen._pool.begin(); iter != _nameManager->_idGen._pool.end(); iter++) {
+		pHeader->size += serialiser.serialise(std::make_pair<void*, std::size_t>(&(*iter), sizeof(unsigned int)));
+	}
 
     return pHeader->size;
 }
 
 void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t length)
 {
-    const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(serialisedData);
+    const NameManagerSerialHeader* pHeader = reinterpret_cast<const NameManagerSerialHeader*>(serialisedData);
     if ( pHeader->size != length )
     {
         throw InvalidInputStringTableException("Internal string table size does not match size of data (recorded length is "
                                                + std::to_string(pHeader->size) + " but length passed in is " + std::to_string(length) + ").");
     }
 
-    const EntryHeader* eHeader = reinterpret_cast<const EntryHeader*>(serialisedData + sizeof(SerialHeader));
+	_nameManager->_idGen._count = pHeader->nameMapCount;
+
+    const EntryHeader* eHeader = reinterpret_cast<const EntryHeader*>(serialisedData + sizeof(NameManagerSerialHeader));
     for ( int i = 0; i < pHeader->count; i++ )
     {
         const EntryHeader* e = &(eHeader[i]);
@@ -114,6 +126,7 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);
         data += sizeof(unsigned int);
 
-        _bimap->insert(boost::bimap<std::string, unsigned int>::value_type(std::string(data), *id));
+		_nameManager->_idToStringMap.insert(std::make_pair(*id, std::string(data)));
+		_nameManager->_stringToIdMap.insert(std::make_pair(std::string(data), *id));
     }
 }

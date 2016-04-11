@@ -161,7 +161,7 @@ public:
 enum class QueryType {
     SELECT,
     INSERT,
-    DELETE,
+    DELETECMD,
     PING,
     DEBUGECHO,  // ECHO
     DEBUGOTHER, // DEBUG

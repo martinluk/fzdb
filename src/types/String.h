@@ -25,12 +25,12 @@ namespace model {
             }
             
         public:
-            String() :Base(100, 0, std::string()), _value(), _valueWrapper(_value)
+            String() :Base(), _value(), _valueWrapper(_value)
             {
             }
             
             String(const std::string &value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(confidence, author, comment), _value(value), _valueWrapper(_value)
+                Base(), _value(value), _valueWrapper(_value)
             {
             }
             
@@ -52,12 +52,13 @@ namespace model {
 
             virtual SubType subtype() const
             {
-                return SubType::TypeString;
+                return SubType::String;
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<String>(_value, _originalAuthorId, _confidence);
-				cloned->_orderingId = _orderingId;
+                auto cloned = std::make_shared<String>();
+				cloned->_value = _value;
+				copyValues(cloned);
 				return cloned;
             }
 

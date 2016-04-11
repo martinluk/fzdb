@@ -72,6 +72,7 @@ public:
     // Primitives are things like int, char, float, etc.
     // Their size is known at compile time.
     void addPrimitive(void* location, std::size_t size);
+	void addPropertyOwner(void* propertyOwner);
     void clearPrimitives();
     int primitiveMemberCount() const;
     

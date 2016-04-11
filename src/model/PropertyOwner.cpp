@@ -6,6 +6,7 @@
 
 PropertyOwner::PropertyOwner() : _locked(false), _manager(NULL)
 {
+	initMemberSerialiser();
 }
 
 PropertyOwner::~PropertyOwner()
@@ -96,7 +97,7 @@ std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, 
 
 std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state)
 {
-	if(value->subtype() == model::types::SubType::TypeEntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
+	if(value->subtype() == model::types::SubType::EntityRef) return meetsCondition(propertyId, model::Object(model::Object::Type::ENTITYREF, value->toString()), state);
 	return meetsCondition(propertyId, model::Object(model::Object::Type::STRING, value->toString()), state);
 }
 
@@ -111,21 +112,19 @@ int PropertyOwner::propertyCount() const {
     return _propertyTable.size();
 }
 
-std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &key) const {
-  auto it = _propertyTable.find(key);
-  if (it == _propertyTable.cend()) {
-    return std::shared_ptr<EntityProperty>();
-  }
+void PropertyOwner::initMemberSerialiser()
+{
+	_memberSerialiser.addPrimitive(&_locked, sizeof(_locked));
+	_memberSerialiser.setInitialised();
+}
 
-  // TODO: Add error messages
-  try {
-    std::shared_ptr<EntityProperty> prop = std::dynamic_pointer_cast<EntityProperty, EntityProperty>(it->second);
-    return prop;
-  }
-  catch (std::bad_cast ex) {
-    return std::shared_ptr<EntityProperty>();
-  }
-  return std::shared_ptr<EntityProperty>();
+MemberSerialiser & PropertyOwner::memberSerialiser()
+{
+	return _memberSerialiser;
+}
+
+std::shared_ptr<EntityProperty> PropertyOwner::getProperty(const unsigned int &key) const {
+  return _propertyTable.at(key);
 }
 
 void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state) {
@@ -149,16 +148,26 @@ void PropertyOwner::insertProperty(std::shared_ptr<EntityProperty> prop, MatchSt
   }
 }
 
-void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state) {
+void PropertyOwner::insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state, EntityProperty::Type propType) {
 
   checkLock();
   object->_manager = _manager;
+  //should this be 100?
+ // object->Init(object->confidence());
 
   if (!hasProperty(key)) {
 
-    auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(key, object->subtype()));
-    pair.second->append(object);
-    _propertyTable.insert(pair);
+	  if (propType == EntityProperty::Type::LOCKED) {
+		  auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(EntityProperty::Type::CONCRETESINGLE, key, object->subtype()));
+		  pair.second->append(object);
+		  pair.second->lock();
+		  _propertyTable.insert(pair);
+	  }
+	  else {
+		  auto pair = std::make_pair<unsigned int, std::shared_ptr<EntityProperty>>(std::move(key), std::make_shared<EntityProperty>(propType, key, object->subtype()));
+		  pair.second->append(object);
+		  _propertyTable.insert(pair);
+	  }   
   }
   else {
     auto prop = getProperty(key);

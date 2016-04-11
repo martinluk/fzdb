@@ -1,0 +1,6 @@
+#include "./UInt.h"
+#include "./TimeStamp.h"
+#include "./EntityRef.h"
+#include "./SourceRef.h"
+#include "./Confidence.h"
+#include "./AuthorID.h"

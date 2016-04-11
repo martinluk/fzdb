@@ -31,13 +31,21 @@ class EntityProperty : public ILogString
 {
     friend class EntitySerialiser;
 public:
+
+	enum class Type {
+		FUZZY,
+		LOCKED,
+		CONCRETESINGLE,
+		CONCRETEMULTI
+	};
     // Constructs a null property. This can be used for returning 'null',
     // for example if no property matches a given search.
     // isNull() will return true.
-    EntityProperty();
-    EntityProperty(const unsigned int &key, model::types::SubType subtype);
-    ~EntityProperty();
-    EntityProperty(const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
+    EntityProperty(Type type);
+    EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype);
+	EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
+
+    ~EntityProperty();   
 
     // Returns true if this is a null property (ie. default-constructed).
     // Internally, a property is null if its key is an empty string.
@@ -87,12 +95,19 @@ public:
 
     bool memberwiseEqual(const EntityProperty* other) const;
 
+	void lock();
+
+	std::shared_ptr<EntityProperty> Clone() const;
+
+	Type type() const;
+
 private:
+	Type _type;
     unsigned int _key;
     unsigned int _count;
     model::types::SubType _subtype;
 
-    std::forward_list<BasePointer> _valuesList;
+    std::vector<BasePointer> _valuesList;
 };
 
 #endif    // MODEL_ENTITYPROPERTY_H

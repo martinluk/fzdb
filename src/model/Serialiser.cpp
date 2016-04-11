@@ -28,12 +28,12 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
     auto startIt = serialData_.begin() + prevSize;
 
     // Copy all the properties in.
-    for ( auto it = properties.cbegin(); it != properties.cend(); ++it )
+    for ( auto it = properties.cbegin(); it != properties.cend(); it++ )
     {
         const char* first = static_cast<const char*>(it->first);
         const char* last = first + it->second;
-        serialData_.insert(startIt, first, last);
-        startIt += it->second;
+        startIt = serialData_.insert(startIt, first, last);
+		std::advance(startIt, it->second);
     }
 
         lastSerialiseBytes_ = propSize;

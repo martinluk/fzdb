@@ -46,22 +46,38 @@ void createSampleEntity(std::shared_ptr<Entity> &ent, unsigned int idBase)
 {
     using namespace model::types;
 
-    EntityProperty* propInt = new EntityProperty(idBase++, model::types::SubType::TypeInt32);
-    EntityProperty* propString = new EntityProperty(idBase++, model::types::SubType::TypeString);
-    EntityProperty* propDate = new EntityProperty(idBase++, model::types::SubType::TypeDate);
-    EntityProperty* propEntityRef = new EntityProperty(idBase++, model::types::SubType::TypeEntityRef);
+    std::shared_ptr<EntityProperty> propInt = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Int32);
+	std::shared_ptr<EntityProperty> propString = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::String);
+	std::shared_ptr<EntityProperty> propDate = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::Date);
+	std::shared_ptr<EntityProperty> propEntityRef = std::make_shared<EntityProperty>(EntityProperty::Type::FUZZY, idBase++, model::types::SubType::EntityRef);
 
-    propInt->append(BasePointer(new Int(1234, 42, 98, "Integer comment")));
-    propInt->append(BasePointer(new Int(5678, 24, 89, "Integer comment")));
+	auto intRecord1 = std::make_shared<Int>(1234, 42, 98, "Integer comment");
+	auto intRecord2 = std::make_shared<Int>(5678, 24, 89, "Integer comment");
+	intRecord1->Init(98);
+	intRecord2->Init(89);
+    propInt->append(intRecord1);
+    propInt->append(intRecord2);
 
-    propString->append(BasePointer(new String("Serialise this! @#!@$@%", 23, 1, "String comment")));
-    propString->append(BasePointer(new String("Mew Purrymore", 32, 2, "I for one welcome our new robot overlords.")));
+	auto stringRecord1 = std::make_shared<String>("Serialise this! @#!@$@%", 23, 1, "String comment");
+	auto stringRecord2 = std::make_shared<String>("Mew Purrymore", 32, 2, "I for one welcome our new robot overlords.");
+	stringRecord1->Init(1);
+	stringRecord2->Init(2);
+    propString->append(stringRecord1);
+    propString->append(stringRecord2);
 
-    propDate->append(BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::After, 12, "Date comment")));
-    propDate->append(BasePointer(new Date(Date::StructuredDate(1210, 4, 4), 1, Date::Ordering::Before, 13, "Date comment")));
+	auto dateRecord1 = std::make_shared<Date>(Date::StructuredDate(1150, 3, 21), Date::Ordering::After);
+	auto dateRecord2 = std::make_shared<Date>(Date::StructuredDate(1210, 4, 4), Date::Ordering::Before);
+	dateRecord1->Init(1);
+	dateRecord2->Init(1);
+    propDate->append(dateRecord1);
+    propDate->append(dateRecord2);
 
-    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)1, 123785, 99, "Entity ref comment")));
-    propEntityRef->append(BasePointer(new EntityRef((EHandle_t)5674564, 2, 34, "Entity ref comment")));
+	auto entityRecord1 = std::make_shared<EntityRef>(1);
+	auto entityRecord2 = std::make_shared<EntityRef>(5674564);
+	entityRecord1->Init(100);
+	entityRecord2->Init(80);
+    propEntityRef->append(entityRecord1);
+    propEntityRef->append(entityRecord2);
 
     // Entity takes ownership of properties here.
     ent->insertProperty(std::shared_ptr<EntityProperty>(propInt));
@@ -75,10 +91,20 @@ TEST_F(SerialisationTest, testSerialiseValues)
 {
     using namespace model::types;
 
-    testSerialisation(BasePointer(new Int(1234, 42, 98, "Integer comment")));
-    testSerialisation(BasePointer(new String("Serialise this! @#!@$@%", 32, 1, "String comment")));
-    testSerialisation(BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::EqualTo, 12, "Date comment")));
-    testSerialisation(BasePointer(new EntityRef((EHandle_t)1, 123785, 99, "Entity ref comment")));
+	auto intRecord = BasePointer(new Int(1234, 42, 98, "Integer comment"));
+	auto stringRecord = BasePointer(new String("Serialise this! @#!@$@%", 32, 1, "String comment"));
+	auto dateRecord = BasePointer(new Date(Date::StructuredDate(1150, 3, 21), Date::Ordering::EqualTo));
+	auto entityRefRecord = BasePointer(new EntityRef((EHandle_t)1));
+
+	intRecord->Init(98);
+	stringRecord->Init(1);
+	dateRecord->Init(1);
+	entityRefRecord->Init(100);
+
+    testSerialisation(intRecord);
+    testSerialisation(stringRecord);
+    testSerialisation(dateRecord);
+    testSerialisation(entityRefRecord);
 }
 
 // Test that entities with different numbers of properties serialise and unserialise correctly.

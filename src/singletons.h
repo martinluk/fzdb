@@ -3,6 +3,7 @@
 
 #include <string>
 #include "model/Database.h"
+#include "./ISession.h"
 
 #include <boost/thread/shared_mutex.hpp>
 

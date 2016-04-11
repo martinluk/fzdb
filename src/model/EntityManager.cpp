@@ -12,6 +12,7 @@
 
 #include "../Parser.h"
 #include "../Util.h"
+#include "../JobQueue.h"
 
 #include "../types/Base.h"
 #include "../types/ValueRef.h"
@@ -37,7 +38,13 @@ EntityManager::~EntityManager()
 
 std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type)
 {
-    unsigned int typeID = getTypeID(type);
+	unsigned int typeID;
+	if (_entityTypeNames.has(type)) {
+		typeID = _entityTypeNames.get(type);
+	}
+	else {
+		typeID = _entityTypeNames.add(type);
+	}
 
     _lastHandle++;
     assert(_lastHandle != Entity::INVALID_EHANDLE);
@@ -160,8 +167,9 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 	for (auto newVar : whereBlock.newEntities) {
 		auto newEntity = createEntity(newVar.second);
 		createdEntities.insert(std::make_pair(newVar.first, newEntity->getHandle()));
-		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle(), 0);
-		whereVars.add(whereVars.indexOf(newVar.first), entityPointer, 0, 0, VariableType::TypeEntityRef, "");
+		auto entityPointer = std::make_shared<model::types::EntityRef>(newEntity->getHandle());
+		entityPointer->Init(100);
+		whereVars.add(whereVars.indexOf(newVar.first), entityPointer, 0, 0, VariableType::EntityRef, "");
 	}
 	
 	//sort by entropy
@@ -188,24 +196,25 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
         std::vector<std::shared_ptr<model::types::Base>> newRecords;
         model::types::SubType newRecordType;
 
+		unsigned int authorID;
+
         switch (triple.object.type) {
         case model::Object::Type::STRING:
-            newRecordType = model::types::SubType::TypeString;
-            newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, 0, confidence));
+            newRecordType = model::types::SubType::String;
+            newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, authorID, confidence));
             break;
         case model::Object::Type::ENTITYREF:
-            newRecordType = model::types::SubType::TypeEntityRef;
-			newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value, 0, confidence));
+            newRecordType = model::types::SubType::EntityRef;
+			newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value));
             break;
         case model::Object::Type::INT:
-            newRecordType = model::types::SubType::TypeInt32;
-			newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, 0, confidence));
+            newRecordType = model::types::SubType::Int32;
+			newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, authorID, confidence));
             break;
         case model::Object::Type::DATE:
-            newRecordType = model::types::SubType::TypeDate;
+            newRecordType = model::types::SubType::Date;
             // TODO: Ordering?
-            newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value),
-                                                                      0, model::types::Date::Ordering::EqualTo, confidence));
+            newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value), model::types::Date::Ordering::EqualTo));
             break;
 		case model::Object::Type::VARIABLE: {
 				auto varId = whereVars.indexOf(triple.object.value);
@@ -218,8 +227,19 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 			}
         }
 
+		for (auto record : newRecords) {
+			record->Init(triple.object.hasCertainty ? triple.object.certainty : 100);
+		}
+
         // Get the ID of the property with the given name.
-        unsigned int propertyId = this->getPropertyName(triple.predicate.value, newRecordType, true);
+		unsigned int propertyId;
+		if (!_propertyNames.has(triple.predicate.value)) {
+			propertyId = _propertyNames.add(triple.predicate.value);
+			_propertyTypes.insert(std::make_pair(propertyId, newRecords[0]->subtype()));
+		}
+		else {
+			propertyId = _propertyNames.get(triple.predicate.value);
+		}
         
         // Switch depending on what the subject of the query is.
         switch (triple.subject.type)
@@ -272,7 +292,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 {
                     if (whereVars.contains(triple.subject.value))
                     {
-                        if (whereVars.typeOf(triple.subject.value) != VariableType::TypeEntityRef)
+                        if (whereVars.typeOf(triple.subject.value) != VariableType::EntityRef)
                         {
 							throw new std::runtime_error("Variables bound in the WHERE clause of an insert statement used in the body of that statement MUST resolve to entity values");
 						}
@@ -358,7 +378,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
             VariableType type = vs.typeOf(line);
             std::string typen = model::types::getSubTypeString(type);
             std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << "of type "<< typen<< std::endl;
-            if (type == VariableType::TypeEntityRef) 
+            if (type == VariableType::EntityRef) {
             {
                 //The variable is entity.
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);
@@ -469,9 +489,9 @@ void EntityManager::createHierarchy(const model::Triple &triple, Entity* ent, un
                                     const std::vector<std::shared_ptr<model::types::Base> > &newRecords, model::types::SubType newRecordType)
 {
     // Check what our record type is.
-    if ( newRecordType != model::types::SubType::TypeEntityRef )
+    if ( newRecordType != model::types::SubType::EntityRef )
         throw std::runtime_error("Expected entity handle for target of hierarchy creation but got \""
-                                 + std::string(model::types::getSubTypeString(newRecordType)) + "\".");
+                                 + std::string(model::types::getSubString(newRecordType)) + "\".");
 
     // For each record:
     for ( const std::shared_ptr<model::types::Base> &ptr : newRecords )
@@ -500,7 +520,8 @@ void EntityManager::changeEntityType(Entity *ent, const std::string &type)
 
     unsigned int typeID = getTypeID(type);
     spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", ent->getHandle(), type, typeID);
-    ent->_type = typeID;
+	//TODO: why was this here?
+    //ent->_type = typeID;
 }
 
 std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const
@@ -547,41 +568,34 @@ void EntityManager::clearAll()
 {
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
-    _lastProperty = 1;
-	_lastTypeID = 0;
     _entityTypeNames.clear();	
     _propertyNames.clear();
 	_propertyTypes.clear();
 	_links.clear();
 	
-	_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type("source", _lastTypeID++));
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("name", _lastProperty));
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty, model::types::SubType::TypeString));
-	auto id = _propertyNames.left.at("name");
+	_entityTypeNames.add("source");
+	unsigned int propertyIdName = _propertyNames.add("name");
+	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(propertyIdName, model::types::SubType::String));
+
 	auto unknownSourceEntity = createEntity("source");
-	unknownSourceEntity->insertProperty(_lastProperty++, std::make_shared<model::types::String>("Unknown Source", 0));
+	auto newRecord = std::make_shared<model::types::String>("Unknown Source", 0);
+	newRecord->Init(100);
+	unknownSourceEntity->insertProperty(propertyIdName, newRecord);
 	unknownSourceEntity->lock();
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::TYPE, _lastProperty)); // 2
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add(ReservedProperties::TYPE), model::types::SubType::String));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUBSET_OF, _lastProperty)); // 3
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add(ReservedProperties::ORDER_SUBSET_OF), model::types::SubType::EntityRef));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(ReservedProperties::ORDER_SUPERSET_OF, _lastProperty)); // 4
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add(ReservedProperties::ORDER_SUPERSET_OF), model::types::SubType::EntityRef));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:author", _lastProperty)); // 5
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add("fuz:author"), model::types::SubType::UInt32));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:source", _lastProperty)); // 6
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeEntityRef));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add("fuz:source"), model::types::SubType::EntityRef));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:created", _lastProperty)); // 7
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeString));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add("fuz:created"), model::types::SubType::TimeStamp));
 
-	_propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type("fuz:certainty", _lastProperty)); // 7
-	_propertyTypes.insert(std::pair<unsigned int, model::types::SubType>(_lastProperty++, model::types::SubType::TypeInt32));
+	_propertyTypes.insert(std::make_pair(_propertyNames.add("fuz:certainty"), model::types::SubType::UInt32));
 }
 
 std::size_t EntityManager::entityCount() const
@@ -681,29 +695,30 @@ bool EntityManager::loadFromFile(const std::string &filename)
 
 unsigned int EntityManager::getTypeID(const std::string &str)
 {
-    // "Generic" type is an empty string.
-    // The ID for this is 0.
-    if ( str.size() < 1 )
-        return ENTITY_TYPE_GENERIC;
+ //   // "Generic" type is an empty string.
+ //   // The ID for this is 0.
+ //   if ( str.size() < 1 )
+ //       return ENTITY_TYPE_GENERIC;
 
-    unsigned int id = 0;
-	if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
-	{
-		id = _entityTypeNames.left.at(str);
-	}
-	else {
-		_lastTypeID++;
-		id = _lastTypeID;
-		assert(id > 0);
-		_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, id));
-	}
+ //   unsigned int id = 0;
+	//if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
+	//{
+	//	id = _entityTypeNames.left.at(str);
+	//}
+	//else {
+	//	_lastTypeID++;
+	//	id = _lastTypeID;
+	//	assert(id > 0);
+	//	_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, id));
+	//}
 
-    return id;
+ //   return id;
+	return _entityTypeNames.get(str);
 }
 
 unsigned int EntityManager::getTypeID(const std::string &str) const
 {
-    // "Generic" type is an empty string.
+    /*// "Generic" type is an empty string.
     // The ID for this is 0.
     if ( str.size() < 1 )
         return ENTITY_TYPE_GENERIC;
@@ -717,7 +732,8 @@ unsigned int EntityManager::getTypeID(const std::string &str) const
         throw std::runtime_error("No type ID for string \"" + str + "\".");
     }
 
-    return id;
+    return id;*/
+	return _entityTypeNames.get(str);
 }
 
 #pragma region linkingandmerging
@@ -745,7 +761,7 @@ std::set<Entity::EHandle_t> EntityManager::getLinkGraph(const Entity::EHandle_t 
 
 const std::string EntityManager::getPropertyName(unsigned int propertyId) const
 {
-	return _propertyNames.right.at(propertyId);
+	return _propertyNames.get(propertyId);
 }
 
 void EntityManager::linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2) {
@@ -849,7 +865,8 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
     //copy the properties of loseEntity to keepEntity
     for (auto prop : loseEntity->properties()) {
-        keepEntity->insertProperty(prop.second);
+		if(prop.second->type() != EntityProperty::Type::LOCKED)
+			keepEntity->insertProperty(prop.second);
     }
 
     //delete EntityManager's ownership of loseEntity (will be automatically deleted)
@@ -876,17 +893,17 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     EntPtr pHigh = _entities[high];
     EntPtr pLow = _entities[low];
     
-    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef);
-    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef);
+    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::EntityRef);
+    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::EntityRef);
     
     // The superset entity holds the subset property pointing to the subset entity, and vice versa.
     // Lambdas are wonderful for convenience.
     auto propNotPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
     {
         std::vector<BasePointer> vals;
-        vals.push_back(EntRefPtr(new EntityRef(h, author, 100, comment)));
-        EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::TypeEntityRef, vals));
-        e->insertProperty(p);
+        vals.push_back(EntRefPtr(new EntityRef(h)));
+        //EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::EntityRef, vals));
+        //e->insertProperty(p);
     };
     
     auto propPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
@@ -902,7 +919,7 @@ void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
                 return;
         }
 
-        p->append(BasePointer(new EntityRef(h, author, 100, comment)));
+        p->append(BasePointer(new EntityRef(h)));
     };
     
     // This sets pHigh <supersetOf> entity:low
@@ -936,54 +953,38 @@ void EntityManager::removeHierarchy(Entity::EHandle_t high, Entity::EHandle_t lo
     EntPtr pHigh = _entities[high];
     EntPtr pLow = _entities[low];
     
-    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::TypeEntityRef, true);
-    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::TypeEntityRef, true);
+    //unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::EntityRef, true);
+   // unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::EntityRef, true);
     
-    // Remove the entity references from the properties if they exist.
-    if ( pHigh->hasProperty(superProperty) )
-    {
-        EntPropertyPtr p = pHigh->getProperty(superProperty);
-        p->remove(EntityRef(low, 0));
-    }
-    
-    if ( pHigh->hasProperty(subProperty) )
-    {
-        EntPropertyPtr p = pLow->getProperty(subProperty);
-        p->remove(EntityRef(high, 0));
-    }
-}
-
-//TODO: Add more type checking
-unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type, bool addIfMissing)
-{
-    if ( addIfMissing && _propertyNames.left.find(str) == _propertyNames.left.end() )
-    {
-            std::cout << "Inserting property " << str << " with type " << (int)type << std::endl;
-            _propertyNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, ++_lastProperty));
-            _propertyTypes[_lastProperty] = type;
-    }
-
-    return getPropertyName(str, type);
+    //// Remove the entity references from the properties if they exist.
+    //if ( pHigh->hasProperty(superProperty) )
+    //{
+    //    EntPropertyPtr p = pHigh->getProperty(superProperty);
+    //    p->remove(EntityRef(low, 0));
+    //}
+    //
+    //if ( pHigh->hasProperty(subProperty) )
+    //{
+    //    EntPropertyPtr p = pLow->getProperty(subProperty);
+    //    p->remove(EntityRef(high, 0));
+    //}
 }
 
 unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type) const
 {
-    auto iter = _propertyNames.left.find(str);
-    if (iter == _propertyNames.left.end()) {
-            return 0;
-    }
+	unsigned int propId = _propertyNames.get(str);
 
-    model::types::SubType retrievedType = _propertyTypes.at(iter->second);
-    if (type != model::types::SubType::TypeUndefined && retrievedType != type) {
+    model::types::SubType retrievedType = _propertyTypes.at(propId);
+    if (type != model::types::SubType::Undefined && retrievedType != type) {
         throw MismatchedTypeException(std::string("Mismatched types when obtaining index for property '" + str
-            + "'. Requested type '" + model::types::getSubTypeString(type) + "' but got '"
-            + model::types::getSubTypeString(retrievedType) + "'.").c_str());
+            + "'. Requested type '" + model::types::getSubString(type) + "' but got '"
+            + model::types::getSubString(retrievedType) + "'.").c_str());
     }
 
-    return iter->second;
+    return propId;
 }
 
-const boost::bimap<std::string, unsigned int>& EntityManager::propertyNameMap() const
+const NameManager& EntityManager::propertyNameMap() const
 {
     return _propertyNames;
 }
@@ -1054,14 +1055,10 @@ bool EntityManager::memberwiseEqual(const EntityManager &other) const
             Entity::EHandle_t, std::set<Entity::EHandle_t> >(_links, other._links) )
         return false;
 
-    // We assume that if the left map is equal, so is the right.
-    if ( !comparePrimitiveMaps<boost::bimap<std::string, unsigned int>::left_map,
-                std::string, unsigned int>(_entityTypeNames.left, other._entityTypeNames.left) )
-        return false;
+     //We assume that if the left map is equal, so is the right.
+    if (!(_entityTypeNames == other._entityTypeNames)) return false;
 
-    if ( !comparePrimitiveMaps<boost::bimap<std::string, unsigned int>::left_map,
-            std::string, unsigned int>(_propertyNames.left, other._propertyNames.left) )
-        return false;
+	if (!(_propertyNames == other._propertyNames)) return false;
 
     if ( !comparePrimitiveMaps<std::map<unsigned int, model::types::SubType>,
             unsigned int, model::types::SubType>(_propertyTypes, other._propertyTypes) )

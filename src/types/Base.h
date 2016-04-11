@@ -22,199 +22,63 @@ namespace model {
         class Base : public ILogString, public PropertyOwner
         {
 		private:
+			bool _initialised;
             MemberSerialiser _memberSerialiser;
 
-            virtual void initMemberSerialiser()
-            {
-                _memberSerialiser.addPrimitive(&_confidence, sizeof(_confidence));
-                _memberSerialiser.addPrimitive(&_orderingId, sizeof(_orderingId));
-                _memberSerialiser.addPrimitive(&_sourceEntityId, sizeof(_sourceEntityId));
-                _memberSerialiser.addPrimitive(&_originalAuthorId, sizeof(_originalAuthorId));
+			virtual void initMemberSerialiser();
 
-                _memberSerialiser.addPrimitive(&_cYearCreated, sizeof(&_cYearCreated));
-                _memberSerialiser.addPrimitive(&_cMonthCreated, sizeof(&_cMonthCreated));
-                _memberSerialiser.addPrimitive(&_cDayCreated, sizeof(&_cDayCreated));
-                _memberSerialiser.addPrimitive(&_cHourCreated, sizeof(&_cHourCreated));
-                _memberSerialiser.addPrimitive(&_cMinCreated, sizeof(&_cMinCreated));
-                _memberSerialiser.addPrimitive(&_cSecCreated, sizeof(&_cSecCreated));
-                _memberSerialiser.addPrimitive(&_cFracSecCreated, sizeof(&_cFracSecCreated));
+		protected:
+			void copyValues(const std::shared_ptr<model::types::Base> ptr);
 
-                _memberSerialiser.addDynamicMember(&_commentWrapper);
-
-                _memberSerialiser.setInitialised();
-            }
-
-            void initConvenienceMembers()
-            {
-                auto dateCreated = _timeCreated.date();
-                auto timeCreated = _timeCreated.time_of_day();
-
-                _cYearCreated = dateCreated.year();
-                _cMonthCreated = dateCreated.month();
-                _cDayCreated = dateCreated.day();
-                _cHourCreated = timeCreated.hours();
-                _cMinCreated = timeCreated.minutes();
-                _cSecCreated = timeCreated.seconds();
-                _cFracSecCreated = timeCreated.fractional_seconds();
-            }
-
-        protected:
-            friend class TypeSerialiser;
-            unsigned char _confidence;
-            
-            std::string _comment;
-            MemberSerialiser::DynamicStringMember _commentWrapper;
-
-            // JONATHAN: Un-const'd these as they don't strictly need to be const (we can just
-            // not provide setter methods) and if they are it messes with the member serialiser.
-            // I should fix that but we don't have time right now.
-
-            // Entity id of source entity
-            unsigned long long _sourceEntityId;
-
-            // User who created the record
-            unsigned int _originalAuthorId;
-
-            // Time record was created
-            boost::posix_time::ptime _timeCreated;
-
-            // Convenience for serialisation.
-            boost::gregorian::date::year_type _cYearCreated;
-            boost::gregorian::date::month_type _cMonthCreated;
-            boost::gregorian::date::day_type _cDayCreated;
-            boost::posix_time::time_duration::hour_type _cHourCreated;
-            boost::posix_time::time_duration::min_type _cMinCreated;
-            boost::posix_time::time_duration::sec_type _cSecCreated;
-            boost::posix_time::time_duration::fractional_seconds_type _cFracSecCreated;
+            friend class TypeSerialiser;			
 
             // id for this record - unique for entity/property/id - related to ordering
             unsigned int _orderingId;
 
         public:
 
-            Base(unsigned char confidence, unsigned int author, const std::string &cmnt) :
-                _comment(cmnt),
-                _commentWrapper(_comment),
-                _timeCreated(boost::posix_time::second_clock::universal_time()),
-                _sourceEntityId(0),
-                _originalAuthorId(author),
-                _cYearCreated(1400),
-                _cMonthCreated(1),
-                _cDayCreated(1),
-                _cHourCreated(0),
-                _cMinCreated(0),
-                _cSecCreated(0),
-                _cFracSecCreated(0)
-            {             
-                if (confidence > 100) confidence = 100;
-                _confidence = confidence;
-            }
+			Base();
 
-            Base() : Base(100, 0, std::string()) {}
+			void Init(const unsigned char confidence);
+
+			virtual void setupDefaultMetaData(unsigned char confidence);
             
-            virtual ~Base() {}
+			virtual ~Base();
 
-            virtual std::shared_ptr<Base> Clone() {
-				auto cloned = std::make_shared<Base>(_confidence, _originalAuthorId, _comment);
-				cloned->_orderingId = _orderingId;
-                return cloned;
-            }
+			virtual std::shared_ptr<Base> Clone();
 
-            virtual bool Equals(const std::string &val) const {
-                return false;
-            }
+			virtual bool Equals(const std::string &val) const;
             
             // This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
-            virtual bool valuesEqualOnly(const Base *other) const
-            {
-                return subtype() == other->subtype();
-            }
+			virtual bool valuesEqualOnly(const Base *other) const;
 
             // Returns whether this value is equal to the given object.
-            bool Equals(const model::Object &object) {
-                if (object.type == model::Object::Type::VARIABLE) return false;
-                if (object.type == model::Object::Type::INT && subtype() != SubType::TypeInt32) return false;
-                if (object.type == model::Object::Type::STRING && subtype() != SubType::TypeString) return false;
-                if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::TypeEntityRef) return false;
-                return Equals(object.value);
-            }
+			bool Equals(const model::Object &object);
 
             // What's the string representation of this value?
-            virtual std::string toString() const
-            {
-                return "";
-            }
+			virtual std::string toString() const;
 
-            unsigned char confidence() const
-            {
-                return _confidence;
-            }
-
-            void setConfidence(unsigned char confidence) {
-                _confidence = confidence;
-            }
-            
-            std::string comment() const
-            {
-                return _comment;
-            }
-            
-            void setComment(const std::string &comment)
-            {
-                _comment = comment;
-            }
+			virtual unsigned char confidence() const;
 
             // Subclasses reimplement this.
             // As a base class, our type is undefined.
-            virtual SubType subtype() const
-            {
-                return SubType::TypeUndefined;
-            }
+			virtual SubType subtype() const;
 
-            virtual std::string logString(const Database* db = NULL) const
-            {
-                return std::string("Base(") + std::to_string(_confidence) + std::string(")");
-            }
+			virtual std::string logString(const Database* db = NULL) const;
 
-            void OrderingId(unsigned int id) {
-                _orderingId = id;
-            }
+			void OrderingId(unsigned int id);
 
-            unsigned int OrderingId() {
-                return _orderingId;
-            }
+			unsigned int OrderingId();
 
             // For debugging - make sure we are -exactly- the same as the other type.
-            virtual bool memberwiseEqual(const Base* other) const
-            {
-                return subtype() == other->subtype() &&
-                        _confidence == other->_confidence &&
-                        _comment == other->_comment &&
-                        _orderingId == other->_orderingId &&
-                        _originalAuthorId == other->_originalAuthorId &&
-                        _sourceEntityId == other->_sourceEntityId &&
-                        _timeCreated == other->_timeCreated;
-            }
-
-			bool hasProperty(const unsigned int &key, MatchState state = MatchState::None) const override;
-
-			std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
+			virtual bool memberwiseEqual(const Base* other) const;
 
         protected:
             // Called when serialising.
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
-            {        
-				if(!_memberSerialiser.initialised()) Base::initMemberSerialiser();				
-                return _memberSerialiser.serialiseAll(serialiser);
-            }
+			virtual std::size_t serialiseSubclass(Serialiser &serialiser);
 
             // Called to construct from serialised data.
-            Base(const char* &serialisedData, std::size_t length) : Base(0, 0, "")
-            {
-				initMemberSerialiser();
-                initConvenienceMembers();
-                serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
-            }
+			Base(const char* &serialisedData, std::size_t length);
         };
 
         // Wrapper class used for comparing confidence with another type.

@@ -30,6 +30,7 @@ public:
 
     // Constructs an entity with the given handle.
     Entity(unsigned int type, EHandle_t handle);
+	Entity(unsigned int type, EHandle_t handle, const PropertyOwner&& base);
 
     ~Entity();
 
@@ -63,7 +64,9 @@ public:
 	std::shared_ptr<EntityProperty> getProperty(const unsigned int &key) const override;
 
 	void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None) override;
-	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None) override;
+
+	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None,
+		EntityProperty::Type propType = EntityProperty::Type::FUZZY) override;
 
 private:
     void initMemberSerialiser();
@@ -72,9 +75,7 @@ private:
         _linkStatus = linkStatus;
     }
 
-private:
-    EHandle_t _handle;
-    unsigned int _type;
+	EHandle_t _handle;
     LinkStatus _linkStatus;
 
     MemberSerialiser _memberSerialiser;

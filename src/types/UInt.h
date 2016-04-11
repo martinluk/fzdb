@@ -1,62 +1,61 @@
-#ifndef FUZZY_MODEL_TYPES_PROPERTY
-#define FUZZY_MODEL_TYPES_PROPERTY
+#ifndef FUZZY_MODEL_TYPES_UINT
+#define FUZZY_MODEL_TYPES_UINT
 
 #include <string>
-#include <memory>
 
 #include "./Base.h"
+#include <iostream>
 
 namespace model {
     namespace types {
 
-        class Property : public Base {
-        private:
+        // Stores an integer value.
+        class UInt : public Base {
+        protected:
             friend class TypeSerialiser;
-            unsigned int _value;
+            uint32_t _value;
             MemberSerialiser _memberSerialiser;
             
             void initMemberSerialiser()
             {
-				_memberSerialiser.addPrimitive(&_value, sizeof(_value));
+                _memberSerialiser.addPrimitive(&_value, sizeof(_value));
 
                 _memberSerialiser.setInitialised();
             }
-            
+
         public:
-			Property() : Base(), _value()
+
+            UInt() : Base(), _value(0)
             {
-                _manager = NULL;
             }
             
-            Property(const unsigned int value, const EntityManager* manager, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(), _value(value)
+            UInt(uint32_t value) :  Base(), _value(value)
             {
-                _manager = manager;
             }
             
             virtual bool valuesEqualOnly(const Base *other) const
             {
-                const Property* s = dynamic_cast<const Property*>(other);
-                assert(s);
+                const UInt* i = dynamic_cast<const UInt*>(other);
+                assert(i);
                 
                 // If the subtypes are not the same then the base implementation
                 // will return false and the statement will short-circuit, meaning
                 // we should avoid dereferencing the pointer if it's null!
                 return Base::valuesEqualOnly(other)
-                        && _value == s->_value;
+                        && _value == i->_value;
             }
             
-            virtual ~Property() {}
+            virtual ~UInt() {}
 
-			unsigned int value() const { return _value; }
+            uint32_t value() const { return _value; }
 
             virtual SubType subtype() const
             {
-                return SubType::PropertyReference;
+                return SubType::UInt32;
             }
 
             virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Property>();
+                auto cloned = std::make_shared<UInt>();
 				cloned->_value = _value;
 				copyValues(cloned);
 				return cloned;
@@ -64,27 +63,36 @@ namespace model {
 
             virtual std::string logString(const Database* db = NULL) const override
             {
-                return std::string("String(\"") + std::to_string(_value) + std::string("\", ")
+                return std::string("Int(") + std::to_string(_value) + std::string(", ")
                     + std::to_string(confidence()) + std::string(")");
             }
 
-			std::string toString() const override;
-
             // Inherited via Base
             virtual bool Equals(const std::string &val) const override {
-                return _value == std::stoul(val);
+                return _value == std::stoi(val);
+            }
+
+            virtual std::string toString() const override {
+                return std::to_string(_value);
+            }
+
+            virtual bool memberwiseEqual(const Base* other) const
+            {
+                const UInt* cOther = dynamic_cast<const UInt*>(other);
+                return Base::memberwiseEqual(other) && cOther &&
+                        _value == cOther->_value;
             }
 
         protected:
-            virtual std::size_t serialiseSubclass(Serialiser &serialiser)
+            virtual std::size_t serialiseSubclass(Serialiser &serialiser) 
             {
 				if (!_memberSerialiser.initialised())initMemberSerialiser();
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
-            Property(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _value()
+            UInt(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
             {
-               initMemberSerialiser();
+                initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);
             }
         };
@@ -92,4 +100,4 @@ namespace model {
 }
 
 
-#endif // !FUZZY_MODEL_TYPES_PROPERTY
+#endif // !FUZZY_MODEL_TYPES_UINT

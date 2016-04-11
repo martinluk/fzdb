@@ -25,6 +25,7 @@ enum class MatchState {
 class PropertyOwner
 {
     friend class EntityManager;
+	friend class PropertyOwnerSerialiser;
 public:
     PropertyOwner();
     virtual ~PropertyOwner();
@@ -36,7 +37,8 @@ public:
 
 	virtual void insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state = MatchState::None);
 
-    virtual void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None);
+    virtual void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None,
+		EntityProperty::Type propType = EntityProperty::Type::FUZZY);
 
     // Removes the property with the given key.
     void removeProperty(const unsigned int &key);
@@ -65,13 +67,18 @@ protected:
 
 	std::map<unsigned int, std::shared_ptr<EntityProperty>> _propertyTable;
 	bool _locked;
-    const EntityManager* _manager;
+    const EntityManager* _manager;	
 
 	inline void checkLock() {
 		if (_locked) {
 			throw std::runtime_error("This item is read only");
 		}
 	}
+
+private:
+	void initMemberSerialiser();
+	MemberSerialiser& memberSerialiser();
+	MemberSerialiser _memberSerialiser;
 };
 
 #endif    // MODEL_PROPERTY_OWNER_H
