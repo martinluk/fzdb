@@ -614,7 +614,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
             //Sample query 
             //Delete $a WHERE {$a 'surname' 'Fred'}
             iter++;
-            type = QueryType::DELETE;
+            type = QueryType::DELETECMD;
             if (iter != tokens.end()) {
                 if (iter->first.type == ParsedTokenType::KEYWORD_CANON) {
                     canon.canon = true;

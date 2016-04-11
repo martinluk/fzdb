@@ -107,7 +107,7 @@ private:
     unsigned int _count;
     model::types::SubType _subtype;
 
-    std::forward_list<BasePointer> _valuesList;
+    std::vector<BasePointer> _valuesList;
 };
 
 #endif    // MODEL_ENTITYPROPERTY_H

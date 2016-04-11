@@ -376,7 +376,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
         {
             std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << std::endl;
             VariableType type = vs.typeOf(line);
-            if (type == VariableType::TypeEntityRef) {
+            if (type == VariableType::EntityRef) {
                 //The variable is entity.
                 std::cout << "Variable represents an entity." << std::endl;
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);

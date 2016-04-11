@@ -45,7 +45,7 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
         case QueryType::INSERT:
             JobQueue::AddJob(new Insert(session, query));
             break;
-        case QueryType::DELETE:
+        case QueryType::DELETECMD:
             JobQueue::AddJob(new Delete(session, query));
             break;
         case QueryType::SELECT:

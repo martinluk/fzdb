@@ -16,19 +16,18 @@ using BasePointer = std::shared_ptr<model::types::Base>;
 
 EntityProperty::EntityProperty(Type type) : _type(type), _subtype(model::types::SubType::Undefined)
 {
-    _count = 0;
+
 }
 
 EntityProperty::EntityProperty(Type type, const unsigned int& key, model::types::SubType subtype) :
 	_type(type), _key(key), _subtype(subtype)
 {
-    _count = 0;
+
 }
 
 EntityProperty::EntityProperty(Type type, const unsigned int& key, model::types::SubType subtype,
     const std::vector<BasePointer> &values) : _type(type), _key(key), _subtype(subtype)
 {
-    _count = 0;
     append(values);
 }
 
@@ -44,7 +43,7 @@ bool EntityProperty::isNull() const
 
 bool EntityProperty::isConcrete() const 
 {
-    if ( _count != 1 ) return false;
+    if (_valuesList.size() != 1 ) return false;
 
     // The confidence must be 1.
     return _valuesList.front()->confidence() == 100;
@@ -63,7 +62,7 @@ unsigned int EntityProperty::key() const
 
 unsigned int EntityProperty::count() const
 {
-    return _count;
+	return _valuesList.size();
 }
 
 void EntityProperty::append(BasePointer value)
@@ -76,14 +75,13 @@ void EntityProperty::append(BasePointer value)
 
 	switch (_type) {
 	case Type::CONCRETEMULTI: {
-		_count += 1;
 
 		if (value->confidence() != 100) {
 			throw std::runtime_error("The property requires a concrete value");
 		}
 
-		_valuesList.emplace_front(value);
-		_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
+		_valuesList.emplace_back(value);
+		std::stable_sort(_valuesList.begin(), _valuesList.end(), model::types::ConfidenceCompare<model::types::Base>());
 		unsigned int count = 0;
 		for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
 			(*iter)->OrderingId(count++);
@@ -94,17 +92,16 @@ void EntityProperty::append(BasePointer value)
 		if (value->confidence() != 100) {
 			throw std::runtime_error("The property requires a concrete value");
 		}
-		_count = 1;
 
 		_valuesList.clear();
 		value->OrderingId(0);
-		_valuesList.emplace_front(value);
+		_valuesList.emplace_back(value);
 		break;
 	}
 	case Type::FUZZY: {
-		_count += 1;
-		_valuesList.emplace_front(value);
-		_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
+
+		_valuesList.emplace_back(value);
+		std::stable_sort(_valuesList.begin(), _valuesList.end(), model::types::ConfidenceCompare<model::types::Base>());
 		unsigned int count = 0;
 		for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
 			(*iter)->OrderingId(count++);
@@ -134,9 +131,8 @@ void EntityProperty::append(const std::vector<BasePointer> &list)
 				}
 			}
 
-			_count += list.size();
-			_valuesList.insert_after(_valuesList.cbefore_begin(), list.begin(), list.end());
-			_valuesList.sort(model::types::ConfidenceCompare<model::types::Base>());
+			_valuesList.insert(_valuesList.end(), list.begin(), list.end());
+			std::stable_sort(_valuesList.begin(), _valuesList.end(), model::types::ConfidenceCompare<model::types::Base>());
 			unsigned int count = 0;
 			for (auto iter = _valuesList.begin(); iter != _valuesList.end(); ++iter) {
 				(*iter)->OrderingId(count++);
@@ -153,7 +149,6 @@ void EntityProperty::append(const std::vector<BasePointer> &list)
 
 void EntityProperty::clear()
 {
-    _count = 0;
     _valuesList.clear();
 }
 
@@ -176,11 +171,7 @@ BasePointer EntityProperty::baseTop() const
 
 std::vector<BasePointer> EntityProperty::baseValues() const
 {
-    std::vector<BasePointer> output;
-    std::transform(_valuesList.begin(), _valuesList.end(), std::inserter(output, output.begin()), [&](BasePointer input) {
-        return input;
-    });
-    return output;
+	return _valuesList;
 }
 
 
@@ -201,21 +192,20 @@ std::string EntityProperty::logString(const Database* db) const
             + std::string(">(k=")
             + keyStr
             + std::string(", [")
-            + std::to_string(_count)
+            + std::to_string(_valuesList.size())
             + std::string("])");
 }
 
 void EntityProperty::remove(const model::types::Base &value)
 {
 	if (_type == Type::LOCKED) throw std::runtime_error("Attempt to remove locked property");
-    _valuesList.remove_if(model::types::ValuesEqualOnly(&value));
-    _count = std::distance(_valuesList.cbegin(), _valuesList.cend());
+	_valuesList.erase(std::remove_if(_valuesList.begin(), _valuesList.end(), model::types::ValuesEqualOnly(&value)), _valuesList.end());
 }
 
 bool EntityProperty::memberwiseEqual(const EntityProperty *other) const
 {
     if ( _key != other->_key ||
-         _count != other->_count ||
+         _valuesList.size() != other->_valuesList.size() ||
          _subtype != other->_subtype )
         return false;
 
@@ -246,9 +236,8 @@ std::shared_ptr<EntityProperty> EntityProperty::Clone() const
 {
 	auto cloned = std::make_shared<EntityProperty>(_type);
 	cloned->_key = _key;
-	cloned->_count = _count;
 	for (auto val : _valuesList) {
-		cloned->_valuesList.emplace_after(_valuesList.end(), val->Clone());
+		cloned->_valuesList.emplace_back(val->Clone());
 	}	
 	return cloned;
 }
