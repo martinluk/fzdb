@@ -17,7 +17,7 @@ namespace model
         class Date : public Base
         {
             friend class TypeSerialiser;
-            typedef unsigned long Date_t;
+            typedef uint64_t Date_t;
         public:
             enum class Ordering
             {
@@ -61,7 +61,7 @@ namespace model
             
             static StructuredDate decode(Date_t g)
             {
-                int y = (((10000*((unsigned long long)g) + 14780)/3652425));
+                int y = (((10000*g + 14780)/3652425));
                 int ddd = g - (365*y + (y/4) - (y/100) + (y/400));
                 if (ddd < 0)
                 {
