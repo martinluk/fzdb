@@ -79,6 +79,10 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 
         if (conditionsIter->subject.type == model::Subject::Type::VARIABLE) {
             if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
+
+				// quick out if the property does not exist in the database
+				if (!_propertyNames.has(conditionsIter->predicate.value)) continue;
+
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 1 - $a <prop> value
                     this->Scan1(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
@@ -104,6 +108,10 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
         }
         else {
             if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
+
+				// quick out if the property does not exist in the database
+				if (!_propertyNames.has(conditionsIter->predicate.value)) continue;
+
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //meanlingless unless in a meta block!
 					this->ScanEPR(std::move(result), std::move(conditionsIter->subject), 
