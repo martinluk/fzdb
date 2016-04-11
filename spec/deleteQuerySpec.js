@@ -6,7 +6,7 @@ describe("fzdb", function() {
 
 
 	describe("delete queries:", function() {
-		fdescribe("DB with one entity", function() {
+		describe("DB with one entity", function() {
             var entityId ;
             beforeAll(function(done) {
             //Not pretty I know, will refactor later once everything is working,.
@@ -53,7 +53,8 @@ describe("fzdb", function() {
             });
 		});
 
-		xdescribe("DB with linked entities:", function() {
+		describe("DB with linked entities:", function() {
+		    pending("deleting linked entities not implemented yet");
 			/* XXX Need double checking behaviour
 			 * Having entity 1 and entity 2 linked together
 			 * Deleting entity 1
@@ -127,6 +128,7 @@ describe("fzdb", function() {
 
 		});
 		describe("Entities with properties:", function() {
+		    pending("deleting entities with properties not implemented yet");
 			/* XXX Need double checking behaviour
 			 * Add with two properties
 			 * Delete one of the property

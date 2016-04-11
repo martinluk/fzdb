@@ -370,6 +370,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         unsigned long long entityId = value.entity();
                         std::cout << "Erasing entity id " << entityId << std::endl;
                         _entities.erase(entityId);
+                        //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
                     }
                 }
 
@@ -396,7 +397,6 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                 spdlog::get("main")->warn("Deleting entity {}", entityId);
                 _entities.erase(entityId);
             } 
-            //TODO Remove all properties that are link to the entity getting deleted
         }
     }
     */
