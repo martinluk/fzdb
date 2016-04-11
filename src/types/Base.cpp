@@ -41,6 +41,7 @@ void model::types::Base::copyValues(const std::shared_ptr<model::types::Base> cl
 
 Base::Base() {
 	_initialised = false;
+	_orderingId = 0;
 }
 
 void Base::Init(unsigned char confidence) {

@@ -208,6 +208,7 @@ namespace model
 			virtual std::shared_ptr<Base> Clone() override {
 				auto cloned = std::make_shared<Date>();
 				cloned->_value = _value;
+				cloned->_order = _order;
 				copyValues(cloned);
 				return cloned;
 			}
