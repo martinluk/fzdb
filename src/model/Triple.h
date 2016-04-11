@@ -57,7 +57,8 @@ namespace model {
             VARIABLE = 0b0001,
             ENTITYREF = 0b1000,
             STRING = 0b1001,
-            INT = 0b1010
+            INT = 0b1010,
+            DATE = 0b1011
         };
 
         const static int VALUE_MASK = 0b1000;

@@ -93,7 +93,7 @@ TEST_F(SerialisationTest, testSerialiseValues)
 
 	auto intRecord = BasePointer(new Int(1234, 42, 98, "Integer comment"));
 	auto stringRecord = BasePointer(new String("Serialise this! @#!@$@%", 32, 1, "String comment"));
-	auto dateRecord = BasePointer(new Date(Date::StructuredDate(1150, 3, 21), 1, Date::Ordering::EqualTo, 12, "Date comment"));
+	auto dateRecord = BasePointer(new Date(Date::StructuredDate(1150, 3, 21), Date::Ordering::EqualTo));
 	auto entityRefRecord = BasePointer(new EntityRef((EHandle_t)1));
 
 	intRecord->Init(98);

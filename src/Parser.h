@@ -24,6 +24,7 @@ enum class ParsedTokenType {
         PROPERTY          = 0x4,       // Property: <forename>
         ENTITYREF         = 0x5,       // Entity handle: entity:1
         CONFIDENCE_RATING = 0x8,    // Confidence for a value: [80]
+        DATE = 0xb,
 
     //structural
         OPEN_CURLBRACE  = 0x6,      // {
@@ -55,6 +56,7 @@ enum class ParsedTokenType {
         KEYWORD_DEMOTE   = TOKEN_KEYWORD_MASK | 0x14,
         KEYWORD_LOGIN    = TOKEN_KEYWORD_MASK | 0x15,
         KEYWORD_LOGOUT   = TOKEN_KEYWORD_MASK | 0x16,
+        KEYWORD_LEVEL    = TOKEN_KEYWORD_MASK | 0x17,
 
     
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
@@ -175,7 +177,8 @@ enum class QueryType {
     USER_DEMOTE,
     USER_PASSWORD,
     USER_LOGIN,
-    USER_LOGOUT
+    USER_LOGOUT,
+    USER_LEVEL
 };
 
 //Aggregate query object - this should contain all info required to do a query

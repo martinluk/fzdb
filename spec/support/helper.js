@@ -48,7 +48,7 @@ helper.sendAdminCmd = function(cmd) {
     return new Promise(function(resolve, reject) {
         client.once('data',function() {
         client.write(cmd);
-            client.once('data',function() {
+            client.once('data',function(data) {
                 client.write('USER LOGOUT');
                     client.once('data',function() {
                     });

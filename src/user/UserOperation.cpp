@@ -76,7 +76,7 @@ void UserOperation::removeUser(const std::string &userName)
 void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session,
         const std::string &oldpassword, const std::string &newpassword) {
 
-	if (session->getUserGroup() != Permission::UserGroup::GUEST) {
+	if (session->getUserGroup() == Permission::UserGroup::GUEST) {
 		throw LoginUnsuccessfulException();
 	}
 

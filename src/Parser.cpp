@@ -19,6 +19,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
     static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\)");
     static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *\"([a-zA-Z0-9]+)\" *\\)");
+    static const boost::regex simpleDateRegex("(0[1-9]|[1-2][0-9]|3[0-1])\\/(0[1-9]|1[0-2])\\/([0-9][0-9][0-9][0-9])");  // More validation still required.
 
    boost::smatch matches;
    std::string data0 = "";
@@ -38,6 +39,12 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     else if (boost::regex_match(str, matches, propertyRegex)) {
         tokenType = ParsedTokenType::PROPERTY;
       str = matches[1];
+    }
+
+    // This needs to precede the integer check.
+    else if ( boost::regex_match(str, matches, simpleDateRegex) )
+    {
+        tokenType = ParsedTokenType::DATE;
     }
 
     else if (boost::regex_match(str, matches, entityRefRegex)) {
@@ -100,6 +107,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
     else if (str == "DEMOTE") tokenType   = ParsedTokenType ::KEYWORD_DEMOTE;
     else if (str == "LOGIN") tokenType    = ParsedTokenType ::KEYWORD_LOGIN;
     else if (str == "LOGOUT") tokenType   = ParsedTokenType ::KEYWORD_LOGOUT;
+    else if (str == "LEVEL") tokenType    = ParsedTokenType ::KEYWORD_LEVEL;
 
     return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -308,6 +316,9 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
                     break;
                 case ParsedTokenType::ENTITYREF:
                     objType = model::Object::Type::ENTITYREF;
+                    break;
+                case ParsedTokenType::DATE:
+                    objType = model::Object::Type::DATE;
                     break;
                 default:
                     throw ParseException("Unknown symbol: " + iter->second);
@@ -602,10 +613,8 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
         }
 
         if(iter->first.type == ParsedTokenType::KEYWORD_USER) {
-            //iter now = USER
             iter++;
-            //iter now = KEYWORD
-            //Can either be UADD, UDELETE, UPASSWORD, UPROMOTE, UDEMOTE, ULOGIN, ULOGOUT
+            //Can either be UADD, UDELETE, UPASSWORD, UPROMOTE, UDEMOTE, ULOGIN, ULOGOUT, LEVEL
             int numberOfArg=-1;
             switch(iter->first.type) {
                 case ParsedTokenType::KEYWORD_ADD: 
@@ -634,6 +643,10 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                     break;
                 case ParsedTokenType::KEYWORD_LOGOUT: 
                     type=QueryType::USER_LOGOUT;
+                    numberOfArg=0;
+                    break;
+                case ParsedTokenType::KEYWORD_LEVEL: 
+                    type=QueryType::USER_LEVEL;
                     numberOfArg=0;
                     break;
                 default:
@@ -672,21 +685,6 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
                     assert(numberOfArg>=0 /*Make sure numberOfArg is assigned*/);
                     assert(numberOfArg<=2 /*Query class only accept two args at most, implement otherwise if nessasary*/);
             }
-            //Should be finish parsing USER
-            /*
-            if (iter != tokens.end()) {
-                std::string leftover = iter->second;
-                int numberMore = 0;
-                while (iter!=tokens.end()) {
-                    numberMore++; iter++;
-                }
-                throw ParseException("Wrong number of arguments given in user, leftover:'"+ leftover +
-                        "' data0:'"+ data0 +
-                        "'data1:'" + data1+"'"+
-                        "Number of tokens to go:" + std::to_string(numberMore)
-                        );
-            }
-            */
             break;
         }
 

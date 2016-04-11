@@ -2,6 +2,8 @@
 #define FUZZY_MODEL_TYPES_DATE
 
 #include "./Base.h"
+#include <stdexcept>
+#include "../Util.h"
 
 namespace model
 {
@@ -31,6 +33,15 @@ namespace model
                     year(y), month(m), day(d)
                 {
                 }
+
+                std::string toString() const
+                {
+                    return (day < 9 ? std::string("0") : std::string("")) + std::to_string(day)
+                            + (month < 9 ? std::string("/0") : std::string("/")) + std::to_string(month)
+                            + (year < 999 ? std::string("/0") : std::string("/"))
+                            + (year < 99 ? std::string("0") : std::string(""))
+                            + (year < 9 ? std::string("0") : std::string("")) + std::to_string(year);
+                }
                 
                 int year;
                 int month;
@@ -50,7 +61,7 @@ namespace model
             
             static StructuredDate decode(Date_t g)
             {
-                int y = ((10000*g + 14780)/3652425);
+                int y = (((10000*((unsigned long long)g) + 14780)/3652425));
                 int ddd = g - (365*y + (y/4) - (y/100) + (y/400));
                 if (ddd < 0)
                 {
@@ -64,15 +75,75 @@ namespace model
                 
                 return StructuredDate(y, mm, dd);
             }
+
+            class InvalidDateException : public std::invalid_argument
+            {
+            public:
+                InvalidDateException(const std::string date, const std::string &msg) :
+                    std::invalid_argument("Date \"" + date + "\" invalid: " + msg)
+                {
+                }
+            };
+
+            static StructuredDate parseDateString(const std::string &str)
+            {
+                // TODO: At some point it would be nice to have fuller date validation,
+                // ie. checking whether the given day is valid for the given year in the
+                // case of leap years, etc. We do, however, assume that the string
+                // passed in matches the data regex within the parser.
+                // For now, we make do with the following extra validation.
+
+                std::vector<std::string> sections = util::split(str, '/');
+                if ( sections.size() != 3 )
+                    throw InvalidDateException(str, "Expected day/month/year format.");
+
+                int day = std::stoi(sections.at(0));
+                int month = std::stoi(sections.at(1));
+                int year = std::stoi(sections.at(2));
+
+                assert(day >= 1 && day <= 31);
+                assert(month >= 1 && month <= 12);
+                assert(year >= 0 && year <= 9999);
+
+                switch (month)
+                {
+                // Thirty days has:
+                case 9:     // September,
+                case 4:     // April,
+                case 6:     // June and
+                case 11:    // November
+                    if ( day > 30 )
+                        throw InvalidDateException(str, "Invalid day for given month.");
+                    break;
+
+                // Febrary, you weirdo.
+                case 2:
+                    if ( day > 29 )
+                        throw InvalidDateException(str, "Invalid day for given month.");
+                    break;
+
+                // 31 days for the rest. This is caught by the parser regex.
+                default:
+                    break;
+                }
+
+                // Because the following is awkward to do with the regex:
+                if ( year < 1 )
+                    throw InvalidDateException(str, "Invalid year.");
+
+                return StructuredDate(year, month, day);
+            }
             
             Date() : Base(), _value(0), _order(Ordering::EqualTo)
             { }
             
-            Date(Date_t value, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                Base(), _value(value), _order(order)
+            Date(Date_t value, Ordering order = Ordering::EqualTo) :
+
+            Base(), _value(value), _order(order)
             { }
+
             
-            Date(const StructuredDate &sd, unsigned int author, Ordering order = Ordering::EqualTo, unsigned char confidence = 100, const std::string &comment = std::string()) :
+            Date(const StructuredDate &sd, Ordering order = Ordering::EqualTo) :
                 Base(), _value(encode(sd)), _order(order)
             { }
             
@@ -112,7 +183,7 @@ namespace model
 
             virtual std::string toString() const override
             {
-                return std::to_string(_value);
+                return date().toString();
             }
 
             virtual bool Equals(const std::string &val) const override

@@ -24,6 +24,7 @@ namespace Permission
     void assertViewDBPermission(UserGroup group);
     void assertModifyDBPermission(UserGroup group);
     void assertUserOpPermission(UserGroup group);
+    std::string userGroupName(UserGroup group);
 
     bool checkPermission(UserGroup group, PermissionType permType);
     void assertPermission(UserGroup group, PermissionType permType);

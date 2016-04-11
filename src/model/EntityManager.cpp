@@ -211,6 +211,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             newRecordType = model::types::SubType::Int32;
 			newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, authorID, confidence));
             break;
+        case model::Object::Type::DATE:
+            newRecordType = model::types::SubType::Date;
+            // TODO: Ordering?
+            newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value), model::types::Date::Ordering::EqualTo));
+            break;
 		case model::Object::Type::VARIABLE: {
 				auto varId = whereVars.indexOf(triple.object.value);
 				for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++) {
@@ -220,7 +225,6 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 				newRecordType = whereVars.typeOf(triple.object.value);
 				break;
 			}
-
         }
 
 		for (auto record : newRecords) {
