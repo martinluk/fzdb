@@ -413,9 +413,7 @@ std::vector<std::string> FSparqlParser::ParseSelectLine(TokenIterator&& iter, To
 
 //parses a tokenised list of strings to give a query object
 Query FSparqlParser::ParseAll(TokenList tokens) {
-
     auto iter = tokens.begin();
-
     QueryType type;
     StringMap sources;
     TriplesBlock conditions;
@@ -608,6 +606,28 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
             }
             else {
                 throw ParseException("Invalid arguments to unlink");
+            }
+            break;
+        }
+
+        if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
+            //Sample query 
+            //Delete $a WHERE {$a 'surname' 'Fred'}
+            iter++;
+            type = QueryType::DELETE;
+            if (iter != tokens.end()) {
+                if (iter->first.type == ParsedTokenType::KEYWORD_CANON) {
+                    canon.canon = true;
+                    iter++; 
+                }
+                selectLine = ParseSelectLine(std::move(iter), tokens.end());
+                if (iter != tokens.end() && iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
+                    iter++; whereClause = ParseInsert(std::move(iter), tokens.end());
+                }
+                else { throw ParseException("Expected 'WHERE' at delete statement."); }
+            }
+            else {
+                throw ParseException("Incomplete DELETE statement");
             }
             break;
         }

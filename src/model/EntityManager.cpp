@@ -1,4 +1,5 @@
 #include "./EntityManager.h"
+#include "spdlog/spdlog.h"
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -10,7 +11,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../Parser.h"
-#include "spdlog/spdlog.h"
 #include "../Util.h"
 #include "../JobQueue.h"
 
@@ -354,6 +354,72 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
     enforceTypeHasBeenSet(modifiedEntities);
 
 	return createdEntities;
+}
+
+void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> selectLine) {
+    /* 
+    * For each variable described in triple block
+    * delete it
+    */
+    using VariableType = model::types::SubType;
+
+    //Get VariableSet from BGP
+    QuerySettings qs; //FIXME Get QuerySettings from online
+    //Iterating over the returned variable set
+    VariableSet vs = BGP(block,qs);
+    std::vector<VariableSetRow>::iterator rowIter;
+
+    for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter){
+        std::string line = *selectLineIter;
+        int id = (int)vs.indexOf(line);
+        if(vs.contains(line) && vs.used(line))
+        {
+            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << std::endl;
+            VariableType type = vs.typeOf(line);
+            if (type == VariableType::TypeEntityRef) {
+                //The variable is entity.
+                std::cout << "Variable represents an entity." << std::endl;
+                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
+                std::vector<VariableSetRow>::iterator rowIter;
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
+                    printf("Inside row iter of size \n");
+                    VariableSetRow row = *rowIter;
+                    std::vector<VariableSetValue>::iterator valueIter;
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
+                        VariableSetValue value = *valueIter;
+                        unsigned long long entityId = value.entity();
+                        std::cout << "Erasing entity id " << entityId << std::endl;
+                        _entities.erase(entityId);
+                        //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
+                    }
+                }
+
+
+            } else  /* TODO Other variable type */ { }
+
+        } else {
+            //Variable in this select line is not used.
+            std::cout << "Select line contains variable " << line << " that is not contained and used." << std::endl;
+            //Can be ignored, and therefore erased from variableset
+        } //END if(vs.contains(line) && vs.used(line))
+    }
+
+    
+    //Find out row number that is entity
+    /*
+    spdlog::get("main")->debug("Data has size {}",data->size());
+    for(auto outIter=data->cbegin(); outIter!=data->cend(); outIter++){
+        spdlog::get("main")->debug("Entered row of size {}",(*outIter).size());
+        for(auto inIter = (*outIter).cbegin(); inIter!=(*outIter).cend(); inIter++){
+            unsigned long long entityId = (*inIter).entity();
+            if (entityId!=0) {
+                //Value's entity value is set, meaning it is entity
+                spdlog::get("main")->warn("Deleting entity {}", entityId);
+                _entities.erase(entityId);
+            } 
+        }
+    }
+    */
 }
 
 bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,

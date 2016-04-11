@@ -7,6 +7,7 @@
 #include "jobs/Echo.h"
 #include "jobs/Unknown.h"
 #include "jobs/Insert.h"
+#include "jobs/Delete.h"
 #include "jobs/BGP.h"
 #include "jobs/DebugJob.h"
 #include "jobs/LoadFileJob.h"
@@ -43,6 +44,9 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
             break;
         case QueryType::INSERT:
             JobQueue::AddJob(new Insert(session, query));
+            break;
+        case QueryType::DELETE:
+            JobQueue::AddJob(new Delete(session, query));
             break;
         case QueryType::SELECT:
             JobQueue::AddJob(new BGP(session, query));

@@ -6,6 +6,8 @@
     "start": "node ./frontend/server.js"
   },
   "dependencies": {
+    "jasmine": "^2.4.1",
+    "es6-promise": "^3.1.2",
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "express-session": "^1.13.0",

@@ -33,7 +33,9 @@ public:
 
 	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings settings) const;
 
-	std::map<std::string, Entity::EHandle_t> Insert(TriplesBlock&& triples, TriplesBlock&& whereBlock, QuerySettings&& settings);
+    void Delete(TriplesBlock&& triples, std::vector<std::string> selectLine);
+
+    std::map<std::string, Entity::EHandle_t> Insert(TriplesBlock&& triples, TriplesBlock&& whereBlock, QuerySettings&& settings);
 
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
