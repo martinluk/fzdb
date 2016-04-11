@@ -349,33 +349,51 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     VariableSet vs = BGP(block,qs);
     std::vector<VariableSetRow>::iterator rowIter;
 
-    for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter){
+    for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter)
+    {
         std::string line = *selectLineIter;
         int id = (int)vs.indexOf(line);
         if(vs.contains(line) && vs.used(line))
         {
-            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << std::endl;
             VariableType type = vs.typeOf(line);
-            if (type == VariableType::TypeEntityRef) {
+            std::string typen = model::types::getSubTypeString(type);
+            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << "of type "<< typen<< std::endl;
+            if (type == VariableType::TypeEntityRef) 
+            {
                 //The variable is entity.
                 std::cout << "Variable represents an entity." << std::endl;
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);
                 std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-                    printf("Inside row iter of size \n");
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
+                {
                     VariableSetRow row = *rowIter;
                     std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                    {
                         VariableSetValue value = *valueIter;
                         unsigned long long entityId = value.entity();
+                        assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
                         std::cout << "Erasing entity id " << entityId << std::endl;
                         _entities.erase(entityId);
                         //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
-                    }
+                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
 
-
-            } else  /* TODO Other variable type */ { }
+            } else if (type == VariableType::PropertyReference) {
+            } else if (type == VariableType::ValueReference) {
+            } else if (type == VariableType::TypeInt32) {
+                //Deleting a constant - nothing to do at data store.
+                //continue.
+            } else if (type == VariableType::TypeString) {
+                //Deleting a constant - nothing to do at data store.
+                //continue.
+            } else if (type == VariableType::TypeDate) {
+                //Deleting a constant - nothing to do at data store.
+                //continue.
+            } else {
+                //There is a new variable type that has been used in query but not implemented delete method.
+                throw std::runtime_error("Delete query found variable that was used, but delete method did not implement for the specific type.");
+            }
 
         } else {
             //Variable in this select line is not used.
