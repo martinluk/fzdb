@@ -1,4 +1,5 @@
 #include "./EntityManager.h"
+#include "spdlog/spdlog.h"
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -10,7 +11,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../Parser.h"
-#include "spdlog/spdlog.h"
 #include "../Util.h"
 
 #include "../types/Base.h"
@@ -346,7 +346,17 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     QuerySettings qs; //FIXME Get QuerySettings from online
     //Iterating over the returned variable set
     VariableSet vs = BGP(block,qs);
-    //std::vector<VariableSetRow> data = vs.getData(); //FIXME Expecting varID
+    printf("Data has width %d\n",vs.width());
+    std::vector<VariableSetRow>::iterator rowIter;
+    for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
+        printf("Inside row iter\n");
+        VariableSetRow row = *rowIter;
+        std::vector<VariableSetValue>::iterator value;
+        for(value=row.begin(); value!=row.end(); value++) {
+            printf("Inside val iter\n");
+        }
+    }
+    
     //Find out row number that is entity
     /*
     spdlog::get("main")->debug("Data has size {}",data->size());

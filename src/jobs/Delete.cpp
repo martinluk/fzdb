@@ -1,7 +1,6 @@
 #include "Delete.h"
 #include "../singletons.h"
 #include "../model/EntityManager.h"
-
 #include "../Exceptions.h"
 
 Delete::Delete(std::shared_ptr<ISession> session, Query query) : Job(session, PermType::ModifyDB), _query(query)

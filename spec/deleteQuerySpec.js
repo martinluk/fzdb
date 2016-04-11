@@ -1,60 +1,64 @@
 var net = require('net');
+var h = require('./support/helper.js');
 
 describe("fzdb", function() {
   var client;
 
-  //connects to the database
-  beforeAll(function(done) { 
-    client = new net.Socket();
-    client.connect(1407, '127.0.0.1', function() {
-      client.write("FLUSH");
-      client.once('data', function(data) {
-        done();
-      });   
-    });
-  });
-
-  var sendCmd = function(cmd) {
-    client.write(cmd);
-	return new Promise(function(resolve, reject) {
-		client.once('data', function(data) {
-		resolve(JSON.parse(data));
-		}); 
-	});     
-	}
 
 	describe("delete queries:", function() {
 		fdescribe("DB with one entity", function() {
-			it("Flush db", function(done) {
-				sendCmd("FLUSH").then(function(data) {
-					done(); 
-				});    
-			});
+            var entityId ;
+            beforeAll(function(done) {
+            //Not pretty I know, will refactor later once everything is working,.
+                h.setupClient();
+                h.sendCmd(h.loginToAdminQuery).then(function() {
+                    h.sendCmd('FLUSH').then(function() {
+                        h.sendCmd('USER LOGOUT').then(function() {
+                            done();
+                        });
+                    });
+                });
+            });
+
 			it("no one used to call Fred", function(done) {
-				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+				h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
 					expect((data.result.data).length).toBe(0); done();
 				});          
 			});
 			it("Adding Fred into DB", function(done) {
-				sendCmd("INSERT DATA { entity:1 <forename> \"Fred\" }").then(function(data) {
-					done(); 
-				});    
+			    h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                    expect(data.result.data).toEqual('Logged in successfully.');
+                    h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                        entityId = data.result.data.a;
+                        console.log(entityId);
+                        h.sendCmd('USER LOGOUT').then(function(data) {
+                            done(); 
+                        });
+                    });
+                });
 			});
 			it("and now Fred lives in DB", function(done) {
-				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+				h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
 					expect((data.result.data).length).toBe(1);
 					done();
 				});          
 			});
 			it("Running the delete query", function(done) {
-				sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					expect(data.status).toBe(true);
-					done();
-				});    
-			});
+			    var stat;
+			    h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                    expect(data.result.data).toEqual('Logged in successfully.');
+                    h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                        stat=data.status;
+                        h.sendCmd('USER LOGOUT').then(function(data) {
+                            expect(data.status).toBe(true);
+                            expect(stat).toBe(true);
+                            done(); 
+                        });
+                    });
+                });
+            });    
 			it("Resulting in Fred no longer lives in DB", function(done) {
-				sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					console.log(data);
+				h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
 					expect((data.result.data).length).toBe(0);
 					done();
 				});          
@@ -153,5 +157,5 @@ describe("fzdb", function() {
 				});      
 			});
 		});
-	});
+    });
 });
