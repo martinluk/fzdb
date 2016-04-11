@@ -361,7 +361,6 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
             if (type == VariableType::TypeEntityRef) 
             {
                 //The variable is entity.
-                std::cout << "Variable represents an entity." << std::endl;
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);
                 std::vector<VariableSetRow>::iterator rowIter;
                 for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
@@ -373,6 +372,12 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         VariableSetValue value = *valueIter;
                         unsigned long long entityId = value.entity();
                         assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
+                        //Check if the entity is linked.
+                        if (_links.find(entityId)!=_links.end()) {
+                            //This entity has linkage, let's not delete it. TODO Delete both?
+                            throw std::runtime_error("This entity currently has linkage with another entity and cannot be deleted in this version of fzdb.");
+                        }
+                        //Erasing the entity
                         std::cout << "Erasing entity id " << entityId << std::endl;
                         _entities.erase(entityId);
                         //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
@@ -380,16 +385,32 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                 }
 
             } else if (type == VariableType::PropertyReference) {
+                //The variable is property
+                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
+                std::vector<VariableSetRow>::iterator rowIter;
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
+                {
+                    VariableSetRow row = *rowIter;
+                    std::vector<VariableSetValue>::iterator valueIter;
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                    {
+                        VariableSetValue value = *valueIter;
+                        unsigned long long propertyId = value.property();
+                        assert(propertyId!=0 /*We have known the value is property, yet propertyId is not set at VarlableSetValue.*/);
+                        std::cout << "Erasing property id " << propertyId << std::endl;
+                        //TODO What if this proeprty is used somewhere else? 
+                        //_property.erase(propertyId);
+                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                }
             } else if (type == VariableType::ValueReference) {
-            } else if (type == VariableType::TypeInt32) {
+                //TODO 
+            } else if (type == VariableType::TypeInt32 ||
+                type == VariableType::TypeString ||
+                type == VariableType::TypeDate) {
                 //Deleting a constant - nothing to do at data store.
                 //continue.
-            } else if (type == VariableType::TypeString) {
-                //Deleting a constant - nothing to do at data store.
-                //continue.
-            } else if (type == VariableType::TypeDate) {
-                //Deleting a constant - nothing to do at data store.
-                //continue.
+            } else if (type == VariableType::TypeUndefined) {
+                throw std::runtime_error("Cannot delete type undefined.");
             } else {
                 //There is a new variable type that has been used in query but not implemented delete method.
                 throw std::runtime_error("Delete query found variable that was used, but delete method did not implement for the specific type.");
@@ -398,7 +419,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
         } else {
             //Variable in this select line is not used.
             std::cout << "Select line contains variable " << line << " that is not contained and used." << std::endl;
-            //Can be ignored, and therefore erased from variableset
+            //Since variable not used, can be ignored.
         } //END if(vs.contains(line) && vs.used(line))
     }
 
