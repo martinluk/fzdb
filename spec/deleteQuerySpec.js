@@ -11,58 +11,46 @@ describe("fzdb", function() {
             beforeAll(function(done) {
             //Not pretty I know, will refactor later once everything is working,.
                 h.setupClient();
-                h.sendCmd(h.loginToAdminQuery).then(function() {
+                h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                    expect(data.result.data).toEqual('Logged in successfully.');
                     h.sendCmd('FLUSH').then(function() {
-                        h.sendCmd('USER LOGOUT').then(function() {
-                            done();
+                        h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                            entityId = data.result.data.a;
+                            h.sendCmd('USER LOGOUT').then(function(data) {
+                                done(); 
+                            });
                         });
                     });
                 });
             });
-
-			it("no one used to call Fred", function(done) {
-				h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					expect((data.result.data).length).toBe(0); done();
-				});          
-			});
-			it("Adding Fred into DB", function(done) {
-			    h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                    expect(data.result.data).toEqual('Logged in successfully.');
-                    h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                        entityId = data.result.data.a;
-                        console.log(entityId);
-                        h.sendCmd('USER LOGOUT').then(function(data) {
-                            done(); 
+            describe("deleting with correct variable", function() {
+                it("and now Fred lives in DB", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                        expect((data.result.data).length).toBe(1);
+                        done();
+                    });          
+                });
+                it("Running the delete query", function(done) {
+                    var stat;
+                    h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                        expect(data.result.data).toEqual('Logged in successfully.');
+                        h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                            stat=data.status;
+                            h.sendCmd('USER LOGOUT').then(function(data) {
+                                expect(data.status).toBe(true);
+                                expect(stat).toBe(true);
+                                done(); 
+                            });
                         });
                     });
+                });    
+                it("Resulting in Fred no longer lives in DB", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                        expect((data.result.data).length).toBe(0);
+                        done();
+                    });          
                 });
-			});
-			it("and now Fred lives in DB", function(done) {
-				h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					expect((data.result.data).length).toBe(1);
-					done();
-				});          
-			});
-			it("Running the delete query", function(done) {
-			    var stat;
-			    h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                    expect(data.result.data).toEqual('Logged in successfully.');
-                    h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-                        stat=data.status;
-                        h.sendCmd('USER LOGOUT').then(function(data) {
-                            expect(data.status).toBe(true);
-                            expect(stat).toBe(true);
-                            done(); 
-                        });
-                    });
-                });
-            });    
-			it("Resulting in Fred no longer lives in DB", function(done) {
-				h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-					expect((data.result.data).length).toBe(0);
-					done();
-				});          
-			});
+            });
 		});
 
 		xdescribe("DB with linked entities:", function() {
