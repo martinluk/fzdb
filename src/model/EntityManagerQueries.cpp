@@ -667,8 +667,6 @@ void EntityManager::ScanMPU(VariableSet&& variableSet, unsigned int variableId, 
 // $a Property Value
 void EntityManager::ScanVPR(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar) const {
 
-	if (!_propertyNames.has(predicate.value)) return;
-
 	unsigned int propertyId = this->getPropertyName(predicate.value, model::types::SubType::Undefined);
 
 	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
