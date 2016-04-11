@@ -342,6 +342,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     * delete it
     */
     using VariableType = model::types::SubType;
+
     //Get VariableSet from BGP
     QuerySettings qs; //FIXME Get QuerySettings from online
     //Iterating over the returned variable set
@@ -349,13 +350,33 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     printf("Data has width %d\n",vs.width());
     std::vector<VariableSetRow>::iterator rowIter;
     for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-        printf("Inside row iter\n");
+        printf("Inside row iter of size \n");
         VariableSetRow row = *rowIter;
         std::vector<VariableSetValue>::iterator value;
         for(value=row.begin(); value!=row.end(); value++) {
             printf("Inside val iter\n");
         }
     }
+
+    for(std::vector<std::string>::iterator it=selectLine.begin(); it!=selectLine.end(); ++it){
+        std::string line = *it;
+        std::string t;
+        int id = (int)vs.indexOf(line);
+        if(vs.contains(line) && vs.used(line)) {
+            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << std::endl;
+            VariableType type = vs.typeOf(line);
+            if (type == VariableType::TypeEntityRef) {
+                std::cout << "is entity ref" << std::endl;
+            } else {
+                //TODO To be implemented
+            }
+
+        } else {
+            //std::cout << "Select line contains variable " << line << " that is not contained and usedm, erase." << std::endl;
+            //Can be ignored, and therefore erased from variableset
+        }
+    }
+
     
     //Find out row number that is entity
     /*
