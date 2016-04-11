@@ -257,3 +257,8 @@ void UserFileOperations::saveCacheToFile() const
     jsonDoc.Accept(writer);
     fclose(fp);
 }
+
+bool UserFileOperations::contains(const std::string & name) const
+{
+	return _userFileCache.find(name) != _userFileCache.end();
+}

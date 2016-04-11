@@ -27,6 +27,7 @@ public:
     void changeUserPassword(const std::shared_ptr<ISession>&& session , 
             const std::string &oldpassword,
             const std::string &newpassword);
+	std::string getUserName(const unsigned int id) const;
 
 private:
     IdGenerator _idGen;

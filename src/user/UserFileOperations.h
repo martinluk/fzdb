@@ -22,6 +22,7 @@ public:
 
         void loadCacheFromFile();
         void saveCacheToFile() const;
+		bool contains(const std::string& name) const;
         static std::string pathToLoginFile();   
 
 private:

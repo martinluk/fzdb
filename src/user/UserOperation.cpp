@@ -79,7 +79,7 @@ void UserOperation::changeUserGroup(const std::string &userName, Permission::Use
 
 void UserOperation::removeUser(const std::string &userName)
 {
-	if (_fileOperations.UserFileCache().find(userName) == _fileOperations.UserFileCache().end()) return;
+	if (!_fileOperations.contains(userName)) return;
     unsigned int oldUserId = _fileOperations.UserFileCache().at(userName).id;
     _idGen.addDeleted(oldUserId);
     _fileOperations.removeUser(userName);
@@ -108,4 +108,12 @@ void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session
     a.passwordHash=Hashing::hashPassword(userName,a.salt,newpassword);
     //hash new password
 	_fileOperations.updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
+}
+
+std::string UserOperation::getUserName(const unsigned int id) const
+{
+	for (auto iter = _fileOperations.UserFileCache().begin(); iter != _fileOperations.UserFileCache().end(); iter++) {
+		if (iter->second.id == id)return iter->first;
+	}
+	return "User not found - account deleted";
 }
