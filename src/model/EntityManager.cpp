@@ -347,34 +347,40 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
     QuerySettings qs; //FIXME Get QuerySettings from online
     //Iterating over the returned variable set
     VariableSet vs = BGP(block,qs);
-    printf("Data has width %d\n",vs.width());
     std::vector<VariableSetRow>::iterator rowIter;
-    for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-        printf("Inside row iter of size \n");
-        VariableSetRow row = *rowIter;
-        std::vector<VariableSetValue>::iterator value;
-        for(value=row.begin(); value!=row.end(); value++) {
-            printf("Inside val iter\n");
-        }
-    }
 
-    for(std::vector<std::string>::iterator it=selectLine.begin(); it!=selectLine.end(); ++it){
-        std::string line = *it;
-        std::string t;
+    for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter){
+        std::string line = *selectLineIter;
         int id = (int)vs.indexOf(line);
-        if(vs.contains(line) && vs.used(line)) {
+        if(vs.contains(line) && vs.used(line))
+        {
             std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << std::endl;
             VariableType type = vs.typeOf(line);
             if (type == VariableType::TypeEntityRef) {
-                std::cout << "is entity ref" << std::endl;
-            } else {
-                //TODO To be implemented
-            }
+                //The variable is entity.
+                std::cout << "Variable represents an entity." << std::endl;
+                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
+                std::vector<VariableSetRow>::iterator rowIter;
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
+                    printf("Inside row iter of size \n");
+                    VariableSetRow row = *rowIter;
+                    std::vector<VariableSetValue>::iterator valueIter;
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
+                        VariableSetValue value = *valueIter;
+                        unsigned long long entityId = value.entity();
+                        std::cout << "Erasing entity id " << entityId << std::endl;
+                        _entities.erase(entityId);
+                    }
+                }
+
+
+            } else  /* TODO Other variable type */ { }
 
         } else {
-            //std::cout << "Select line contains variable " << line << " that is not contained and usedm, erase." << std::endl;
+            //Variable in this select line is not used.
+            std::cout << "Select line contains variable " << line << " that is not contained and used." << std::endl;
             //Can be ignored, and therefore erased from variableset
-        }
+        } //END if(vs.contains(line) && vs.used(line))
     }
 
     
