@@ -35,7 +35,7 @@ void model::types::Base::copyValues(const std::shared_ptr<model::types::Base> cl
 	cloned->_orderingId = _orderingId;
 
 	for (auto prop : _propertyTable) {
-		cloned->insertProperty(prop.second);
+		cloned->insertProperty(prop.second->Clone());
 	}
 }
 
@@ -59,8 +59,8 @@ std::shared_ptr<Base> Base::Clone() {
 	return cloned;
 }
 
-bool Base::Equals(const std::string &val) const {
-	return false;
+unsigned char Base::Equals(const std::string &val) const {
+	return 0;
 }
 
 // This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
@@ -70,11 +70,11 @@ bool Base::valuesEqualOnly(const Base *other) const
 }
 
 // Returns whether this value is equal to the given object.
-bool Base::Equals(const model::Object &object) {
-	if (object.type == model::Object::Type::VARIABLE) return false;
-	if (object.type == model::Object::Type::INT && subtype() != SubType::Int32) return false;
-	if (object.type == model::Object::Type::STRING && subtype() != SubType::String) return false;
-	if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::EntityRef) return false;
+unsigned char Base::Equals(const model::Object &object) {
+	if (object.type == model::Object::Type::VARIABLE) return 0;
+	if (object.type == model::Object::Type::INT && subtype() != SubType::Int32) return 0;
+	if (object.type == model::Object::Type::STRING && subtype() != SubType::String) return 0;
+	if (object.type == model::Object::Type::ENTITYREF && subtype() != SubType::EntityRef) return 0;
 	return Equals(object.value);
 }
 

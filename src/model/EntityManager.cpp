@@ -221,7 +221,6 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             break;
         case model::Object::Type::DATE:
             newRecordType = model::types::SubType::Date;
-            // TODO: Ordering?
             newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value), model::types::Date::Ordering::EqualTo));
             break;
 		case model::Object::Type::VARIABLE: {
@@ -272,10 +271,6 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 // Keep track that we modified it.
                 modifiedEntities.insert(currentEntity.get());
 
-                // TODO: Author and comment!
-                //if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
-                //    continue;
-
                 //note that the OrderingId attribute of a record is assigned as part of insertion
                 // For each value we need to insert:
                 for (auto newRecord : newRecords)
@@ -318,12 +313,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
                              modifiedEntities.insert(currentEntity.get());
 
-                            // TODO: Author and comment!
-                            //if ( performSpecialInsertOperations(triple, currentEntity.get(), newRecords, newRecordType, 0, std::string()) )
-                            //    continue;
-
 							for (auto newRecord : newRecords) {
-								// TODO : figure out why clone VariableRef doesn't work :/
 
 								auto clonedRecord = newRecord->Clone();
 								currentEntity->insertProperty(propertyId, clonedRecord);

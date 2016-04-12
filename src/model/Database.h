@@ -10,6 +10,8 @@ class Database
 public:
     Database();
     ~Database();
+
+	void init();
     
     // Entities
     EntityManager& entityManager();

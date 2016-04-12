@@ -47,13 +47,13 @@ namespace model {
 
 			virtual std::shared_ptr<Base> Clone();
 
-			virtual bool Equals(const std::string &val) const;
+			virtual unsigned char Equals(const std::string &val) const;
             
             // This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
 			virtual bool valuesEqualOnly(const Base *other) const;
 
             // Returns whether this value is equal to the given object.
-			bool Equals(const model::Object &object);
+			unsigned char Equals(const model::Object &object);
 
             // What's the string representation of this value?
 			virtual std::string toString() const;

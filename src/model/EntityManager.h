@@ -87,9 +87,6 @@ private:
 	unsigned int _lastTypeID;
 
 	// This maps string type names to entity type IDs.
-	//boost::bimap<std::string, unsigned int> _entityTypeNames;
-	//boost::bimap<std::string, unsigned int> _propertyNames;
-
 	NameManager _propertyNames;
 	NameManager _entityTypeNames;
 

@@ -8,6 +8,11 @@ Database::~Database()
 {
 }
 
+void Database::init()
+{
+	_users.init();
+}
+
 EntityManager& Database::entityManager()
 {
     return _entityManager;    

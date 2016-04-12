@@ -83,8 +83,8 @@ namespace model {
             }
 
             // Inherited via Base
-            virtual bool Equals(const std::string &val) const override {				
-				return _value == boost::posix_time::time_from_string(val);
+            virtual unsigned char Equals(const std::string &val) const override {				
+				return _value == boost::posix_time::time_from_string(val) ? 100 : 0;
             }
 
             virtual std::string toString() const override {

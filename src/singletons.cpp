@@ -25,6 +25,7 @@ namespace Singletons
                         std::cout << "Loaded file " << _dataFilePath << " successfully." << std::endl;
                     }
                 }
+				_database->init();
     }
 
     void shutdown()

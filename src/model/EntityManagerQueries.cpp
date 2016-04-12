@@ -357,7 +357,7 @@ void EntityManager::ScanVUR(VariableSet&& variableSet, unsigned int variableId, 
 			if (!iter->second->hasProperty(propId)) continue;
 			auto vals = iter->second->getProperty(propId)->baseValues();
 			for (auto value : vals) {
-				if (value->Equals(object)) {
+				if (value->Equals(object) > 0) {
 					auto newRow = VariableSetRow(row);
 					auto newRecord = std::make_shared<model::types::EntityRef>(iter->second->getHandle());
 					newRow[variableId] = VariableSetValue(newRecord, 0, iter->second->_handle);
@@ -433,7 +433,7 @@ void EntityManager::ScanMVR(VariableSet&& variableSet, unsigned int variableId, 
 		//check if val meets the property
 		for(auto prop : val->properties()) {
 			for (auto val : prop.second->baseValues()) {
-				if (val->Equals(object)) {
+				if (val->Equals(object) > 0) {
 					auto newRecord = std::make_shared<model::types::Property>(prop.first, this, 0);
 					newRecord->Init(100);
 					variableSet.addToMetaRefRow(vsv.metaRef(), variableId2, newRecord, prop.first, vsv.entity());
@@ -459,7 +459,7 @@ void EntityManager::ScanMUR(VariableSet&& variableSet, unsigned int variableId, 
 		bool found = false;
 		for (auto prop : val->properties()) {
 			for (auto val : prop.second->baseValues()) {
-				if (val->Equals(object)) {
+				if (val->Equals(object) > 0) {
 					found = true;
 					break;
 				}
@@ -677,7 +677,7 @@ void EntityManager::ScanVPR(VariableSet&& variableSet, unsigned int variableId, 
 		matches = currentEntity->meetsCondition(propertyId, std::move(object));
 		for (auto match : matches) {
 			auto newValue = std::make_shared<model::types::EntityRef>(currentEntity->getHandle());
-			newValue->Init(100);
+			newValue->Init(match->confidence());
 			newValue->OrderingId(match->OrderingId());
 			variableSet.add(std::move(variableId), newValue, propertyId, currentEntity->getHandle(), model::types::SubType::EntityRef, std::move(metaVar));
 		}
@@ -933,7 +933,7 @@ std::vector<unsigned int> EntityManager::ScanHelp1(VariableSet&& variableSet, co
 	for (auto propertyPair : properties) {
 		auto vals = propertyPair.second->baseValues();
 		for (auto value : vals) {
-			if (value->Equals(object)) {
+			if (value->Equals(object) > 0) {
 				auto newRecord = std::make_shared<model::types::Property>(propertyPair.first, this, 0);
 				newRecord->Init(100);
 				rowsAdded.push_back(variableSet.add(std::move(variableId),

@@ -48,6 +48,10 @@ namespace model
                 int day;
             };
 
+			static unsigned char diffFunc(const Date_t date1, const Date_t date2) {
+				return 100 / ((0.025*(abs((long long int)date1 - (long long int)date2))) + 1);
+			}
+
             static Date_t encode(const StructuredDate &sd)
             {
                 int d = sd.day;
@@ -186,9 +190,17 @@ namespace model
                 return date().toString();
             }
 
-            virtual bool Equals(const std::string &val) const override
+            virtual unsigned char Equals(const std::string &val) const override
             {
-                return _value == std::stoul(val);
+				auto otherDate = encode(parseDateString(val));
+				switch(_order) {
+				case Ordering::EqualTo:
+					return otherDate == _value ? 100 : 0;
+				case Ordering::After:
+					return otherDate >= _value ? diffFunc(otherDate, _value) : 0;
+				case Ordering::Before:
+					return otherDate <= _value ? diffFunc(otherDate, _value) : 0;
+				}
             }
 
             virtual std::string logString(const Database* db =  NULL) const override

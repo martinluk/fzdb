@@ -120,6 +120,10 @@ helper.testCase = function(name, command, expected, timeout, focus) {
   });
 };
 
+helper.ftestCase = function(name, command, expected, timeout) {
+  helper.testCase(name, command, expected, timeout, true);
+}
+
 helper.resultTemplate = function(results) {
   return {"status":true,"errorCode":0,"info":"","result":{"type":"fsparql","data":results}};
 };

@@ -16,30 +16,17 @@
 #include <map>
 #include <cassert>
 
-#define JSONFILENAME "userFile.json"
-#define ADD_ADMIN_ON_INIT true
-
 #define USERNAME "username"
 #define HASH "passwordHash"
 #define SALT "salt"
 #define ID "id"
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
+#define JSONFILENAME "userFile.json"
 
 UserFileOperations::UserFileOperations()
 {
-    if (ADD_ADMIN_ON_INIT) {
-        //Add admin into cache
-        UserAttributes admin;
-        admin.userName = ADMIN_USERNAME;
-        admin.salt = Hashing::genSalt();
-        admin.passwordHash = Hashing::hashPassword(admin.userName,admin.salt,ADMIN_PASSWORD);
-        admin.userGroup = Permission::UserGroup::ADMIN;
-        addUser(admin);
-    } else { 
-        //Load from json
-        loadCacheFromFile();
-    }
+
 }
 
 std::string UserFileOperations::pathToLoginFile() {
@@ -94,6 +81,11 @@ UserAttributes UserFileOperations::getUserAttributes(const std::string &userName
         throw UserNotExistException();
     }
     return _userFileCache.at(userName);
+}
+
+const std::map<std::string, UserAttributes>& UserFileOperations::UserFileCache() const
+{
+	return _userFileCache;
 }
 
  
@@ -264,4 +256,9 @@ void UserFileOperations::saveCacheToFile() const
     Writer<FileWriteStream> writer(os);
     jsonDoc.Accept(writer);
     fclose(fp);
+}
+
+bool UserFileOperations::contains(const std::string & name) const
+{
+	return _userFileCache.find(name) != _userFileCache.end();
 }

@@ -44,6 +44,8 @@ namespace model {
 				return SubType::AuthorID;
 			}
 
+			std::string toString() const override;
+
         protected:
 
             AuthorID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)

@@ -7,16 +7,27 @@
 
 #include "../ISession.h"
 
-UserOperation::UserOperation() : UserFileOperations()
+UserOperation::UserOperation()
 {
-    _idGen = IdGenerator(0);
+    _idGen = IdGenerator();
+}
+
+void UserOperation::init() {
+	if (ADD_ADMIN_ON_INIT) {
+		//Add admin into cache
+		addUser(ADMIN_USERNAME, ADMIN_PASSWORD, Permission::UserGroup::ADMIN);
+	}
+	else {
+		//Load from json
+		_fileOperations.loadCacheFromFile();
+	}
 }
 
 Permission::UserGroup UserOperation::getUserGroup(const std::string &userName) const
 {
     if (userName.empty())
         return Permission::UserGroup::GUEST;
-    UserAttributes currUserAttr = getUserAttributes(userName);
+    UserAttributes currUserAttr = _fileOperations.getUserAttributes(userName);
     return currUserAttr.userGroup;
 }
 
@@ -26,7 +37,7 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
     UserAttributes currUserAttr;
     //See if user exist
     try {
-        currUserAttr = getUserAttributes(userName);
+        currUserAttr = _fileOperations.getUserAttributes(userName);
     } catch (const UserNotExistException &){
         throw LoginUnsuccessfulException();
     }
@@ -38,7 +49,7 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
         spdlog::get("main")->warn("[{:<}] {} {}", _uuid, userName , " logged in unsuccessfully.");
         throw LoginUnsuccessfulException();
     }
-    session->userId(_userFileCache[userName].id);
+    session->userId(_fileOperations.UserFileCache().at(userName).id);
     session->setCurrentUserName(userName);
     session->setUserGroup(currUserAttr.userGroup);
 
@@ -55,22 +66,23 @@ void UserOperation::addUser(const std::string &userName, const std::string &pass
     a.passwordHash=Hashing::hashPassword(userName,a.salt,password);
     a.userGroup=userGroup;
     a.id = _idGen.getId();
-    UserFileOperations::addUser(a); //Super will throw UserAlreadyExistedException if user already exist
+	_fileOperations.addUser(a); //Super will throw UserAlreadyExistedException if user already exist
 }
 
 void UserOperation::changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup)
 {
     assert(newUserGroup!=Permission::UserGroup::GUEST);
-    UserAttributes a = getUserAttributes(userName);
+    UserAttributes a = _fileOperations.getUserAttributes(userName);
     a.userGroup = newUserGroup;
-    updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
+	_fileOperations.updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
 }
 
 void UserOperation::removeUser(const std::string &userName)
 {
-    unsigned int oldUserId = _userFileCache[userName].id;
+	if (!_fileOperations.contains(userName)) return;
+    unsigned int oldUserId = _fileOperations.UserFileCache().at(userName).id;
     _idGen.addDeleted(oldUserId);
-    UserFileOperations::removeUser(userName);
+    _fileOperations.removeUser(userName);
 }
 
 void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session,
@@ -81,7 +93,7 @@ void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session
 	}
 
     std::string userName = session->username();
-    UserAttributes a = getUserAttributes(userName);
+    UserAttributes a = _fileOperations.getUserAttributes(userName);
     //Check old password
     std::string actualHash = a.passwordHash;
     std::string currSalt = a.salt;
@@ -95,5 +107,13 @@ void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session
     //gen new hash
     a.passwordHash=Hashing::hashPassword(userName,a.salt,newpassword);
     //hash new password
-    updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
+	_fileOperations.updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
+}
+
+std::string UserOperation::getUserName(const unsigned int id) const
+{
+	for (auto iter = _fileOperations.UserFileCache().begin(); iter != _fileOperations.UserFileCache().end(); iter++) {
+		if (iter->second.id == id)return iter->first;
+	}
+	return "User not found - account deleted";
 }
