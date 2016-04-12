@@ -374,9 +374,8 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
         if(vs.contains(line) && vs.used(line))
         {
             VariableType type = vs.typeOf(line);
-            std::string typen = model::types::getSubTypeString(type);
-            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << "of type "<< typen<< std::endl;
-            if (type == VariableType::EntityRef) {
+            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << "of type "<< std::endl;
+            if (type == VariableType::EntityRef) 
             {
                 //The variable is entity.
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);
@@ -422,12 +421,12 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                 }
             } else if (type == VariableType::ValueReference) {
                 //TODO 
-            } else if (type == VariableType::TypeInt32 ||
-                type == VariableType::TypeString ||
-                type == VariableType::TypeDate) {
+            } else if (type == VariableType::Int32 ||
+                type == VariableType::String ||
+                type == VariableType::Date) {
                 //Deleting a constant - nothing to do at data store.
                 //continue.
-            } else if (type == VariableType::TypeUndefined) {
+            } else if (type == VariableType::Undefined) {
                 throw std::runtime_error("Cannot delete type undefined.");
             } else {
                 //There is a new variable type that has been used in query but not implemented delete method.
