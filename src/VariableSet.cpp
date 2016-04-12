@@ -92,7 +92,7 @@ std::vector<unsigned int> VariableSet::find(const unsigned int varId, const std:
 
     std::vector<unsigned int> output;
     for (unsigned int i = 0; i < _values.size(); i++) {
-        if (_values[i][varId].dataPointer()->Equals(value)) output.push_back(i);
+        if (_values[i][varId].dataPointer()->Equals(value) > 0) output.push_back(i);
     }
     return output;
 }
@@ -202,7 +202,7 @@ std::vector<VariableSetRow> VariableSet::extractRowsWith(const unsigned int vari
 	std::vector<VariableSetRow> results;
 	for (auto iter = _values.cbegin(); iter != _values.cend(); iter++) {
 		
-		if (!iter->at(variable).empty() && iter->at(variable).dataPointer()->Equals(value)) {
+		if (!iter->at(variable).empty() && iter->at(variable).dataPointer()->Equals(value) > 0) {
 			results.emplace_back(*iter);
 		}
 	}

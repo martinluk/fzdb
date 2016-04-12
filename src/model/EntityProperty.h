@@ -104,7 +104,6 @@ public:
 private:
 	Type _type;
     unsigned int _key;
-    unsigned int _count;
     model::types::SubType _subtype;
 
     std::vector<BasePointer> _valuesList;

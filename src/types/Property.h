@@ -71,8 +71,8 @@ namespace model {
 			std::string toString() const override;
 
             // Inherited via Base
-            virtual bool Equals(const std::string &val) const override {
-                return _value == std::stoul(val);
+            virtual unsigned char Equals(const std::string &val) const override {
+                return _value == std::stoul(val) ? 100 : 0;
             }
 
         protected:

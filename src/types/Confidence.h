@@ -45,6 +45,9 @@ namespace model {
 				return SubType::Confidence;
 			}
 
+			void value(const uint32_t value) { _value = value; }
+			uint32_t value() const { return _value; }
+
         protected:
 
 			Confidence(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)

@@ -236,6 +236,7 @@ std::shared_ptr<EntityProperty> EntityProperty::Clone() const
 {
 	auto cloned = std::make_shared<EntityProperty>(_type);
 	cloned->_key = _key;
+	cloned->_subtype = _subtype;
 	for (auto val : _valuesList) {
 		cloned->_valuesList.emplace_back(val->Clone());
 	}	

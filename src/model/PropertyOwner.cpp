@@ -1,6 +1,7 @@
 #include "./PropertyOwner.h"
 
 #include "./types/Base.h"
+#include "./types/Confidence.h"
 #include "./EntityManager.h"
 #include "../singletons.h"
 
@@ -49,19 +50,23 @@ const std::map<unsigned int, std::shared_ptr<EntityProperty>>& PropertyOwner::pr
 
 // Tests if the entity meets the condition
 std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, const model::Object&& obj, MatchState state) {
+
     if (!hasProperty(propertyId)) return std::vector<BasePointer>();
     std::vector<BasePointer> values = getProperty(propertyId)->baseValues();
+	std::vector<BasePointer> results(values.size());
+	std::vector<BasePointer>::iterator endIter = results.begin();
+
 	if (obj.type == model::Object::Type::ENTITYREF) {
 
-		for (auto iter = values.begin(); iter != values.end(); ) {
+		for (auto iter = values.cbegin(); iter != values.cend(); iter++) {
 			
 			// if it is an exact match, return don't remove
-			if ((*iter)->Equals(obj)) {
-				iter++;
-				continue;
+			if ((*iter)->Equals(obj) > 0) {
+				*endIter = *iter;
+				endIter++;
 			}
 			
-			auto entity = Singletons::cDatabase()->entityManager().getEntity(std::stoul(obj.value));
+			auto entity = Singletons::cDatabase()->entityManager().getEntity(std::stoull(obj.value));
 
 			if (state != MatchState::UpTree && entity->hasProperty(4)) {
 				auto subSets = entity->getProperty(4)->baseValues();
@@ -73,26 +78,34 @@ std::vector<BasePointer> PropertyOwner::meetsCondition(unsigned int propertyId, 
 					}
 				}
 				if (met) {
-					iter++;
-					continue;
+					*endIter = *iter;
+					endIter++;
 				}
 			}
 			
 			if (state != MatchState::DownTree && entity->hasProperty(3)) {
 				auto subSet = entity->getProperty(3)->baseTop();
-				if (this->meetsCondition(propertyId, std::move(subSet), MatchState::UpTree).size() > 0) {
-					iter++;
-					continue;
+				auto result = this->meetsCondition(propertyId, std::move(subSet), MatchState::UpTree);
+
+				if (result.size() > 0) {
+					auto matchedEntity = Singletons::cDatabase()->entityManager().getEntity(std::stoull(result[0]->toString()));
+					unsigned int newConf = result[0]->confidence() / matchedEntity->getProperty(4)->count();
+					*endIter = (*iter)->Clone();
+					auto confidenceRecord = std::dynamic_pointer_cast<model::types::Confidence>((*endIter)->getProperty(8)->baseTop()->Clone());
+					confidenceRecord->value(newConf);
+					(*endIter)->insertProperty(8, confidenceRecord, MatchState::None, EntityProperty::Type::CONCRETESINGLE);
+					endIter++;
 				}
 			}
-
-			iter = values.erase(iter);
 		}
 	}
 	else {
-		values.erase(std::remove_if(values.begin(), values.end(), [obj](BasePointer ptr) { return !ptr->Equals(obj); }), values.end());
+		endIter = std::copy_if(values.cbegin(), values.cend(), results.begin(), [obj](BasePointer ptr) {
+			return ptr->Equals(obj) > 0; 
+		});
 	}    
-    return values;
+	results.resize(std::distance(results.begin(), endIter));
+    return results;
 }
 
 std::vector<std::shared_ptr<model::types::Base>> PropertyOwner::meetsCondition(unsigned int propertyId, const std::shared_ptr<model::types::Base>&& value, MatchState state)

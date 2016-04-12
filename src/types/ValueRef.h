@@ -50,8 +50,8 @@ namespace model {
             }
 
             // Inherited via Base
-            virtual bool Equals(const std::string &val) const override {
-                return _value == std::stoll(val);
+            virtual unsigned char Equals(const std::string &val) const override {
+                return _value == std::stoll(val) ? 100 : 0;
             }
 
             virtual bool valuesEqualOnly(const Base* other) const
