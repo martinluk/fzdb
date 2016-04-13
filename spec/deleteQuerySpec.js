@@ -192,6 +192,7 @@ describe("fzdb", function() {
                 });
                 it("Smith", function() {
                     it("Deleting",function(done){
+                        expect(false).toEqual(true); //FIXME The fuck?
                         h.sendCmd("DELETE $a WHERE { $a <surname> \"Smith\" }").then(function(data) {
                             expect(data.status).toEqual(true);
                             expect(data.errorCode).toEqual(0);
@@ -243,7 +244,7 @@ describe("fzdb", function() {
             pending("Test awaiting to be implemented");
         });
 
-		fdescribe("Entities with properties:", function() {
+		describe("Entities with properties:", function() {
             beforeEach(function(done) {
                 h.setupClient();
                 h.sendCmd(h.loginToAdminQuery).then(function(data) {

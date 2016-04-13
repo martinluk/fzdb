@@ -415,8 +415,9 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                     {
                         VariableSetValue value = *valueIter;
                         unsigned long long propertyId = value.property();
-                        //value.entity() should be set on every PropertyRef variable set value in the variableset - you can put in an assert to check this
+                        unsigned long long entityId = value.entity();
                         assert(propertyId!=0 /*We have known the value is property, yet propertyId is not set at VarlableSetValue.*/);
+                        assert(entityId!=0 /*We have known the value is property, yet propertyId is not set at VarlableSetValue.*/);
                         std::cout << "Erasing property id " << propertyId << std::endl;
                         //TODO What if this proeprty is used somewhere else? 
                         //_property.erase(propertyId);
