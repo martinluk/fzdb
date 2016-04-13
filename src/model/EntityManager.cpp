@@ -417,8 +417,10 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         unsigned long long propertyId = value.property();
                         unsigned long long entityId = value.entity();
                         //assert(propertyId!=0 /*We have known the value is property, yet propertyId is not set at VarlableSetValue.*/);
-                        assert(entityId!=0 && propertyId!=0);
+                        assert(entityId!=0);
+                        assert(propertyId!=0);
                         std::cout << "Erasing property id " << propertyId << std::endl;
+                        _entities.erase(entityId);
                         //TODO What if this proeprty is used somewhere else? 
                         //_property.erase(propertyId);
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
