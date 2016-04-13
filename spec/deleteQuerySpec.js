@@ -9,7 +9,6 @@ describe("fzdb", function() {
 		describe("DB with one entity", function() {
             var entityId ;
             beforeAll(function(done) {
-            //Not pretty I know, will refactor later once everything is working,.
                 h.setupClient();
                 h.sendCmd(h.loginToAdminQuery).then(function(data) {
                     expect(data.result.data).toEqual('Logged in successfully.');
@@ -54,13 +53,6 @@ describe("fzdb", function() {
 		});
 
 		describe("DB with linked entities:", function() {
-			/* 
-			 * Having entity 1 and entity 2 linked together
-			 * Deleting any of them will receieve exception
-			 * Removing linkage
-			 * Deleting entity 1 results in deletion
-			 * Deleting entity 2 results in deletion.
-			 */
             var smithId;
             var fredId;
             beforeAll(function(done) {
@@ -246,32 +238,6 @@ describe("fzdb", function() {
                         });      
                     });
                 });
-                /*
-                xit("Fred",function(done){
-                    h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
-                        expect(data.status).toEqual(false);
-                        expect(data.errorCode).toEqual(8);
-                        expect(data.info).toEqual('This entity currently has linkage with another entity, unlink them first.');
-                        done();
-                    });      
-                });
-                xit(", and both Smith and Fred is still here.", function() {
-                    it("getting the forename of entity:1 after link", function(done) {
-                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
-                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
-                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
-                            done();
-                        });      
-                    });
-                    it("getting the forename of entity:1 after link", function(done) {
-                        h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
-                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
-                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
-                            done();
-                        });      
-                    });
-                });
-                */
 
             });
 		});
