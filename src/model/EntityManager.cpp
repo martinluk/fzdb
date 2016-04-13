@@ -390,7 +390,8 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         unsigned long long entityId = value.entity();
                         assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
                         //Check if the entity is linked.
-                        if (_links.find(entityId)!=_links.end()) {
+                        auto linkGraph = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
+                        if (linkGraph.size() > 1) {
                             //This entity has linkage, let's not delete it.
                             throw std::runtime_error("This entity currently has linkage with another entity, unlink them first.");
                         }

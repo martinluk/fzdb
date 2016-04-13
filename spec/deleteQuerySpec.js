@@ -137,16 +137,46 @@ describe("fzdb", function() {
                         done();
                     });      
                 });
+                it(", and both Smith and Fred is still here.", function() {
+                    it("getting the forename of entity:1 after link", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                    it("getting the forename of entity:1 after link", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                });
                 it("Fred",function(done){
-                    h.sendCmd("DELETE $a WHERE { $a <surname> \"Fred\" }") .then(function(data) {
+                    h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
                         expect(data.status).toEqual(false);
                         expect(data.errorCode).toEqual(8);
                         expect(data.info).toEqual('This entity currently has linkage with another entity, unlink them first.');
                         done();
                     });      
                 });
-
-
+                it(", and both Smith and Fred is still here.", function() {
+                    it("getting the forename of entity:1 after link", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                    it("getting the forename of entity:1 after link", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                });
 
             });
 		});
