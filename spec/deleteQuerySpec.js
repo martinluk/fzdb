@@ -239,8 +239,63 @@ describe("fzdb", function() {
 
             });
 		});
-		describe("Entities with properties:", function() {
-		    pending("deleting entities with properties not implemented yet");
+        describe("Merged query:", function() {
+            pending("Test awaiting to be implemented");
+        });
+
+		fdescribe("Entities with properties:", function() {
+            beforeEach(function(done) {
+                h.setupClient();
+                h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                    expect(data.result.data).toEqual('Logged in successfully.');
+                    h.sendCmd('FLUSH').then(function(data) {
+                        expect(data.status).toBe(true);
+                        expect(data.result.data).toEqual("Database cleared.");
+                        h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                            expect(data.status).toBe(true);
+                            expect(data.result.data.a).not.toBeNull();
+                            //Inserting Macro
+                            h.sendCmd("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Beer\"; <profession> \"Bartender\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                                expect(data.status).toBe(true);
+                                expect(data.result.data.a).not.toBeNull();
+                                h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                                    expect(data.status).toBe(true);
+                                    expect(data.result.data.a).not.toBeNull();
+                                    done();
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+            afterEach(function(done) {
+                h.sendCmd('USER LOGOUT').then(function(data) {
+                    expect(data.status).toBe(true);
+                    done(); 
+                });
+            });
+            it("Sanity check - User level.",function(done) {
+                h.sendCmd("USER LEVEL").then(function(data) {
+                    expect(data.status).toBe(true);
+                    expect(data.result.data).not.toBeNull();
+                    expect(data.result.data).toBe('ADMIN');
+                    done();
+                });
+            });
+            it("Sanity Check - getting entities with forename Marco", function(done) {
+                h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
+                    expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
+                    done();
+                });
+            });
+            it("Sanity Check - getting entities with forename Marco and surname Reus", function(done) {
+                h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\" . $a <surname> \"Reus\"}").then(function(data) {
+                expect(data).toEqual(
+                    ({status: true, errorCode: 0, info:'', 
+                        result: ({type: 'fsparql', data:[({ a: '2'})]})}));
+                    done();
+                });
+            });
 			/* XXX Need double checking behaviour
 			 * Add with two properties
 			 * Delete one of the property
@@ -248,16 +303,6 @@ describe("fzdb", function() {
 			 * Delete remaining property
 			 * No property left
 			 */
-			it("Starting new db state", function(done) {
-				sendCmd("FLUSH").then(function(data) { done(); });    
-			});
-
-			it("setting entity:2's forename to 'Ned' and surname to 'Flanders'", function(done) {
-				client.write("INSERT DATA { entity:2 <forename> \"Ned\"; <surname> \"Flanders\" }");
-					client.once('data', function(data) {
-					done();
-				});      
-			});
 		});
     });
 });
