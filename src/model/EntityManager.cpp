@@ -391,8 +391,8 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
                         //Check if the entity is linked.
                         if (_links.find(entityId)!=_links.end()) {
-                            //This entity has linkage, let's not delete it. TODO Delete both?
-                            throw std::runtime_error("This entity currently has linkage with another entity and cannot be deleted in this version of fzdb.");
+                            //This entity has linkage, let's not delete it.
+                            throw std::runtime_error("This entity currently has linkage with another entity, unlink them first.");
                         }
                         //Erasing the entity
                         std::cout << "Erasing entity id " << entityId << std::endl;
@@ -413,6 +413,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                     {
                         VariableSetValue value = *valueIter;
                         unsigned long long propertyId = value.property();
+                        //value.entity() should be set on every PropertyRef variable set value in the variableset - you can put in an assert to check this
                         assert(propertyId!=0 /*We have known the value is property, yet propertyId is not set at VarlableSetValue.*/);
                         std::cout << "Erasing property id " << propertyId << std::endl;
                         //TODO What if this proeprty is used somewhere else? 
