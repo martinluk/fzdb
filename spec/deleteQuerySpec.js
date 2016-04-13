@@ -2,8 +2,6 @@ var net = require('net');
 var h = require('./support/helper.js');
 
 describe("fzdb", function() {
-  var client;
-
 
 	describe("delete queries:", function() {
 		describe("DB with one entity", function() {
