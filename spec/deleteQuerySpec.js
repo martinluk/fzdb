@@ -2,79 +2,75 @@ var net = require('net');
 var h = require('./support/helper.js');
 
 describe("fzdb", function() {
-
 	describe("delete queries:", function() {
-		describe("DB with one entity", function() {
+	    beforeEach(function(done) {
+            h.setupClient();
+            h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                expect(data.result.data).toEqual('Logged in successfully.');
+                done(); 
+            });
+        });
+        afterEach(function(done) {
+            h.sendCmd('USER LOGOUT').then(function(data) {
+                expect(data.result.data).toEqual('Logged out successfully.');
+                done(); 
+            });
+        });
+		fdescribe("DB with one entity", function() {
             var entityId ;
-            beforeAll(function(done) {
-                h.setupClient();
-                h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                    expect(data.result.data).toEqual('Logged in successfully.');
-                    h.sendCmd('FLUSH').then(function() {
-                        h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                            entityId = data.result.data.a;
-                            h.sendCmd('USER LOGOUT').then(function(data) {
-                                done(); 
-                            });
-                        });
+            beforeEach(function(done) {
+                h.sendCmd('FLUSH').then(function() {
+                    h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                        entityId = data.result.data.a;
+                        done(); 
                     });
                 });
             });
-            describe("deleting with correct variable", function() {
-                it("and now Fred lives in DB", function(done) {
-                    h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-                        expect((data.result.data).length).toBe(1);
-                        done();
-                    });          
-                });
-                it("Running the delete query", function(done) {
+            it("Fred is in DB", function(done) {
+                h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                    expect((data.result.data).length).toBe(1);
+                    done();
+                });          
+            });
+
+            describe("Deleting Fred from DB", function() {
+                beforeEach(function(done) {
                     var stat;
-                    h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                        expect(data.result.data).toEqual('Logged in successfully.');
-                        h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
-                            stat=data.status;
-                            h.sendCmd('USER LOGOUT').then(function(data) {
-                                expect(data.status).toBe(true);
-                                expect(stat).toBe(true);
-                                done(); 
-                            });
-                        });
+                    h.sendCmd("DELETE WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                        expect(data.status).toBe(true);
+                        stat=data.status;
+                        done();
                     });
-                });    
-                it("Resulting in Fred no longer lives in DB", function(done) {
+
+                });
+                fit("Resulting in Fred no longer lives in DB", function(done) {
                     h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
                         expect((data.result.data).length).toBe(0);
                         done();
                     });          
                 });
             });
+
 		});
 
 		describe("DB with linked entities:", function() {
             var smithId;
             var fredId;
-            beforeAll(function(done) {
-                h.setupClient();
-                h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                    expect(data.result.data).toEqual('Logged in successfully.');
-                    h.sendCmd('FLUSH').then(function(data) {
+            beforeEach(function(done) {
+                h.sendCmd('FLUSH').then(function(data) {
+                    expect(data.status).toBe(true);
+                    expect(data.result.data).toEqual("Database cleared.");
+                    h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                         expect(data.status).toBe(true);
-                        expect(data.result.data).toEqual("Database cleared.");
-                        h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                        expect(data.result.data.a).not.toBeNull();
+                        fredId = data.result.data.a;
+                        h.sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data.result.data.a).not.toBeNull();
-                            fredId = data.result.data.a;
-                            h.sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                                expect(data.status).toBe(true);
-                                expect(data.result.data.a).not.toBeNull();
-                                smithId = data.result.data.a;
-                                h.sendCmd("LINK entity:" + fredId + " entity:" + smithId).then(function(data) {
-                                    expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities ' + fredId + ' and ' + smithId + ' linked successfully.'})}));
-                                    h.sendCmd('USER LOGOUT').then(function(data) {
-                                        expect(data.status).toBe(true);
-                                        done(); 
-                                    });
-                                });
+                            smithId = data.result.data.a;
+                            h.sendCmd("LINK entity:" + fredId + " entity:" + smithId).then(function(data) {
+                                expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities ' + fredId + ' and ' + smithId + ' linked successfully.'})}));
+                                done(); 
                             });
                         });
                     });
@@ -298,6 +294,7 @@ describe("fzdb", function() {
         });
 
 		describe("Entities with properties:", function() {
+		    pending("Need to change how set up work");
 		    var moeId;
             beforeEach(function(done) {
                 h.setupClient();

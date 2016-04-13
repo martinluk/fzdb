@@ -115,6 +115,24 @@ std::vector<VariableSetRow>::iterator VariableSet::erase(std::vector<VariableSet
 	}
 }
 
+std::vector<std::string> VariableSet::getVariables() {
+    //Iterate over _nameMap keys and return the variable used in this VariableSet
+    //XXX This method was implemented as cannot find an efficient way to iterate over the rows, with their variable names
+    //The reason that I want variable name at DeleteQuery is to find the Type of variable at BGP to apply correct action
+    //Please feel free to change/let me know if a better implementation exists.
+    std::vector<std::string> o;
+    typedef boost::bimap<std::string, unsigned int> nm_type;
+    nm_type::const_iterator iterEnd=_nameMap.end();
+    for(nm_type::const_iterator iter = _nameMap.begin(); 
+            iter!= iterEnd;
+            ++iter) {
+        o.push_back(iter->left);
+    }
+    return o;
+
+
+}
+
 std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) const {
 
     std::vector<VariableSetValue> output;

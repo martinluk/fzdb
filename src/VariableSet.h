@@ -161,6 +161,7 @@ public:
     const bool contains(const std::string name) const;
 	const bool contains(const unsigned int id) const;
 
+
     const bool used(const std::string name) const;
 	const bool used(unsigned int id) const;
 
@@ -195,8 +196,11 @@ public:
 
 	void sort();
 
+    std::vector<std::string> getVariables();
+
 private:
 	boost::bimap<std::string, unsigned int> _nameMap;
+    std::vector<std::string> _vars;
 	std::vector<model::types::SubType> _typeMap;
     std::vector<VariableSetRow> _values;
     std::vector<bool> _variablesUsed;

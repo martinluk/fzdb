@@ -10,7 +10,7 @@ Delete::Delete(std::shared_ptr<ISession> session, Query query) : Job(session, Pe
 QueryResult Delete::executeNonConst() {
 	QueryResult result;
 	try {
-		_database->entityManager().Delete(std::move(_query.whereClause),_query.selectLine);
+		_database->entityManager().Delete( std::move(_query.whereClause), std::move(_query.settings));
 	}
 	catch (MismatchedTypeException ex) {
 		return QueryResult::generateError(QueryResult::ErrorCode::TypeMismatch, ex.what());

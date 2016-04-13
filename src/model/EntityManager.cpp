@@ -354,29 +354,28 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 	return createdEntities;
 }
 
-void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> selectLine) {
-    /* 
-    * For each variable described in triple block
-    * delete it
-    */
+// For each variable described in triple block delete it
+void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
     using VariableType = model::types::SubType;
 
     //Get VariableSet from BGP
-    QuerySettings qs; //FIXME Get QuerySettings from online
     //Iterating over the returned variable set
-    VariableSet vs = BGP(block,qs);
+    VariableSet vs = BGP(whereBlock,settings);
+
+    std::vector<std::string> variables = vs.getVariables();
     std::vector<VariableSetRow>::iterator rowIter;
 
-    for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter)
-    {
-        std::string line = *selectLineIter;
-        int id = (int)vs.indexOf(line);
-        if(vs.contains(line) && vs.used(line))
+    //for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter)
+    for(std::vector<std::string>::iterator varsIter=variables.begin(); varsIter!=variables.end(); ++varsIter){
+        std::string var = *varsIter;
+        std::cout << "variable " << var << std::endl;
+        std::vector<VariableSetRow>::iterator rowIter;
+
+        int id = (int)vs.indexOf(var);
+        if(vs.contains(var) && vs.used(var))
         {
-            VariableType type = vs.typeOf(line);
-            std::cout << "Select line contains variable " << line << " that is contained and used of id -"<< id  << "of type "<< std::endl;
-            if (type == VariableType::EntityRef) 
-            {
+            VariableType type = vs.typeOf(var);
+            if (type == VariableType::EntityRef) {
                 //The variable is entity.
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);
                 std::vector<VariableSetRow>::iterator rowIter;
@@ -391,7 +390,6 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
                         //Check if the entity is linked.
                         //auto linkGraph = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
-                        //if (linkGraph.size() > 1) {
                         if (_links.find(entityId)!=_links.end()) {
                             //This entity has linkage, let's not delete it.
                             throw std::runtime_error("This entity currently has linkage with another entity, unlink them first.");
@@ -416,7 +414,7 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                         VariableSetValue value = *valueIter;
                         unsigned long long propertyId = value.property();
                         unsigned long long entityId = value.entity();
-                        //assert(propertyId!=0 /*We have known the value is property, yet propertyId is not set at VarlableSetValue.*/);
+                        //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
                         assert(entityId!=0);
                         assert(propertyId!=0);
                         std::cout << "Erasing property id " << propertyId << std::endl;
@@ -427,9 +425,8 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
                 }
             } else if (type == VariableType::ValueReference) {
                 //TODO 
-            } else if (type == VariableType::Int32 ||
-                type == VariableType::String ||
-                type == VariableType::Date) {
+            } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
+
                 //Deleting a constant - nothing to do at data store.
                 //continue.
             } else if (type == VariableType::Undefined) {
@@ -440,28 +437,11 @@ void EntityManager::Delete(TriplesBlock&& block, std::vector<std::string> select
             }
 
         } else {
-            //Variable in this select line is not used.
-            std::cout << "Select line contains variable " << line << " that is not contained and used." << std::endl;
+            //Variable in this variable is not used.
+            std::cout << "Select line contains variable " << var << " that is not contained and used." << std::endl;
             //Since variable not used, can be ignored.
-        } //END if(vs.contains(line) && vs.used(line))
-    }
-
-    
-    //Find out row number that is entity
-    /*
-    spdlog::get("main")->debug("Data has size {}",data->size());
-    for(auto outIter=data->cbegin(); outIter!=data->cend(); outIter++){
-        spdlog::get("main")->debug("Entered row of size {}",(*outIter).size());
-        for(auto inIter = (*outIter).cbegin(); inIter!=(*outIter).cend(); inIter++){
-            unsigned long long entityId = (*inIter).entity();
-            if (entityId!=0) {
-                //Value's entity value is set, meaning it is entity
-                spdlog::get("main")->warn("Deleting entity {}", entityId);
-                _entities.erase(entityId);
-            } 
-        }
-    }
-    */
+        } //END if(vs.contains(var) && vs.used(var))
+    }//End variable for loop
 }
 
 bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
