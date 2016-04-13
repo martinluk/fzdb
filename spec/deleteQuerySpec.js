@@ -53,7 +53,7 @@ describe("fzdb", function() {
             });
 		});
 
-		fdescribe("DB with linked entities:", function() {
+		describe("DB with linked entities:", function() {
 			/* 
 			 * Having entity 1 and entity 2 linked together
 			 * Deleting any of them will receieve exception
@@ -177,6 +177,101 @@ describe("fzdb", function() {
                         });      
                     });
                 });
+
+            });
+            describe("Entities after unlinking", function() {
+                beforeAll(function(done) {
+                    h.sendCmd(h.loginToAdminQuery).then(function(data) {
+                        expect(data.status).toBe(true);
+                        expect(data.result.data).toEqual('Logged in successfully.');
+                        h.sendCmd("UNLINK entity:" + fredId + " entity:" + smithId) .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities ' + fredId + ' and ' + smithId + ' unlinked successfully.'})}));
+                            done();
+                        });     
+                    });
+                });
+                afterAll(function(done) {
+                    h.sendCmd('USER LOGOUT').then(function(data) {
+                        if(!data.status) {
+                            console.log(data);
+                        }
+                        expect(data.status).toBe(true);
+                        expect(data.result.data).toEqual('Logged out successfully.');
+                        done();
+                    });
+                });
+                it("Smith", function() {
+                    it("Deleting",function(done){
+                        h.sendCmd("DELETE $a WHERE { $a <surname> \"Smith\" }").then(function(data) {
+                            expect(data.status).toEqual(true);
+                            expect(data.errorCode).toEqual(0);
+                            done();
+                        });      
+                    });
+                    it("Fred still here", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                    it("Smith is gone.", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[]})}));
+                            done();
+                        });      
+                    });
+                });
+                it("Fred", function() {
+                    it("Deleting",function(done){
+                        h.sendCmd("DELETE $a WHERE { $a <forename> \"Smith\" }").then(function(data) {
+                            expect(data.status).toEqual(true);
+                            expect(data.errorCode).toEqual(0);
+                            done();
+                        });      
+                    });
+                    it("Fred is gone", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[]})}));
+                            done();
+                        });      
+                    });
+                    it("Smith is still here.", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: smithId})]})}));
+                            done();
+                        });      
+                    });
+                });
+                /*
+                xit("Fred",function(done){
+                    h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
+                        expect(data.status).toEqual(false);
+                        expect(data.errorCode).toEqual(8);
+                        expect(data.info).toEqual('This entity currently has linkage with another entity, unlink them first.');
+                        done();
+                    });      
+                });
+                xit(", and both Smith and Fred is still here.", function() {
+                    it("getting the forename of entity:1 after link", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                    it("getting the forename of entity:1 after link", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: fredId})]})}));
+                            done();
+                        });      
+                    });
+                });
+                */
 
             });
 		});
