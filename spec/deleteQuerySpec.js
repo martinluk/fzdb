@@ -298,6 +298,7 @@ describe("fzdb", function() {
         });
 
 		describe("Entities with properties:", function() {
+		    var moeId;
             beforeEach(function(done) {
                 h.setupClient();
                 h.sendCmd(h.loginToAdminQuery).then(function(data) {
@@ -308,10 +309,10 @@ describe("fzdb", function() {
                         h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data.result.data.a).not.toBeNull();
-                            //Inserting Macro
                             h.sendCmd("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Water\"; <profession> \"Bartender\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                                 expect(data.status).toBe(true);
                                 expect(data.result.data.a).not.toBeNull();
+                                moeId=data.result.data.a;
                                 h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                                     expect(data.status).toBe(true);
                                     expect(data.result.data.a).not.toBeNull();
@@ -351,6 +352,47 @@ describe("fzdb", function() {
                     });
                 });
                 it("Ability to get <forename> from BGP", function(done) {
+                    h.sendCmd("SELECT $a WHERE { entity:2 $a \"Marco\"}").then(function(data) {
+                        expect(data.result.data).not.toBeNull();
+                        expect(data).toEqual(h.resultTemplate([{a:'forename'}]));
+                        done();
+                    });
+                });
+                it("Entity numbers of drinks water", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <drinks> \"Water\"}").then(function(data) {
+                        expect(data).toEqual(h.resultTemplate([{a:'2'},{a:'3'}]));
+                        done();
+                    });
+                });
+            });
+            describe("Deleting properties",function() {
+                describe("that globally has only one name", function() {
+                    beforeEach(function() {
+                        console.log(moeId);
+
+                    });
+                    it("Return nothin when deleted", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
+                            //expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
+                            done();
+                        });
+                    });
+                    it("Adding back does not break the system", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
+                            //expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
+                            done();
+                        });
+                    });
+
+                });
+                it("that globally has more than one name", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\" . $a <surname> \"Reus\"}").then(function(data) {
+                    expect(data).toEqual(
+                        ({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'})]})}));
+                        done();
+                    });
+                });
+                it("after the only property got deleted, adding back, and query works fine.", function(done) {
                     h.sendCmd("SELECT $a WHERE { entity:2 $a \"Marco\"}").then(function(data) {
                         expect(data.result.data).not.toBeNull();
                         expect(data).toEqual(h.resultTemplate([{a:'forename'}]));
