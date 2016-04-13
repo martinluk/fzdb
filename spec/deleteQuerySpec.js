@@ -169,7 +169,7 @@ describe("fzdb", function() {
                 });
 
             });
-            fdescribe("Entities after unlinking ", function() {
+            describe("Entities after unlinking ", function() {
                 describe("Deleting Fred", function() {
                     beforeAll(function(done) {
                         h.setupClient();
@@ -309,7 +309,7 @@ describe("fzdb", function() {
                             expect(data.status).toBe(true);
                             expect(data.result.data.a).not.toBeNull();
                             //Inserting Macro
-                            h.sendCmd("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Beer\"; <profession> \"Bartender\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                            h.sendCmd("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Water\"; <profession> \"Bartender\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                                 expect(data.status).toBe(true);
                                 expect(data.result.data.a).not.toBeNull();
                                 h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,\"person\") }").then(function(data) {
@@ -328,26 +328,40 @@ describe("fzdb", function() {
                     done(); 
                 });
             });
-            it("Sanity check - User level.",function(done) {
-                h.sendCmd("USER LEVEL").then(function(data) {
-                    expect(data.status).toBe(true);
-                    expect(data.result.data).not.toBeNull();
-                    expect(data.result.data).toBe('ADMIN');
-                    done();
+            describe("Sanity Checks",function() {
+                it("User level of execution at it.",function(done) {
+                    h.sendCmd("USER LEVEL").then(function(data) {
+                        expect(data.status).toBe(true);
+                        expect(data.result.data).not.toBeNull();
+                        expect(data.result.data).toBe('ADMIN');
+                        done();
+                    });
                 });
-            });
-            it("Sanity Check - getting entities with forename Marco", function(done) {
-                h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
-                    expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
-                    done();
+                it("Entity numbers of forename Macro", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
+                        expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
+                        done();
+                    });
                 });
-            });
-            it("Sanity Check - getting entities with forename Marco and surname Reus", function(done) {
-                h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\" . $a <surname> \"Reus\"}").then(function(data) {
-                expect(data).toEqual(
-                    ({status: true, errorCode: 0, info:'', 
-                        result: ({type: 'fsparql', data:[({ a: '2'})]})}));
-                    done();
+                it("Entity number of Macro Reus", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\" . $a <surname> \"Reus\"}").then(function(data) {
+                    expect(data).toEqual(
+                        ({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'})]})}));
+                        done();
+                    });
+                });
+                it("Ability to get <forename> from BGP", function(done) {
+                    h.sendCmd("SELECT $a WHERE { entity:2 $a \"Marco\"}").then(function(data) {
+                        expect(data.result.data).not.toBeNull();
+                        expect(data).toEqual(h.resultTemplate([{a:'forename'}]));
+                        done();
+                    });
+                });
+                it("Entity numbers of drinks water", function(done) {
+                    h.sendCmd("SELECT $a WHERE { $a <drinks> \"Water\"}").then(function(data) {
+                        expect(data).toEqual(h.resultTemplate([{a:'2'},{a:'3'}]));
+                        done();
+                    });
                 });
             });
 			/* XXX Need double checking behaviour
