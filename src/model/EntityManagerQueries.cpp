@@ -937,7 +937,7 @@ std::vector<unsigned int> EntityManager::ScanHelp1(VariableSet&& variableSet, co
 				auto newRecord = std::make_shared<model::types::Property>(propertyPair.first, this, 0);
 				newRecord->Init(100);
 				rowsAdded.push_back(variableSet.add(std::move(variableId),
-					newRecord, 0, 0,
+                    newRecord, entity->getHandle(), propertyPair.first,
 					model::types::SubType::PropertyReference, std::move(metaVar)));
 			}
 		}

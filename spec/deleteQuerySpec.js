@@ -366,12 +366,15 @@ describe("fzdb", function() {
                 });
             });
             describe("Deleting properties",function() {
+                pending("To be implemented");
                 describe("that globally has only one name", function() {
-                    beforeEach(function() {
-                        console.log(moeId);
-
+                    beforeEach(function(done) {
+                        h.sendCmd("DELETE $a WHERE { entity:"+moeId+" $a \"Bartender\"}").then(function(data) {
+                            console.log(data);
+                            done();
+                        });
                     });
-                    it("Return nothin when deleted", function(done) {
+                    fit("Return nothin when deleted", function(done) {
                         h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
                             //expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
                             done();
