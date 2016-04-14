@@ -1,22 +1,22 @@
 var net = require('net');
 var h = require('./support/helper.js');
 
-describe("fzdb", function() {
+fdescribe("fzdb", function() {
+    beforeEach(function(done) {
+        h.setupClient();
+        h.sendCmd(h.loginToAdminQuery).then(function(data) {
+            expect(data.result.data).toEqual('Logged in successfully.');
+            done(); 
+        });
+    });
+    afterEach(function(done) {
+        h.sendCmd('USER LOGOUT').then(function(data) {
+            expect(data.result.data).toEqual('Logged out successfully.');
+            done(); 
+        });
+    });
 	describe("delete queries:", function() {
-	    beforeEach(function(done) {
-            h.setupClient();
-            h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                expect(data.result.data).toEqual('Logged in successfully.');
-                done(); 
-            });
-        });
-        afterEach(function(done) {
-            h.sendCmd('USER LOGOUT').then(function(data) {
-                expect(data.result.data).toEqual('Logged out successfully.');
-                done(); 
-            });
-        });
-		fdescribe("DB with one entity", function() {
+		describe("DB with one entity", function() {
             var entityId ;
             beforeEach(function(done) {
                 h.sendCmd('FLUSH').then(function() {
@@ -43,7 +43,7 @@ describe("fzdb", function() {
                     });
 
                 });
-                fit("Resulting in Fred no longer lives in DB", function(done) {
+                it("Resulting in Fred no longer lives in DB", function(done) {
                     h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
                         expect((data.result.data).length).toBe(0);
                         done();
@@ -56,6 +56,8 @@ describe("fzdb", function() {
 		describe("DB with linked entities:", function() {
             var smithId;
             var fredId;
+            var delSmithQ = "DELETE WHERE { $a <surname> \"Smith\" }";
+            var delFredQ = "DELETE WHERE { $a <forename> \"Fred\" }";
             beforeEach(function(done) {
                 h.sendCmd('FLUSH').then(function(data) {
                     expect(data.status).toBe(true);
@@ -76,6 +78,13 @@ describe("fzdb", function() {
                     });
                 });
             });
+            afterEach(function(done) {
+                h.sendCmd('FLUSH').then(function(data) {
+                    expect(data.status).toBe(true);
+                    expect(data.result.data).toEqual("Database cleared.");
+                    done();
+                });
+            });
             describe("Sanity check after linkage.", function() {
                 it("getting the forename of entity:1 after link", function(done) {
                     h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
@@ -93,45 +102,37 @@ describe("fzdb", function() {
                 });
             });
             describe("Cannot delete linked entity", function() {
-                beforeEach(function(done) {
-                    h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                        expect(data.status).toBe(true);
-                        expect(data.result.data).toEqual('Logged in successfully.');
-                        done();
-                    });
-                });
-                afterEach(function(done) {
-                    h.sendCmd('USER LOGOUT').then(function(data) {
-                        expect(data.status).toBe(true);
-                        expect(data.result.data).toEqual('Logged out successfully.');
-                        done();
-                    });
-                });
-                it("debug check - asserting is admin.",function(done) {
-                    h.sendCmd("USER LEVEL").then(function(data) {
-                        expect(data.status).toBe(true);
-                        expect(data.result.data).not.toBeNull();
-                        expect(data.result.data).toBe('ADMIN');
-                        done();
-                    });
-                });
+
                 it("Smith",function(done){
-                    h.sendCmd("DELETE $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                    h.sendCmd(delSmithQ) .then(function(data) {
                         expect(data.status).toEqual(false);
                         expect(data.errorCode).toEqual(8);
                         expect(data.info).toEqual('This entity currently has linkage with another entity, unlink them first.');
                         done();
                     });      
                 });
-                it(", and both Smith and Fred is still here.", function() {
-                    it("getting the forename of entity:1 after link", function(done) {
+                it("Fred",function(done){
+                    h.sendCmd(delFredQ) .then(function(data) {
+                        expect(data.status).toEqual(false);
+                        expect(data.errorCode).toEqual(8);
+                        expect(data.info).toEqual('This entity currently has linkage with another entity, unlink them first.');
+                        done();
+                    });      
+                });
+                describe("Deleting Fred with linkage:", function() {
+                    beforeEach(function(done) {
+                        h.sendCmd(delFredQ) .then(function(data) {
+                            done();
+                        });      
+                    });
+                    it("Fred is still here", function(done) {
                         h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
                             expect(data).toEqual(({status: true, errorCode: 0, info:'',
                                 result: ({type: 'fsparql', data:[({a: fredId})]})}));
                             done();
                         });      
                     });
-                    it("getting the forename of entity:1 after link", function(done) {
+                    it("Smith is still here.", function(done) {
                         h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
                             expect(data).toEqual(({status: true, errorCode: 0, info:'',
                                 result: ({type: 'fsparql', data:[({a: fredId})]})}));
@@ -139,23 +140,20 @@ describe("fzdb", function() {
                         });      
                     });
                 });
-                it("Fred",function(done){
-                    h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
-                        expect(data.status).toEqual(false);
-                        expect(data.errorCode).toEqual(8);
-                        expect(data.info).toEqual('This entity currently has linkage with another entity, unlink them first.');
-                        done();
-                    });      
-                });
-                it(", and both Smith and Fred is still here.", function() {
-                    it("getting the forename of entity:1 after link", function(done) {
+                describe("Deleting Smith with linkage:", function() {
+                    beforeEach(function(done) {
+                        h.sendCmd(delSmithQ) .then(function(data) {
+                            done();
+                        });      
+                    });
+                    it("Fred is still here", function(done) {
                         h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" }") .then(function(data) {
                             expect(data).toEqual(({status: true, errorCode: 0, info:'',
                                 result: ({type: 'fsparql', data:[({a: fredId})]})}));
                             done();
                         });      
                     });
-                    it("getting the forename of entity:1 after link", function(done) {
+                    it("Smith is still here.", function(done) {
                         h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
                             expect(data).toEqual(({status: true, errorCode: 0, info:'',
                                 result: ({type: 'fsparql', data:[({a: fredId})]})}));
@@ -166,46 +164,33 @@ describe("fzdb", function() {
 
             });
             describe("Entities after unlinking ", function() {
-                describe("Deleting Fred", function() {
-                    beforeAll(function(done) {
-                        h.setupClient();
-                        h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                            expect(data.result.data).toEqual('Logged in successfully.');
-                            h.sendCmd('FLUSH').then(function(data) {
-                                expect(data.status).toBe(true);
-                                expect(data.result.data).toEqual("Database cleared.");
-                                h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                                    expect(data.status).toBe(true);
-                                    expect(data.result.data.a).not.toBeNull();
-                                    fredId = data.result.data.a;
-                                    h.sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                                        expect(data.status).toBe(true);
-                                        expect(data.result.data.a).not.toBeNull();
-                                        smithId = data.result.data.a;
-                                        h.sendCmd("LINK entity:" + fredId + " entity:" + smithId).then(function(data) {
-                                            expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities ' + fredId + ' and ' + smithId + ' linked successfully.'})}));
-                                            h.sendCmd("UNLINK entity:" + fredId + " entity:" + smithId) .then(function(data) {
-                                                expect(data.status).toBe(true);
-                                                done();
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                afterAll(function(done) {
-                    h.sendCmd('USER LOGOUT').then(function(data) {
-                        if(!data.status) {
-                            console.log(data);
-                        }
+                beforeEach(function(done) {
+                    h.sendCmd("UNLINK entity:" + fredId + " entity:" + smithId) .then(function(data) {
                         expect(data.status).toBe(true);
-                        expect(data.result.data).toEqual('Logged out successfully.');
                         done();
                     });
                 });
-                    it("Executed, ",function(done){
-                        h.sendCmd("DELETE $a WHERE { $a <forename> \"Fred\" }").then(function(data) {
+                describe("Can delete", function() {
+                    it("Fred",function(done){
+                        h.sendCmd(delFredQ).then(function(data) {
+                            expect(data.status).toEqual(true);
+                            expect(data.errorCode).toEqual(0);
+                            done();
+                        });      
+                    });
+
+                    it("Smith",function(done){
+                        h.sendCmd(delSmithQ).then(function(data) {
+                            expect(data.status).toEqual(true);
+                            expect(data.errorCode).toEqual(0);
+                            done();
+                        });      
+                    });
+
+                });
+                describe("Deleting Fred", function() {
+                    beforeEach(function(done) {
+                        h.sendCmd(delFredQ).then(function(data) {
                             expect(data.status).toEqual(true);
                             expect(data.errorCode).toEqual(0);
                             done();
@@ -225,48 +210,10 @@ describe("fzdb", function() {
                             done();
                         });      
                     });
-
                 });
-                describe("Smith:",function() {
-                    beforeAll(function(done) {
-                        h.setupClient();
-                        h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                            expect(data.result.data).toEqual('Logged in successfully.');
-                            h.sendCmd('FLUSH').then(function(data) {
-                                expect(data.status).toBe(true);
-                                expect(data.result.data).toEqual("Database cleared.");
-                                h.sendCmd("INSERT DATA { $a <forename> \"Fred\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                                    expect(data.status).toBe(true);
-                                    expect(data.result.data.a).not.toBeNull();
-                                    fredId = data.result.data.a;
-                                    h.sendCmd("INSERT DATA { $a <surname> \"Smith\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                                        expect(data.status).toBe(true);
-                                        expect(data.result.data.a).not.toBeNull();
-                                        smithId = data.result.data.a;
-                                        h.sendCmd("LINK entity:" + fredId + " entity:" + smithId).then(function(data) {
-                                            expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'text', data: 'Entities ' + fredId + ' and ' + smithId + ' linked successfully.'})}));
-                                            h.sendCmd("UNLINK entity:" + fredId + " entity:" + smithId) .then(function(data) {
-                                                expect(data.status).toBe(true);
-                                                done();
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                afterAll(function(done) {
-                    h.sendCmd('USER LOGOUT').then(function(data) {
-                        if(!data.status) {
-                            console.log(data);
-                        }
-                        expect(data.status).toBe(true);
-                        expect(data.result.data).toEqual('Logged out successfully.');
-                        done();
-                    });
-                });
-                    it("Deleting Smith",function(done){
-                        h.sendCmd("DELETE $a WHERE { $a <surname> \"Smith\" }").then(function(data) {
+                describe("Deleting Smith:",function() {
+                    beforeEach(function(done) {
+                        h.sendCmd(delSmithQ).then(function(data) {
                             expect(data.status).toEqual(true);
                             expect(data.errorCode).toEqual(0);
                             done();
@@ -297,24 +244,20 @@ describe("fzdb", function() {
 		    pending("Need to change how set up work");
 		    var moeId;
             beforeEach(function(done) {
-                h.setupClient();
-                h.sendCmd(h.loginToAdminQuery).then(function(data) {
-                    expect(data.result.data).toEqual('Logged in successfully.');
-                    h.sendCmd('FLUSH').then(function(data) {
+                h.sendCmd('FLUSH').then(function(data) {
+                    expect(data.status).toBe(true);
+                    expect(data.result.data).toEqual("Database cleared.");
+                    h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                         expect(data.status).toBe(true);
-                        expect(data.result.data).toEqual("Database cleared.");
-                        h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Reus\"; <age> \"28\"; <drinks> \"Water\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                        expect(data.result.data.a).not.toBeNull();
+                        h.sendCmd("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Water\"; <profession> \"Bartender\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data.result.data.a).not.toBeNull();
-                            h.sendCmd("INSERT DATA { $a <forename> \"Moe\"; <surname> \"Szyslak\"; <age> \"34\"; <drinks> \"Water\"; <profession> \"Bartender\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                            moeId=data.result.data.a;
+                            h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                                 expect(data.status).toBe(true);
                                 expect(data.result.data.a).not.toBeNull();
-                                moeId=data.result.data.a;
-                                h.sendCmd("INSERT DATA { $a <forename> \"Marco\"; <surname> \"Polo\"; <age> \"34\"; <drinks> \"Wine\" } WHERE { NEW($a,\"person\") }").then(function(data) {
-                                    expect(data.status).toBe(true);
-                                    expect(data.result.data.a).not.toBeNull();
-                                    done();
-                                });
+                                done();
                             });
                         });
                     });
@@ -363,6 +306,7 @@ describe("fzdb", function() {
                 });
             });
             describe("Deleting properties",function() {
+                pending("Still fixing my bugs, will implement after this.");
                 describe("that globally has only one name", function() {
                     beforeEach(function(done) {
                         h.sendCmd("DELETE $a WHERE { entity:"+moeId+" $a \"Bartender\"}").then(function(data) {

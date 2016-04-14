@@ -377,6 +377,8 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
             VariableType type = vs.typeOf(var);
             if (type == VariableType::EntityRef) {
                 //The variable is entity.
+                assert(vs.contains(var));
+
                 std::vector<VariableSetRow> column = vs.extractRowsWith(id);
                 std::vector<VariableSetRow>::iterator rowIter;
                 for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
@@ -390,12 +392,16 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
                         assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
                         //Check if the entity is linked.
                         //auto linkGraph = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
+                        spdlog::get("main")->info("has link graph ****** {}", entityId);
+                        //if (linkGraph.size() > 1) {
                         if (_links.find(entityId)!=_links.end()) {
                             //This entity has linkage, let's not delete it.
                             throw std::runtime_error("This entity currently has linkage with another entity, unlink them first.");
                         }
+                        spdlog::get("main")->info("after check ****** {}", entityId);
                         //Erasing the entity
                         std::cout << "Erasing entity id " << entityId << std::endl;
+                        spdlog::get("main")->info("Removing entityId {}", entityId);
                         _entities.erase(entityId);
                         //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
