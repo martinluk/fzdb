@@ -423,18 +423,44 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
                         //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
                         assert(entityId!=0);
                         assert(propertyId!=0);
-                        std::cout << "Erasing property id " << propertyId << std::endl;
-                        _entities.erase(entityId);
-                        //TODO What if this proeprty is used somewhere else? 
-                        //_property.erase(propertyId);
+                        std::cout << "Erasing property id " << propertyId << "entitiyiD"<<entityId<< std::endl;
+                        /*
+                         This is how it was added... I think.
+                        for (auto val : values) {
+                            std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
+                            auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
+                            assert(record->_manager == this);
+                            for (auto newRecord : newRecords)
+                            {
+                                record->insertProperty(propertyId, newRecord);
+                            }
+                        }
+					*/
+                        _entities.erase(propertyId);
+                        //Check if Property is used elsewhere.
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
-            } else if (type == VariableType::ValueReference) {
-                //TODO 
+            //} else if (type == VariableType::ValueReference) {
             } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
-
-                //Deleting a constant - nothing to do at data store.
-                //continue.
+                std::cout << "of object" << std::endl;
+                //TODO Check if object is an entiy
+                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
+                std::vector<VariableSetRow>::iterator rowIter;
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
+                {
+                    VariableSetRow row = *rowIter;
+                    std::vector<VariableSetValue>::iterator valueIter;
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                    {
+                        VariableSetValue value = *valueIter;
+                        unsigned long long propertyId = value.property();
+                        unsigned long long entityId = value.entity();
+                        //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
+                        assert(entityId!=0);
+                        std::cout << "Erasing value of entityid" <<entityId<<"PropID"<<propertyId<< std::endl;
+                        //Check if Property is used elsewhere.
+                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                }
             } else if (type == VariableType::Undefined) {
                 throw std::runtime_error("Cannot delete type undefined.");
             } else {
