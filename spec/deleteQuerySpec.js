@@ -294,7 +294,8 @@ fdescribe("fzdb", function() {
                 });
             });
 
-            fdescribe("Deleting values", function() {
+            describe("Deleting values", function() {
+                pending("one sec...");
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
                         expect(data.status).toBe(true);
@@ -309,7 +310,7 @@ fdescribe("fzdb", function() {
                         done();
                     });
                 });
-                describe("Deleting moe profession bartender", function() {
+                fdescribe("Deleting moe profession bartender", function() {
                     beforeEach(function(done) {
                         h.sendCmd("DELETE WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
                             expect(data.status).toBe(true);
@@ -363,7 +364,7 @@ fdescribe("fzdb", function() {
                         done();
                     });
                 });
-                describe("that globally has only one name", function() {
+                fdescribe("that globally has only one name", function() {
                     beforeEach(function(done) {
                         h.sendCmd("DELETE WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
                             expect(data.status).toBe(true);
@@ -378,7 +379,7 @@ fdescribe("fzdb", function() {
                         });
                     });
                     it("Other properties still exist OK", function(done) {  //FIXME Apprantly deletes other associated property?
-                        pending("Known bug - will fix.");
+                        //pending("Known bug - will fix.");
                         h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <forename> $o}").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data).toEqual(h.resultTemplate([{o:'Moe'}]));

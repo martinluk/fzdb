@@ -355,7 +355,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 }
 
 // For each variable described in triple block delete it
-void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
+    void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
     using VariableType = model::types::SubType;
 
     //Get VariableSet from BGP
@@ -365,102 +365,101 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
     std::vector<std::string> variables = vs.getVariables();
     std::vector<VariableSetRow>::iterator rowIter;
 
-    //for(std::vector<std::string>::iterator selectLineIter=selectLine.begin(); selectLineIter!=selectLine.end(); ++selectLineIter)
     for(std::vector<std::string>::iterator varsIter=variables.begin(); varsIter!=variables.end(); ++varsIter){
         std::string var = *varsIter;
         std::cout << "variable " << var << std::endl;
         std::vector<VariableSetRow>::iterator rowIter;
 
-        int id = (int)vs.indexOf(var);
-        if(vs.contains(var) && vs.used(var))
-        {
+        if(vs.contains(var) && vs.used(var)) {
+            int variableSetId = (int)vs.indexOf(var);
             VariableType type = vs.typeOf(var);
+            std::vector<VariableSetRow> column = vs.extractRowsWith(variableSetId);
             if (type == VariableType::EntityRef) {
-                //The variable is entity.
-                assert(vs.contains(var));
-
-                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
                 std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
-                {
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
                     VariableSetRow row = *rowIter;
                     std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
-                    {
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
                         VariableSetValue value = *valueIter;
                         unsigned long long entityId = value.entity();
                         assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
                         //Check if the entity is linked.
-                        //auto linkGraph = getLinkGraph(entityId, std::set<Entity::EHandle_t>());
-                        spdlog::get("main")->info("has link graph ****** {}", entityId);
-                        //if (linkGraph.size() > 1) {
                         if (_links.find(entityId)!=_links.end()) {
                             //This entity has linkage, let's not delete it.
                             throw std::runtime_error("This entity currently has linkage with another entity, unlink them first.");
                         }
-                        spdlog::get("main")->info("after check ****** {}", entityId);
                         //Erasing the entity
-                        std::cout << "Erasing entity id " << entityId << std::endl;
                         spdlog::get("main")->info("Removing entityId {}", entityId);
                         _entities.erase(entityId);
                         //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
-
             } else if (type == VariableType::PropertyReference) {
                 //The variable is property
-                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
                 std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
-                {
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
                     VariableSetRow row = *rowIter;
                     std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
-                    {
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
                         VariableSetValue value = *valueIter;
-                        unsigned long long propertyId = value.property();
-                        unsigned long long entityId = value.entity();
+                        EHandle_t propertyId = value.property();
+                        EHandle_t entityId = value.entity();
                         //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
                         assert(entityId!=0);
                         assert(propertyId!=0);
+                        //TODO Get the entity
+                        assert(EntityExists(propertyId));
+                        auto e = _entities.at(entityId);
+                        assert(e->hasProperty(propertyId));
+                        //TODO Locate the property from entity
+                        //TODO Delete the property
+                        //TODO Remove all others
+
                         std::cout << "Erasing property id " << propertyId << "entitiyiD"<<entityId<< std::endl;
+                        //_propertyTypes.erase(propertyId); //TODO Check if empty
+                        //Check if Property is used elsewhere.
+                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                }
+            } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
+                std::cout << "of object" << std::endl; //TODO WHERE I am now!
                         /*
                          This is how it was added... I think.
                         for (auto val : values) {
                             std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
                             auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
-                            assert(record->_manager == this);
+                         kkkk   assert(record->_manager == this);
                             for (auto newRecord : newRecords)
                             {
                                 record->insertProperty(propertyId, newRecord);
                             }
                         }
-					*/
-                        _entities.erase(propertyId);
-                        //Check if Property is used elsewhere.
-                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
-                }
-            //} else if (type == VariableType::ValueReference) {
-            } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
-                std::cout << "of object" << std::endl;
-                //TODO Check if object is an entiy
-                std::vector<VariableSetRow> column = vs.extractRowsWith(id);
+                        */
                 std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) 
-                {
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
                     VariableSetRow row = *rowIter;
                     std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
-                    {
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
                         VariableSetValue value = *valueIter;
                         unsigned long long propertyId = value.property();
                         unsigned long long entityId = value.entity();
-                        //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
+                        assert(propertyId!=0);
                         assert(entityId!=0);
-                        std::cout << "Erasing value of entityid" <<entityId<<"PropID"<<propertyId<< std::endl;
+                        std::cout << "Object of entityid" <<entityId<<"PropID"<<propertyId<< std::endl;
                         //Check if Property is used elsewhere.
+                        /*
+                        auto values = variableSet.getData(variableSet.indexOf(triple.subject.value));
+                        for (auto val: values) {
+                            std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
+                        }
+                        */
+						
+                        //auto record = dereference(_entities.at(entityId), propertyId,value.
+                        //auto val_ptr = value->dataPointer();
+                        
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
+            } else if (type == VariableType::ValueReference) { //To my understanding ValueReference should not appear here?
+                throw std::runtime_error("Cannot delete type Valuereference.");
             } else if (type == VariableType::Undefined) {
                 throw std::runtime_error("Cannot delete type undefined.");
             } else {
