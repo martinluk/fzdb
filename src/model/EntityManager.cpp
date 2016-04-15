@@ -408,15 +408,17 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         assert(entityId!=0);
                         assert(propertyId!=0);
                         //TODO Get the entity
-                        assert(EntityExists(propertyId));
-                        auto e = _entities.at(entityId);
-                        assert(e->hasProperty(propertyId));
+                        //assert(EntityExists(propertyId)); //This causes map::at exception FIXME
+                        // auto e = _entities.at(entityId); //This cauases map::at exception 
                         //TODO Locate the property from entity
                         //TODO Delete the property
                         //TODO Remove all others
 
                         std::cout << "Erasing property id " << propertyId << "entitiyiD"<<entityId<< std::endl;
                         //_propertyTypes.erase(propertyId); //TODO Check if empty
+                        //_propertyNames.remove(propertyId); //TODO Check if empty
+                        _entities.erase(propertyId);
+
                         //Check if Property is used elsewhere.
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
@@ -445,13 +447,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         assert(propertyId!=0);
                         assert(entityId!=0);
                         std::cout << "Object of entityid" <<entityId<<"PropID"<<propertyId<< std::endl;
-                        //Check if Property is used elsewhere.
                         /*
                         auto values = variableSet.getData(variableSet.indexOf(triple.subject.value));
                         for (auto val: values) {
                             std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
                         }
-                        */
 						
                         //auto record = dereference(_entities.at(entityId), propertyId,value.
                         //auto val_ptr = value->dataPointer();

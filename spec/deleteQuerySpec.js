@@ -295,7 +295,6 @@ fdescribe("fzdb", function() {
             });
 
             describe("Deleting values", function() {
-                pending("one sec...");
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
                         expect(data.status).toBe(true);
@@ -310,7 +309,7 @@ fdescribe("fzdb", function() {
                         done();
                     });
                 });
-                fdescribe("Deleting moe profession bartender", function() {
+                describe("Deleting moe profession bartender", function() {
                     beforeEach(function(done) {
                         h.sendCmd("DELETE WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
                             expect(data.status).toBe(true);
@@ -336,7 +335,6 @@ fdescribe("fzdb", function() {
 
                 });
             });
-
             describe("Deleting properties",function() {
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $p WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
@@ -364,9 +362,13 @@ fdescribe("fzdb", function() {
                         done();
                     });
                 });
-                fdescribe("that globally has only one name", function() {
+                describe("that globally has only one name", function() {
                     beforeEach(function(done) {
                         h.sendCmd("DELETE WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
+                            if (!data.status) {
+                                console.log("Delete query got false status, here is why.");
+                                console.log(data);
+                            }
                             expect(data.status).toBe(true);
                             done();
                         });
@@ -374,12 +376,11 @@ fdescribe("fzdb", function() {
                     it("return nothing when selected", function(done) {
                         h.sendCmd("SELECT $p WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
                             expect(data.status).toBe(true);
-                            expect(Object.keys(data.result.data).length).toBe(0);
+                            expect(data).toEqual(h.resultTemplate([]));
                             done();
                         });
                     });
                     it("Other properties still exist OK", function(done) {  //FIXME Apprantly deletes other associated property?
-                        //pending("Known bug - will fix.");
                         h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <forename> $o}").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data).toEqual(h.resultTemplate([{o:'Moe'}]));
@@ -387,6 +388,7 @@ fdescribe("fzdb", function() {
                         });
                     });
                     it("Adding back does not break the system", function(done) {
+                            pending("Test waiting to be implemented.");
                         h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
                             //expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
                             done();
@@ -441,8 +443,6 @@ fdescribe("fzdb", function() {
                         });
                     });
                     it("Szyslak profession is still Bartender", function(done) {
-                        //FIXME Returns nothing - probably got deleted too
-                        pending("Known bug - will fix.");
                         h.sendCmd("SELECT $s WHERE { entity:"+moeId+" <profession> $s}").then(function(data) {
                             expect(data).toEqual(h.resultTemplate([({s:'Bartender'})]));
                             done();
