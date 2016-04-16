@@ -294,7 +294,7 @@ fdescribe("fzdb", function() {
                 });
             });
 
-            describe("Deleting values", function() {
+            fdescribe("Deleting values", function() {
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
                         expect(data.status).toBe(true);
@@ -335,7 +335,7 @@ fdescribe("fzdb", function() {
 
                 });
             });
-            fdescribe("Deleting properties",function() {
+            describe("Deleting properties",function() {
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $p WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
                         expect(data.status).toBe(true);

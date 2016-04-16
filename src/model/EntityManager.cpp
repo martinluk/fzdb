@@ -434,33 +434,6 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
                 
-                    /*
-                std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-                    VariableSetRow row = *rowIter;
-                    std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
-                        VariableSetValue value = *valueIter;
-                        EHandle_t propertyId = value.property();
-                        //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
-                        assert(entityId!=0);
-                        assert(propertyId!=0);
-                        //TODO Get the entity
-                        assert(EntityExists(entityId)); //This causes map::at exception FIXME
-                        //auto e = _entities.at(entityId); //This cauases map::at exception 
-                        //TODO Locate the property from entity
-                        //TODO Delete the property
-                        //TODO Remove all others
-
-                        std::cout << "Erasing property id " << propertyId << "entitiyiD"<<entityId<< std::endl;
-                        //_propertyTypes.erase(propertyId); //TODO Check if empty
-                        //_propertyNames.remove(propertyId); //TODO Check if empty
-                        _entities.erase(propertyId);
-
-                        //Check if Property is used elsewhere.
-                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
-                }
-                        */
             } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
                 std::cout << "of object" << std::endl; //TODO WHERE I am now!
                         /*
