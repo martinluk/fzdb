@@ -469,6 +469,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
             *iter++;
             type = QueryType::DEBUGECHO;
 
+
             if (iter != tokens.end()) {
                 data0 = iter->second;
                 *iter++;
@@ -612,17 +613,13 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 
         if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
             //Sample query 
-            //Delete $a WHERE {$a 'surname' 'Fred'}
+            //Delete WHERE {$a 'surname' 'Fred'}
             iter++;
             type = QueryType::DELETECMD;
             if (iter != tokens.end()) {
-                if (iter->first.type == ParsedTokenType::KEYWORD_CANON) {
-                    canon.canon = true;
-                    iter++; 
-                }
-                selectLine = ParseSelectLine(std::move(iter), tokens.end());
                 if (iter != tokens.end() && iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
-                    iter++; whereClause = ParseInsert(std::move(iter), tokens.end());
+                    iter++;
+                    whereClause = ParseInsert(std::move(iter), tokens.end());
                 }
                 else { throw ParseException("Expected 'WHERE' at delete statement."); }
             }

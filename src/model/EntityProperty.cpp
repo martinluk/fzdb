@@ -202,6 +202,20 @@ void EntityProperty::remove(const model::types::Base &value)
 	_valuesList.erase(std::remove_if(_valuesList.begin(), _valuesList.end(), model::types::ValuesEqualOnly(&value)), _valuesList.end());
 }
 
+void EntityProperty::remove(const int orderingId) {
+    //Removes entries whose orderingId matches the one in parameter.
+    //Iterating over the _valuesList and check 
+    //TODO Potential optimisation: use the remove_if above, it looks so cool.
+    std::vector<BasePointer>::iterator iter;
+    for(iter=_valuesList.begin() ; iter!=_valuesList.end(); ++iter) {
+        BasePointer e = *iter;
+        if(e->OrderingId() == orderingId) {
+            _valuesList.erase(iter);
+            return;
+        }
+    }
+}
+
 bool EntityProperty::memberwiseEqual(const EntityProperty *other) const
 {
     if ( _key != other->_key ||

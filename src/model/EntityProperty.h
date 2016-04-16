@@ -91,6 +91,9 @@ public:
     // This ignores the confidence of the value.
     void remove(const model::types::Base &value);
     
+    //Removes entries whose orderingId matches the one in parameter.
+    void remove(const int orderingId);
+
     virtual std::string logString(const Database* db = NULL) const override;
 
     bool memberwiseEqual(const EntityProperty* other) const;
