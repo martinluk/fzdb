@@ -397,20 +397,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             } else if (type == VariableType::PropertyReference) {
                 //The item that we want to delete is property
                 //The deletion will cause deleting this property on all entities
-                //I **think** BGP, will return all entities that have this property
+                //BGP will return all entities that have this property
                 //We will first iterate through BGP VariableSet to get all entities with this property
                 //Then access the std::shared_ptr<Entity> 
                 //Then access its property owner
                 //Then delete the property.
-
-                /*
-                EHandle_t propertyId = value.property();
-                for(std::vector<std::shared_ptr<Entity>>::iterator it=entityList().begin();
-                        it!=entityList().end(); ++it) {
-                    std::shared_ptr<Entity> e = *it;
-                    if(e.hasProperty
-                }
-                */
 
                 std::vector<VariableSetRow>::iterator rowIter;
                 for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
@@ -422,54 +413,40 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         //Proceed with caution. 
                         unsigned long long propertyId = value.entity(); //XXX See above caution.
                         unsigned long long entityId = value.property(); //XXX See above caution.
-                        std::cout << "property id: " << propertyId << "entitiyid:"<< entityId<< std::endl;
+                        //TODO Use preprocessor - if debug build use assert, release build throws exception.
                         assert(entityId!=0);
                         assert(propertyId!=0);
                         assert(EntityExists(entityId));
                         std::shared_ptr<Entity> e = _entities.at(entityId);
                         assert(e->hasProperty(propertyId,MatchState::None)) ;
-                        std::shared_ptr<EntityProperty> ep =  e->getProperty(propertyId);
                         e->removeProperty(propertyId);
-
-                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                    }
+                    //TODO Remove PropertyName and propertyType 
                 }
                 
             } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
-                std::cout << "of object" << std::endl; //TODO WHERE I am now!
-                        /*
-                         This is how it was added... I think.
-                        for (auto val : values) {
-                            std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
-                            auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
-                         kkkk   assert(record->_manager == this);
-                            for (auto newRecord : newRecords)
-                            {
-                                record->insertProperty(propertyId, newRecord);
-                            }
-                        }
-                        */
+
                 std::vector<VariableSetRow>::iterator rowIter;
                 for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
                     VariableSetRow row = *rowIter;
                     std::vector<VariableSetValue>::iterator valueIter;
                     for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
                         VariableSetValue value = *valueIter;
-                        unsigned long long propertyId = value.property();
-                        unsigned long long entityId = value.entity();
-                        assert(propertyId!=0);
+                        std::shared_ptr<model::types::Base> val_ptr = value.dataPointer();
+                        unsigned long long entityId = value.entity(); //XXX See above caution.
+                        unsigned long long propertyId = value.property(); //XXX See above caution.
+                        int orderingId = val_ptr->OrderingId();
                         assert(entityId!=0);
-                        std::cout << "Object of entityid" <<entityId<<"PropID"<<propertyId<< std::endl;
-                        /*
-                        auto values = variableSet.getData(variableSet.indexOf(triple.subject.value));
-                        for (auto val: values) {
-                            std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
-                        }
-						
-						*/
-                        //auto record = dereference(_entities.at(entityId), propertyId,value.
-                        //auto val_ptr = value->dataPointer();
-                        
-                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                        assert(propertyId!=0);
+                        assert(EntityExists(entityId));
+                        std::shared_ptr<Entity> e = _entities.at(entityId);
+                        assert(e->hasProperty(propertyId,MatchState::None)) ;
+                        std::shared_ptr<EntityProperty> ep =  e->getProperty(propertyId);
+                        model::types::Base* val_o= val_ptr.get();
+                        model::types::Base v = *val_ptr.get();
+                        ep->remove(v);
+                        //TODO If EntityProperty is now empty, delete it too.
+                    }
                 }
             } else if (type == VariableType::ValueReference) { //To my understanding ValueReference should not appear here?
                 throw std::runtime_error("Cannot delete type Valuereference.");
