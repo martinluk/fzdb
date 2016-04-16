@@ -355,8 +355,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 }
 
 // For each variable described in triple block delete it
-void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
+std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
     using VariableType = model::types::SubType;
+
+    //Records number of deletion in subject, property, and object.
+    std::tuple<int,int,int> result = std::make_tuple(0,0,0);
 
     //Get VariableSet from BGP
     //Iterating over the returned variable set
@@ -396,6 +399,7 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
                         //Erasing the entity
                         spdlog::get("main")->info("Removing entityId {}", entityId);
                         _entities.erase(entityId);
+                        std::get<0>(result) = std::get<0>(result)+1;
                     } else if (type == VariableType::PropertyReference) {
                         //The item that we want to delete is property
                         //The deletion will cause deleting this property on all entities
@@ -419,6 +423,7 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
                         spdlog::get("main")->info("Removing property of name {}", _propertyNames.get(propertyId));
                         _propertyNames.remove(propertyId);
                         _propertyTypes.erase(propertyId);
+                        std::get<1>(result) = std::get<1>(result)+1;
                     } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
                         std::shared_ptr<model::types::Base> val_ptr = value.dataPointer();
                         int orderingId = val_ptr->OrderingId();
@@ -433,6 +438,7 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
                         if(ep->isEmpty()) {
                             e->removeProperty(propertyId);
                         }
+                        std::get<2>(result) = std::get<2>(result)+1;
                     } else if (type == VariableType::ValueReference) { //To my understanding ValueReference should not appear here?
                         throw std::runtime_error("Cannot delete type Valuereference.");
                     } else if (type == VariableType::Undefined) {
@@ -446,6 +452,7 @@ void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
             }
         } //END if(vs.contains(var) && vs.used(var))
     }//End variable for loop
+    return result;
 }
 
 bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
