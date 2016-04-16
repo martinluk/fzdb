@@ -1,7 +1,7 @@
 var net = require('net');
 var h = require('./support/helper.js');
 
-fdescribe("fzdb", function() {
+describe("fzdb", function() {
     beforeEach(function(done) {
         h.setupClient();
         h.sendCmd(h.loginToAdminQuery).then(function(data) {
@@ -294,7 +294,7 @@ fdescribe("fzdb", function() {
                 });
             });
 
-            fdescribe("Deleting values", function() {
+            describe("Deleting values", function() {
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
                         expect(data.status).toBe(true);

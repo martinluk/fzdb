@@ -444,7 +444,8 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         std::shared_ptr<EntityProperty> ep =  e->getProperty(propertyId);
                         model::types::Base* val_o= val_ptr.get();
                         model::types::Base v = *val_ptr.get();
-                        ep->remove(v);
+                        //ep->remove(v);
+                        ep->remove(orderingId);
                         //TODO If EntityProperty is now empty, delete it too.
                     }
                 }
