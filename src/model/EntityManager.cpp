@@ -395,7 +395,46 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
             } else if (type == VariableType::PropertyReference) {
-                //The variable is property
+                //The item that we want to delete is property
+                //The deletion will cause deleting this property on all entities
+                //I **think** BGP, will return all entities that have this property
+                //We will first iterate through BGP VariableSet to get all entities with this property
+                //Then access the std::shared_ptr<Entity> 
+                //Then access its property owner
+                //Then delete the property.
+
+                /*
+                EHandle_t propertyId = value.property();
+                for(std::vector<std::shared_ptr<Entity>>::iterator it=entityList().begin();
+                        it!=entityList().end(); ++it) {
+                    std::shared_ptr<Entity> e = *it;
+                    if(e.hasProperty
+                }
+                */
+
+                std::vector<VariableSetRow>::iterator rowIter;
+                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
+                    VariableSetRow row = *rowIter;
+                    std::vector<VariableSetValue>::iterator valueIter;
+                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
+                        VariableSetValue value = *valueIter;
+                        //XXX A few tests that was done returned propertyId as the entityId swapped
+                        //Proceed with caution. 
+                        unsigned long long propertyId = value.entity(); //XXX See above caution.
+                        unsigned long long entityId = value.property(); //XXX See above caution.
+                        std::cout << "property id: " << propertyId << "entitiyid:"<< entityId<< std::endl;
+                        assert(entityId!=0);
+                        assert(propertyId!=0);
+                        assert(EntityExists(entityId));
+                        std::shared_ptr<Entity> e = _entities.at(entityId);
+                        assert(e->hasProperty(propertyId,MatchState::None)) ;
+                        std::shared_ptr<EntityProperty> ep =  e->getProperty(propertyId);
+                        e->removeProperty(propertyId);
+
+                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
+                }
+                
+                    /*
                 std::vector<VariableSetRow>::iterator rowIter;
                 for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
                     VariableSetRow row = *rowIter;
@@ -403,13 +442,12 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                     for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
                         VariableSetValue value = *valueIter;
                         EHandle_t propertyId = value.property();
-                        EHandle_t entityId = value.entity();
                         //assert(propertyId!=0 We have known the value is property, yet propertyId is not set at VarlableSetValue.);
                         assert(entityId!=0);
                         assert(propertyId!=0);
                         //TODO Get the entity
-                        //assert(EntityExists(propertyId)); //This causes map::at exception FIXME
-                        // auto e = _entities.at(entityId); //This cauases map::at exception 
+                        assert(EntityExists(entityId)); //This causes map::at exception FIXME
+                        //auto e = _entities.at(entityId); //This cauases map::at exception 
                         //TODO Locate the property from entity
                         //TODO Delete the property
                         //TODO Remove all others
@@ -422,6 +460,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         //Check if Property is used elsewhere.
                     }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
                 }
+                        */
             } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
                 std::cout << "of object" << std::endl; //TODO WHERE I am now!
                         /*
@@ -453,6 +492,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                             std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
                         }
 						
+						*/
                         //auto record = dereference(_entities.at(entityId), propertyId,value.
                         //auto val_ptr = value->dataPointer();
                         

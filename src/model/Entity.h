@@ -68,6 +68,7 @@ public:
 	void insertProperty(unsigned int key, std::shared_ptr<model::types::Base> object, MatchState state = MatchState::None,
 		EntityProperty::Type propType = EntityProperty::Type::FUZZY) override;
 
+    void removeProperty(const unsigned int & key) ;
 private:
     void initMemberSerialiser();
 

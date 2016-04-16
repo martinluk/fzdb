@@ -72,6 +72,11 @@ std::shared_ptr<EntityProperty> Entity::getProperty(const unsigned int & key) co
 	return PropertyOwner::getProperty(key);	
 }
 
+void Entity::removeProperty(const unsigned int & key)
+{
+	PropertyOwner::removeProperty(key);	
+}
+
 void Entity::insertProperty(std::shared_ptr<EntityProperty> prop, MatchState state)
 {
 	switch (prop->key()) {

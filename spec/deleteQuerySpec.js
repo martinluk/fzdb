@@ -335,7 +335,7 @@ fdescribe("fzdb", function() {
 
                 });
             });
-            describe("Deleting properties",function() {
+            fdescribe("Deleting properties",function() {
                 it("existence before deleting", function(done) {
                     h.sendCmd("SELECT $p WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
                         expect(data.status).toBe(true);
