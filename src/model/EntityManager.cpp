@@ -388,6 +388,21 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, Query
                     unsigned long long propertyId = value.property(); 
                     if (type==VariableType::EntityRef) {
                         //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
+                        const std::string e_name= std::string("entity:")+std::to_string(entityId);
+                        const std::string p_name = "$p";
+                        const std::string o_name = "$o";
+                        TriplesBlock tb;
+                        tb.variables.insert(p_name);
+                        tb.variables.insert(o_name);
+                        model::Triple trip(model::Subject(model::Subject::Type::ENTITYREF,e_name),
+                                    model::Predicate(model::Predicate::Type::VARIABLE,p_name),
+                                    model::Object(model::Object::Type::VARIABLE, o_name));
+                        tb.Add(std::move(trip));
+
+                        auto intermediate = Delete(std::move(tb),std::move(settings));
+                        std::get<0>(result) = std::get<0>(intermediate)+std::get<0>(result);
+                        std::get<1>(result) = std::get<1>(intermediate)+std::get<1>(result);
+                        std::get<2>(result) = std::get<2>(intermediate)+std::get<2>(result);
 
                         assert(entityId!=0);
                         assert(EntityExists(entityId));

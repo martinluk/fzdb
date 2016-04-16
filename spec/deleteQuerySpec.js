@@ -356,7 +356,6 @@ describe("fzdb", function() {
                 it("no error when deleting forename",function(done) {
                     h.sendCmd("DELETE WHERE { entity:"+moeId+" $p \"Moe\"}").then(function(data) {
                         expect(data.status).toBe(true);
-                        console.log(data);
                         done();
                     });
                 });
