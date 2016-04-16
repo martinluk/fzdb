@@ -355,7 +355,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 }
 
 // For each variable described in triple block delete it
-    void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
+void EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
     using VariableType = model::types::SubType;
 
     //Get VariableSet from BGP
@@ -374,15 +374,20 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             int variableSetId = (int)vs.indexOf(var);
             VariableType type = vs.typeOf(var);
             std::vector<VariableSetRow> column = vs.extractRowsWith(variableSetId);
-            if (type == VariableType::EntityRef) {
-                std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-                    VariableSetRow row = *rowIter;
-                    std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
-                        VariableSetValue value = *valueIter;
-                        unsigned long long entityId = value.entity();
-                        assert(entityId!=0 /*We have known the value is entity, yet entityId is not set at VarlableSetValue.*/);
+            //Refactor section begin
+            std::vector<VariableSetRow>::iterator rowIter;
+            for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
+                VariableSetRow row = *rowIter;
+                std::vector<VariableSetValue>::iterator valueIter;
+                for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
+                    VariableSetValue value = *valueIter;
+                    unsigned long long entityId = value.entity();
+                    unsigned long long propertyId = value.property(); 
+                    if (type==VariableType::EntityRef) {
+                        //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
+
+                        assert(entityId!=0);
+                        assert(EntityExists(entityId));
                         //Check if the entity is linked.
                         if (_links.find(entityId)!=_links.end()) {
                             //This entity has linkage, let's not delete it.
@@ -391,50 +396,31 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         //Erasing the entity
                         spdlog::get("main")->info("Removing entityId {}", entityId);
                         _entities.erase(entityId);
-                        //TODO Remove all properties that are link to the entity getting deleted, by constructing a query and recursively call delete.
-                    }//END of value iter for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) 
-                }
-            } else if (type == VariableType::PropertyReference) {
-                //The item that we want to delete is property
-                //The deletion will cause deleting this property on all entities
-                //BGP will return all entities that have this property
-                //We will first iterate through BGP VariableSet to get all entities with this property
-                //Then access the std::shared_ptr<Entity> 
-                //Then access its property owner
-                //Then delete the property.
-
-                std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-                    VariableSetRow row = *rowIter;
-                    std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
-                        VariableSetValue value = *valueIter;
+                    } else if (type == VariableType::PropertyReference) {
+                        //The item that we want to delete is property
+                        //The deletion will cause deleting this property on all entities
+                        //BGP will return all entities that have this property
+                        //We will first iterate through BGP VariableSet to get all entities with this property
+                        //Then access the std::shared_ptr<Entity> 
+                        //Then access its property owner
+                        //Then delete the property.
+        
                         //XXX A few tests that was done returned propertyId as the entityId swapped
                         //Proceed with caution. 
-                        unsigned long long propertyId = value.entity(); //XXX See above caution.
-                        unsigned long long entityId = value.property(); //XXX See above caution.
-                        //TODO Use preprocessor - if debug build use assert, release build throws exception.
+                        propertyId = value.entity(); //XXX See above caution.
+                        entityId = value.property(); //XXX See above caution.
                         assert(entityId!=0);
                         assert(propertyId!=0);
                         assert(EntityExists(entityId));
                         std::shared_ptr<Entity> e = _entities.at(entityId);
                         assert(e->hasProperty(propertyId,MatchState::None)) ;
                         e->removeProperty(propertyId);
-                    }
-                    //TODO Remove PropertyName and propertyType 
-                }
-                
-            } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
-
-                std::vector<VariableSetRow>::iterator rowIter;
-                for(rowIter=vs.begin(); rowIter!=vs.end(); rowIter++) {
-                    VariableSetRow row = *rowIter;
-                    std::vector<VariableSetValue>::iterator valueIter;
-                    for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
-                        VariableSetValue value = *valueIter;
+                        //Remove PropertyName and propertyType 
+                        spdlog::get("main")->info("Removing property of name {}", _propertyNames.get(propertyId));
+                        _propertyNames.remove(propertyId);
+                        _propertyTypes.erase(propertyId);
+                    } else if (type == VariableType::Int32 || type == VariableType::String || type == VariableType::Date) {
                         std::shared_ptr<model::types::Base> val_ptr = value.dataPointer();
-                        unsigned long long entityId = value.entity(); //XXX See above caution.
-                        unsigned long long propertyId = value.property(); //XXX See above caution.
                         int orderingId = val_ptr->OrderingId();
                         assert(entityId!=0);
                         assert(propertyId!=0);
@@ -442,26 +428,22 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                         std::shared_ptr<Entity> e = _entities.at(entityId);
                         assert(e->hasProperty(propertyId,MatchState::None)) ;
                         std::shared_ptr<EntityProperty> ep =  e->getProperty(propertyId);
-                        model::types::Base* val_o= val_ptr.get();
-                        model::types::Base v = *val_ptr.get();
-                        //ep->remove(v);
                         ep->remove(orderingId);
-                        //TODO If EntityProperty is now empty, delete it too.
+                        //If EntityProperty is now empty, delete it too.
+                        if(ep->isEmpty()) {
+                            e->removeProperty(propertyId);
+                        }
+                    } else if (type == VariableType::ValueReference) { //To my understanding ValueReference should not appear here?
+                        throw std::runtime_error("Cannot delete type Valuereference.");
+                    } else if (type == VariableType::Undefined) {
+                        throw std::runtime_error("Cannot delete type undefined.");
+                    } else {
+                        //There is a new variable type that has been used in query but not implemented delete method.
+                        throw std::runtime_error("Delete query found variable that was used, but delete method did not implement for the specific type.");
                     }
-                }
-            } else if (type == VariableType::ValueReference) { //To my understanding ValueReference should not appear here?
-                throw std::runtime_error("Cannot delete type Valuereference.");
-            } else if (type == VariableType::Undefined) {
-                throw std::runtime_error("Cannot delete type undefined.");
-            } else {
-                //There is a new variable type that has been used in query but not implemented delete method.
-                throw std::runtime_error("Delete query found variable that was used, but delete method did not implement for the specific type.");
-            }
 
-        } else {
-            //Variable in this variable is not used.
-            std::cout << "Select line contains variable " << var << " that is not contained and used." << std::endl;
-            //Since variable not used, can be ignored.
+                }
+            }
         } //END if(vs.contains(var) && vs.used(var))
     }//End variable for loop
 }

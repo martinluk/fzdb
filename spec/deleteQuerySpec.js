@@ -236,9 +236,6 @@ describe("fzdb", function() {
                 });
             });
 		});
-        describe("Merged query:", function() {
-            pending("Test awaiting to be implemented");
-        });
 		describe("Entities with properties and values:", function() {
 		    var moeId;
 		    var reusId;
@@ -356,7 +353,7 @@ describe("fzdb", function() {
                         done();
                     });
                 });
-                it("no error when deleting profession",function(done) {
+                it("no error when deleting forename",function(done) {
                     h.sendCmd("DELETE WHERE { entity:"+moeId+" $p \"Moe\"}").then(function(data) {
                         expect(data.status).toBe(true);
                         done();
@@ -380,7 +377,7 @@ describe("fzdb", function() {
                             done();
                         });
                     });
-                    it("Other properties still exist OK", function(done) {  //FIXME Apprantly deletes other associated property?
+                    it("Other properties still exist OK", function(done) {
                         h.sendCmd("SELECT $o WHERE { entity:"+moeId+" <forename> $o}").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data).toEqual(h.resultTemplate([{o:'Moe'}]));
@@ -388,9 +385,8 @@ describe("fzdb", function() {
                         });
                     });
                     it("Adding back does not break the system", function(done) {
-                            pending("Test waiting to be implemented.");
-                        h.sendCmd("SELECT $a WHERE { $a <forename> \"Marco\"}").then(function(data) {
-                            //expect(data).toEqual(({status: true, errorCode: 0, info:'', result: ({type: 'fsparql', data:[({ a: '2'}), ({a: '4'})]})}));
+                        h.sendCmd("INSERT DATA { entity:"+moeId+" <profession> \"Bartender\"}").then(function(data) {
+                            expect(data.status).toBe(true);
                             done();
                         });
                     });
