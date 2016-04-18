@@ -42,7 +42,7 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const
     // Push back the appropriate amount of dummy entry headers.
     EntryHeader eHeader;
     Serialiser::zeroBuffer(&eHeader, sizeof(EntryHeader));
-    for ( int i = 0; i < header.count; i++ )
+    for ( std::size_t i = 0; i < header.count; i++ )
     {
         propList.push_back(Serialiser::SerialProperty(&eHeader, sizeof(EntryHeader)));
     }
@@ -107,20 +107,20 @@ void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t le
 	_nameManager->_idGen._count = pHeader->nameMapCount;
 
     const EntryHeader* eHeader = reinterpret_cast<const EntryHeader*>(serialisedData + sizeof(NameManagerSerialHeader));
-    for ( int i = 0; i < pHeader->count; i++ )
+    for ( std::size_t i = 0; i < pHeader->count; i++ )
     {
         const EntryHeader* e = &(eHeader[i]);
-        if ( (const char*)e - serialisedData >= length )
+        if ( static_cast<std::size_t>((const char*)e - serialisedData) >= length )
             throw InvalidInputStringTableException("Header start for string " + std::to_string(i) + " exceeds length of input data.");
         
         const char* data = serialisedData + e->offset;
-        if ( data - serialisedData >= length )
+        if (static_cast<std::size_t>(data - serialisedData) >= length )
             throw InvalidInputStringTableException("Data start for string " + std::to_string(i) + " exceeds length of input data.");
         
-        if ( e->offset + e->stringSize > length )
+        if (static_cast<std::size_t>(e->offset + e->stringSize) > length )
             throw InvalidInputStringTableException("Length of string " + std::to_string(i) + " exceeds length of input data.");
         
-        if ( e->stringSize > 0 && *(data + sizeof(int) + e->stringSize - 1) != '\0' )
+        if (e->stringSize > 0 && *(data + sizeof(int) + e->stringSize - 1) != '\0' )
             throw InvalidInputStringTableException("String " + std::to_string(i) + " is not null-terminated.");
         
         const unsigned int* id = reinterpret_cast<const unsigned int*>(data);

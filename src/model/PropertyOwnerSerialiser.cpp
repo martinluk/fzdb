@@ -72,7 +72,7 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const
     std::vector<Serialiser::SerialProperty> propList;
     propList.push_back(Serialiser::SerialProperty(&header, sizeof(PropertyOwnerSerialHeader)));
 
-    for ( int i = 0; i < header.propertyCount; i++ )
+    for ( std::size_t i = 0; i < header.propertyCount; i++ )
     {
         propList.push_back(Serialiser::SerialProperty(&phPlaceholder, sizeof(PropertyHeader)));
     }
@@ -107,7 +107,7 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const
         std::shared_ptr<EntityProperty> prop = it->second;
 
         // Serialise each value.
-        for ( int i = 0; i < prop->count(); i++ )
+        for (std::size_t i = 0; i < prop->count(); i++ )
         {
             TypeSerialiser typeSerialiser(prop->baseValue(i));
 			propSerialisedSize += typeSerialiser.serialise(serialiser);
@@ -141,7 +141,7 @@ void populate(std::shared_ptr<PropertyOwner> ent, const PropertyHeader* header, 
     using namespace model::types;
 
     std::vector<BasePointer> values;
-    for ( int i = 0; i < header->valueCount; i++ )
+    for (std::size_t i = 0; i < header->valueCount; i++ )
     {
         std::size_t advance = 0;
         BasePointer val = TypeSerialiser::unserialise(data, &advance);
@@ -207,7 +207,7 @@ std::shared_ptr<PropertyOwner> PropertyOwnerSerialiser::unserialise(const char* 
 
     // Unserialise the properties.
     const PropertyHeader* pPropHeaders = reinterpret_cast<const PropertyHeader*>(serialData + sizeof(PropertyOwnerSerialHeader));
-    for ( int i = 0; i < pHeader->propertyCount; i++ )
+    for (std::size_t i = 0; i < pHeader->propertyCount; i++ )
     {
         // Get the header for this property.
         const PropertyHeader* p = &(pPropHeaders[i]);

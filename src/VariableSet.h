@@ -190,7 +190,7 @@ public:
 		return _size;
 	}
 
-	unsigned int height() const {
+	std::size_t height() const {
 		return _values.size();
 	}
 

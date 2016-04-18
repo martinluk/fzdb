@@ -635,7 +635,7 @@ std::string EntityManager::dumpContents() const
                 {
                     str << "  {\n";
                     
-                    for ( int i = 0; i < prop->count(); i++ )
+                    for (std::size_t i = 0; i < prop->count(); i++ )
                     {
                         BasePointer val = prop->baseValue(i);
                         str << "    " << val->logString(_database) << "\n";

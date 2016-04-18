@@ -94,7 +94,7 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
     EntityHeader dummyHeader;
     Serialiser::zeroBuffer(&dummyHeader, sizeof(EntityHeader));
 
-    for ( int i = 0; i < edHeader.entityCount; i++ )
+    for ( std::size_t i = 0; i < edHeader.entityCount; i++ )
     {
         serialiser.serialise(Serialiser::SerialProperty(&dummyHeader, sizeof(EntityHeader)));
     }
@@ -103,7 +103,7 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const
 
     // Serialise each entity.
     std::size_t rawEntByteCount = 0;
-    for ( int i = 0; i < edHeader.entityCount; i++ )
+    for (std::size_t i = 0; i < edHeader.entityCount; i++ )
     {
         // Serialise the entity.
         EntitySerialiser eSer(entList[i]);
@@ -150,14 +150,14 @@ void GraphSerialiser::unserialise(const char *serialisedData, std::size_t length
         const EntityDataHeader* pEntData = reinterpret_cast<const EntityDataHeader*>(serialisedData + pHeader->entityDataOffset);
         const EntityHeader* pEntHeaders = reinterpret_cast<const EntityHeader*>(pEntData + 1);
         _manager->_entities.clear();
-        for ( int i = 0; i < pEntData->entityCount; i++ )
+        for (std::size_t i = 0; i < pEntData->entityCount; i++ )
         {
             const EntityHeader* pEntHeader = &(pEntHeaders[i]);
-            if ( (const char*)pEntHeader - serialisedData >= length )
+            if ( static_cast<std::size_t>((const char*)pEntHeader - serialisedData) >= length )
             throw InvalidInputGraphException("Header start for entity " + std::to_string(i) + " exceeds length of input data.");
             
             const char* data = reinterpret_cast<const char*>(pEntData) + pEntHeader->offset;
-            if ( data - serialisedData >= length )
+            if ( static_cast<std::size_t>(data - serialisedData) >= length )
             throw InvalidInputGraphException("Data start for entity " + std::to_string(i) + " exceeds length of input data.");
             
             if ( pEntHeader->offset + pEntHeader->size > length )
@@ -206,19 +206,19 @@ void GraphSerialiser::unserialise(std::map<Entity::EHandle_t, std::set<Entity::E
 
     const std::size_t* pCount = reinterpret_cast<const std::size_t*>(data);
     data += sizeof(std::size_t);
-    if ( data - serialisedData > length )
+    if ( static_cast<std::size_t>(data - serialisedData) > length )
         throw InvalidInputGraphException("Entity link table input is not long enough to contain header.");
 
     for ( std::size_t i = 0; i < *pCount; i++ )
     {
         const Entity::EHandle_t* pKey = reinterpret_cast<const Entity::EHandle_t*>(data);
         data += sizeof(Entity::EHandle_t);
-        if ( data - serialisedData >= length )
+        if ( static_cast<std::size_t>(data - serialisedData) >= length )
             throw InvalidInputGraphException("Entity link table input " + std::to_string(i) + " exceeded length of input data.");
 
         const std::size_t* pNumValues = reinterpret_cast<const std::size_t*>(data);
         data += sizeof(std::size_t);
-        if ( data - serialisedData > length )
+        if (static_cast<std::size_t>(data - serialisedData) > length )
             throw InvalidInputGraphException("Entity link table input " + std::to_string(i) + " exceeded length of input data.");
 
         std::set<Entity::EHandle_t> set;
@@ -226,7 +226,7 @@ void GraphSerialiser::unserialise(std::map<Entity::EHandle_t, std::set<Entity::E
         {
             const Entity::EHandle_t* val = reinterpret_cast<const Entity::EHandle_t*>(data);
             data += sizeof(Entity::EHandle_t);
-            if ( data - serialisedData > length )
+            if (static_cast<std::size_t>(data - serialisedData) > length )
                 throw InvalidInputGraphException("Entity link table value " + std::to_string(j) + " of input "
                                                  + std::to_string(i) + " exceeded length of input data.");
 

@@ -39,7 +39,7 @@ public:
 
         // Returns a reinterpret_cast of the given byte of data.
         template <typename T>
-        T reinterpretCast(int index)
+        T reinterpretCast(const std::size_t index)
         {
             return reinterpret_cast<T>(begin() + index);
         }

@@ -60,7 +60,7 @@ unsigned int EntityProperty::key() const
 }
 
 
-unsigned int EntityProperty::count() const
+std::size_t EntityProperty::count() const
 {
 	return _valuesList.size();
 }

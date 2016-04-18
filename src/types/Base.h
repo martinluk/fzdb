@@ -41,7 +41,7 @@ namespace model {
 
 			void Init(const unsigned char confidence);
 
-			virtual void setupDefaultMetaData(unsigned char confidence);
+			virtual void setupDefaultMetaData(const unsigned char confidence);
             
 			virtual ~Base();
 

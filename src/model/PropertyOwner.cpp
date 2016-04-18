@@ -35,6 +35,7 @@ void PropertyOwner::removeProperty(const unsigned int &key) {
   }
   catch (const std::out_of_range &ex)
   {
+	  //TODO : catch this?
   }
 }
 

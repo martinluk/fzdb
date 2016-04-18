@@ -328,7 +328,11 @@ TriplesBlock FSparqlParser::ParseTriples(TokenIterator&& iter, TokenIterator end
                     o = model::Object(objType, iter->second);
                 }
                 else {
-                    o = model::Object(objType, iter->second, std::stoul(confidence));
+					unsigned long conf = std::stoul(confidence);
+					if (conf < 0 || conf > 100) {
+						throw ParseException("Confidence values must be integers between 0 and 100");
+					}
+                    o = model::Object(objType, iter->second, static_cast<char>(conf));
                 }
                 
                 if (!inMetaBlock) {

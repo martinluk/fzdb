@@ -49,7 +49,7 @@ namespace model
             };
 
 			static unsigned char diffFunc(const Date_t date1, const Date_t date2) {
-				return 100 / ((0.025*(abs((long long int)date1 - (long long int)date2))) + 1);
+				return static_cast<unsigned char>(std::lround(100 / ((0.025*(abs((long long int)date1 - (long long int)date2))) + 1)));
 			}
 
             static Date_t encode(const StructuredDate &sd)
@@ -65,19 +65,19 @@ namespace model
             
             static StructuredDate decode(Date_t g)
             {
-                int y = (((10000*g + 14780)/3652425));
-                int ddd = g - (365*y + (y/4) - (y/100) + (y/400));
+				Date_t y = (((10000*g + 14780)/3652425));
+				Date_t ddd = g - (365*y + (y/4) - (y/100) + (y/400));
                 if (ddd < 0)
                 {
                     y = y - 1;
                     ddd = g - (365*y + (y/4) - (y/100) + (y/400));
                 }
-                int mi = ((100*ddd + 52)/3060);
-                int mm = (mi + 2)%12 + 1;
+				int mi = static_cast<int>(((100*ddd + 52)/3060));
+				int mm = static_cast<int>((mi + 2)%12 + 1);
                 y = y + ((mi + 2)/12);
-                int dd = ddd - ((mi*306 + 5)/10) + 1;
+				int dd = static_cast<int>(ddd - ((mi*306 + 5)/10) + 1);
                 
-                return StructuredDate(y, mm, dd);
+                return StructuredDate(static_cast<int>(y), mm, dd);
             }
 
             class InvalidDateException : public std::invalid_argument
@@ -200,6 +200,10 @@ namespace model
 					return otherDate >= _value ? diffFunc(otherDate, _value) : 0;
 				case Ordering::Before:
 					return otherDate <= _value ? diffFunc(otherDate, _value) : 0;
+				default:
+					// ordering must be equal to one of the three above values
+					assert(false);
+					return 0;
 				}
             }
 

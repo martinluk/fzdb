@@ -48,15 +48,15 @@ void PrimitiveMapSerialiser<A,B>::unserialise(const char *data, std::size_t leng
 
     const SerialHeader* pHeader = reinterpret_cast<const SerialHeader*>(data);
     const char* dataBegin = data + sizeof(SerialHeader);
-    if ( dataBegin - data > length )
+    if (static_cast<std::size_t>(dataBegin - data) > length )
         throw InvalidPrimitiveMapInputException("Input data is not long enough to contain primitive map header.");
 
     std::size_t stride = pHeader->primitiveASize + pHeader->primitiveBSize;
 
-    for ( int i = 0; i < pHeader->count; i++ )
+    for ( std::size_t i = 0; i < pHeader->count; i++ )
     {
         const char* d = dataBegin + (i * stride);
-        if ( d - data >= length || (d + stride) - data > length )
+        if (static_cast<std::size_t>(d - data) >= length || static_cast<std::size_t>((d + stride) - data) > length )
             throw InvalidPrimitiveMapInputException("Data item " + std::to_string(i) + " exceeded length of data.");
 
         A a;

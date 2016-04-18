@@ -585,7 +585,7 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, 
 		for (size_t valId = 1; valId < values.size(); valId++) {
 
 			VariableSetRow newVec(*iter);
-			newVec.ranking(newVec.ranking()-newVec.at(valId).dataPointer()->confidence());
+			newVec.ranking(newVec.ranking()-static_cast<int>(newVec.at(valId).dataPointer()->confidence()));
 			unsigned int newRowId = variableSet.add(std::move(newVec));
 			variableSet.add(variableId2, values[valId]->Clone(), propertyId, entityHandle, values[valId]->subtype(), std::move(metaVar), newRowId);
 		}

@@ -82,7 +82,7 @@ void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types
 
 			_values[row][var].metaRef(metaRef);
 
-			auto metaRowId = add(indexOf(metaVar), valueRef, entityId, propertyId, model::types::SubType::ValueReference, "");
+			auto metaRowId = add(indexOf(metaVar), valueRef, propertyId, entityId, model::types::SubType::ValueReference, "");
 			_values[metaRowId][indexOf(metaVar)].metaRef(metaRef);
 		}
     }
@@ -177,8 +177,8 @@ const unsigned int VariableSet::getMetaRef() {
 
 void VariableSet::removeMetaRefs(unsigned int metaRef) {
 	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
-    for(int i = 0; i < _values.size(); i++) {
-        for (int j = 0; j < _values[i].size(); j++) {
+    for(std::size_t i = 0; i < _values.size(); i++) {
+        for (std::size_t j = 0; j < _values[i].size(); j++) {
             if (_values[i][j].metaRef() == metaRef) {
 				_values[i][j].reset();
             }

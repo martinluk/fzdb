@@ -62,7 +62,7 @@ public:
     // Getters
     const unsigned int& keyRef() const;
 
-    virtual unsigned int count() const;
+    virtual std::size_t count() const;
 
     //std::vector<std::shared_ptr<T>> values() const;
     //std::shared_ptr<T> const& value(int index) const;

@@ -52,6 +52,10 @@ std::vector<std::shared_ptr<model::types::Base>> Entity::meetsCondition(unsigned
 		if(state == MatchState::None) return std::vector<std::shared_ptr<model::types::Base>>();
 	case LinkStatus::None:
 		return PropertyOwner::meetsCondition(propertyId, std::move(obj), state);
+	default:
+		// link status must be equal to one of the above values
+		assert(false);
+		return std::vector<std::shared_ptr<model::types::Base>>();
 	}	
 }
 

@@ -26,7 +26,7 @@ std::string outputSerialiserData(const Serialiser &serialiser)
     // i progresses in multiples of 8.
     unsigned int total = 0;
     unsigned int line = 1;
-    for (int i = 0; i < length; i += 8)
+    for (std::size_t i = 0; i < length; i += 8)
     {
             if ( i > 0 )
                 log << "\n";
@@ -42,7 +42,7 @@ std::string outputSerialiserData(const Serialiser &serialiser)
             log << std::hex << std::setfill ('0') << std::setw(2);
 
             // j selects the characters in each batch of 8.
-            for(int j = 0; j < 8 && i+j < length; j++)
+            for(std::size_t j = 0; j < 8 && i+j < length; j++)
             {
                     if ( j > 0 )
                             log << " ";
@@ -64,7 +64,7 @@ std::string outputSerialiserData(const Serialiser &serialiser)
 
             log << "\t";
 
-            for(int j = 0; j < 8 && i+j < length; j++)
+            for(std::size_t j = 0; j < 8 && i+j < length; j++)
             {
                     if ( buffer[i+j] < 32 || buffer[i+j] > 126 )
                             log << '.';
@@ -138,7 +138,7 @@ std::string printEntityProperty(const std::shared_ptr<EntityProperty> prop)
 {
     std::string str = std::string("EntityProperty(") + std::to_string(prop->key());
 
-    for ( int i = 0; i < prop->count(); i++ )
+    for (std::size_t i = 0; i < prop->count(); i++ )
     {
         str += std::string(",\n    ") + prop->baseValue(i)->logString();
     }
