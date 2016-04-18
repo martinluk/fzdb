@@ -1,13 +1,13 @@
-#include "Parser.h"
+#include "./parser.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
 #include <iostream>
 
-#include "./filters/RegexFilter.h"
-#include "./filters/OrderingFilters.h"
-#include "spdlog/spdlog.h"
+#include "./filters/regex_filter.h"
+#include "./filters/ordering_filters.h"
+#include <spdlog/spdlog.h>
 
 TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsigned int chr) {
 

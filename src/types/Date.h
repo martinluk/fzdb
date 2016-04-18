@@ -1,9 +1,9 @@
 #ifndef FUZZY_MODEL_TYPES_DATE
 #define FUZZY_MODEL_TYPES_DATE
 
-#include "./Base.h"
+#include "./base.h"
 #include <stdexcept>
-#include "../Util.h"
+#include "../util.h"
 
 namespace model
 {

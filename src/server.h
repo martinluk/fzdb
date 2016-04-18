@@ -9,7 +9,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-#include "./ISession.h"
+#include "./isession.h"
 #include "./session.h"
 
 using boost::asio::ip::tcp;

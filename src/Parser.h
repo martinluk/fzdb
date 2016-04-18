@@ -7,9 +7,9 @@
 #include <string>
 #include <map>
 
-#include "model/Triple.h"
-#include "filters/IFilter.h"
-#include "model/QuerySettings.h"
+#include "./model/triple.h"
+#include "./filters/ifilter.h"
+#include "./model/query_settings.h"
 
 // Values that don't collide with masks range from 0x0 to 0xf.
 #define TOKEN_SPLITTER_MASK 0b010000    // This token is a splitter.

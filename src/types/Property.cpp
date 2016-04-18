@@ -1,5 +1,5 @@
-#include "Property.h"
-#include "../model/EntityManager.h"
+#include "./property.h"
+#include "../model/entity_manager.h"
 #include "../singletons.h"
 
 using namespace model::types;

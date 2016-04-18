@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "user/Permission.h"
+#include "user/permission.h"
 
 class PermissionTest : public ::testing::Test {
 protected:

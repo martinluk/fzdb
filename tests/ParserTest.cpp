@@ -10,7 +10,7 @@
 #include <map>
 #include <utility>
 
-#include "Parser.h"
+#include "parser.h"
 
 class ParserTestIdentifyToken : public ::testing::Test {
 protected:

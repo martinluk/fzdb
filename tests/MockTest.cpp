@@ -5,11 +5,11 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
-#include "ISession.h"
-#include "jobs/Ping.h"
-#include "jobs/Echo.h"
+#include "isession.h"
+#include "jobs/ping.h"
+#include "jobs/echo.h"
 
-#include "QueryResult.h"
+#include "query_result.h"
 
 using ::testing::AtLeast; 
 

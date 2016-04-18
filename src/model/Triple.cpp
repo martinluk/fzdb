@@ -1,4 +1,4 @@
-#include "./Triple.h"
+#include "./triple.h"
 
 using namespace model;
 

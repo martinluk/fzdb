@@ -1,7 +1,7 @@
-#include "./Confidence.h"
-#include "./AuthorID.h"
-#include "./TimeStamp.h"
-#include "../JobQueue.h"
+#include "./confidence.h"
+#include "./author_id.h"
+#include "./timestamp.h"
+#include "../job_queue.h"
 
 void model::types::Confidence::setupDefaultMetaData(const unsigned char confidence)
 {

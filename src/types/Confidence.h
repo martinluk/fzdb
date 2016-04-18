@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "./UInt.h"
+#include "./uint.h"
 #include <iostream>
 
 namespace model {

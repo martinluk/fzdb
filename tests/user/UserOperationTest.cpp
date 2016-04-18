@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 #include <string>
 
-#include "user/UserOperation.h"
-#include "user/Permission.h"
-#include "user/UserExceptions.h"
+#include "user/user_operation.h"
+#include "user/permission.h"
+#include "user/user_exceptions.h"
 class UserOperationTest : public ::testing::Test {
 	public:
 		UserOperation uo;

@@ -1,4 +1,4 @@
-#include "user/Hashing.h"
+#include "./hashing.h"
 
 namespace Hashing
 {

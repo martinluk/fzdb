@@ -4,18 +4,18 @@
 #include <vector>
 #include <string>
 
-#include "types/Int.h"
-#include "types/String.h"
-#include "types/Date.h"
-#include "types/EntityRef.h"
-#include "types/SubType.h"
-#include "model/Entity.h"
-#include "model/EntityManager.h"
+#include "types/int.h"
+#include "types/string.h"
+#include "types/date.h"
+#include "types/entity_ref.h"
+#include "types/subtype.h"
+#include "model/entity.h"
+#include "model/entity_manager.h"
 
-#include "model/TypeSerialiser.h"
-#include "model/Serialiser.h"
-#include "model/EntitySerialiser.h"
-#include "model/GraphSerialiser.h"
+#include "model/type_serialiser.h"
+#include "model/serialiser.h"
+#include "model/entity_serialiser.h"
+#include "model/graph_serialiser.h"
 
 // TODO: Extend these. They probably don't cover all edge cases.
 

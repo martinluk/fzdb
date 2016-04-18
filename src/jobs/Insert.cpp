@@ -1,8 +1,8 @@
-#include "Insert.h"
+#include "./insert.h"
 #include "../singletons.h"
-#include "../model/EntityManager.h"
+#include "../model/entity_manager.h"
 
-#include "../Exceptions.h"
+#include "../exceptions.h"
 #include <rapidjson/document.h>
 
 Insert::Insert(std::shared_ptr<ISession> session, Query query) 

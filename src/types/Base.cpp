@@ -1,13 +1,13 @@
-#include "./Base.h"
-#include "./String.h"
-#include "./Int.h"
-#include "./UInt.h"
-#include "./TimeStamp.h"
-#include "./EntityRef.h"
-#include "./SourceRef.h"
-#include "./Confidence.h"
-#include "./AuthorID.h"
-#include "../JobQueue.h"
+#include "./base.h"
+#include "./string.h"
+#include "./int.h"
+#include "./uint.h"
+#include "./timestamp.h"
+#include "./entity_ref.h"
+#include "./source_ref.h"
+#include "./confidence.h"
+#include "./author_id.h"
+#include "../job_queue.h"
 
 using namespace model::types;
 

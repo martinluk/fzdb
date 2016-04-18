@@ -18,12 +18,12 @@
 #include "./server.h"
 #include "./singletons.h"
 
-#include "./user/UserFileOperations.h"
+#include "./user/user_file_operations.h"
 
-#include "JobQueue.h"
+#include "./job_queue.h"
 
-#include "model/EntityManager.h"
-#include "model/Triple.h"
+#include "./model/entity_manager.h"
+#include "./model/triple.h"
 
 #include "./platform.h"
 

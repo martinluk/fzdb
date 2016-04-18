@@ -2,9 +2,9 @@
 #define JOB_PINGJOB_H
 #include "../session.h"
 
-#include "../Job.h"
+#include "../job.h"
 
-#include "QueryResult.h"
+#include "../query_result.h"
 
 // Debugging command. Responds with "PONG".
 class PingJob : public Job

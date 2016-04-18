@@ -6,10 +6,10 @@
 #include <memory>
 #include <algorithm>
 
-#include "./Triple.h"
-#include "./PropertyOwner.h"
-#include "./MemberSerialiser.h"
-#include "ILogString.h"
+#include "./triple.h"
+#include "./property_owner.h"
+#include "./member_serialiser.h"
+#include "./ilog_string.h"
 
 // Represents an entity in the graph database.
 // Each entity has a handle, which is a unique identifier.

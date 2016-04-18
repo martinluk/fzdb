@@ -1,8 +1,8 @@
-#include "BGP.h"
+#include "bgp.h"
 #include "../singletons.h"
-#include "../model/EntityManager.h"
-#include "../VariableSet.h"
-#include "../Exceptions.h"
+#include "../model/entity_manager.h"
+#include "../variable_set.h"
+#include "../exceptions.h"
 
 #include <rapidjson/document.h>
 

@@ -1,8 +1,8 @@
 #ifndef MODEL_DATABASE_H
 #define MODEL_DATABASE_H
 
-#include "EntityManager.h"
-#include "../user/UserOperation.h"
+#include "./entity_manager.h"
+#include "../user/user_operation.h"
 
 // Convenience class that encapsulates the main data within the database application.
 class Database

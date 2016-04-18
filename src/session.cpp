@@ -4,9 +4,9 @@
 #include <boost/uuid/uuid.hpp>
 
 #include "./session.h"
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
-#include "./CommandInterpreter.h"
+#include "./command_interpreter.h"
 #include "./server.h"
 #include <algorithm>
 #include <cassert>

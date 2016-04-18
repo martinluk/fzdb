@@ -1,15 +1,15 @@
 #ifndef FUZZY_MODEL_TYPES_BASE
 #define FUZZY_MODEL_TYPES_BASE
 
-#include "../model/Serialiser.h"
+#include "../model/serialiser.h"
 #include <cassert>
 #include <cstring>
 #include <memory>
-#include "../model/ILogString.h"
-#include "../model/Triple.h"
-#include "../model/MemberSerialiser.h"
-#include "../model/PropertyOwner.h"
-#include "./SubType.h"
+#include "../model/ilog_string.h"
+#include "../model/triple.h"
+#include "../model/member_serialiser.h"
+#include "../model/property_owner.h"
+#include "./subtype.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 

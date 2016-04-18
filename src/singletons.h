@@ -2,8 +2,8 @@
 #define SINGLETONS_H
 
 #include <string>
-#include "model/Database.h"
-#include "./ISession.h"
+#include "./model/database.h"
+#include "./isession.h"
 
 #include <boost/thread/shared_mutex.hpp>
 

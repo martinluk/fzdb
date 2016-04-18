@@ -2,8 +2,8 @@
 #define JOBS_ECHOJOB_H
 #include "../session.h"
 
-#include "../Job.h"
-#include "QueryResult.h"
+#include "../job.h"
+#include "../query_result.h"
 #include <string>
 
 // Debugging command. Responds with whatever input was passed in.

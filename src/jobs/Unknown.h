@@ -3,9 +3,9 @@
 
 #include "../session.h"
 
-#include "../Job.h"
+#include "../job.h"
 
-#include "QueryResult.h"
+#include "../query_result.h"
 
 // Generic "Unknown" job for when an unknown command is invoked.
 class UnknownJob : public Job

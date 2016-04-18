@@ -1,12 +1,12 @@
-#include "./Entity.h"
-#include "./EntityManager.h"
+#include "./entity.h"
+#include "./entity_manager.h"
 #include "../singletons.h"
-#include "./types/String.h"
-#include "./types/UInt.h"
-#include "./types/EntityRef.h"
-#include "./types/TypeID.h"
+#include "./types/string.h"
+#include "./types/uint.h"
+#include "./types/entity_ref.h"
+#include "./types/type_id.h"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 #include <stdexcept>
 #include <string>

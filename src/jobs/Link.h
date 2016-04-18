@@ -2,9 +2,9 @@
 #define JOBS_LINK_H
 #include "../session.h"
 
-#include "../Job.h"
-#include "QueryResult.h"
-#include "../model/Entity.h"
+#include "../job.h"
+#include "../query_result.h"
+#include "../model/entity.h"
 #include <string>
 
 namespace jobs {

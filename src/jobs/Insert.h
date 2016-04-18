@@ -1,10 +1,10 @@
 #ifndef FUZZY_JOBS_INSERT
 #define FUZZY_JOBS_INSERT
 
-#include "../Job.h"
-#include "../model/Triple.h"
-#include "../Parser.h"
-#include "../QueryResult.h"
+#include "../job.h"
+#include "../model/triple.h"
+#include "../parser.h"
+#include "../query_result.h"
 
 #include <string>
 

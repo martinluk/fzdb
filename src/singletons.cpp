@@ -1,5 +1,5 @@
 #include "./singletons.h"
-#include "model/Database.h"
+#include "./model/database.h"
 #include <iostream>
 
 #include <boost/thread/shared_mutex.hpp>

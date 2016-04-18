@@ -1,8 +1,8 @@
-#include "Link.h"
+#include "./link.h"
 #include "../singletons.h"
-#include "../model/EntityManager.h"
+#include "../model/entity_manager.h"
 
-#include "../Exceptions.h"
+#include "../exceptions.h"
 
 using namespace jobs;
 

@@ -1,8 +1,8 @@
-#include "Flush.h"
+#include "./flush.h"
 #include "../singletons.h"
-#include "../model/EntityManager.h"
+#include "../model/entity_manager.h"
 
-#include "../Exceptions.h"
+#include "../exceptions.h"
 
 Flush::Flush(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp)
 {

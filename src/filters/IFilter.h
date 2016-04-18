@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "../types/Base.h"
-#include "../VariableSet.h"
+#include "../types/base.h"
+#include "../variable_set.h"
 
 class IFilter {
 public:

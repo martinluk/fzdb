@@ -1,8 +1,8 @@
 #ifndef FUZZYDB_ISESSION
 #define FUZZYDB_ISESSION
 
-#include <user/Permission.h>
-#include <user/UserOperation.h>
+#include "./user/permission.h"
+#include "./user/user_operation.h"
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>

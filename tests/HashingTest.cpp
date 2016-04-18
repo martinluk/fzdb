@@ -1,6 +1,6 @@
 #include <limits.h>
 #include "gtest/gtest.h"
-#include "user/Hashing.h"
+#include "user/hashing.h"
 
 class HashingTest : public ::testing::Test {
 protected:

@@ -1,5 +1,5 @@
-#include "Job.h"
-#include "singletons.h"
+#include "./job.h"
+#include "./singletons.h"
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>

@@ -3,7 +3,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 using SessionVector = std::vector<std::shared_ptr<ISession>>;
 

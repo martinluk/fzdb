@@ -1,4 +1,4 @@
-#include "Echo.h"
+#include "./echo.h"
 
 EchoJob::EchoJob(std::shared_ptr<ISession> session, const std::string &message) : 
     Job(session, PermType::ViewDB) {

@@ -1,13 +1,13 @@
 #ifndef FUZZYDB_JOB
 #define FUZZYDB_JOB
 
-#include "ISession.h"
-#include "QueryResult.h"
+#include "./isession.h"
+#include "./query_result.h"
 #include <cassert>
 
 //class Database;
-#include "./model/Database.h"
-#include "./user/Permission.h"
+#include "./model/database.h"
+#include "./user/permission.h"
 
 class Job 
 {
