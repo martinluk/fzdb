@@ -49,3 +49,4 @@ exclude/*
 
 node_modules
 tools/structs/structs
+documentation
