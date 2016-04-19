@@ -102,10 +102,12 @@ add_library(fuzzy-database-lib OBJECT ${SOURCES_NO_MAIN} ${HEADERS})
 
 add_executable(fuzzy-database ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc $<TARGET_OBJECTS:fuzzy-database-lib> $<TARGET_OBJECTS:vedis-lib>)
 
-add_dependencies(fuzzy-database nowide)
-add_dependencies(fuzzy-database spdlog)
-add_dependencies(fuzzy-database rapidjson)
-add_dependencies(fuzzy-database vedis-lib)
+add_dependencies(fuzzy-database fuzzy-database-lib)
+
+add_dependencies(fuzzy-database-lib nowide)
+add_dependencies(fuzzy-database-lib spdlog)
+add_dependencies(fuzzy-database-lib rapidjson)
+add_dependencies(fuzzy-database-lib vedis-lib)
 
 target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
