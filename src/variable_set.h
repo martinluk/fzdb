@@ -77,26 +77,26 @@ class VariableSetValue {
 
 class VariableSetRow {
  private:
-  const unsigned char _size;
+  const std::size_t _size;
   std::vector<VariableSetValue> _values;
   int _ranking;
 
  public:
-  explicit VariableSetRow(const unsigned char size) : _size(size), _values(_size), _ranking(0) {}
-  VariableSetRow(const unsigned char size, const std::vector<VariableSetValue>&& values) : _size(size), _values(values), _ranking(0) {}
+  explicit VariableSetRow(const std::size_t size) : _size(size), _values(_size), _ranking(0) {}
+  VariableSetRow(const std::size_t size, const std::vector<VariableSetValue>&& values) : _size(size), _values(values), _ranking(0) {}
 
   VariableSetRow(const VariableSetRow& rhs) : _size(rhs._size), _values(rhs._values), _ranking(rhs._ranking) {}
   VariableSetRow(VariableSetRow&& rhs) : _size(rhs._size), _values(rhs._values), _ranking(rhs._ranking) {}
 
-  VariableSetValue& operator[](unsigned char index) {
+  VariableSetValue& operator[](const std::size_t index) {
     return _values[index];
   }
 
-  VariableSetValue at(unsigned char index) const {
+  VariableSetValue at(const std::size_t index) const {
     return _values[index];
   }
 
-  unsigned char size() const {
+  std::size_t size() const {
     return _size;
   }
 
@@ -167,15 +167,15 @@ class VariableSet {
   const bool used(unsigned int id) const;
 
   const VariableType typeOf(const std::string name) const;
-  const VariableType typeOf(const unsigned char id) const;
+  const VariableType typeOf(const std::size_t id) const;
 
-  const unsigned char indexOf(const std::string name) const;
+  const std::size_t indexOf(const std::string name) const;
 
   const unsigned int getMetaRef();
 
   void removeMetaRefs(unsigned int metaRef);
 
-  void addToMetaRefRow(unsigned int metaRef, unsigned char position, const std::shared_ptr<model::types::Base>&& value,
+  void addToMetaRefRow(unsigned int metaRef, std::size_t position, const std::shared_ptr<model::types::Base>&& value,
   const unsigned int propertyId, const Entity::EHandle_t entityId);
 
   // this doesn't seem to work
@@ -187,7 +187,7 @@ class VariableSet {
 
   void removeRowsWith(const unsigned int variable);
 
-  unsigned char width() const {
+  std::size_t width() const {
     return _size;
   }
 
@@ -205,7 +205,7 @@ class VariableSet {
   std::vector<model::types::SubType> _typeMap;
   std::vector<VariableSetRow> _values;
   std::vector<bool> _variablesUsed;
-  unsigned int _size;
+  std::size_t _size;
   unsigned int _nextMetaRef;
 };
 #endif  // !FUZZY_VARIABLESET
