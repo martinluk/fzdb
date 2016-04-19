@@ -22,7 +22,7 @@
 #define ID "id"
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
-#define JSONFILENAME "userFile.json"
+#define JSONFILENAME "D:\\Projects\\fzdb\\build\\userFile.json"
 
 UserFileOperations::UserFileOperations()
 {
@@ -251,11 +251,12 @@ void UserFileOperations::saveCacheToFile() const
     
     //XXX Window system should use wb?
     // TODO: Exception check for opening/writing file!
-    FILE* fp = fopen(pathToLoginFile().c_str(),"w");
-    FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-    Writer<FileWriteStream> writer(os);
-    jsonDoc.Accept(writer);
-    fclose(fp);
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	jsonDoc.Accept(writer);
+	std::ofstream outfile(pathToLoginFile());
+	outfile << buffer.GetString() << std::endl;
+	outfile.close();
 }
 
 bool UserFileOperations::contains(const std::string & name) const
