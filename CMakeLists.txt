@@ -46,7 +46,7 @@ include_directories(${VEDIS_INCLUDE_DIRS})
 
 message("DEBUG: ${RAPIDJSON_INCLUDE_DIRS}")
 
-FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+FILE(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 
 #Admin account set up
@@ -84,7 +84,7 @@ macro(GroupSources curdir)
         string(REPLACE "src" "Headers" groupname ${groupname})
         source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
       else()
-        if(${child} MATCHES .*\\.cpp$)
+        if(${child} MATCHES .*\\.cc$)
           string(REPLACE "src" "Source Files" groupname ${groupname})
           source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
         endif()
