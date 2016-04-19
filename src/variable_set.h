@@ -1,8 +1,6 @@
 #ifndef FUZZY_VARIABLESET
 #define FUZZY_VARIABLESET
 
-#include <boost/bimap.hpp>
-
 #include <vector>
 #include <set>
 #include <string>
@@ -14,6 +12,7 @@
 
 #include "./model/entity.h"
 #include "./types/base.h"
+#include "./util/name_manager.h"
 
 using VariableType = model::types::SubType;
 
@@ -200,7 +199,7 @@ class VariableSet {
   std::vector<std::string> getVariables();
 
  private:
-  boost::bimap<std::string, unsigned int> _nameMap;
+  NameManager _nameMap;
   std::vector<std::string> _vars;
   std::vector<model::types::SubType> _typeMap;
   std::vector<VariableSetRow> _values;

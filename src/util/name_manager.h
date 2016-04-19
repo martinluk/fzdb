@@ -4,6 +4,7 @@
 #include "./id_generator.h"
 #include <string>
 #include <map>
+#include <vector>
 
 class StringMapSerialiser;
 
@@ -20,6 +21,8 @@ private:
 public:
 
 	NameManager() {}
+
+	NameManager(unsigned int start) : _idGen(start) {}
 
 	unsigned int add(const std::string name) {
 		unsigned int newId = _idGen.getId();
@@ -70,6 +73,14 @@ public:
 
 	size_t size() const {
 		return _idToStringMap.size();
+	}
+
+	std::vector<std::string> names() const {
+		std::vector<std::string> v;
+		for (auto it = _stringToIdMap.begin(); it != _stringToIdMap.end(); ++it) {
+			v.push_back(it->first);
+		}
+		return v;
 	}
 };
 

@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
 import socket, select, string, sys, json, platform
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 # ======================================
 # ========== Global Variables ==========

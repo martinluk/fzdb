@@ -15,14 +15,12 @@
 
 using VariableType = model::types::SubType;
 
-VariableSet::VariableSet(const std::set<std::string> &variableNames) {
+VariableSet::VariableSet(const std::set<std::string> &variableNames) : _nameMap(0) {
     _size = variableNames.size();
     _nextMetaRef = 1;
     _variablesUsed = std::vector<bool>(_size);
-    unsigned char count = 0;
     for (auto variableName : variableNames) {
-        _variablesUsed[count] = false;
-		_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, count++));
+        _variablesUsed[_nameMap.add(variableName)] = false;
 		_typeMap.push_back(VariableType::Undefined);       
     }
     
@@ -32,7 +30,8 @@ void VariableSet::extend(std::string variableName) {
 	
 	_variablesUsed.push_back(false);
 	_typeMap.push_back(VariableType::Undefined);
-	_nameMap.insert(boost::bimap<std::string, unsigned int>::value_type(variableName, _size++));
+	_nameMap.add(variableName);
+	_size++;
 }
 
 unsigned int VariableSet::add(const VariableSetRow&& row) {
@@ -57,7 +56,7 @@ void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types
         throw std::runtime_error("Attempting to add to a non-existent row");
     }
 
-    if (_nameMap.right.find(var) == _nameMap.right.end()) {
+    if (!_nameMap.has(var)) {
         throw std::runtime_error("Unexpected variable");
     }
     else {
@@ -120,17 +119,7 @@ std::vector<std::string> VariableSet::getVariables() {
     //XXX This method was implemented as cannot find an efficient way to iterate over the rows, with their variable names
     //The reason that I want variable name at DeleteQuery is to find the Type of variable at BGP to apply correct action
     //Please feel free to change/let me know if a better implementation exists.
-    std::vector<std::string> o;
-    typedef boost::bimap<std::string, unsigned int> nm_type;
-    nm_type::const_iterator iterEnd=_nameMap.end();
-    for(nm_type::const_iterator iter = _nameMap.begin(); 
-            iter!= iterEnd;
-            ++iter) {
-        o.push_back(iter->left);
-    }
-    return o;
-
-
+    return _nameMap.names();
 }
 
 std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) const {
@@ -143,15 +132,15 @@ std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) con
 }
 
 const bool VariableSet::contains(const std::string name) const {
-	return _nameMap.left.find(name) != _nameMap.left.end();
+	return _nameMap.has(name);
 }
 
 const bool VariableSet::contains(const unsigned int id) const {
-	return _nameMap.right.find(id) != _nameMap.right.end();
+	return _nameMap.has(id);
 }
 
 const bool VariableSet::used(const std::string name) const {
-    return _variablesUsed[_nameMap.left.at(name)];
+    return _variablesUsed[_nameMap.get(name)];
 }
 
 const bool VariableSet::used(unsigned int id) const
@@ -160,7 +149,7 @@ const bool VariableSet::used(unsigned int id) const
 }
 
 const VariableType VariableSet::typeOf(const std::string name) const {
-	return _typeMap.at(_nameMap.left.at(name));
+	return _typeMap.at(_nameMap.get(name));
 }
 
 const VariableType VariableSet::typeOf(const std::size_t id) const {
@@ -168,7 +157,7 @@ const VariableType VariableSet::typeOf(const std::size_t id) const {
 }
 
 const std::size_t VariableSet::indexOf(const std::string name) const {
-	return _nameMap.left.at(name);
+	return _nameMap.get(name);
 }
 
 const unsigned int VariableSet::getMetaRef() {
@@ -193,7 +182,7 @@ void VariableSet::addToMetaRefRow(unsigned int metaRef, std::size_t position, co
   bool found = false;
 
   for (std::size_t i = 0; i < _values.size(); i++) {
-    for (std::size_t j = 0; j < _values.size(); j++) {
+    for (std::size_t j = 0; j < _values[i].size(); j++) {
       if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
         _values[i][position].reset(value, entityId, propertyId);
         found = true;
