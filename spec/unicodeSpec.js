@@ -2,7 +2,7 @@ var net = require('net');
 var h = require('./support/helper.js');
 
 //TODO I guess we can do serializing and deserializing too....
-fdescribe("fzdb - unicode support", function() {
+describe("fzdb - unicode support", function() {
     beforeEach(function(done) {
         h.setupClient();
         h.sendCmd(h.loginToAdminQuery).then(function(data) {
@@ -50,6 +50,13 @@ fdescribe("fzdb - unicode support", function() {
 
     languageTest=function(lang, word) {
         describe("Language: "+ lang + ", word=" + word +":",function() {
+            it("ECHO command",function(done) {
+                h.sendCmd("ECHO "+word).then(function(data) {
+                    expect(data.status).toBe(true);
+                    expect(data.result.data).toEqual(word);
+                    done();
+                });
+            });
             it("simple value correctly into database",function(done) {
                 h.sendCmd("INSERT DATA { $a <forename> \""+word+"\" } WHERE { NEW($a,\"person\") }").then(function(data) {
                     expect(data.status).toBe(true);
