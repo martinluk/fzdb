@@ -4,15 +4,13 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
-Job::Job(std::shared_ptr<ISession> session, PermType permtype)
-{
+Job::Job(std::shared_ptr<ISession> session, PermType permtype) {
     _session = session;
     _database = NULL;
     _permtype = permtype;
 }
 
-QueryResult Job::execute()
-{
+QueryResult Job::execute() {
     QueryResult result;
 
     // Jonathan: This is a bit of a hack, really. Listen for any uncaught exceptions and return a generic error.
@@ -20,8 +18,7 @@ QueryResult Job::execute()
     // propagated back, and then not do any exception handling at all in any of the job subclasses
     // to allow all exceptions to be caught here.
     // Still, better to return a generic error code than for the database to crash out.
-    try
-    {
+    try {
         //Check session permission matches with the the session
         std::string username = _session->username();
         //Read user group
@@ -36,17 +33,14 @@ QueryResult Job::execute()
             return result;
         }
 
-        if ( constOperation() )
-        {
+        if ( constOperation() ) {
             // Get a shared lock - no limit on these.
             boost::shared_lock<boost::shared_mutex> lock(Singletons::databaseMutex());
             
             _database = Singletons::database();
             result = executeConst();
             _database = NULL;
-        }
-        else
-        {
+        } else {
             // Get an exclusive lock for writing - there can only be one of these.
             // Only a single thread can acquire an upgrade_lock at one time.
             boost::upgrade_lock<boost::shared_mutex> lock(Singletons::databaseMutex());
@@ -56,9 +50,7 @@ QueryResult Job::execute()
             result = executeNonConst();
             _database = NULL;
         }
-    }
-    catch ( const std::exception &e )
-    {
+    } catch ( const std::exception &e ) {
         result.setErrorCode(QueryResult::ErrorCode::UnhandledError);
         result.setInfo(e.what());
     }

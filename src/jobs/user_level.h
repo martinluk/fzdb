@@ -1,4 +1,6 @@
-#pragma once
+#ifndef JOBS_USER_LEVEL
+#define JOBS_USER_LEVEL
+
 #include "../isession.h"
 #include "../session.h"
 #include "../job.h"
@@ -17,3 +19,4 @@ private:
     std::shared_ptr<ISession> _session;
 };
 
+#endif

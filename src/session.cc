@@ -161,7 +161,7 @@ void TCPSession::respond(const std::string response) {
     memset(buffer, 0, max_length);
     
     // i advances by 1023 each time, because the 1024th byte is 0.
-    for ( int i = 0; i < response.length(); i += max_length - 1 )
+    for ( std::size_t i = 0; i < response.length(); i += max_length - 1 )
     {
         // Find out how many chars to copy.
         int charsToCopy = std::min<int>(max_length - 1, response.length() - i);

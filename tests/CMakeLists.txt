@@ -1,6 +1,6 @@
 project(fuzzy-database-tests)
-cmake_minimum_required(VERSION 2.8.11)
-cmake_policy(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.7)
+cmake_policy(VERSION 2.8.7)
 
 message("Building Tests")
 
@@ -14,25 +14,20 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
 include_directories(${GTEST_INCLUDE_DIRS}) 
 include_directories(${GMOCK_INCLUDE_DIRS}) 
 
-set(PD "${CMAKE_CURRENT_SOURCE_DIR}/../src/")
-
-FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../src/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cc)
-SET(SOURCES_NO_MAIN ${SOURCES})
-LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cc")
-#message("BOO: ${SOURCES}")
-#message("WOO: ${SOURCES_NO_MAIN}")
-
-add_executable(fuzzy-database-test ${TEST_SOURCES} ${SOURCES_NO_MAIN} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest> $<TARGET_OBJECTS:gmock>)
+add_executable(fuzzy-database-test ${TEST_SOURCES} ${TEST_HEADERS} $<TARGET_OBJECTS:gtest> $<TARGET_OBJECTS:gmock> $<TARGET_OBJECTS:fuzzy-database-lib>)
 add_dependencies(fuzzy-database-test nowide)
 add_dependencies(fuzzy-database-test gtest)
+
+add_dependencies(fuzzy-database-test fuzzy-database-lib)
 add_dependencies(fuzzy-database-test spdlog)
 add_dependencies(fuzzy-database-test rapidjson)
 
-#remove main otherwise there are 2 main functions!
-
-#target_link_libraries(fuzzy-database-test ${GTEST_LIBRARIES})
 target_link_libraries(fuzzy-database-test ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(fuzzy-database-test ${Boost_LIBRARIES})
 target_link_libraries(fuzzy-database-test ${Boost_Nowide_LIBRARIES})
+
+if(UNIX AND NOT APPLE)
+   target_link_libraries(fuzzy-database-test -lrt) 
+endif()
 
 add_test(NAME test COMMAND fuzzy-database-test)

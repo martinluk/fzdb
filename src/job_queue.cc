@@ -28,7 +28,6 @@ void JobQueue::Shutdown() {
   _threads.join_all();
 }
 
-std::weak_ptr<ISession> JobQueue::CurrentSession()
-{
+std::weak_ptr<ISession> JobQueue::CurrentSession() {
 	return _currentSession;
 }

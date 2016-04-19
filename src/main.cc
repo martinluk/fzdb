@@ -126,8 +126,7 @@ int main(int argc, char* argv[]) {
       std::cout << "Loading from datafile " << dataFilePath << std::endl;
       Singletons::setDataFilePath(dataFilePath);
     }
-  }
-  catch (boost::program_options::error& e) {
+  } catch (boost::program_options::error& e) {
     std::cout << e.what() << std::endl;
     return 1;
   }

@@ -1,3 +1,6 @@
+#ifndef FUZZY_JOBS_PROMOTE_EDITOR
+#define FUZZY_JOBS_PROMOTE_EDITOR
+
 #include "../job.h"
 
 // Promotes an editor to an admin. Requires admin privileges.
@@ -11,3 +14,5 @@ class PromoteEditorJob : public Job {
     private:
         std::string _username;
 };
+
+#endif

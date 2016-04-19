@@ -5,14 +5,10 @@
 #include <stdexcept>
 #include "./model/serialiser.h"
 
-namespace FileSystem
-{
-    class FileFormatError : public std::runtime_error
-    {
+namespace FileSystem {
+    class FileFormatError : public std::runtime_error {
     public:
-        FileFormatError() : std::runtime_error("File format was not valid")
-        {
-        }
+        FileFormatError() : std::runtime_error("File format was not valid") { }
     };
 
     // Writes binary output to a file on disk, including the required headers for
@@ -24,7 +20,7 @@ namespace FileSystem
     void readFile(const std::string &filename, char* buffer, std::size_t length);
     void readFile(const std::string &filename, std::vector<char> &buffer);
     
-    std::size_t fileLength(const std::string &filename);    // Size of file, including extra headers.
+    std::streamoff fileLength(const std::string &filename);    // Size of file, including extra headers.
     std::size_t dataLength(const std::string &filename);    // Size of data serialised within file (not including headers).
     
     // Returns the working directory of the application.

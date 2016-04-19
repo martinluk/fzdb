@@ -1,3 +1,6 @@
+#ifndef FUZZY_JOBS_DELETE_USER
+#define FUZZY_JOBS_DELETE_USER
+
 #include "../job.h"
 
 // Deletes a user from the database. Requires admin privileges.
@@ -11,3 +14,5 @@ class DeleteUserJob : public Job {
     private:
         std::string _username;
 };
+
+#endif

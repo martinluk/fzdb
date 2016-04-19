@@ -69,7 +69,7 @@ endif()
 
 # disable warnings about C++ standard library
 if(WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS -D_WIN32_WINNT=0x060001")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE -D_WIN32_WINNT=0x060001")
 endif()
 
 macro(GroupSources curdir)
@@ -95,7 +95,13 @@ endmacro()
 
 GroupSources(src)
 
-add_executable(fuzzy-database ${SOURCES} ${HEADERS} $<TARGET_OBJECTS:vedis-lib>)
+SET(SOURCES_NO_MAIN ${SOURCES})
+LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc")
+
+add_library(fuzzy-database-lib OBJECT ${SOURCES_NO_MAIN} ${HEADERS})
+
+add_executable(fuzzy-database ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc $<TARGET_OBJECTS:fuzzy-database-lib> $<TARGET_OBJECTS:vedis-lib>)
+
 add_dependencies(fuzzy-database nowide)
 add_dependencies(fuzzy-database spdlog)
 add_dependencies(fuzzy-database rapidjson)
@@ -108,6 +114,10 @@ target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
 
 if(UNIX AND NOT APPLE)
    target_link_libraries(fuzzy-database -lrt) 
+endif()
+
+if(WIN32)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/service)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)

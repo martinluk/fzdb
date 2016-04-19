@@ -177,43 +177,47 @@ const unsigned int VariableSet::getMetaRef() {
 
 void VariableSet::removeMetaRefs(unsigned int metaRef) {
 	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
-    for(std::size_t i = 0; i < _values.size(); i++) {
-        for (std::size_t j = 0; j < _values[i].size(); j++) {
-            if (_values[i][j].metaRef() == metaRef) {
-				_values[i][j].reset();
-            }
-        }
+  unsigned char valuesSize = static_cast<unsigned char>(_values.size());
+  for(unsigned char i = 0; i < valuesSize; i++) {
+    for (unsigned char j = 0; j < valuesSize; j++) {
+      if (_values[i][j].metaRef() == metaRef) {
+	      _values[i][j].reset();
+      }
     }
+  }
 }
 
 void VariableSet::addToMetaRefRow(unsigned int metaRef, unsigned char position, const std::shared_ptr<model::types::Base>&& value,
 	const unsigned int propertyId, const Entity::EHandle_t entityId) {
 	if (metaRef == 0) throw std::runtime_error("Unexpected MetaRef");
-    bool found = false;
-    for (int i = 0; i < _values.size(); i++) {
-        for (unsigned char j = 0; j < _values[i].size(); j++) {
-            if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
-                _values[i][position].reset(value, entityId, propertyId);
-                found = true;
-                break;
-            }
-        }
-        if (found)break;
+
+  bool found = false;
+  unsigned char valuesSize = static_cast<unsigned char>(_values.size());
+
+  for (unsigned char i = 0; i < valuesSize; i++) {
+    for (unsigned char j = 0; j < valuesSize; j++) {
+      if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
+        _values[i][position].reset(value, entityId, propertyId);
+        found = true;
+        break;
+      }
     }
+    if (found)break;
+  }
 }
 
 //this doesn't seem to work
 void VariableSet::trimEmptyRows() {
-    _values.erase(std::remove_if(_values.begin(), _values.end(), [](VariableSetRow row) {
-        bool allEmpty = true;
-        for (auto val : row) {
-            if (!val.empty()) {
-                allEmpty = false;
-                break;
-            }
-        }
-        return allEmpty;
-    }), _values.end());
+  _values.erase(std::remove_if(_values.begin(), _values.end(), [](VariableSetRow row) {
+    bool allEmpty = true;
+    for (auto val : row) {
+      if (!val.empty()) {
+        allEmpty = false;
+        break;
+      }
+    }
+    return allEmpty;
+  }), _values.end());
 }
 
 std::vector<VariableSetRow> VariableSet::extractRowsWith(const unsigned int variable, const std::string value) const {

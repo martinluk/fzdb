@@ -1,3 +1,6 @@
+#ifndef FUZZY_JOBS_DEMOTE_ADMIN
+#define FUZZY_JOBS_DEMOTE_ADMIN
+
 #include "../job.h"
 
 // Demotes an admin back to an editor. Requires admin privileges.
@@ -11,3 +14,5 @@ class DemoteAdminJob : public Job {
     private:
         std::string _username;
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef FUZZY_JOBS_ADD_USER
+#define FUZZY_JOBS_ADD_USER
+
 #include "../job.h"
 
 // Adds a new user to the database. Requires admin privileges.
@@ -12,3 +15,5 @@ class AddUserJob : public Job {
         std::string _username;
         std::string _password;
 };
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef JOBS_USER_PASSWORD
+#define JOBS_USER_PASSWORD
+
 #include "../session.h"
 #include "../job.h"
 #include "../query_result.h"
@@ -18,3 +20,4 @@ private:
     std::shared_ptr<ISession> _session;
 };
 
+#endif
