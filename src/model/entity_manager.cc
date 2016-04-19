@@ -370,7 +370,6 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, Query
 
     for(std::vector<std::string>::iterator varsIter=variables.begin(); varsIter!=variables.end(); ++varsIter){
         std::string var = *varsIter;
-        std::cout << "variable " << var << std::endl;
         std::vector<VariableSetRow>::iterator rowIter;
 
         if(vs.contains(var) && vs.used(var)) {
