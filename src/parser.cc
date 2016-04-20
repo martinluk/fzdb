@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "./filters/regex_filter.h"
+#include "./filters/lev_filter.h"
 #include "./filters/ordering_filters.h"
 #include <spdlog/spdlog.h>
 
@@ -399,6 +400,7 @@ IFilter* FSparqlParser::parseFilter(const TokenInfo&& filterInfo, const std::str
    IFilter* output = nullptr;
    if (filterInfo.data0.length() > 0) {
      if (filterInfo.data0 == "regex" && RegexFilter::TestAndCreate(&output, filterDescription)) return output;
+	 if (filterInfo.data0 == "lev" && LevFilter::TestAndCreate(&output, filterDescription)) return output;
    }
    else {
      if (OrderingFilter::TestAndCreate(&output, filterDescription)) return output;

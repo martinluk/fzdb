@@ -45,7 +45,7 @@ public:
    OrderingFilter(const std::string variable, const Operator op, const std::string value) : _variable(variable), _value(value), _operator(op) {}
 
    bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) override {
-       unsigned char aa = variableSet.indexOf(_variable);
+	   std::size_t aa = variableSet.indexOf(_variable);
        std::shared_ptr<model::types::OrderedType> val = std::dynamic_pointer_cast<model::types::OrderedType, model::types::Base>(values.at(aa).dataPointer());
 	   switch (_operator) {
 	   case Operator::EQUAL:
@@ -64,6 +64,7 @@ public:
 		   // all enum cases have been considered
 		   assert(false);
 	   }
+	   return false;
    }
 
 };
