@@ -3,14 +3,14 @@
 
 #include <string>
 
-#include "./base.h"
+#include "./ordered_type.h"
 #include <iostream>
 
 namespace model {
     namespace types {
 
         // Stores an integer value.
-        class UInt : public Base {
+        class UInt : public OrderedType {
         protected:
             friend class TypeSerialiser;
             uint32_t _value;
@@ -25,11 +25,11 @@ namespace model {
 
         public:
 
-            UInt() : Base(), _value(0)
+            UInt() : OrderedType(), _value(0)
             {
             }
             
-            UInt(uint32_t value) :  Base(), _value(value)
+            UInt(uint32_t value) :  OrderedType(), _value(value)
             {
             }
             
@@ -83,6 +83,14 @@ namespace model {
                         _value == cOther->_value;
             }
 
+			bool greaterThan(const std::string rhs) override {
+				return _value > std::stoul(rhs);
+			}
+
+			bool lessThan(const std::string rhs) override {
+				return _value < std::stoul(rhs);
+			}
+
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) 
             {
@@ -90,7 +98,7 @@ namespace model {
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
-            UInt(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
+            UInt(const char* &serialisedData, std::size_t length) : OrderedType(serialisedData, length)
             {
                 initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);

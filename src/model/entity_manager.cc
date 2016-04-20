@@ -27,22 +27,17 @@
 
 static const unsigned int ENTITY_TYPE_GENERIC = 0;
 
-EntityManager::EntityManager(Database *db) : _database(db)
-{
+EntityManager::EntityManager(Database *db) : _database(db) {
 	clearAll();
 }
 
-EntityManager::~EntityManager()
-{
-}
+EntityManager::~EntityManager() { }
 
-std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type)
-{
+std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type) {
 	unsigned int typeID;
 	if (_entityTypeNames.has(type)) {
 		typeID = _entityTypeNames.get(type);
-	}
-	else {
+	} else {
 		typeID = _entityTypeNames.add(type);
 	}
 
@@ -64,8 +59,7 @@ std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type)
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings settings) const
-{
+VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings settings) const {
     VariableSet result(triplesBlock.variables);
 
     //sort by entropy
@@ -86,27 +80,23 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 1 - $a <prop> value
                     this->Scan1(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
-                }
-                else {
+                } else {
                     //option 2 - $a <prop> $b
                     this->Scan2(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate),
 						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
-            }
-            else {
+            } else {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option3 - $a $b value
                     this->Scan3(std::move(result), result.indexOf(conditionsIter->subject.value),
 						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
-                }
-                else {
+                } else {
                     //option 4 - $a $b $c
                     this->Scan4(std::move(result), result.indexOf(conditionsIter->subject.value), 
 						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
             }
-        }
-        else {
+        } else {
             if (conditionsIter->predicate.type == model::Predicate::Type::PROPERTY) {
 
 				// quick out if the property does not exist in the database
@@ -116,20 +106,17 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
                     //meanlingless unless in a meta block!
 					this->ScanEPR(std::move(result), std::move(conditionsIter->subject), 
 						std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
-                }
-                else {
+                } else {
                     //option 5 - entity <prop> $c
                     this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate),
 						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
                 }
-            }
-             else {
+            } else {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 7 - entity $b value
                     this->Scan6(std::move(result), std::move(conditionsIter->subject),
 						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
-                }
-                else {
+                } else {
                     //option 8 - entity $b $c
                     this->Scan7(std::move(result), std::move(conditionsIter->subject),
 						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
@@ -139,27 +126,6 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
     }
 
     return result;
-}
-
-void EntityManager::enforceTypeHasBeenSet(const Entity *entity)
-{
-#ifdef ENFORCE_ENTITIES_HAVE_TYPES
-    if ( entity->getType() == ENTITY_TYPE_GENERIC )
-    throw std::runtime_error("Attempted operation on entity " + std::to_string(entity->getHandle())
-                                 + " before assigning it a type!");
-#endif
-}
-
-void EntityManager::enforceTypeHasBeenSet(const std::set<const Entity *> &ents)
-{
-#ifdef ENFORCE_ENTITIES_HAVE_TYPES
-    for ( const Entity* e : ents )
-    {
-    if ( e->getType() == ENTITY_TYPE_GENERIC )
-        throw std::runtime_error("Entity " + std::to_string(e->getHandle())
-                     + " was not assigned a type!");
-    }
-#endif
 }
 
 //Inserts new data into the data store
@@ -192,8 +158,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
     std::set<const Entity *> modifiedEntities;
 
     // Iterate over each triple.
-    for (; iter != end; iter++)
-    {
+    for (; iter != end; iter++) {
         // I know virtually everyone else I've spoken to hates putting beginning braces
         // on new lines, but if there was ever a case for that it would be here.
         // It's so much more readable now!
@@ -243,24 +208,20 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 		if (!_propertyNames.has(triple.predicate.value)) {
 			propertyId = _propertyNames.add(triple.predicate.value);
 			_propertyTypes.insert(std::make_pair(propertyId, newRecords[0]->subtype()));
-		}
-		else {
+		} else {
 			propertyId = _propertyNames.get(triple.predicate.value);
 		}
         
         // Switch depending on what the subject of the query is.
-        switch (triple.subject.type)
-        {
+        switch (triple.subject.type) {
             // EntityRef means we're doing something to an entity in the database
             // that's been explicitly specified by ID.
-            case model::Subject::Type::ENTITYREF:
-            {
+            case model::Subject::Type::ENTITYREF: {
                 // Get the ID.
                 auto entity_id = std::stoll(triple.subject.value);
 
                 // Error out if the entity doesn't exist.
-                if (_entities.find(entity_id) == _entities.end())
-                {
+                if (_entities.find(entity_id) == _entities.end()) {
                     //_entities[entity_id] = std::make_shared<Entity>(ENTITY_TYPE_GENERIC, entity_id);
 					throw std::runtime_error("No entity with id " + std::to_string(entity_id) + " was found");
                 }
@@ -273,13 +234,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
                 //note that the OrderingId attribute of a record is assigned as part of insertion
                 // For each value we need to insert:
-                for (auto newRecord : newRecords)
-                {
+                for (auto newRecord : newRecords) {
                     // Add it to the property (cloning).
                     currentEntity->insertProperty(propertyId, newRecord->Clone());
 
-                    if (triple.meta_variable != "")
-                    {
+                    if (triple.meta_variable != "") {
 						variableSet.add(variableSet.indexOf(triple.meta_variable),
 							std::make_shared<model::types::ValueRef>(entity_id, propertyId, newRecord->OrderingId()), propertyId, entity_id,
 							model::types::SubType::ValueReference, "");
@@ -291,27 +250,22 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             // Variable means that it's some entity/entities referred to elsewhere in the query.
             case model::Subject::Type::VARIABLE:
             {
-                if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end())
-                {
-                    if (whereVars.contains(triple.subject.value))
-                    {
-                        if (whereVars.typeOf(triple.subject.value) != VariableType::EntityRef)
-                        {
+                if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end()) {
+                    if (whereVars.contains(triple.subject.value)) {
+                        if (whereVars.typeOf(triple.subject.value) != VariableType::EntityRef) {
 							throw new std::runtime_error("Variables bound in the WHERE clause of an insert statement used in the body of that statement MUST resolve to entity values");
 						}
 
 						auto varId = whereVars.indexOf(triple.subject.value);
 
-                        for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++)
-                        {
+                        for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++) {
 							if ((*whereVarIter)[varId].empty()) continue;
 
 							Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*whereVarIter)[varId].dataPointer())->value();
-                            // TODO: Do we need to check the handle is valid?
 
 							std::shared_ptr<Entity> currentEntity = _entities[entityHandle];
 
-                             modifiedEntities.insert(currentEntity.get());
+                            modifiedEntities.insert(currentEntity.get());
 
 							for (auto newRecord : newRecords) {
 
@@ -326,19 +280,14 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 							}
 						}
 					}
-                }
-                else
-                {
-
+                } else {
 					auto values = variableSet.getData(variableSet.indexOf(triple.subject.value));
 
-                    for (auto val : values)
-                    {
+                    for (auto val : values) {
 						std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
 						auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
                         assert(record->_manager == this);
-                        for (auto newRecord : newRecords)
-                        {
+                        for (auto newRecord : newRecords) {
 							record->insertProperty(propertyId, newRecord);
 						}
 					}
@@ -346,16 +295,13 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
                 break;
             }
         }
-    }
-    
-    // Ensure all the entities we processed have a type.
-    enforceTypeHasBeenSet(modifiedEntities);
+    }   
 
 	return createdEntities;
 }
 
 // For each variable described in triple block delete it
-std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings){
+std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings) {
     using VariableType = model::types::SubType;
 
     //Records number of deletion in subject, property, and object.
@@ -368,7 +314,7 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, Query
     std::vector<std::string> variables = vs.getVariables();
     std::vector<VariableSetRow>::iterator rowIter;
 
-    for(std::vector<std::string>::iterator varsIter=variables.begin(); varsIter!=variables.end(); ++varsIter){
+    for(std::vector<std::string>::iterator varsIter=variables.begin(); varsIter!=variables.end(); ++varsIter) {
         std::string var = *varsIter;
         std::vector<VariableSetRow>::iterator rowIter;
 
@@ -469,71 +415,7 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, Query
     return result;
 }
 
-bool EntityManager::performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
-                                                   model::types::SubType newRecordType, unsigned int author, const std::string &comment)
-{
-    // If we reference the type, perform a type change.
-    if ( triple.predicate.value == ReservedProperties::TYPE )
-    {
-        if ( triple.object.type != model::Object::Type::STRING )
-            throw std::runtime_error("Entity types must be specified as strings.");
-
-        changeEntityType(ent, triple.object.value);
-        return true;
-    }
-
-    // If we should do hierarchy things, do so here.
-    if ( triple.predicate.value == ReservedProperties::ORDER_SUBSET_OF ||
-         triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
-    {
-        createHierarchy(triple, ent, author, comment, newRecords, newRecordType);
-        return true;
-    }
-
-    return false;
-}
-
-void EntityManager::createHierarchy(const model::Triple &triple, Entity* ent, unsigned int author, const std::string &comment,
-                                    const std::vector<std::shared_ptr<model::types::Base> > &newRecords, model::types::SubType newRecordType)
-{
-    // Check what our record type is.
-    if ( newRecordType != model::types::SubType::EntityRef )
-        throw std::runtime_error("Expected entity handle for target of hierarchy creation but got \""
-                                 + std::string(model::types::getSubString(newRecordType)) + "\".");
-
-    // For each record:
-    for ( const std::shared_ptr<model::types::Base> &ptr : newRecords )
-    {
-        model::types::Base* b = ptr.get();
-        model::types::EntityRef* r = dynamic_cast<model::types::EntityRef*>(b);
-
-        // This should always be true, if the record type passed in is correct.
-        assert(r);
-
-        if ( triple.predicate.value == ReservedProperties::ORDER_SUPERSET_OF )
-        {
-            createHierarchy(ent->getHandle(), r->value(), author, comment);
-        }
-        else
-        {
-            createHierarchy(r->value(), ent->getHandle(), author, comment);
-        }
-    }
-}
-
-void EntityManager::changeEntityType(Entity *ent, const std::string &type)
-{
-    // TODO: If the entity changes type, hierarchy relationships may become semantically invalid
-    // (since they should only be between entities of the same type)!
-
-    unsigned int typeID = getTypeID(type);
-    spdlog::get("main")->info("Setting entity {} type to {} (numeric id {})", ent->getHandle(), type, typeID);
-	//TODO: why was this here?
-    //ent->_type = typeID;
-}
-
-std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const
-{
+std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const {
 	if (prop == 0) {
 		throw std::runtime_error("deference error");
 	}
@@ -543,26 +425,22 @@ std::shared_ptr<model::types::Base> EntityManager::dereference(Entity::EHandle_t
     return _entities.at(entity)->getProperty(prop)->baseValue(val);
 }
 
-std::vector<std::shared_ptr<Entity>> EntityManager::entityList() const
-{
+std::vector<std::shared_ptr<Entity>> EntityManager::entityList() const {
     std::vector<std::shared_ptr<Entity>> list;
     
-    for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it )
-    {
+    for ( auto it = _entities.cbegin(); it != _entities.cend(); ++it ) {
         list.push_back(it->second);
     }
     
     return list;
 }
 
-std::shared_ptr<Entity> EntityManager::getEntity(Entity::EHandle_t entity) const
-{
+std::shared_ptr<Entity> EntityManager::getEntity(Entity::EHandle_t entity) const {
 	return _entities.at(entity);
 }
 
 // TODO: Do we need some sort of handle renumber function too?
-void EntityManager::insertEntity(std::shared_ptr<Entity> ent)
-{
+void EntityManager::insertEntity(std::shared_ptr<Entity> ent) {
     assert(ent->getHandle() != Entity::INVALID_EHANDLE);
     assert(_entities.find(ent->getHandle()) == _entities.end());
     
@@ -572,8 +450,7 @@ void EntityManager::insertEntity(std::shared_ptr<Entity> ent)
     _entities.insert(std::pair<Entity::EHandle_t, std::shared_ptr<Entity>>(ent->getHandle(), ent));
 }
 
-void EntityManager::clearAll()
-{
+void EntityManager::clearAll() {
     _entities.clear();
     _lastHandle = Entity::INVALID_EHANDLE;
     _entityTypeNames.clear();	
@@ -606,13 +483,11 @@ void EntityManager::clearAll()
 	_propertyTypes.insert(std::make_pair(_propertyNames.add("fuz:certainty"), model::types::SubType::UInt32));
 }
 
-std::size_t EntityManager::entityCount() const
-{
+std::size_t EntityManager::entityCount() const {
     return _entities.size();
 }
 
-std::string EntityManager::dumpContents() const
-{
+std::string EntityManager::dumpContents() const {
     std::stringstream str;
     str << "Number of entities: " << _entities.size() << "\n";
     
@@ -651,8 +526,7 @@ std::string EntityManager::dumpContents() const
     return str.str();
 }
 
-bool EntityManager::saveToFile(const std::string &filename)
-{
+bool EntityManager::saveToFile(const std::string &filename) {
     Serialiser serialiser;
     GraphSerialiser gSer(this);
     gSer.serialise(serialiser);
@@ -669,8 +543,7 @@ bool EntityManager::saveToFile(const std::string &filename)
     return success;
 }
 
-bool EntityManager::loadFromFile(const std::string &filename)
-{
+bool EntityManager::loadFromFile(const std::string &filename) {
     std::size_t size = FileSystem::dataLength(filename);
     if ( size < 1 )
         return false;
@@ -701,46 +574,11 @@ bool EntityManager::loadFromFile(const std::string &filename)
     return true;
 }
 
-unsigned int EntityManager::getTypeID(const std::string &str)
-{
- //   // "Generic" type is an empty string.
- //   // The ID for this is 0.
- //   if ( str.size() < 1 )
- //       return ENTITY_TYPE_GENERIC;
-
- //   unsigned int id = 0;
-	//if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
-	//{
-	//	id = _entityTypeNames.left.at(str);
-	//}
-	//else {
-	//	_lastTypeID++;
-	//	id = _lastTypeID;
-	//	assert(id > 0);
-	//	_entityTypeNames.insert(boost::bimap<std::string, unsigned int>::value_type(str, id));
-	//}
-
- //   return id;
-	return _entityTypeNames.get(str);
+unsigned int EntityManager::getTypeID(const std::string &str) {
+ 	return _entityTypeNames.get(str);
 }
 
-unsigned int EntityManager::getTypeID(const std::string &str) const
-{
-    /*// "Generic" type is an empty string.
-    // The ID for this is 0.
-    if ( str.size() < 1 )
-        return ENTITY_TYPE_GENERIC;
-
-    unsigned int id = 0;
-    if (_entityTypeNames.left.find(str) != _entityTypeNames.left.end())
-    {
-        id = _entityTypeNames.left.at(str);
-    }
-    else {
-        throw std::runtime_error("No type ID for string \"" + str + "\".");
-    }
-
-    return id;*/
+unsigned int EntityManager::getTypeID(const std::string &str) const {  
 	return _entityTypeNames.get(str);
 }
 
@@ -883,103 +721,7 @@ void EntityManager::mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t 
 
 #pragma endregion linkingandmerging
 
-void EntityManager::createHierarchy(Entity::EHandle_t high, Entity::EHandle_t low, unsigned int author, const std::string &comment)
-{
-    using namespace model::types;
-    typedef std::shared_ptr<EntityRef> EntRefPtr;
-    typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
-    typedef std::shared_ptr<Entity> EntPtr;
-    
-    if ( _entities.find(high) == _entities.end() )
-        throw std::runtime_error("Entity with ID" + std::to_string(high) + " does not exist.");
-
-    if ( _entities.find(low) == _entities.end() )
-        throw std::runtime_error("Entity with ID" + std::to_string(low) + " does not exist.");
-    
-    // High is a superset of low.
-    // Low is a subset of high.
-    EntPtr pHigh = _entities[high];
-    EntPtr pLow = _entities[low];
-    
-    unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::EntityRef);
-    unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::EntityRef);
-    
-    // The superset entity holds the subset property pointing to the subset entity, and vice versa.
-    // Lambdas are wonderful for convenience.
-    auto propNotPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
-    {
-        std::vector<BasePointer> vals;
-        vals.push_back(EntRefPtr(new EntityRef(h)));
-        //EntPropertyPtr p(new EntityProperty(prop, model::types::SubType::EntityRef, vals));
-        //e->insertProperty(p);
-    };
-    
-    auto propPresent = [&] (EntPtr e, Entity::EHandle_t h, unsigned int prop)
-    {
-        EntPropertyPtr p = e->getProperty(prop);
-
-        // Check whether this entity is already part of this property.
-        std::vector<BasePointer> list = p->baseValues();
-        for ( const BasePointer &v : list )
-        {
-            EntityRef* e = dynamic_cast<EntityRef*>(v.get());
-            if ( e->value() == h )
-                return;
-        }
-
-        p->append(BasePointer(new EntityRef(h)));
-    };
-    
-    // This sets pHigh <supersetOf> entity:low
-    std::cout << "Setting " << high << " <supersetOf> " << low << std::endl;
-    if ( !pHigh->hasProperty(superProperty) )
-        propNotPresent(pHigh, low, superProperty);
-    else
-        propPresent(pHigh, low, superProperty);
-    
-    // This sets pLow <subsetOf> entity:high
-    std::cout << "Setting " << low << " <subsetOf> " << high << std::endl;
-    if ( !pLow->hasProperty(subProperty) )
-        propNotPresent(pLow, high, subProperty);
-    else
-        propPresent(pLow, high, subProperty);
-}
-
-void EntityManager::removeHierarchy(Entity::EHandle_t high, Entity::EHandle_t low)
-{
-    using namespace model::types;
-    typedef std::shared_ptr<EntityRef> EntRefPtr;
-    typedef std::shared_ptr<EntityProperty> EntPropertyPtr;
-    typedef std::shared_ptr<Entity> EntPtr;
-    
-    if ( _entities.find(high) == _entities.end() )
-        throw std::runtime_error("Entity with ID" + std::to_string(high) + " does not exist.");
-
-    if ( _entities.find(low) == _entities.end() )
-        throw std::runtime_error("Entity with ID" + std::to_string(low) + " does not exist.");
-    
-    EntPtr pHigh = _entities[high];
-    EntPtr pLow = _entities[low];
-    
-    //unsigned int superProperty = getPropertyName(ReservedProperties::ORDER_SUPERSET_OF, model::types::SubType::EntityRef, true);
-   // unsigned int subProperty = getPropertyName(ReservedProperties::ORDER_SUBSET_OF, model::types::SubType::EntityRef, true);
-    
-    //// Remove the entity references from the properties if they exist.
-    //if ( pHigh->hasProperty(superProperty) )
-    //{
-    //    EntPropertyPtr p = pHigh->getProperty(superProperty);
-    //    p->remove(EntityRef(low, 0));
-    //}
-    //
-    //if ( pHigh->hasProperty(subProperty) )
-    //{
-    //    EntPropertyPtr p = pLow->getProperty(subProperty);
-    //    p->remove(EntityRef(high, 0));
-    //}
-}
-
-unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type) const
-{
+unsigned int EntityManager::getPropertyName(const std::string &str, model::types::SubType type) const {
 	unsigned int propId = _propertyNames.get(str);
 
     model::types::SubType retrievedType = _propertyTypes.at(propId);
@@ -992,19 +734,16 @@ unsigned int EntityManager::getPropertyName(const std::string &str, model::types
     return propId;
 }
 
-const NameManager& EntityManager::propertyNameMap() const
-{
+const NameManager& EntityManager::propertyNameMap() const {
     return _propertyNames;
 }
 
 template<typename T, typename A, typename B>
-bool comparePrimitiveMaps(const T &mapA, const T &mapB)
-{
+bool comparePrimitiveMaps(const T &mapA, const T &mapB) {
     if ( mapA.size() != mapB.size() )
         return false;
 
-    for ( auto it = mapA.begin(); it != mapA.end(); ++it )
-    {
+    for ( auto it = mapA.begin(); it != mapA.end(); ++it ) {
         const B &thisVal = it->second;
 
         auto otherIt = mapB.find(it->first);
@@ -1020,34 +759,27 @@ bool comparePrimitiveMaps(const T &mapA, const T &mapB)
 }
 
 template<typename T, typename A, typename B>
-void printPrimitiveMaps(const T &mapA, const T &mapB)
-{
+void printPrimitiveMaps(const T &mapA, const T &mapB) {
     std::cout << "Map A has " << mapA.size() << " items." << std::endl;
     int i = 0;
-    for ( auto it = mapA.begin(); it != mapA.end(); ++it )
-    {
+    for ( auto it = mapA.begin(); it != mapA.end(); ++it ) {
         std::cout << "Item " << i << ": " << it->first << " -> " << it->second << std::endl;
-
         i++;
     }
 
     std::cout << "Map B has " << mapB.size() << " items." << std::endl;
     i = 0;
-    for ( auto it = mapB.begin(); it != mapB.end(); ++it )
-    {
+    for ( auto it = mapB.begin(); it != mapB.end(); ++it ) {
         std::cout << "Item " << i << ": " << it->first << " -> " << it->second << std::endl;
-
         i++;
     }
 }
 
-bool EntityManager::memberwiseEqual(const EntityManager &other) const
-{
+bool EntityManager::memberwiseEqual(const EntityManager &other) const {
     if ( _entities.size() != other._entities.size() )
         return false;
 
-    for ( auto it = _entities.begin(); it != _entities.end(); ++it )
-    {
+    for ( auto it = _entities.begin(); it != _entities.end(); ++it ) {
         const Entity* thisEnt = it->second.get();
 
         auto otherEntIt = other._entities.find(it->first);

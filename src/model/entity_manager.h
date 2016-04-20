@@ -58,9 +58,6 @@ public:
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
-	void createHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset, unsigned int author, const std::string &comment);
-	void removeHierarchy(Entity::EHandle_t superset, Entity::EHandle_t subset);
-
 	//move to private
 	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
 
@@ -92,18 +89,8 @@ private:
 
 	std::map<unsigned int, model::types::SubType> _propertyTypes;
 
-	void changeEntityType(Entity* ent, const std::string &type);
 	unsigned int getTypeID(const std::string &str);
 	unsigned int getTypeID(const std::string &str) const;
-	static void enforceTypeHasBeenSet(const Entity* entity);
-	static void enforceTypeHasBeenSet(const std::set<const Entity*> &ents);
-
-	void createHierarchy(const model::Triple &triple, Entity* ent, unsigned int author, const std::string &comment,
-		const std::vector<std::shared_ptr<model::types::Base> > &newRecords, model::types::SubType newRecordType);
-
-	void removeHierarchy(const model::Triple &triple);
-	bool performSpecialInsertOperations(const model::Triple &triple, Entity* ent, const std::vector<std::shared_ptr<model::types::Base> > &newRecords,
-		model::types::SubType newRecordType, unsigned int author, const std::string &comment);
 
 	void insertEntity(std::shared_ptr<Entity> ent);
 

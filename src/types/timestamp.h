@@ -4,6 +4,7 @@
 #include <string>
 
 #include "./base.h"
+#include "./ordered_type.h"
 #include <iostream>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -12,7 +13,7 @@ namespace model {
     namespace types {
 
         // Stores an integer value.
-        class TimeStamp : public Base {
+        class TimeStamp : public OrderedType {
         private:
             friend class TypeSerialiser;
 
@@ -38,7 +39,7 @@ namespace model {
             }
 
         public:
-			TimeStamp() : Base(), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
+			TimeStamp() : OrderedType(), _value(boost::posix_time::second_clock::universal_time()), _cYearCreated(1400),
 				_cMonthCreated(1),
 				_cDayCreated(1),
 				_cHourCreated(0),
@@ -105,6 +106,14 @@ namespace model {
 			//timestamps don't have any metadata
 			void setupDefaultMetaData(const unsigned char confidence) override {}
 
+			bool greaterThan(const std::string rhs) override {
+				return _value > boost::posix_time::time_from_string(rhs);
+			}
+
+			bool lessThan(const std::string rhs) override {
+				return _value < boost::posix_time::time_from_string(rhs);
+			}
+
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser) 
             {
@@ -112,7 +121,7 @@ namespace model {
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
-			TimeStamp(const char* &serialisedData, std::size_t length) : Base(serialisedData, length), _cYearCreated(1400),
+			TimeStamp(const char* &serialisedData, std::size_t length) : OrderedType(serialisedData, length), _cYearCreated(1400),
 				_cMonthCreated(1),
 				_cDayCreated(1),
 				_cHourCreated(0),

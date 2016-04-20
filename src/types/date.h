@@ -1,7 +1,7 @@
 #ifndef FUZZY_MODEL_TYPES_DATE
 #define FUZZY_MODEL_TYPES_DATE
 
-#include "./base.h"
+#include "./ordered_type.h"
 #include <stdexcept>
 #include "../util.h"
 
@@ -14,7 +14,7 @@ namespace model
         // and this can be converted to a StructuredDate
         // (year, month, day). Ordering can also be
         // specified, eg. before/after some date.
-        class Date : public Base
+        class Date : public OrderedType
         {
             friend class TypeSerialiser;
             typedef uint64_t Date_t;
@@ -138,17 +138,17 @@ namespace model
                 return StructuredDate(year, month, day);
             }
             
-            Date() : Base(), _value(0), _order(Ordering::EqualTo)
+            Date() : OrderedType(), _value(0), _order(Ordering::EqualTo)
             { }
             
             Date(Date_t value, Ordering order = Ordering::EqualTo) :
 
-            Base(), _value(value), _order(order)
+            OrderedType(), _value(value), _order(order)
             { }
 
             
             Date(const StructuredDate &sd, Ordering order = Ordering::EqualTo) :
-                Base(), _value(encode(sd)), _order(order)
+                OrderedType(), _value(encode(sd)), _order(order)
             { }
             
             virtual bool valuesEqualOnly(const Base *other) const
@@ -229,6 +229,16 @@ namespace model
 				return cloned;
 			}
 
+			bool greaterThan(const std::string rhs) override {
+				auto otherDate = encode(parseDateString(rhs));
+				return _value > otherDate;
+			}
+
+			bool lessThan(const std::string rhs) override {
+				auto otherDate = encode(parseDateString(rhs));
+				return _value < otherDate;
+			}
+
         protected:
             virtual std::size_t serialiseSubclass(Serialiser &serialiser)
             {
@@ -236,7 +246,7 @@ namespace model
                 return Base::serialiseSubclass(serialiser) + _memberSerialiser.serialiseAll(serialiser);
             }
 
-            Date(const char* &serialisedData, std::size_t length) : Base(serialisedData, length)
+            Date(const char* &serialisedData, std::size_t length) : OrderedType(serialisedData, length)
             {
                 initMemberSerialiser();
                 serialisedData += _memberSerialiser.unserialiseAll(serialisedData, length);

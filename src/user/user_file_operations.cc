@@ -225,7 +225,6 @@ void UserFileOperations::saveCacheToFile() const
     jsonDoc.AddMember(USERCOLLECTION,userCollections,allocator);
 
     //Using rapidJson FileWriteStream to write to user file.
-    char writeBuffer[65536];
     
     //XXX Window system should use wb?
     // TODO: Exception check for opening/writing file!

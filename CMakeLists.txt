@@ -24,6 +24,7 @@ else()
   message( FATAL_ERROR "CMAKE_BUILD_TYPE must be DEBUG or RELEASE - it's currently ${CMAKE_BUILD_TYPE}" )
 endif()
 
+SET(DOXYGEN_FOUND FALSE)
 
 message("Using generator ${CMAKE_GENERATOR}")
 
