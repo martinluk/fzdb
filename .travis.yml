@@ -1,9 +1,7 @@
 language: cpp
 sudo: required
 dist: trusty
-branch: 
-    only:
-        - master
+
 cache:
   apt: true
   directories:
