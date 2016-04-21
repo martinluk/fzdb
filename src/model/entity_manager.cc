@@ -59,7 +59,7 @@ std::shared_ptr<Entity> EntityManager::createEntity(const std::string &type) {
 
 // Basic Graph Pattern
 // When presented with a sanatised list of triples finds values for variables that satisfy that condition
-VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings settings) const {
+VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings&& settings) const {
     VariableSet result(triplesBlock.variables);
 
     //sort by entropy
@@ -79,21 +79,21 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 1 - $a <prop> value
-                    this->Scan1(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+                    this->Scan1(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable), std::move(settings));
                 } else {
                     //option 2 - $a <prop> $b
                     this->Scan2(std::move(result), result.indexOf(conditionsIter->subject.value), std::move(conditionsIter->predicate),
-						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
+						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable), std::move(settings));
                 }
             } else {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option3 - $a $b value
                     this->Scan3(std::move(result), result.indexOf(conditionsIter->subject.value),
-						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable), std::move(settings));
                 } else {
                     //option 4 - $a $b $c
                     this->Scan4(std::move(result), result.indexOf(conditionsIter->subject.value), 
-						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
+						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable), std::move(settings));
                 }
             }
         } else {
@@ -105,21 +105,21 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //meanlingless unless in a meta block!
 					this->ScanEPR(std::move(result), std::move(conditionsIter->subject), 
-						std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+						std::move(conditionsIter->predicate), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable), std::move(settings));
                 } else {
                     //option 5 - entity <prop> $c
                     this->Scan5(std::move(result), std::move(conditionsIter->subject), std::move(conditionsIter->predicate),
-						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
+						result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable), std::move(settings));
                 }
             } else {
                 if (model::Object::IsValue(conditionsIter->object.type)) {
                     //option 7 - entity $b value
                     this->Scan6(std::move(result), std::move(conditionsIter->subject),
-						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable));
+						result.indexOf(conditionsIter->predicate.value), std::move(conditionsIter->object), std::move(conditionsIter->meta_variable), std::move(settings));
                 } else {
                     //option 8 - entity $b $c
                     this->Scan7(std::move(result), std::move(conditionsIter->subject),
-						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable));
+						result.indexOf(conditionsIter->predicate.value), result.indexOf(conditionsIter->object.value), std::move(conditionsIter->meta_variable), std::move(settings));
                 }
             }
         }
@@ -129,9 +129,9 @@ VariableSet EntityManager::BGP(TriplesBlock triplesBlock, const QuerySettings se
 }
 
 //Inserts new data into the data store
-std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, QuerySettings&& settings)
+std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& block, TriplesBlock&& whereBlock, const QuerySettings&& settings)
 {
-	VariableSet whereVars = BGP(whereBlock, settings);
+	VariableSet whereVars = BGP(whereBlock, std::move(settings));
 
 	for (auto newVar : whereBlock.newEntities) {
 		whereVars.extend(newVar.first);
@@ -301,7 +301,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 }
 
 // For each variable described in triple block delete it
-std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, QuerySettings&& settings) {
+std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const QuerySettings&& settings) {
     using VariableType = model::types::SubType;
 
     //Records number of deletion in subject, property, and object.
@@ -309,7 +309,7 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, Query
 
     //Get VariableSet from BGP
     //Iterating over the returned variable set
-    VariableSet vs = BGP(whereBlock,settings);
+    VariableSet vs = BGP(whereBlock, std::move(settings));
 
     std::vector<std::string> variables = vs.getVariables();
     std::vector<VariableSetRow>::iterator rowIter;

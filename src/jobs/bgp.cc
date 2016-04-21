@@ -16,7 +16,7 @@ QueryResult BGP::executeConst() const
     QueryResult result;
     try {
       //run BGP
-        VariableSet variables = _database->entityManager().BGP(_query.whereClause, _query.settings);
+        VariableSet variables = _database->entityManager().BGP(_query.whereClause, std::move(_query.settings));
 
         variables.trimEmptyRows();
 
