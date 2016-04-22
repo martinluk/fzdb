@@ -42,6 +42,7 @@ describe("Fuzzy Database", function() {
       "user_password"  : "USER PASSWORD verybadpassword betterpassword",
       "user_promote"   : "USER PROMOTE creativeUserName",
       "user_demote"    : "USER DEMOTE creativeUserName",
+      "user_reset"     : "USER RESET creativeUserName betterpassword",
       "login_to_admin" : h.loginToAdminQuery
   };
 
@@ -68,7 +69,9 @@ describe("Fuzzy Database", function() {
         it("run user demote query", function(done) { 
             assertNotEnoughPermission(sampleQuery.user_demote,done);
         });
-        //TODO Load query
+        it("run user reset query", function(done) { 
+            assertNotEnoughPermission(sampleQuery.user_reset,done);
+        });
     });
     
     assertEditorNotPermissiveFunction=function(name, command) {
@@ -111,6 +114,7 @@ describe("Fuzzy Database", function() {
         assertEditorNotPermissiveFunction('flush command', 'FLUSH');
         assertEditorNotPermissiveFunction('promote command', sampleQuery.user_promote);
         assertEditorNotPermissiveFunction('demote command', sampleQuery.user_demote);
+        assertEditorNotPermissiveFunction('reset command', sampleQuery.user_reset);
 
     });
 
@@ -331,6 +335,95 @@ describe("Fuzzy Database", function() {
                 sendCmd('USER LOGOUT').then(function(data) { done(); });
             });
         });
+    });
+    describe("admin can reset password of other user", function() {
+            var login={name:'editorAcc', password:'password'};
+            //Assert cannot login into the account (since does not exist)
+            it("Login to user", function(done) {
+                q='USER LOGIN '+login.name+' '+login.password;
+                sendCmd(q).then(function(data) {
+                    expect(data.errorCode).toEqual(7);
+                    expect(data.info).toEqual('Login name/password combination incorrect');
+                    done();
+                });
+            });
+            //Add user
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Add User", function(done) {
+                addQ='USER ADD '+login.name+' '+login.password;
+                sendCmd(addQ).then(function(data) { done(); });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            //Assert is editor
+            it("Login to user", function(done) {
+                q='USER LOGIN '+login.name+' '+login.password;
+                sendCmd(q).then(function(data) { 
+                    expect(data.status).toBe(true);
+                    done(); });
+            });
+            it("Assert is editor", function(done) {
+                q='USER LEVEL';
+                sendCmd(q).then(function(data) { 
+                    expect(data.result.data).toBe('EDITOR');
+                    done(); });
+            });
+            it("Logout from user", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            //User admin to reset the user
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Reset the user", function(done) {
+                dQ='USER RESET '+login.name+' newpassword'
+                sendCmd(dQ).then(function(data) { 
+                    expect(data.status).toBe(true);
+                    done();
+                });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            // Assert cannot login using old login
+            it("Login to user", function(done) {
+                q='USER LOGIN '+login.name+' '+login.password;
+                sendCmd(q).then(function(data) {
+                    expect(data.errorCode).toEqual(7);
+                    expect(data.info).toEqual('Login name/password combination incorrect');
+                    done();
+                });
+            });
+            it("Login to user", function(done) {
+                q='USER LOGIN '+login.name+' '+'newpassword';
+                sendCmd(q).then(function(data) {
+                    expect(data.errorCode).toEqual(0);
+                    done();
+                });
+            });
+            it("Assert is editor", function(done) {
+                q='USER LEVEL';
+                sendCmd(q).then(function(data) { 
+                    expect(data.result.data).toBe('EDITOR');
+                    done(); });
+            });
+            it("Logout from user", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
+            //Delete the user
+            it("Log into Admin", function(done) {
+                sendCmd(sampleQuery.login_to_admin).then(function(data) { done(); });
+            });
+            it("Delete the user", function(done) {
+                dQ='USER DELETE '+login.name;
+                sendCmd(dQ).then(function(data) { done(); });
+            });
+            it("Logout from Admin", function(done) {
+                sendCmd('USER LOGOUT').then(function(data) { done(); });
+            });
     });
     describe("can change password", function() {
         describe("on editor",function() {

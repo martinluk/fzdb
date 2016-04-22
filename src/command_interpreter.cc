@@ -22,6 +22,7 @@
 #include "./jobs/user_logout.h"
 #include "./jobs/user_level.h"
 #include "./jobs/user_password.h"
+#include "./jobs/user_reset.h"
 
 #include "./parser.h"
 
@@ -92,6 +93,9 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
         break;
       case QueryType::USER_LOGOUT:
         JobQueue::AddJob(new UserLogoutJob(session));
+        break;
+      case QueryType::USER_RESET:
+        JobQueue::AddJob(new ResetPasswordJob(session, query.data0, query.data1));
         break;
       case QueryType::USER_LEVEL:
         JobQueue::AddJob(new UserLevelJob(session));
