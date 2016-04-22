@@ -21,7 +21,7 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) : _nameMap(
     _variablesUsed = std::vector<bool>(_size);
     for (auto variableName : variableNames) {
         _variablesUsed[_nameMap.add(variableName)] = false;
-		_typeMap.push_back(VariableType::Undefined);       
+		_typeMap.push_back(0);       
     }
     
 }
@@ -29,7 +29,7 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) : _nameMap(
 void VariableSet::extend(std::string variableName) {
 	
 	_variablesUsed.push_back(false);
-	_typeMap.push_back(VariableType::Undefined);
+	_typeMap.push_back(0);
 	_nameMap.add(variableName);
 	_size++;
 }
@@ -61,14 +61,16 @@ void VariableSet::add(const unsigned int var, const std::shared_ptr<model::types
     }
     else {
 		
-		if (type != _typeMap[var]) {
+		//TODO: the type should now NEVER be wrong
+		/*if (type != _typeMap[var]) {
 			if (_typeMap[var] == VariableType::Undefined) {
 				_typeMap[var] = type;
 			}
 			else {
 				throw std::runtime_error("Attempted to mix variable types!");
 			}
-		}
+		}*/
+		_typeMap[var] = _typeMap[var] | static_cast<unsigned char>(type);
 
         _variablesUsed[var] = true;
 
@@ -148,13 +150,30 @@ const bool VariableSet::used(unsigned int id) const
 	return _variablesUsed[id];
 }
 
-const VariableType VariableSet::typeOf(const std::string name) const {
+const unsigned char VariableSet::typeOf(const std::string name) const {
 	return _typeMap.at(_nameMap.get(name));
 }
 
-const VariableType VariableSet::typeOf(const std::size_t id) const {
+const unsigned char VariableSet::typeOf(const std::size_t id) const {
 	return _typeMap.at(id);
 }
+
+void VariableSet::enforcePosition(const unsigned int id, const model::types::TypePosition pos) {
+
+	unsigned char posChar = ((~static_cast<unsigned char>(pos)) & 0b11110000);
+
+	if (used(id) && ((_typeMap.at(id) & posChar) != 0)) {
+		for (auto iter = begin(); iter != end(); iter++) {
+			if (!(*iter)[id].empty() &&
+				(static_cast<unsigned char>((*iter)[id].dataPointer()->subtype())
+					& static_cast<unsigned char>(pos)) == 0)
+				(*iter)[id].reset();
+		}
+	} 
+
+	_typeMap[id] = _typeMap[id] | static_cast<unsigned char>(pos);
+}
+
 
 const std::size_t VariableSet::indexOf(const std::string name) const {
 	return _nameMap.get(name);
@@ -183,7 +202,7 @@ void VariableSet::addToMetaRefRow(unsigned int metaRef, std::size_t position, co
 
   for (std::size_t i = 0; i < _values.size(); i++) {
     for (std::size_t j = 0; j < _values[i].size(); j++) {
-      if (_values[i][j].metaRef() == metaRef && typeOf(j) != model::types::SubType::ValueReference) {
+      if (_values[i][j].metaRef() == metaRef && (typeOf(j) & static_cast<unsigned char>(model::types::TypePosition::METASUBJECT)) == 0) {
         _values[i][position].reset(value, entityId, propertyId);
         found = true;
         break;

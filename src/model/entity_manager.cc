@@ -167,25 +167,25 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
         unsigned char confidence = triple.object.hasCertainty ? triple.object.certainty : 100;
         std::vector<std::shared_ptr<model::types::Base>> newRecords;
-        model::types::SubType newRecordType;
+		//std::vector<model::types::SubType> newRecordTypes;
 
 		unsigned int authorID;
 
         switch (triple.object.type) {
         case model::Object::Type::STRING:
-            newRecordType = model::types::SubType::String;
+            //newRecordTypes.push_back(model::types::SubType::String);
             newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, authorID, confidence));
             break;
         case model::Object::Type::ENTITYREF:
-            newRecordType = model::types::SubType::EntityRef;
+            //newRecordTypes.push_back(model::types::SubType::EntityRef);
 			newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value));
             break;
         case model::Object::Type::INT:
-            newRecordType = model::types::SubType::Int32;
+            //newRecordTypes.push_back(model::types::SubType::Int32);
 			newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, authorID, confidence));
             break;
         case model::Object::Type::DATE:
-            newRecordType = model::types::SubType::Date;
+            //newRecordTypes.push_back(model::types::SubType::Date);
             newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value), model::types::Date::Ordering::EqualTo));
             break;
 		case model::Object::Type::VARIABLE: {
@@ -193,8 +193,8 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 				for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++) {
 					if ((*whereVarIter)[varId].empty()) continue;
 	    			newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
+					//newRecordTypes.push_back((*whereVarIter)[varId].dataPointer()->subtype());
 				}
-				newRecordType = whereVars.typeOf(triple.object.value);
 				break;
 			}
         }
@@ -252,7 +252,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             {
                 if (block.metaVariables.find(triple.subject.value) == block.metaVariables.end()) {
                     if (whereVars.contains(triple.subject.value)) {
-                        if (whereVars.typeOf(triple.subject.value) != VariableType::EntityRef) {
+                        if ((whereVars.typeOf(triple.subject.value) & static_cast<unsigned char>(model::types::TypePosition::SUBJECT)) == 0) {
 							throw new std::runtime_error("Variables bound in the WHERE clause of an insert statement used in the body of that statement MUST resolve to entity values");
 						}
 
@@ -320,7 +320,7 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const
 
         if(vs.contains(var) && vs.used(var)) {
             int variableSetId = (int)vs.indexOf(var);
-            VariableType type = vs.typeOf(var);
+
             std::vector<VariableSetRow> column = vs.extractRowsWith(variableSetId);
             //Refactor section begin
             std::vector<VariableSetRow>::iterator rowIter;
@@ -329,6 +329,8 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const
                 std::vector<VariableSetValue>::iterator valueIter;
                 for(valueIter=row.begin(); valueIter!=row.end(); valueIter++) {
                     VariableSetValue value = *valueIter;
+					if (value.empty()) continue;
+					VariableType type = value.dataPointer()->subtype();
                     unsigned long long entityId = value.entity();
                     unsigned long long propertyId = value.property(); 
                     if (type==VariableType::EntityRef) {

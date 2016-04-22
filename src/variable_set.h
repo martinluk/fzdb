@@ -165,8 +165,10 @@ class VariableSet {
   const bool used(const std::string name) const;
   const bool used(unsigned int id) const;
 
-  const VariableType typeOf(const std::string name) const;
-  const VariableType typeOf(const std::size_t id) const;
+  const unsigned char typeOf(const std::string name) const;
+  const unsigned char typeOf(const std::size_t id) const;
+
+  void enforcePosition(const unsigned int id, const model::types::TypePosition pos);
 
   const std::size_t indexOf(const std::string name) const;
 
@@ -201,7 +203,7 @@ class VariableSet {
  private:
   NameManager _nameMap;
   std::vector<std::string> _vars;
-  std::vector<model::types::SubType> _typeMap;
+  std::vector<unsigned char> _typeMap;
   std::vector<VariableSetRow> _values;
   std::vector<bool> _variablesUsed;
   std::size_t _size;

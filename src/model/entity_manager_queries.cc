@@ -28,23 +28,12 @@ void EntityManager::Scan1(VariableSet&& variableSet, unsigned int variableId, co
 
 	//the variable has been used before, we only need to iterate over valid values from before
 	if (variableSet.used(variableId)) {
-
-		//in this scan we can only remove variables from variableset
-		switch (variableSet.typeOf(variableId)) {
-		case model::types::SubType::SourceRef:
-		case model::types::SubType::EntityRef: {
+		
+		if ((variableSet.typeOf(variableId) & static_cast<unsigned char>(model::types::TypePosition::METASUBJECT)) == 0) {
+			variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
 			ScanUPR(std::move(variableSet), variableId, std::move(predicate), std::move(object), std::move(metaVar), std::move(settings));
-			break;
-		}
-
-		case model::types::SubType::ValueReference: {
+		} else {
 			ScanMPR(std::move(variableSet), variableId, std::move(predicate), std::move(object), std::move(metaVar), std::move(settings));
-			break;
-		}
-
-		default: {
-			throw std::runtime_error("The first element in a triple MUST be an entity or a meta variable!");
-		}
 		}
 		return;
 	}
@@ -64,31 +53,28 @@ void EntityManager::Scan2(VariableSet&& variableSet, unsigned int variableId, co
 
 		if (variableSet.used(variableId2)) {
 			// this cannot add any new data, only remove it			
-			switch (variableSet.typeOf(variableId)) {
-			case model::types::SubType::SourceRef:
-			case model::types::SubType::EntityRef:
+			if ((variableSet.typeOf(variableId) & static_cast<unsigned char>(model::types::TypePosition::METASUBJECT)) == 0) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::OBJECT);
 				ScanUPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar), std::move(settings));
-				break;
-			case model::types::SubType::ValueReference:
+			} else {
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::OBJECT);
 				ScanMPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar), std::move(settings));
-				break;
 			}
 		}
 		else {
-			switch (variableSet.typeOf(variableId)) {
-			case model::types::SubType::SourceRef:
-			case model::types::SubType::EntityRef:
+			if ((variableSet.typeOf(variableId) & static_cast<unsigned char>(model::types::TypePosition::METASUBJECT)) == 0) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
 				ScanUPV(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar), std::move(settings));
-				break;
-			case model::types::SubType::ValueReference:
+			} else {
 				ScanMPV(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar), std::move(settings));
-				break;
 			}
 		}
 		return;
 	}
 	else {
 		if (variableSet.used(variableId2)) {
+			variableSet.enforcePosition(variableId2, model::types::TypePosition::OBJECT);
 			ScanVPU(std::move(variableSet), variableId, std::move(predicate), variableId2, std::move(metaVar), std::move(settings));
 		}
 		else {
@@ -104,31 +90,28 @@ void EntityManager::Scan3(VariableSet&& variableSet, unsigned int variableId, un
 
 		if (variableSet.used(variableId2)) {
 			// this cannot add any new data, only remove it			
-			switch (variableSet.typeOf(variableId)) {
-			case model::types::SubType::SourceRef:
-			case model::types::SubType::EntityRef:
+			if ((variableSet.typeOf(variableId) & static_cast<unsigned char>(model::types::TypePosition::METASUBJECT)) == 0) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
 				ScanUUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar), std::move(settings));
-				break;
-			case model::types::SubType::ValueReference:
+			} else {
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
 				ScanMUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar), std::move(settings));
-				break;
 			}
 		}
 		else {
-			switch (variableSet.typeOf(variableId)) {
-			case model::types::SubType::SourceRef:
-			case model::types::SubType::EntityRef:
+			if ((variableSet.typeOf(variableId) & static_cast<unsigned char>(model::types::TypePosition::METASUBJECT)) == 0) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
 				ScanUVR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar), std::move(settings));
-				break;
-			case model::types::SubType::ValueReference:
+			} else {
 				ScanMVR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar), std::move(settings));
-				break;
 			}
 		}
 		return;
 	}
 	else {
 		if (variableSet.used(variableId2)) {
+			variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
 			ScanVUR(std::move(variableSet), variableId, variableId2, std::move(object), std::move(metaVar), std::move(settings));
 		}
 		else {
@@ -144,17 +127,25 @@ void EntityManager::Scan4(VariableSet&& variableSet, unsigned int variableId, un
 	if (variableSet.used(variableId)) {
 		if (variableSet.used(variableId2)) {
 			if (variableSet.used(variableId3)) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
+				variableSet.enforcePosition(variableId3, model::types::TypePosition::OBJECT);
 				ScanUUU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 			else {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
 				ScanUUV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 		}
 		else {
 			if (variableSet.used(variableId3)) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
+				variableSet.enforcePosition(variableId3, model::types::TypePosition::OBJECT);
 				ScanUVU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 			else {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::SUBJECT);
 				ScanUVV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 		}
@@ -162,14 +153,18 @@ void EntityManager::Scan4(VariableSet&& variableSet, unsigned int variableId, un
 	else {
 		if (variableSet.used(variableId2)) {
 			if (variableSet.used(variableId3)) {
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
+				variableSet.enforcePosition(variableId3, model::types::TypePosition::OBJECT);
 				ScanVUU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 			else {
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::PREDICATE);
 				ScanVUV(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 		}
 		else {
 			if (variableSet.used(variableId3)) {
+				variableSet.enforcePosition(variableId3, model::types::TypePosition::OBJECT);
 				ScanVVU(std::move(variableSet), variableId, variableId2, variableId3, std::move(metaVar), std::move(settings));
 			}
 			else {
@@ -183,6 +178,7 @@ void EntityManager::Scan4(VariableSet&& variableSet, unsigned int variableId, un
 //entity <predicate> $c
 void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subject, const model::Predicate&& predicate, unsigned int variableId, const std::string&& metaVar, const QuerySettings&& settings) const {
 	if (variableSet.used(variableId)) {
+		variableSet.enforcePosition(variableId, model::types::TypePosition::OBJECT);
 		ScanEPU(std::move(variableSet), std::move(subject), std::move(predicate), variableId, std::move(metaVar), std::move(settings));
 	}
 	else {
@@ -193,6 +189,7 @@ void EntityManager::Scan5(VariableSet&& variableSet, const model::Subject&& subj
 // entity $b value
 void EntityManager::Scan6(VariableSet&& variableSet, const model::Subject&& subject, unsigned int variableId, const model::Object&& object, const std::string&& metaVar, const QuerySettings&& settings) const {
 	if (variableSet.used(variableId)) {
+		variableSet.enforcePosition(variableId, model::types::TypePosition::PREDICATE);
 		ScanEUR(std::move(variableSet), std::move(subject), variableId, std::move(object), std::move(metaVar), std::move(settings));
 	}
 	else {
@@ -208,14 +205,18 @@ void EntityManager::Scan7(VariableSet&& variableSet, const model::Subject&& subj
 	if (EntityExists(entityRef)) {
 		if (variableSet.used(variableId)) {
 			if (variableSet.used(variableId2)) {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::PREDICATE);
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::OBJECT);
 				ScanEUU(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar), std::move(settings));
 			}
 			else {
+				variableSet.enforcePosition(variableId, model::types::TypePosition::PREDICATE);
 				ScanEUV(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar), std::move(settings));
 			}
 		}
 		else {
 			if (variableSet.used(variableId2)) {
+				variableSet.enforcePosition(variableId2, model::types::TypePosition::OBJECT);
 				ScanEVU(std::move(variableSet), std::move(subject), variableId, variableId2, std::move(metaVar), std::move(settings));
 			}
 			else {
@@ -544,6 +545,10 @@ void EntityManager::ScanUPV(VariableSet&& variableSet, unsigned int variableId, 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
 	for (auto iter = variableSet.begin(); iter != variableSet.end(); ) {
+		if ((*iter)[variableId].empty()) {
+			iter = variableSet.erase(iter);
+			continue;
+		}
 		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();
 		auto currentEntityIter = _entities.find(entityHandle);
 		std::shared_ptr<Entity> currentEntity;
@@ -597,9 +602,6 @@ void EntityManager::ScanUPU(VariableSet&& variableSet, unsigned int variableId, 
 
 	const unsigned int propertyId = this->getPropertyId(predicate.value);
 
-	if (variableSet.typeOf(variableId) != model::types::SubType::EntityRef) {
-		throw std::runtime_error("Not yet implemented :/");
-	}
 	for (auto iter = variableSet.begin(); iter != variableSet.end(); ) {
 
 		Entity::EHandle_t entityHandle = std::dynamic_pointer_cast<model::types::EntityRef, model::types::Base>((*iter)[variableId].dataPointer())->value();

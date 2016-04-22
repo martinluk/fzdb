@@ -1,11 +1,15 @@
 #ifndef FUZZY_MODEL_TYPES_SUBTYPE
 #define FUZZY_MODEL_TYPES_SUBTYPE
 
-#define SUBTYPE_VALUE_MASK 0b100000
-#define SUBTYPE_REFERENCE_MASK 0b010000
-
 namespace model {
     namespace types {
+
+		enum class TypePosition {
+			SUBJECT     = 0b10000000,
+			PREDICATE   = 0b01000000,
+			OBJECT      = 0b00100000,
+			METASUBJECT = 0b00010000,
+		};
 
         // Enum for the different subtypes that are defined.
         enum class SubType
@@ -13,19 +17,19 @@ namespace model {
             Undefined = 0x0,
 			SUBTYPE_COUNT = 0x1,
 
-			PropertyReference = SUBTYPE_REFERENCE_MASK | 0x0,
-			ValueReference = SUBTYPE_REFERENCE_MASK | 0x1,
-			
-			Int32 = SUBTYPE_VALUE_MASK | 0x0,
-            String = SUBTYPE_VALUE_MASK | 0x1,
-            EntityRef = SUBTYPE_VALUE_MASK | 0x2,
-            Date = SUBTYPE_VALUE_MASK | 0x3,
-			UInt32 = SUBTYPE_VALUE_MASK | 0x4,
-			TimeStamp = SUBTYPE_VALUE_MASK | 0x5,
-			TypeID = SUBTYPE_VALUE_MASK | 0x6,
-			AuthorID = SUBTYPE_VALUE_MASK | 0x7,
-			SourceRef = SUBTYPE_VALUE_MASK | 0x8,
-			Confidence = SUBTYPE_VALUE_MASK | 0x9
+			PropertyReference = ((int)TypePosition::PREDICATE)   | 0x0,
+			ValueReference    = ((int)TypePosition::METASUBJECT) | 0x1,
+			EntityRef         = ((int)TypePosition::SUBJECT)     | ((int)TypePosition::OBJECT) | 0x2,
+			SourceRef         = ((int)TypePosition::SUBJECT)     | ((int)TypePosition::OBJECT) | 0x3,
+
+			Int32       = ((int)TypePosition::OBJECT) | 0x0,
+            String      = ((int)TypePosition::OBJECT) | 0x1,
+            Date        = ((int)TypePosition::OBJECT) | 0x2,
+			UInt32      = ((int)TypePosition::OBJECT) | 0x3,
+			TimeStamp   = ((int)TypePosition::OBJECT) | 0x4,
+			TypeID      = ((int)TypePosition::OBJECT) | 0x5,
+			AuthorID    = ((int)TypePosition::OBJECT) | 0x6,
+			Confidence  = ((int)TypePosition::OBJECT) | 0x7
         };
 
         // Strings corresponding to the enum entries.

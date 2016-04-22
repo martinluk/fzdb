@@ -52,10 +52,10 @@ FILE(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 
 #Admin account set up
 #TODO(Martin Luk) Refactor Admin setting into some kind of config file?
-if(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-	message("Release Build - Database user json file should be added to correct dirrectory before building project.")
-else()
-	message("Debug build - Assuming no user json file ")
+#if(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+#	message("Release Build - Database user json file should be added to correct dirrectory before building project.")
+#else()
+	#message("Debug build - Assuming no user json file ")
 	add_definitions("-DINIT_ADD_ADMIN")
 
 	SET(ADMIN_USERNAME "fzydb_admin")
@@ -66,7 +66,7 @@ else()
 	add_definitions("-DADMIN_PASSWORD=\"${ADMIN_PASSWORD}\"")
 	message("Admin password set as default")
 
-endif()
+#endif()
 
 # disable warnings about C++ standard library
 if(WIN32)
