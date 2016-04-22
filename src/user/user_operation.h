@@ -23,9 +23,14 @@ public:
     void removeUser(const std::string &userName);
     void changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup);
     Permission::UserGroup getUserGroup(const std::string &userName) const;
+
     void changeUserPassword(const std::shared_ptr<ISession>&& session , 
             const std::string &oldpassword,
             const std::string &newpassword);
+
+    void changeUserPassword(const std::string &username,
+            const std::string &newpassword);
+
 	std::string getUserName(const unsigned int id) const;
 
 private:

@@ -109,6 +109,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
   else if (str == "LOGIN") tokenType  = ParsedTokenType ::KEYWORD_LOGIN;
   else if (str == "LOGOUT") tokenType   = ParsedTokenType ::KEYWORD_LOGOUT;
   else if (str == "LEVEL") tokenType  = ParsedTokenType ::KEYWORD_LEVEL;
+  else if (str == "RESET") tokenType  = ParsedTokenType ::KEYWORD_RESET;
 
   return std::pair<TokenInfo, std::string>(TokenInfo(tokenType, line, chr, data0), str);
 }
@@ -637,7 +638,7 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
 
     if(iter->first.type == ParsedTokenType::KEYWORD_USER) {
       iter++;
-      //Can either be UADD, UDELETE, UPASSWORD, UPROMOTE, UDEMOTE, ULOGIN, ULOGOUT, LEVEL
+      //Can either be UADD, UDELETE, UPASSWORD, UPROMOTE, UDEMOTE, ULOGIN, ULOGOUT, LEVEL, RESET
       int numberOfArg=-1;
       switch(iter->first.type) {
         case ParsedTokenType::KEYWORD_ADD: 
@@ -671,6 +672,10 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
         case ParsedTokenType::KEYWORD_LEVEL: 
           type=QueryType::USER_LEVEL;
           numberOfArg=0;
+          break;
+        case ParsedTokenType::KEYWORD_RESET: 
+          type=QueryType::USER_RESET;
+          numberOfArg=2;
           break;
         default:
           throw ParseException("Invalid arguments following USER");
