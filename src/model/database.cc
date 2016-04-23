@@ -1,7 +1,8 @@
 #include "./database.h"
 
-Database::Database() : _entityManager(this), _users()
+Database::Database(const std::string&& dataFilePath) : _entityManager(this), _users(), _dataFilePath(dataFilePath)
 {
+	
 }
 
 Database::~Database()
@@ -31,4 +32,9 @@ UserOperation& Database::users()
 const UserOperation& Database::users() const
 {
     return _users;
+}
+
+const std::string Database::dataFilePath() const
+{
+	return _dataFilePath;
 }

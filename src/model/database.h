@@ -8,7 +8,7 @@
 class Database
 {
 public:
-    Database();
+    Database(const std::string&& dataFilePath);
     ~Database();
 
 	void init();
@@ -20,10 +20,12 @@ public:
     // Users
     UserOperation& users();
     const UserOperation& users() const;
+	const std::string dataFilePath() const;
     
 private:
     EntityManager _entityManager;
     UserOperation _users;
+	const std::string _dataFilePath;
 };
 
 #endif // MODEL_DATABASE_H
