@@ -4,11 +4,11 @@
 #include "../job.h"
 
 
-class DeleteUserJob : public Job {
 
-    /**
-     * @brief Deletes a user from the database. Requires admin privileges.
-     */
+/**
+ * @brief Deletes a user from the database. Requires admin privileges.
+ */
+class DeleteUserJob : public Job {
     public:
         DeleteUserJob(std::shared_ptr<ISession> session, const std::string &username);
         

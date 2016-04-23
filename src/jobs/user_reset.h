@@ -3,11 +3,11 @@
 
 #include "../job.h"
 
-class ResetPasswordJob : public Job {
 
-    /**
-     * @brief Resets password of other users - runnable by admin
-     */
+/**
+ * @brief Resets password of other users - runnable by admin
+ */
+class ResetPasswordJob : public Job {
     public:
 
         /**

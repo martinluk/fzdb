@@ -6,10 +6,10 @@
 
 #include "../query_result.h"
 
+/**
+ * @brief Logs a user into the database. 
+ */
 class UserLoginJob : public Job {
-    /**
-     * @brief Logs a user into the database. 
-     */
 public:
     typedef Permission::PermissionType PermType;
 

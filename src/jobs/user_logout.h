@@ -7,11 +7,11 @@
 
 #include "../query_result.h"
 
-class UserLogoutJob : public Job {
 
-    /**
-     * @brief Logs a currently logged-in user out of the database.
-     */
+/**
+ * @brief Logs a currently logged-in user out of the database.
+ */
+class UserLogoutJob : public Job {
 public:
 
     /**

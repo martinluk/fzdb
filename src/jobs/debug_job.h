@@ -6,13 +6,13 @@
 
 #include "../query_result.h"
 
+/**
+* @brief Generic debug job.  Depending on the command arguments, we do various debug tasks here.
+*/
 class DebugJob : public Job
 {
 
 
-    /**
-     * @brief Generic debug job.  Depending on the command arguments, we do various debug tasks here.
-     */
     friend class DebugDumpEntities;
 public:
         DebugJob(std::shared_ptr<ISession> session, const std::string &message);

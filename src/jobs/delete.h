@@ -8,12 +8,12 @@
 
 #include <string>
 
+
+
+/**
+* @brief A delete query job.
+*/
 class Delete : public Job {
-
-
-    /**
-     * @brief A delete query job.
-     */
 public:
 
   Delete(std::shared_ptr<ISession> session, Query query);

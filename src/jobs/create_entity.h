@@ -5,17 +5,17 @@
 #include "../query_result.h"
 #include <string>
 
-class CreateEntityJob : public Job
-{
 /**
  * @brief Creates a new entity with the given type. 
  */
+class CreateEntityJob : public Job
+{
 public:
     /**
      * @brief Create job constructor.
      *
      * @param session Session object of the current session.
-     * @param type Name fo the type.
+     * @param type Name of the type.
      */
     CreateEntityJob(std::shared_ptr<ISession> session, const std::string &type);
 

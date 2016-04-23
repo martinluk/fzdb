@@ -5,10 +5,10 @@
 #include "../job.h"
 #include "../query_result.h"
 
-class DebugLoadFile
 /**
  * @brief Tests loading a file that was previously saved using DebugSaveFile. 
  */
+class DebugLoadFile
 {
 public:
     static QueryResult execute();

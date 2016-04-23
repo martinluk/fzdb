@@ -9,13 +9,12 @@
 
 namespace jobs {
     
-    class Link : public Job
-    {
 
     /**
     * @brief Links two entities together. 
     */
 
+    class Link : public Job {
     public:
 
         Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
@@ -28,12 +27,12 @@ namespace jobs {
         Entity::EHandle_t _entity2;
     };
 
-    class Unlink : public Link
-    {
-
     /**
     * @brief Unlinks two previously linked entities. 
     */
+    class Unlink : public Link
+    {
+
     public:
         Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
         virtual QueryResult executeNonConst() override;

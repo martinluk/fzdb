@@ -6,11 +6,11 @@
 
 #include "../query_result.h"
 
-class PingJob : public Job
-
 /**
 * @brief Debugging command. Responds with "PONG". 
 **/
+class PingJob : public Job
+
 {
 public:
 

@@ -7,12 +7,11 @@
 
 #include "../query_result.h"
 
-// Returns the current level of the user.
+/**
+ * @brief Returns the current level of the user.
+ */
 class UserLevelJob : public Job {
 
-    /**
-     * @brief Returns the current level of the user.
-     */
 public:
 
     /**

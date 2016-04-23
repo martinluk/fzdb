@@ -3,11 +3,11 @@
 
 #include "../job.h"
 
-class PromoteEditorJob : public Job {
 
-    /**
-     * @brief Promotes an editor to an admin. Requires admin privileges.
-     */
+/**
+ * @brief Promotes an editor to an admin. Requires admin privileges.
+ */
+class PromoteEditorJob : public Job {
     public:
         PromoteEditorJob(std::shared_ptr<ISession> session, const std::string &username);
         

@@ -5,13 +5,12 @@
 #include "../job.h"
 #include "../query_result.h"
 
-// Changes the userpassword, arg0=old password, arg1=new password
+
+
+/**
+ * @brief Changes the user password of the current user.
+ */
 class UserPasswordJob : public Job {
-
-
-    /**
-     * @brief Changes the user password of the current user.
-     */
 public:
 
     /**

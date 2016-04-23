@@ -5,13 +5,11 @@
 #include "../job.h"
 #include "../query_result.h"
 
+/**
+* @brief Informally tests entity serialisation and outputs the results for inspection. 
+*/
 class DebugSerialise
 {
-
-
-    /**
-     * @brief Informally tests entity serialisation and outputs the results for inspection. 
-     */
 public:
     static QueryResult execute();
 };

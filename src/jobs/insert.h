@@ -8,12 +8,12 @@
 
 #include <string>
 
+/**
+ * @brief Inserts a set of triples into the database.
+ */
 class Insert : public Job
 {
 
-  /**
-  * @brief Inserts a set of triples into the database.
-  */
 public:
 
   Insert(std::shared_ptr<ISession> session, Query query);
