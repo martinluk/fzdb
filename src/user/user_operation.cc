@@ -66,7 +66,7 @@ void UserOperation::addUser(const std::string &userName, const std::string &pass
     a.passwordHash=Hashing::hashPassword(userName,a.salt,password);
     a.userGroup=userGroup;
     a.id = _idGen.getId();
-	_fileOperations.addUser(a); //Super will throw UserAlreadyExistedException if user already exist
+	_fileOperations.addUser(a); //
 }
 
 void UserOperation::changeUserGroup(const std::string &userName, Permission::UserGroup newUserGroup)
