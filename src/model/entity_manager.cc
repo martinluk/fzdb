@@ -594,7 +594,13 @@ bool EntityManager::loadFromFile(const std::string &filename) {
         return false;
     }
 
-    clearAll();
+	_entities.clear();
+	_lastHandle = Entity::INVALID_EHANDLE;
+	_entityTypeNames.clear();
+	_propertyNames.clear();
+	_propertyTypes.clear();
+	_links.clear();
+
     GraphSerialiser gSer(this);
     gSer.unserialise(buffer, size);
     delete[] buffer;
