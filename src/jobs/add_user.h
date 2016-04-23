@@ -3,9 +3,19 @@
 
 #include "../job.h"
 
-// Adds a new user to the database. Requires admin privileges.
+/**
+ * @brief Adds a new user to the database. Requires admin privileges.
+ */
+
 class AddUserJob : public Job {
     public:
+        /**
+         * @brief Constructor of the add user job.
+         *
+         * @param session Session object of current session.
+         * @param username Username of the user to be added.
+         * @param password Password of the user to be added.
+         */
         AddUserJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password);
         
         virtual bool constOperation() const override { return false; }

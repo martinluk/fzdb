@@ -3,8 +3,11 @@
 
 #include "../job.h"
 
-// Demotes an admin back to an editor. Requires admin privileges.
 class DemoteAdminJob : public Job {
+
+    /**
+     * @brief Demotes an admin back to an editor. Requires admin privileges. 
+     */
     public:
         DemoteAdminJob(std::shared_ptr<ISession> session, const std::string &username);
         

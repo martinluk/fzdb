@@ -3,9 +3,20 @@
 
 #include "../job.h"
 
-// Resets password of other users - runnable by admin
 class ResetPasswordJob : public Job {
+
+    /**
+     * @brief Resets password of other users - runnable by admin
+     */
     public:
+
+        /**
+         * @brief Resets password of other users - runnable by admin
+         *
+         * @param session Session object of the current session.
+         * @param username Username of the user that wished to be reset.
+         * @param password The new password.
+         */
         ResetPasswordJob(std::shared_ptr<ISession> session,
                 const std::string &username,
                 const std::string &password);

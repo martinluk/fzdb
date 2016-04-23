@@ -6,9 +6,12 @@
 #include "../query_result.h"
 #include <string>
 
-// Debugging command. Responds with whatever input was passed in.
 class EchoJob : public Job
 {
+
+    /**
+     * @brief Debugging command. Responds with whatever input was passed in. 
+     */
 public:
 
     EchoJob(std::shared_ptr<ISession> session, const std::string &message);

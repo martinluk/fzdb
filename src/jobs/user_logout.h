@@ -7,9 +7,18 @@
 
 #include "../query_result.h"
 
-// Logs a currently logged-in user out of the database.
 class UserLogoutJob : public Job {
+
+    /**
+     * @brief Logs a currently logged-in user out of the database.
+     */
 public:
+
+    /**
+     * @brief Constructor of user log out job.
+     *
+     * @param session Session object of the current session.
+     */
     UserLogoutJob(std::shared_ptr<ISession> session);
     
     virtual bool constOperation() const override { return true; }

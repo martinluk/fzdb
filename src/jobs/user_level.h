@@ -9,7 +9,17 @@
 
 // Returns the current level of the user.
 class UserLevelJob : public Job {
+
+    /**
+     * @brief Returns the current level of the user.
+     */
 public:
+
+    /**
+     * @brief Constructor of the User Level job.
+     *
+     * @param session Session object of the current session.
+     */
     UserLevelJob(std::shared_ptr<ISession> session);
     
     virtual bool constOperation() const override { return true; }

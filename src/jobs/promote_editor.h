@@ -3,8 +3,11 @@
 
 #include "../job.h"
 
-// Promotes an editor to an admin. Requires admin privileges.
 class PromoteEditorJob : public Job {
+
+    /**
+     * @brief Promotes an editor to an admin. Requires admin privileges.
+     */
     public:
         PromoteEditorJob(std::shared_ptr<ISession> session, const std::string &username);
         

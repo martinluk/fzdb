@@ -8,9 +8,13 @@
 
 #include <string>
 
-// Deletes all entities within the database.
+// 
 class Flush : public Job
 {
+
+  /**
+    * @brief Deletes all entities within the database. 
+  */
 public:
 
   Flush(std::shared_ptr<ISession> session);

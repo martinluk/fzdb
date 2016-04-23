@@ -9,6 +9,11 @@
 #include <string>
 
 class Delete : public Job {
+
+
+    /**
+     * @brief A delete query job.
+     */
 public:
 
   Delete(std::shared_ptr<ISession> session, Query query);

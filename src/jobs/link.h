@@ -9,9 +9,13 @@
 
 namespace jobs {
     
-    // Links two entities together.
     class Link : public Job
     {
+
+    /**
+    * @brief Links two entities together. 
+    */
+
     public:
 
         Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
@@ -24,15 +28,20 @@ namespace jobs {
         Entity::EHandle_t _entity2;
     };
 
-    // Unlinks two previously linked entities.
     class Unlink : public Link
     {
+
+    /**
+    * @brief Unlinks two previously linked entities. 
+    */
     public:
         Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
         virtual QueryResult executeNonConst() override;
     };
 
-    // Merges two entities. This is like linking except it cannot be undone.
+    ///
+    /// Merges two entities. This is like linking except it cannot be undone.
+    ///
     class Merge : public Link
     {
     public:

@@ -4,9 +4,12 @@
 #include "../job.h"
 #include "../query_result.h"
 
-// Saves the current database state to a file.
 class SaveFileJob : public Job
 {
+
+/**
+* @brief Saves the current database state to a file. 
+*/
 public:
     SaveFileJob(std::shared_ptr<ISession> session, const std::string &message);
 

@@ -5,9 +5,12 @@
 #include "../job.h"
 #include "../query_result.h"
 
-// Tests saving a sample file.
 class DebugSaveFile
 {
+
+    /**
+     * @brief Tests saving a sample file.
+     */
 public:
     static QueryResult execute();
 };

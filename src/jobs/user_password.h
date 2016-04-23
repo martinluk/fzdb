@@ -7,7 +7,20 @@
 
 // Changes the userpassword, arg0=old password, arg1=new password
 class UserPasswordJob : public Job {
+
+
+    /**
+     * @brief Changes the user password of the current user.
+     */
 public:
+
+    /**
+     * @brief Changes the user password of the current user.
+     *
+     * @param session Session object of the current session.
+     * @param oldpassword Old password of the current user.
+     * @param newpassword New password of the current user.
+     */
     UserPasswordJob(std::shared_ptr<ISession> session, 
             const std::string &oldpassword,
             const std::string &newpassword);

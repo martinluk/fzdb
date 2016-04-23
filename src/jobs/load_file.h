@@ -4,8 +4,8 @@
 #include "../job.h"
 #include "../query_result.h"
 
-// Loads a specified database file from disk.
 class LoadFileJob : public Job
+/* Loads a specified database file from disk. */
 {
 public:
     LoadFileJob(std::shared_ptr<ISession> session, const std::string &message);
