@@ -49,4 +49,11 @@ exclude/*
 
 node_modules
 tools/structs/structs
+
+#Doxygen specifics
 documentation
+Doxyfile.bak
+html/
+latex/
+
+
