@@ -85,6 +85,18 @@ void UserOperation::removeUser(const std::string &userName)
     _fileOperations.removeUser(userName);
 }
 
+void UserOperation::changeUserPassword(const std::string &username,  const std::string &newpassword) {
+    //Get user attributes
+    UserAttributes a = _fileOperations.getUserAttributes(username);
+    //Get new salt
+    a.salt=Hashing::genSalt();
+    //gen new hash
+    a.passwordHash=Hashing::hashPassword(username,a.salt,newpassword);
+    //hash new password
+	_fileOperations.updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
+
+}
+
 void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session,
         const std::string &oldpassword, const std::string &newpassword) {
 
@@ -109,6 +121,7 @@ void UserOperation::changeUserPassword(const std::shared_ptr<ISession>&& session
     //hash new password
 	_fileOperations.updateUser(a.userName,a); //Super will throw UserNotExistException if user not already exist
 }
+
 
 std::string UserOperation::getUserName(const unsigned int id) const
 {

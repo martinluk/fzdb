@@ -57,6 +57,7 @@ enum class ParsedTokenType {
         KEYWORD_LOGIN    = TOKEN_KEYWORD_MASK | 0x15,
         KEYWORD_LOGOUT   = TOKEN_KEYWORD_MASK | 0x16,
         KEYWORD_LEVEL    = TOKEN_KEYWORD_MASK | 0x17,
+        KEYWORD_RESET    = TOKEN_KEYWORD_MASK | 0x18,
 
     
         SPLITTER1 = TOKEN_SPLITTER_MASK | 0x0,
@@ -178,7 +179,8 @@ enum class QueryType {
     USER_PASSWORD,
     USER_LOGIN,
     USER_LOGOUT,
-    USER_LEVEL
+    USER_LEVEL,
+    USER_RESET
 };
 
 //Aggregate query object - this should contain all info required to do a query
