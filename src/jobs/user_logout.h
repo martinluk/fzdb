@@ -7,16 +7,17 @@
 
 #include "../query_result.h"
 
-// Logs a currently logged-in user out of the database.
-class UserLogoutJob : public Job {
-public:
-    UserLogoutJob(std::shared_ptr<ISession> session);
-    
-    virtual bool constOperation() const override { return true; }
-    virtual QueryResult executeConst() const override;
+namespace jobs {
+	// Logs a currently logged-in user out of the database.
+	class UserLogout : public Job {
+	public:
+		UserLogout(std::shared_ptr<ISession> session);
 
-private:
-    std::shared_ptr<ISession> _session;
-};
+		virtual bool constOperation() const override { return true; }
+		virtual QueryResult executeConst() const override;
 
+	private:
+		std::shared_ptr<ISession> _session;
+	};
+}
 #endif

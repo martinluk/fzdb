@@ -37,7 +37,7 @@ protected:
 
 TEST_F(MockTest, ping_command) {
   std::shared_ptr<ISession> mockSession = std::make_shared<MockSession>();
-  PingJob* ping = new PingJob(mockSession);
+  jobs::Ping* ping = new jobs::Ping(mockSession);
 
   QueryResult result = ping->execute();
 

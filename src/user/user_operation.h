@@ -18,6 +18,7 @@ public:
     UserOperation();
     
     Permission::UserGroup login(std::shared_ptr<ISession>&& session, const std::string &userName, const std::string &password);
+	void logout(const std::shared_ptr<ISession>&& session) const;
 	void init();
     void addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup);
     void removeUser(const std::string &userName);

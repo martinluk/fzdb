@@ -1,10 +1,12 @@
 #include "./ping.h"
 
-PingJob::PingJob(std::shared_ptr<ISession> session) : Job(session, PermType::ViewDB)
+using namespace jobs;
+
+Ping::Ping(std::shared_ptr<ISession> session) : Job(session, PermType::ViewDB)
 {
 }
 
-QueryResult PingJob::executeConst() const
+QueryResult Ping::executeConst() const
 {
   QueryResult result;
   result.setResultDataText("PONG");
