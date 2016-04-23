@@ -8,20 +8,21 @@
 
 #include <string>
 
-// Insers a set of triples into the database.
-class Insert : public Job
-{
-public:
+namespace jobs {
+  // Insers a set of triples into the database.
+  class Insert : public Job
+  {
+  public:
 
-  Insert(std::shared_ptr<ISession> session, Query query);
+    Insert(std::shared_ptr<ISession> session, Query query);
 
-  virtual bool constOperation() const override { return false; }
-  virtual QueryResult executeNonConst() override;
+    virtual bool constOperation() const override { return false; }
+    virtual QueryResult executeNonConst() override;
 
-private:
-  Query _query;
+  private:
+    Query _query;
 
-};
-
+  };
+}
 
 #endif

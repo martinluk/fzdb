@@ -4,6 +4,8 @@
 
 #include "../exceptions.h"
 
+using namespace jobs;
+
 Flush::Flush(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp)
 {
 }

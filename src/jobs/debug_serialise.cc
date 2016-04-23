@@ -14,6 +14,8 @@
 #include "../model/entity.h"
 #include "../model/entity_serialiser.h"
 
+using namespace jobs;
+
 std::string outputSerialiserData(const Serialiser &serialiser) {
   std::stringstream log;
 

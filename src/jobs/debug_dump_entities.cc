@@ -3,7 +3,9 @@
 #include"../model/entity_manager.h"
 #include "../model/database.h"
 
-QueryResult DebugDumpEntities::execute(const DebugJob &j)
+using namespace jobs;
+
+QueryResult DebugDumpEntities::execute(const Debug &j)
 {
     QueryResult result;
     result.setResultDataText(j._database->entityManager().dumpContents());

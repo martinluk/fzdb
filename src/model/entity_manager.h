@@ -1,3 +1,7 @@
+/**
+ * EntityManager.h - defines the entity manager class
+ */
+
 #ifndef MODEL_ENTITY_MANAGER_H
 #define MODEL_ENTITY_MANAGER_H
 
@@ -18,60 +22,203 @@
 #include "../util.h"
 #include "./query_settings.h"
 #include "./util/name_manager.h"
+#include <gtest/gtest_prod.h>
 
-// Management class that keeps track of entities and their associated metadata.
-class EntityManager
-{
+namespace jobs {
+	class DebugSaveFile;
+}
+
+/**
+ * @brief Manages Entities
+ * @details This class maintains a list of entities and contains the definitions of all 
+ * Create, Select and Delete operations possible in the database. 
+ */
+class EntityManager {
 	friend class GraphSerialiser;
 	friend class Entity;
+	friend class jobs::DebugSaveFile;
+	FRIEND_TEST(SerialisationTest, testSerialiseEntityManager);
+	FRIEND_TEST(SerialisationTest, testWriteReadFiles);
 public:
-	EntityManager(Database* db);
+	/**
+	 * @brief Constructor for the entity manager
+	 * 
+	 * @param db A pointer to the database object this entity manager is a part of
+	 */
+	explicit EntityManager(Database* db);
+
+	/**
+	 * @brief Destroys the entity manager
+	 */
 	~EntityManager();
 
-	// Creates an entity on the heap and returns a pointer to it.
-	std::shared_ptr<Entity> createEntity(const std::string &type);
-
+	/**
+	 * @brief Performs basic graph processing on the database using the given triples
+	 * @details Selects all triples in the database that match the given pattern.
+	 * 
+	 * @param triplesBlock The triples to evaluate
+	 * @param settings Additional settings for the query
+	 * 
+	 * @return The triples selected from the database
+	 */
 	VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings&& settings) const;
 
-    std::tuple<int,int,int> Delete(TriplesBlock&& whereBlock, const QuerySettings&& settings);
+  std::tuple<int,int,int> Delete(TriplesBlock&& whereBlock, const QuerySettings&& settings);
 
-    std::map<std::string, Entity::EHandle_t> Insert(TriplesBlock&& triples, TriplesBlock&& whereBlock, const QuerySettings&& settings);
+  /**
+   * @brief Inserts the given triples into the datastore
+   * @details Evaluates the whereblock and then iterates over the given triples inserting any 
+   * generated entities, properties or records into the database.
+   * 
+   * @param triples Triples representing the new data to insert
+   * @param whereBlock Triples representing queries to run before inserting the new triples
+   * @param settings Additional settings for the query
+   * @return A map from the variables that were supplied in the query to the ids given to the entities they generated
+   * by the database.
+   */
+  std::map<std::string, Entity::EHandle_t> Insert(TriplesBlock&& triples, TriplesBlock&& whereBlock, const QuerySettings&& settings);
 
+  /**
+   * @brief Tests whether an entity exists
+   * @details Tests whether the entity with the given handle exists in the
+   * datbase
+   * 
+   * @param handle The entity handle to test
+   * @return Boolean representing whether the entity exists in the database or n
+   */
 	bool EntityExists(Entity::EHandle_t handle) const {
 		return _entities.find(handle) != _entities.cend();
 	}
 
 	std::shared_ptr<model::types::Base> dereference(Entity::EHandle_t entity, unsigned int prop, unsigned int val) const;
 
+	/**
+	 * @brief Gets a list of all entities
+	 * @details Transforms the map of entities into a vector and returns it
+	 * @return A vector of all entities in the database
+	 */
 	std::vector<std::shared_ptr<Entity>> entityList() const;
+
+	/**
+	 * @brief Gets a pointer to the entity with the given id
+	 * @details Gets a pointer to the entity with the given id. Throws an error if the entity
+	 * id does not exist
+	 * 
+	 * @param entity The id of the entity to retrieve
+	 * @return A shared pointer to the entity
+	 */
 	std::shared_ptr<Entity> getEntity(Entity::EHandle_t entity) const;
+
+	/**
+	 * @brief Gets the number of entities
+	 * @details Retrieves the number of entities stored by this entity manager
+	 * @return The number of entities
+	 */
 	std::size_t entityCount() const;
 
+	/**
+	 * @brief Clears the database back to its default state
+	 * @details Deletes all data in the database and reseeds the built-in types. Writes to
+	 * the output file on completion.
+	 */
 	void clearAll();
 
 	std::string dumpContents() const;
 
+	/**
+	 * @brief Saves the database to disk
+	 * @details Serialiases the database and writes it to the specified file
+	 * 
+	 * @param filename The filename to write to, relative paths are from the exe location
+	 * @return Boolean indicating whether the save was succesful
+	 */
 	bool saveToFile(const std::string &filename);
+
+	/**
+	 * @brief Loads the database from disk
+	 * @details Reads the specified files and unserialises the database
+	 * 
+	 * @param filename The file to read from, relative paths are from the exe location
+	 * @return Boolean indicating whether the load was succesful
+	 */
 	bool loadFromFile(const std::string &filename);
 
+	/**
+	 * @brief Links two entities
+	 * @details Links the entities with the given ids. The link graph that this creates is then
+	 * evaluated and link properties set on the affected entities. The entity with the lowest id
+	 * is assigned LinkMaster, the others LinkSlave.
+	 * 
+	 * @param entityId The id of one of the entities to link
+	 * @param entityId2 The id of the other entity to link
+	 */
 	void linkEntities(const Entity::EHandle_t entityId, const Entity::EHandle_t entityId2);
+
+	/**
+	 * @brief Unlinks two entities
+	 * @details Unlinks the entities with the given ids. If either entity is still part of a link 
+	 * graph those graphs are recalculated and link properties reassigned.
+	 * 
+	 * @param entityId The id of one of the entities to unlink
+	 * @param entityId2 The id of the other entity to unlink
+	 */
 	void unlinkEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
+
+	/**
+	 * @brief Merges two entities
+	 * @details Copies all properties from the entity with the higher id to the entity with the lower
+	 * id and then deletes the entity with the higher id
+	 * 
+	 * @param entityId The id of one of the entities to merge
+	 * @param entityId2 The id of the other entity to merge
+	 */
 	void mergeEntities(Entity::EHandle_t entityId, Entity::EHandle_t entityId2);
 
-	//move to private
-	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
-
+	/**
+	 * @brief Gets the name of the property with the given id
+	 * @details Retrieves the name of the property with the given id. Throws an error
+	 * if the id is not present in the name registry.
+	 * 
+	 * @param int The id of the property to find the name of
+	 * @return The name of the property with id `propertyId`
+	 */
 	const std::string getPropertyName(unsigned int propertyId) const;
 
+	/**
+	 * @brief Gets the property name manager
+	 * @details Returns a read-only reference to the property name manager
+	 * @return Read-only reference to the property name manager
+	 */
 	const NameManager& propertyNameMap() const;
 
+	/**
+	 * @brief Gets the name of the type with the given id
+	 * @details Retrieves the name of the entity type with the given id. Throws
+	 * an error if the id is not present in the name registry.
+	 * 
+	 * @param int The id of the entity type to find the name of
+	 * @return The name of the entity type with id `id`
+	 */
 	std::string getTypeName(const unsigned int id) const {
 		return _entityTypeNames.get(id);
 	}
 
+	/**
+	 * @brief Tests if two EntityManagers are equal
+	 * @details Tests the equality of this entity manager with the given entity manager
+	 * by comparing all of the members.
+	 * 
+	 * @param other The entity manager to compare this entity manager with
+	 * @return Whether the two managers are equal
+	 */
 	bool memberwiseEqual(const EntityManager &other) const;
 
 private:
+
+	std::shared_ptr<Entity> createEntity(const std::string &type);
+
+	std::set<Entity::EHandle_t> getLinkGraph(const Entity::EHandle_t start, std::set<Entity::EHandle_t>&& visited) const;
+
 	// TODO: (Jonathan) This could be an unordered map, but we may want to utilise the
 	// numerical nature of the entity handles. O(log n) is still pretty good.
 	typedef std::map<Entity::EHandle_t, std::shared_ptr<Entity>> EntityMap;

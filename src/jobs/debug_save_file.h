@@ -5,11 +5,13 @@
 #include "../job.h"
 #include "../query_result.h"
 
-// Tests saving a sample file.
-class DebugSaveFile
-{
-public:
-    static QueryResult execute();
-};
+namespace jobs {  
+  // Tests saving a sample file.
+  class DebugSaveFile
+  {
+  public:
+      static QueryResult execute();
+  }; 
+}
 
 #endif  // JOBS_DEBUGSAVEFILE_H

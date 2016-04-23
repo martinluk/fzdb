@@ -8,18 +8,19 @@
 
 #include <string>
 
-class Delete : public Job {
-public:
+namespace jobs {  
+  class Delete : public Job {
+  public:
 
-  Delete(std::shared_ptr<ISession> session, Query query);
+    Delete(std::shared_ptr<ISession> session, Query query);
 
-  virtual bool constOperation() const override { return false; }
-  virtual QueryResult executeNonConst() override;
+    virtual bool constOperation() const override { return false; }
+    virtual QueryResult executeNonConst() override;
 
-private:
-  Query _query;
+  private:
+    Query _query;
 
-};
-
+  };
+}
 
 #endif

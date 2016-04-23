@@ -5,11 +5,13 @@
 #include "../job.h"
 #include "../query_result.h"
 
-// Tests loading a file that was previously saved using DebugSaveFile.
-class DebugLoadFile
-{
-public:
-    static QueryResult execute();
-};
+namespace jobs {  
+  // Tests loading a file that was previously saved using DebugSaveFile.
+  class DebugLoadFile
+  {
+  public:
+      static QueryResult execute();
+  };  
+}
 
 #endif  // JOBS_DEBUGLOADFILE_H

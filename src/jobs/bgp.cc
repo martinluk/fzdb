@@ -6,6 +6,8 @@
 
 #include <rapidjson/document.h>
 
+using namespace jobs;
+
 BGP::BGP(std::shared_ptr<ISession> session, Query query)
     : Job(session, PermType::ViewDB ), _query(query)
 {

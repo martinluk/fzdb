@@ -41,19 +41,19 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
         JobQueue::AddJob(new PingJob(session));
         break;
       case QueryType::DEBUGECHO:
-        JobQueue::AddJob(new EchoJob(session, query.data0));
+        JobQueue::AddJob(new jobs::Echo(session, query.data0));
         break;
       case QueryType::INSERT:
-        JobQueue::AddJob(new Insert(session, query));
+        JobQueue::AddJob(new jobs::Insert(session, query));
         break;
       case QueryType::DELETECMD:
-        JobQueue::AddJob(new Delete(session, query));
+        JobQueue::AddJob(new jobs::Delete(session, query));
         break;
       case QueryType::SELECT:
-        JobQueue::AddJob(new BGP(session, query));
+        JobQueue::AddJob(new jobs::BGP(session, query));
         break;
       case QueryType::DEBUGOTHER:
-        JobQueue::AddJob(new DebugJob(session, query.data0));
+        JobQueue::AddJob(new jobs::Debug(session, query.data0));
         break;
       case QueryType::LOAD:
         JobQueue::AddJob(new LoadFileJob(session, query.data0));
@@ -71,13 +71,13 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
         JobQueue::AddJob(new jobs::Merge(session, query.entities[0], query.entities[1]));
         break;
       case QueryType::FLUSH:
-        JobQueue::AddJob(new Flush(session));
+        JobQueue::AddJob(new jobs::Flush(session));
         break;
       case QueryType::USER_ADD:
-        JobQueue::AddJob(new AddUserJob(session, query.data0, query.data1));
+        JobQueue::AddJob(new jobs::AddUser(session, query.data0, query.data1));
         break;
       case QueryType::USER_DELETE:
-        JobQueue::AddJob(new DeleteUserJob(session, query.data0));
+        JobQueue::AddJob(new jobs::DeleteUser(session, query.data0));
         break;
       case QueryType::USER_PASSWORD:
         JobQueue::AddJob(new UserPasswordJob(session, query.data0, query.data1)); 
@@ -86,7 +86,7 @@ void CommandInterpreter::ProcessCommand(std::shared_ptr<ISession> session, std::
         JobQueue::AddJob(new PromoteEditorJob(session, query.data0));
         break;
       case QueryType::USER_DEMOTE:
-        JobQueue::AddJob(new DemoteAdminJob(session, query.data0));
+        JobQueue::AddJob(new jobs::DemoteAdmin(session, query.data0));
         break;
       case QueryType::USER_LOGIN:
         JobQueue::AddJob(new UserLoginJob(session, query.data0, query.data1));

@@ -4,12 +4,14 @@
 #include "../user/user_operation.h"
 #include "../user/user_exceptions.h"
 
-DeleteUserJob::DeleteUserJob(std::shared_ptr<ISession> session, const std::string &username)
+using namespace jobs;
+
+DeleteUser::DeleteUser(std::shared_ptr<ISession> session, const std::string &username)
     :Job(session, PermType::UserOp ) {
     _username = username;
 }
 
-QueryResult DeleteUserJob::executeNonConst()
+QueryResult DeleteUser::executeNonConst()
 {
     try {
         _database->users().removeUser(_username);

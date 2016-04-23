@@ -50,3 +50,5 @@ exclude/*
 node_modules
 tools/structs/structs
 documentation
+doxygen.exe
+libclang.dll

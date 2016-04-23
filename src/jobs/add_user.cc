@@ -4,13 +4,15 @@
 #include "../user/user_operation.h"
 #include "../user/user_exceptions.h"
 
-AddUserJob::AddUserJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password):
+using namespace jobs;
+
+AddUser::AddUser(std::shared_ptr<ISession> session, const std::string &username, const std::string &password):
     Job(session, PermType::UserOp) {
     _username = username;
     _password = password;
 }
 
-QueryResult AddUserJob::executeNonConst()
+QueryResult AddUser::executeNonConst()
 {
     try {
         //TODO Need to verify username and password are not empty.

@@ -5,6 +5,8 @@
 #include "../exceptions.h"
 #include <rapidjson/document.h>
 
+using namespace jobs;
+
 Insert::Insert(std::shared_ptr<ISession> session, Query query) 
     : Job(session, PermType::ModifyDB), _query(query)
 {
