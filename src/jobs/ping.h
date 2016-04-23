@@ -6,19 +6,19 @@
 
 #include "../query_result.h"
 
+namespace jobs {
 /**
 * @brief Debugging command. Responds with "PONG". 
 **/
-class PingJob : public Job
+	class Ping : public Job
+	{
+	public:
 
-{
-public:
+		Ping(std::shared_ptr<ISession> session);
 
-    PingJob(std::shared_ptr<ISession> session);
+		virtual bool constOperation() const override { return true; }
+		virtual QueryResult executeConst() const override;
 
-    virtual bool constOperation() const override { return true; }
-    virtual QueryResult executeConst() const override;
-
-};
-
+	};
+}
 #endif    // JOB_PINGJOB_H

@@ -6,29 +6,22 @@
 
 #include "../query_result.h"
 
-/**
- * @brief Logs a user into the database. 
- */
-class UserLoginJob : public Job {
-public:
-    typedef Permission::PermissionType PermType;
-
+namespace jobs {
     /**
-     * @brief Constructor of user login job.
-     *
-     * @param session Session object of the current user.
-     * @param username User name provided by user.
-     * @param password Password provided by user.
+     * @brief Logs a user into the database. 
      */
-    UserLoginJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password);
+	class UserLogin : public Job {
+	public:
+		typedef Permission::PermissionType PermType;
+		UserLogin(std::shared_ptr<ISession> session, const std::string &username, const std::string &password);
+		virtual bool constOperation() const override { return false; }
+		virtual QueryResult executeNonConst() override;
 
-    virtual bool constOperation() const override { return false; }
-    virtual QueryResult executeNonConst() override;
-
-private:
-    std::string _username;
-    std::string _password;
-    std::shared_ptr<ISession> _session;
-};
+	private:
+		std::string _username;
+		std::string _password;
+		std::shared_ptr<ISession> _session;
+	};
+}
 
 #endif

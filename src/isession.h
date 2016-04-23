@@ -7,14 +7,10 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid.hpp>
 
-//#include <jobs/UserLogoutJob.h>
-
 // Implements base session functionality.
 class ISession
 {
     friend class UserOperation;
-    friend class UserLogoutJob;
-
 public:
     virtual boost::asio::ip::tcp::socket& socket() = 0;
     virtual void start() = 0;

@@ -2,31 +2,24 @@
 #define FUZZY_JOBS_RESET_PASSWORD
 
 #include "../job.h"
+namespace jobs {
 
+    /**
+     * @brief Resets password of other users - runnable by admin
+     */
+	class ResetPassword : public Job {
+	public:
+		ResetPassword(std::shared_ptr<ISession> session,
+			const std::string &username,
+			const std::string &password);
 
-/**
- * @brief Resets password of other users - runnable by admin
- */
-class ResetPasswordJob : public Job {
-    public:
+		virtual bool constOperation() const override { return false; }
+		virtual QueryResult executeNonConst() override;
 
-        /**
-         * @brief Resets password of other users - runnable by admin
-         *
-         * @param session Session object of the current session.
-         * @param username Username of the user that wished to be reset.
-         * @param password The new password.
-         */
-        ResetPasswordJob(std::shared_ptr<ISession> session,
-                const std::string &username,
-                const std::string &password);
-        
-        virtual bool constOperation() const override { return false; }
-        virtual QueryResult executeNonConst() override;
-        
-    private:
-        std::string _username;
-        std::string _password;
-};
+	private:
+		std::string _username;
+		std::string _password;
+	};
+}
 
 #endif

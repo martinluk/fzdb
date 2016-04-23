@@ -57,8 +57,13 @@ Permission::UserGroup UserOperation::login(std::shared_ptr<ISession>&& session, 
     return currUserAttr.userGroup;
 }
 
-void UserOperation::addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup)
-{
+void UserOperation::logout(const std::shared_ptr<ISession>&& session) const {
+	session->clearCurrentUserName();
+	session->_userId = 0;
+	session->setUserGroup(Permission::UserGroup::GUEST);
+}
+
+void UserOperation::addUser(const std::string &userName, const std::string &password, Permission::UserGroup userGroup) {
     assert(!userName.empty());
     UserAttributes a;
     a.userName=userName;

@@ -29,6 +29,13 @@ public:
      * @return Usergroup of the logged in user.
      */
     Permission::UserGroup login(std::shared_ptr<ISession>&& session, const std::string &userName, const std::string &password);
+
+	/**
+	 * @brief Logout the current session.
+	 *
+	 * @param session Session object for the current session.
+	 */
+	void logout(const std::shared_ptr<ISession>&& session) const;
 	/**
 	 * @brief Initialise the class.
 	 */

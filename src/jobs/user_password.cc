@@ -2,7 +2,9 @@
 #include "../user/permission.h"
 #include "../user/user_operation.h"
 
-UserPasswordJob::UserPasswordJob(std::shared_ptr<ISession> session,
+using namespace jobs;
+
+UserPassword::UserPassword(std::shared_ptr<ISession> session,
         const std::string &oldpassword,
         const std::string &newpassword) : Job(session,PermType::LoggedInUser) {
     _oldpassword=oldpassword;
@@ -10,7 +12,7 @@ UserPasswordJob::UserPasswordJob(std::shared_ptr<ISession> session,
     _session=session;
 };
 
-QueryResult UserPasswordJob::executeNonConst()
+QueryResult UserPassword::executeNonConst()
 {
     try {
         _database->users().changeUserPassword(std::move(_session), _oldpassword, _newpassword);

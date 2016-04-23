@@ -4,14 +4,16 @@
 #include "../user/permission.h"
 #include "../user/user_operation.h"
 
-UserLoginJob::UserLoginJob(std::shared_ptr<ISession> session, const std::string &username, const std::string &password)
+using namespace jobs;
+
+UserLogin::UserLogin(std::shared_ptr<ISession> session, const std::string &username, const std::string &password)
     : Job(session,PermType::ViewDB) {
     _username=username;
     _password=password;
     _session=session;
 };
 
-QueryResult UserLoginJob::executeNonConst()
+QueryResult UserLogin::executeNonConst()
 {
     try {
         //TODO Verify username and password are not empty

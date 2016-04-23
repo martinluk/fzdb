@@ -7,12 +7,14 @@
 #include "../singletons.h"
 #include "../model/entity_manager.h"
 
-LoadFileJob::LoadFileJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
+using namespace jobs;
+
+LoadFile::LoadFile(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
 {
     _message = message;
 }
 
-SaveFileJob::SaveFileJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
+SaveFile::SaveFile(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
 {
     _message = message;
 }
@@ -62,7 +64,7 @@ bool _preprocess(std::string &message)
     return true;
 }
 
-QueryResult LoadFileJob::executeNonConst()
+QueryResult LoadFile::executeNonConst()
 {
     if ( !_preprocess(_message) )
     {
@@ -80,7 +82,7 @@ QueryResult LoadFileJob::executeNonConst()
     }
 }
 
-QueryResult SaveFileJob::executeConst() const
+QueryResult SaveFile::executeConst() const
 {
     if ( !_preprocess(_message) )
     {

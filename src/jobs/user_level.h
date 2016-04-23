@@ -7,25 +7,19 @@
 
 #include "../query_result.h"
 
-/**
- * @brief Returns the current level of the user.
- */
-class UserLevelJob : public Job {
-
-public:
-
+namespace jobs {
     /**
-     * @brief Constructor of the User Level job.
-     *
-     * @param session Session object of the current session.
+     * @brief Returns the current level of the user.
      */
-    UserLevelJob(std::shared_ptr<ISession> session);
-    
-    virtual bool constOperation() const override { return true; }
-    virtual QueryResult executeConst() const override;
+	class UserLevel : public Job {
+	public:
+		UserLevel(std::shared_ptr<ISession> session);
+		virtual bool constOperation() const override { return true; }
+		virtual QueryResult executeConst() const override;
 
-private:
-    std::shared_ptr<ISession> _session;
-};
+	private:
+		std::shared_ptr<ISession> _session;
+	};
+}
 
 #endif
