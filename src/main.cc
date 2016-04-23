@@ -125,7 +125,9 @@ int main(int argc, char* argv[]) {
     if (vm.count("file")) {
       std::cout << "Loading from datafile " << dataFilePath << std::endl;
       Singletons::setDataFilePath(dataFilePath);
-    }
+	} else {
+		Singletons::setDataFilePath("fuz.dat");
+	}
   } catch (boost::program_options::error& e) {
     std::cout << e.what() << std::endl;
     return 1;

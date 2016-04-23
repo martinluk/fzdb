@@ -6,12 +6,14 @@
 #include "./debug_load_file.h"
 #include "./debug_dump_entities.h"
 
-DebugJob::DebugJob(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
+using namespace jobs;
+
+Debug::Debug(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
 {
     _message = message;
 }
 
-QueryResult DebugJob::executeConst() const
+QueryResult Debug::executeConst() const
 {
     // Split the string by spaces.
     std::vector<std::string> list = util::split(_message, ' ');

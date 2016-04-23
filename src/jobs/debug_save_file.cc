@@ -7,6 +7,8 @@
 
 #include <sstream>
 
+using namespace jobs;
+
 QueryResult DebugSaveFile::execute()
 {
     using namespace model::types;

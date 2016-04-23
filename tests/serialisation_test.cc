@@ -11,6 +11,7 @@
 #include "types/subtype.h"
 #include "model/entity.h"
 #include "model/entity_manager.h"
+#include "model/database.h"
 
 #include "model/type_serialiser.h"
 #include "model/serialiser.h"
@@ -126,7 +127,9 @@ TEST_F(SerialisationTest, testSerialiseEntities)
 // Test that entity manager with different numbers of entities serialises and unserialises correctly.
 TEST_F(SerialisationTest, testSerialiseEntityManager)
 {
-    EntityManager manager(NULL);
+	Database database("test.dat");
+    EntityManager manager(&database);
+	manager.clearAll();
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
     createSampleEntity(ent, 7);
     std::shared_ptr<Entity> ent2 = manager.createEntity("newType");
@@ -146,7 +149,9 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
 // Check that files are written to and read from disk correctly.
 TEST_F(SerialisationTest, testWriteReadFiles)
 {
-    EntityManager manager(NULL);
+	Database database("test.dat");
+    EntityManager manager(&database);
+	manager.clearAll();
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
     createSampleEntity(ent, 7);
     std::shared_ptr<Entity> ent2 = manager.createEntity("newType");

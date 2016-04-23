@@ -6,22 +6,23 @@
 #include "../query_result.h"
 #include <string>
 
-
-/**
+namespace jobs {  
+ /**
  * @brief Debugging command. Responds with whatever input was passed in. 
  */
-class EchoJob : public Job
-{
-    public:
+  class Echo : public Job
+  {
+  public:
 
-    EchoJob(std::shared_ptr<ISession> session, const std::string &message);
+      Echo(std::shared_ptr<ISession> session, const std::string &message);
 
-    virtual bool constOperation() const override { return true; }
-    virtual QueryResult executeConst() const override;
+      virtual bool constOperation() const override { return true; }
+      virtual QueryResult executeConst() const override;
 
-private:
-    std::string _message;
+  private:
+      std::string _message;
 
-};
+  };
+}
 
 #endif    // JOBS_ECHOJOB_H

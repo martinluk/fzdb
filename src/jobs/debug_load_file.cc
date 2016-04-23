@@ -8,6 +8,8 @@
 #include <sstream>
 #include <vector>
 
+using namespace jobs;
+
 QueryResult DebugLoadFile::execute()
 {
     using namespace model::types;

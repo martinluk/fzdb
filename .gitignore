@@ -55,5 +55,5 @@ documentation
 Doxyfile.bak
 html/
 latex/
-
-
+doxygen.exe
+libclang.dll

@@ -3,6 +3,8 @@
 #include "../model/entity_manager.h"
 #include "../exceptions.h"
 
+using namespace jobs;
+
 Delete::Delete(std::shared_ptr<ISession> session, Query query) : Job(session, PermType::ModifyDB), _query(query)
 {
 }
