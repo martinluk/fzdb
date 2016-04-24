@@ -12,6 +12,8 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/document.h>
 
+#include "../model/database.h"
+
 #include <cstdio>
 #include <map>
 #include <cassert>
@@ -22,16 +24,15 @@
 #define ID "id"
 #define USERGROUPINT "userGroupInt"
 #define USERCOLLECTION "users"
-#define JSONFILENAME "userFile.json"
 
-UserFileOperations::UserFileOperations() {
+UserFileOperations::UserFileOperations(Database* database) : _database(database) {
 
 }
 
-std::string UserFileOperations::pathToLoginFile() {
+std::string UserFileOperations::pathToLoginFile() const {
   //XXX Using current path of solution to put login file
   boost::filesystem::path dir = boost::filesystem::current_path();
-  dir /= JSONFILENAME;
+  dir /= _database->userFilePath();
   return dir.string();
 }
 

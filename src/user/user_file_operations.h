@@ -8,12 +8,14 @@
 
 #include <rapidjson/document.h>
 
+class Database;
+
 /** Manager between user file and the user information. **/
 
 class UserFileOperations {
  public:
   /** Constructor of the class. **/
-  UserFileOperations();
+  UserFileOperations(Database* database);
 
  public:
   /** Add user to the user file. **/
@@ -38,11 +40,12 @@ class UserFileOperations {
   bool contains(const std::string& name) const;
 
   /** Provides the path to the user file. **/
-  static std::string pathToLoginFile();
+  std::string pathToLoginFile() const;
 
  private:
   /** The current cache of user file. **/
   std::map<std::string, UserAttributes> _userFileCache;
+  const Database* _database;
 };
 
 #endif    // USER_USERFILEOPERATIONS_H

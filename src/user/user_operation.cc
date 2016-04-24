@@ -3,11 +3,13 @@
 #include "./user_attributes.h"
 #include "./user_exceptions.h"
 #include "./hashing.h"
+#include "../model/database.h"
 #include <spdlog/spdlog.h>
 
 #include "../isession.h"
 
-UserOperation::UserOperation() {
+UserOperation::UserOperation(Database* database)
+	: _database(database), _fileOperations(database) {
   _idGen = IdGenerator();
 }
 

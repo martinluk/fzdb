@@ -9,9 +9,10 @@ Database* _database = NULL;
 boost::shared_mutex _databaseMutex;
 
 std::string _dataFilePath;
+std::string _userFilePath;
 
 void initialise() {
-  _database = new Database(std::move(_dataFilePath));
+  _database = new Database(std::move(_dataFilePath), std::move(_userFilePath));
   if ( boost::filesystem::exists(_dataFilePath)) {
     if ( !_database->entityManager().loadFromFile(_dataFilePath)) {
       std::cout << "Could not load file: " << _dataFilePath << std::endl;
@@ -32,6 +33,10 @@ void shutdown() {
 
 void setDataFilePath(const std::string &path) {
   _dataFilePath = path;
+}
+
+void setUserFilePath(const std::string& userPath) {
+	_userFilePath = userPath;
 }
 
 Database* database() {

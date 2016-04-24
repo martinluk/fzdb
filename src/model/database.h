@@ -7,7 +7,7 @@
 // Convenience class that encapsulates the main data within the database application.
 class Database {
  public:
-  Database(const std::string&& dataFilePath);
+  Database(const std::string&& dataFilePath, const std::string&& userFilePath);
   ~Database();
 
   void init();
@@ -20,11 +20,13 @@ class Database {
   UserOperation& users();
   const UserOperation& users() const;
   const std::string dataFilePath() const;
+  const std::string userFilePath() const;
 
  private:
   EntityManager _entityManager;
   UserOperation _users;
   const std::string _dataFilePath;
+  const std::string _userFilePath;
 };
 
 #endif // MODEL_DATABASE_H

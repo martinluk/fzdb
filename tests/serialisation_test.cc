@@ -127,7 +127,7 @@ TEST_F(SerialisationTest, testSerialiseEntities)
 // Test that entity manager with different numbers of entities serialises and unserialises correctly.
 TEST_F(SerialisationTest, testSerialiseEntityManager)
 {
-	Database database("test.dat");
+	Database database("test.dat", "userFile.json");
     EntityManager manager(&database);
 	manager.clearAll();
     std::shared_ptr<Entity> ent = manager.createEntity("newType");
@@ -149,7 +149,7 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
 // Check that files are written to and read from disk correctly.
 TEST_F(SerialisationTest, testWriteReadFiles)
 {
-	Database database("test.dat");
+	Database database("test.dat", "userFile.json");
     EntityManager manager(&database);
 	manager.clearAll();
     std::shared_ptr<Entity> ent = manager.createEntity("newType");

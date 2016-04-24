@@ -16,7 +16,7 @@ void shutdown();
 
 // Sets the path to the file that should be loaded when the database starts.
 void setDataFilePath(const std::string &path);
-
+void setUserFilePath(const std::string &path);
 // Only call these if you know what you're doing!
 // Normal operations should be performed through Job subclasses.
 // There's probably a better way to do this.

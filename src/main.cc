@@ -70,6 +70,7 @@ int main(int argc, char* argv[]) {
   unsigned int port;
   int loggingLevel;
   std::string dataFilePath;
+  std::string userFilePath;
   std::string configFilePath;
 
   /*
@@ -84,6 +85,9 @@ int main(int argc, char* argv[]) {
     ("log",
      boost::program_options::value<int>(&loggingLevel)->default_value(0),
      "set logging level")
+    ("userfile",
+     boost::program_options::value<std::string>(&userFilePath),
+     "set user file path")
     ("file",
      boost::program_options::value<std::string>(&dataFilePath),
      "set data file path");
@@ -128,6 +132,15 @@ int main(int argc, char* argv[]) {
     } else {
       Singletons::setDataFilePath("fuz.dat");
     }
+
+	if (vm.count("userfile")) {
+		std::cout << "Loading from userfile " << userFilePath << std::endl;
+		Singletons::setUserFilePath(userFilePath);
+	}
+	else {
+		Singletons::setUserFilePath("userFile.json");
+	}
+
   } catch (boost::program_options::error& e) {
     std::cout << e.what() << std::endl;
     return 1;

@@ -11,13 +11,14 @@
 #include "./hashing.h"
 
 class ISession;
+class Database;
 
 /**
  * Handles the user operation, by interating with userFileOperation class
  */
 class UserOperation {
  public:
-  UserOperation();
+  UserOperation(Database* database);
 
   /**
    * @brief Checks whether the user has provided with correct user name and password.  If login success, it updates the session object.  If login fail, it throws LoginUnsucessfulException
@@ -111,6 +112,8 @@ class UserOperation {
    * @brief The class where it opereates on the user file.
    */
   UserFileOperations _fileOperations;
+
+  Database* _database;
 };
 
 #endif    // USER_USEROPERATION_H

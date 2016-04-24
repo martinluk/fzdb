@@ -1,14 +1,15 @@
 #include "gtest/gtest.h"
 #include <string>
 
+#include "model/database.h"
 #include "user/user_operation.h"
 #include "user/permission.h"
 #include "user/user_exceptions.h"
 class UserOperationTest : public ::testing::Test {
 	public:
-		UserOperation uo;
 protected:
-	void setUp() {
+
+	void SetUp() {
 	}
 	void TearDown() {
 	}
@@ -42,6 +43,9 @@ TEST_F(UserOperationTest, loginTest) {
 */
 
 TEST_F(UserOperationTest, addUser) {
+
+	Database database("test.dat", "userFile.json");
+	UserOperation uo = database.users();
 	//Assert there does not exist the specific user
 	const std::string userName="testingAddUserFunction";
 	EXPECT_THROW(uo.getUserGroup(userName), UserNotExistException);
@@ -93,6 +97,10 @@ TEST_F(UserOperationTest, changeUserGroup) {
 }
 */
 TEST_F(UserOperationTest, getUserGroup) {
+
+	Database database("test.dat", "userFile.json");
+	UserOperation uo = database.users();
+
 	//If Empty string, returns guest.
 	const std::string blankUserName="";
 	ASSERT_EQ(Permission::UserGroup::GUEST,uo.getUserGroup(blankUserName));
