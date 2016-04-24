@@ -7,52 +7,48 @@
 #include <iostream>
 
 namespace model {
-    namespace types {
+namespace types {
 
-        // Stores an integer value.
-        class AuthorID : public UInt {      
-			friend class TypeSerialiser;
-        public:
+// Stores an integer value.
+class AuthorID : public UInt {
+  friend class TypeSerialiser;
+ public:
 
-            AuthorID() : UInt()
-            {
+  AuthorID() : UInt() {
 
-            }
-            
-            AuthorID(uint32_t value) :
-                UInt(value)
-            {
-            }            
-           
-			void setupDefaultMetaData(const unsigned char confidence) override;
+  }
 
-            virtual ~AuthorID() {}            
+  AuthorID(uint32_t value) :
+    UInt(value) {
+  }
 
-            virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<AuthorID>();
-				cloned->_value = _value;
-				copyValues(cloned);
-				return cloned;
-            }    
+  void setupDefaultMetaData(const unsigned char confidence) override;
 
-			unsigned char confidence() const override {
-				return 100;
-			}
+  virtual ~AuthorID() {}
 
-			virtual SubType subtype() const
-			{
-				return SubType::AuthorID;
-			}
+  virtual std::shared_ptr<Base> Clone() override {
+    auto cloned = std::make_shared<AuthorID>();
+    cloned->_value = _value;
+    copyValues(cloned);
+    return cloned;
+  }
 
-			std::string toString() const override;
+  unsigned char confidence() const override {
+    return 100;
+  }
 
-        protected:
+  virtual SubType subtype() const {
+    return SubType::AuthorID;
+  }
 
-            AuthorID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)
-            {
-            }
-        };
-    }
+  std::string toString() const override;
+
+ protected:
+
+  AuthorID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length) {
+  }
+};
+}
 }
 
 

@@ -8,10 +8,10 @@
 #include "../variable_set.h"
 
 class IFilter {
-public:
-   virtual bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) = 0;
+ public:
+  virtual bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) = 0;
 
-   virtual ~IFilter() {}
+  virtual ~IFilter() {}
 };
 
 #endif

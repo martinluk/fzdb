@@ -26,89 +26,90 @@ using BasePointer = std::shared_ptr<model::types::Base>;
 // otherwise unserialisation is nigh impossible because it needs to be polymorphic.
 // The object owns all of its values.
 
-class EntityProperty : public ILogString
-{
-    friend class EntitySerialiser;
-public:
+class EntityProperty : public ILogString {
+  friend class EntitySerialiser;
+ public:
 
-	enum class Type {
-		FUZZY,
-		LOCKED,
-		CONCRETESINGLE,
-		CONCRETEMULTI
-	};
-    // Constructs a null property. This can be used for returning 'null',
-    // for example if no property matches a given search.
-    // isNull() will return true.
-    EntityProperty(Type type);
-    EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype);
-	EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
+  enum class Type {
+    FUZZY,
+    LOCKED,
+    CONCRETESINGLE,
+    CONCRETEMULTI
+  };
+  // Constructs a null property. This can be used for returning 'null',
+  // for example if no property matches a given search.
+  // isNull() will return true.
+  EntityProperty(Type type);
+  EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype);
+  EntityProperty(Type type, const unsigned int &key, model::types::SubType subtype, const std::vector<BasePointer> &values);
 
-    ~EntityProperty();   
+  ~EntityProperty();
 
-    // Returns true if this is a null property (ie. default-constructed).
-    // Internally, a property is null if its key is an empty string.
-    bool isNull() const;
+  // Returns true if this is a null property (ie. default-constructed).
+  // Internally, a property is null if its key is an empty string.
+  bool isNull() const;
 
-    // Returns true if this property is concrete.
-    // A property is concrete if it has one value of confidence 1.
-    bool isConcrete() const;
+  // Returns true if this property is concrete.
+  // A property is concrete if it has one value of confidence 1.
+  bool isConcrete() const;
 
-    // Returns true if the property is empty.
-    // A property is empty if it has no values.
-    bool isEmpty() const;
+  // Returns true if the property is empty.
+  // A property is empty if it has no values.
+  bool isEmpty() const;
 
-    // Getters
-    const unsigned int& keyRef() const;
+  // Getters
+  const unsigned int& keyRef() const;
 
-    virtual std::size_t count() const;
+  virtual std::size_t count() const;
 
-    //std::vector<std::shared_ptr<T>> values() const;
-    //std::shared_ptr<T> const& value(int index) const;
+  //std::vector<std::shared_ptr<T>> values() const;
+  //std::shared_ptr<T> const& value(int index) const;
 
-    virtual BasePointer baseValue(int index) const;
-    virtual std::vector<BasePointer> baseValues() const;
+  virtual BasePointer baseValue(int index) const;
+  virtual std::vector<BasePointer> baseValues() const;
 
-    //virtual std::shared_ptr<T> top() const;
-    virtual BasePointer baseTop() const;
-    
-    virtual unsigned int key() const;
-    virtual model::types::SubType subtype() const { return _subtype; }
+  //virtual std::shared_ptr<T> top() const;
+  virtual BasePointer baseTop() const;
 
-    // Setters:
+  virtual unsigned int key() const;
+  virtual model::types::SubType subtype() const {
+    return _subtype;
+  }
 
-    // Appends a value to the value list.
-    void append(BasePointer value);
+  // Setters:
 
-    // Appends a list of values.
-    void append(const std::vector<BasePointer> &list);
+  // Appends a value to the value list.
+  void append(BasePointer value);
 
-    // Clears this property of any values.
-    void clear();
+  // Appends a list of values.
+  void append(const std::vector<BasePointer> &list);
 
-    // Removes any entries whose value matches.
-    // This ignores the confidence of the value.
-    void remove(const model::types::Base &value);
-    
-    //Removes entries whose orderingId matches the one in parameter.
-    void remove(const int orderingId);
+  // Clears this property of any values.
+  void clear();
 
-    virtual std::string logString(const Database* db = NULL) const override;
+  // Removes any entries whose value matches.
+  // This ignores the confidence of the value.
+  void remove(const model::types::Base &value);
 
-    bool memberwiseEqual(const EntityProperty* other) const;
+  //Removes entries whose orderingId matches the one in parameter.
+  void remove(const int orderingId);
 
-	void lock();
+  virtual std::string logString(const Database* db = NULL) const override;
 
-	std::shared_ptr<EntityProperty> Clone() const;
+  bool memberwiseEqual(const EntityProperty* other) const;
 
-	Type type() const;
+  void lock();
 
-private:
-	Type _type;
-    unsigned int _key;
-    model::types::SubType _subtype;
+  std::shared_ptr<EntityProperty> Clone() const;
 
-    std::vector<BasePointer> _valuesList;
+  Type type() const;
+
+ private:
+  Type _type;
+  unsigned int _key;
+  model::types::SubType _subtype;
+
+  std::vector<BasePointer> _valuesList;
 };
 
 #endif    // MODEL_ENTITYPROPERTY_H

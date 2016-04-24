@@ -16,96 +16,91 @@
 class EntityManager;
 
 namespace model {
-    namespace types {
+namespace types {
 
-        // Base value type class. All other types inherit from this.
-        class Base : public ILogString, public PropertyOwner
-        {
-		private:
-			bool _initialised;
-            MemberSerialiser _memberSerialiser;
+// Base value type class. All other types inherit from this.
+class Base : public ILogString, public PropertyOwner {
+ private:
+  bool _initialised;
+  MemberSerialiser _memberSerialiser;
 
-			virtual void initMemberSerialiser();
+  virtual void initMemberSerialiser();
 
-		protected:
-			void copyValues(const std::shared_ptr<model::types::Base> ptr);
+ protected:
+  void copyValues(const std::shared_ptr<model::types::Base> ptr);
 
-            friend class TypeSerialiser;			
+  friend class TypeSerialiser;
 
-            // id for this record - unique for entity/property/id - related to ordering
-            unsigned int _orderingId;
+  // id for this record - unique for entity/property/id - related to ordering
+  unsigned int _orderingId;
 
-        public:
+ public:
 
-			Base();
+  Base();
 
-			void Init(const unsigned char confidence);
+  void Init(const unsigned char confidence);
 
-			virtual void setupDefaultMetaData(const unsigned char confidence);
-            
-			virtual ~Base();
+  virtual void setupDefaultMetaData(const unsigned char confidence);
 
-			virtual std::shared_ptr<Base> Clone();
+  virtual ~Base();
 
-			virtual unsigned char Equals(const std::string &val) const;
-            
-            // This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
-			virtual bool valuesEqualOnly(const Base *other) const;
+  virtual std::shared_ptr<Base> Clone();
 
-            // Returns whether this value is equal to the given object.
-			unsigned char Equals(const model::Object &object);
+  virtual unsigned char Equals(const std::string &val) const;
 
-            // What's the string representation of this value?
-			virtual std::string toString() const;
+  // This specifically should NOT compare the confidence, ordering, source, author, time of creation or comment.
+  virtual bool valuesEqualOnly(const Base *other) const;
 
-			virtual unsigned char confidence() const;
+  // Returns whether this value is equal to the given object.
+  unsigned char Equals(const model::Object &object);
 
-            // Subclasses reimplement this.
-            // As a base class, our type is undefined.
-			virtual SubType subtype() const;
+  // What's the string representation of this value?
+  virtual std::string toString() const;
 
-			virtual std::string logString(const Database* db = NULL) const;
+  virtual unsigned char confidence() const;
 
-			void OrderingId(unsigned int id);
+  // Subclasses reimplement this.
+  // As a base class, our type is undefined.
+  virtual SubType subtype() const;
 
-			unsigned int OrderingId();
+  virtual std::string logString(const Database* db = NULL) const;
 
-            // For debugging - make sure we are -exactly- the same as the other type.
-			virtual bool memberwiseEqual(const Base* other) const;
+  void OrderingId(unsigned int id);
 
-        protected:
-            // Called when serialising.
-			virtual std::size_t serialiseSubclass(Serialiser &serialiser);
+  unsigned int OrderingId();
 
-            // Called to construct from serialised data.
-			Base(const char* &serialisedData, std::size_t length);
-        };
+  // For debugging - make sure we are -exactly- the same as the other type.
+  virtual bool memberwiseEqual(const Base* other) const;
 
-        // Wrapper class used for comparing confidence with another type.
-        template <typename T>
-        class ConfidenceCompare {
-        public:
-            bool operator() (const std::shared_ptr<T> &a, const std::shared_ptr<T> &b) const
-            {
-                return a->confidence() > b->confidence();
-            }
-        };
-        
-        // Wrapper class used to check whether the value members of two types are equal.
-        class ValuesEqualOnly
-        {
-            const Base* _ptr;
-        public:
-            explicit ValuesEqualOnly(const Base* ptr) : _ptr(ptr)
-            {
-            }
-            
-            bool operator () (const std::shared_ptr<Base> &a) const
-            {
-            return a->valuesEqualOnly(_ptr);
-            }
-        };
-    }
+ protected:
+  // Called when serialising.
+  virtual std::size_t serialiseSubclass(Serialiser &serialiser);
+
+  // Called to construct from serialised data.
+  Base(const char* &serialisedData, std::size_t length);
+};
+
+// Wrapper class used for comparing confidence with another type.
+template <typename T>
+class ConfidenceCompare {
+ public:
+  bool operator() (const std::shared_ptr<T> &a, const std::shared_ptr<T> &b) const {
+    return a->confidence() > b->confidence();
+  }
+};
+
+// Wrapper class used to check whether the value members of two types are equal.
+class ValuesEqualOnly {
+  const Base* _ptr;
+ public:
+  explicit ValuesEqualOnly(const Base* ptr) : _ptr(ptr) {
+  }
+
+  bool operator () (const std::shared_ptr<Base> &a) const {
+    return a->valuesEqualOnly(_ptr);
+  }
+};
+}
 }
 
 

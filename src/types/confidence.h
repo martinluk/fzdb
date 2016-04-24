@@ -7,54 +7,54 @@
 #include <iostream>
 
 namespace model {
-    namespace types {
+namespace types {
 
-        // Stores an integer value.
-        class Confidence : public UInt {      
-			friend class TypeSerialiser;
-        public:
+// Stores an integer value.
+class Confidence : public UInt {
+  friend class TypeSerialiser;
+ public:
 
-			Confidence() : UInt()
-            {
-            }
-            
-			Confidence(uint32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
-                UInt()
-            {
-				if (value > 100) value = 100;
-				_value = value;
-            }       
+  Confidence() : UInt() {
+  }
 
-			void setupDefaultMetaData(const unsigned char confidence) override;
-            
-            virtual ~Confidence() {}
+  Confidence(uint32_t value, unsigned int author, unsigned char confidence = 100, const std::string &comment = std::string()) :
+    UInt() {
+    if (value > 100) value = 100;
+    _value = value;
+  }
 
-            virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<Confidence>();
-				cloned->_value = _value;
-				copyValues(cloned);
-				return cloned;
-            }          
+  void setupDefaultMetaData(const unsigned char confidence) override;
 
-			unsigned char confidence() const override {
-				return 100;
-			}
+  virtual ~Confidence() {}
 
-			virtual SubType subtype() const
-			{
-				return SubType::Confidence;
-			}
+  virtual std::shared_ptr<Base> Clone() override {
+    auto cloned = std::make_shared<Confidence>();
+    cloned->_value = _value;
+    copyValues(cloned);
+    return cloned;
+  }
 
-			void value(const uint32_t value) { _value = value; }
-			uint32_t value() const { return _value; }
+  unsigned char confidence() const override {
+    return 100;
+  }
 
-        protected:
+  virtual SubType subtype() const {
+    return SubType::Confidence;
+  }
 
-			Confidence(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)
-            {
-            }
-        };
-    }
+  void value(const uint32_t value) {
+    _value = value;
+  }
+  uint32_t value() const {
+    return _value;
+  }
+
+ protected:
+
+  Confidence(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length) {
+  }
+};
+}
 }
 
 

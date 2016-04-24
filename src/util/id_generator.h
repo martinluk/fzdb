@@ -9,12 +9,12 @@ class StringMapSerialiser;
 // If an ID is released, call addDeleted() to let the generator know.
 // Released IDs are kept in a stack and re-allocated.
 class IdGenerator {
-	friend class StringMapSerialiser;
-private:
+  friend class StringMapSerialiser;
+ private:
   unsigned int _count;
   std::deque<unsigned int> _pool;
 
-public:
+ public:
 
   IdGenerator(unsigned int startCount) : _count(startCount) {}
   IdGenerator() : _count(1) {}
@@ -35,15 +35,15 @@ public:
   }
 
   void clear() {
-	  _count = 1;
-	  _pool.clear();
+    _count = 1;
+    _pool.clear();
   }
 
   bool operator ==(const IdGenerator &b) const {
-	  if (_count != b._count) return false;
-	  if (_pool.size() != b._pool.size()) return false;
-	  //TODO: item by item check
-	  return true;
+    if (_count != b._count) return false;
+    if (_pool.size() != b._pool.size()) return false;
+    //TODO: item by item check
+    return true;
   }
 };
 

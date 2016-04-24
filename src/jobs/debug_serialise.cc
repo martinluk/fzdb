@@ -44,7 +44,7 @@ std::string outputSerialiserData(const Serialiser &serialiser) {
     // j selects the characters in each batch of 8.
     for(std::size_t j = 0; j < 8 && i+j < length; j++) {
       if ( j > 0 )
-          log << " ";
+        log << " ";
 
       // If we don't cast to unsigned char, the int will sometimes end up
       // with a negative sign and spam 'ffffff', which we don't want.
@@ -93,21 +93,19 @@ std::string outputSerialiserData(const Serialiser &serialiser) {
   return log.str();
 }
 
-std::string testSerialise(const std::shared_ptr<model::types::Base> ser)
-{
-    std::stringstream log;
-    Serialiser serialiser;
+std::string testSerialise(const std::shared_ptr<model::types::Base> ser) {
+  std::stringstream log;
+  Serialiser serialiser;
 
-    model::types::TypeSerialiser typeSerialiser(ser);
-    typeSerialiser.serialise(serialiser);
+  model::types::TypeSerialiser typeSerialiser(ser);
+  typeSerialiser.serialise(serialiser);
 
-    log << outputSerialiserData(serialiser);
+  log << outputSerialiserData(serialiser);
 
-    return log.str();
+  return log.str();
 }
 
-std::string testSerialise(const std::shared_ptr<Entity> ent)
-{
+std::string testSerialise(const std::shared_ptr<Entity> ent) {
   std::stringstream log;
   Serialiser serialiser;
 
@@ -119,21 +117,18 @@ std::string testSerialise(const std::shared_ptr<Entity> ent)
   return log.str();
 }
 
-std::string printEntity(const std::shared_ptr<Entity> ent)
-{
+std::string printEntity(const std::shared_ptr<Entity> ent) {
   return std::string("Entity(")
-      //+ std::to_string(ent->getType()) + std::string(", ")
-      + std::to_string(ent->getHandle()) + std::string(", ")
-      + std::to_string(ent->propertyCount())
-      + std::string(")");
+         //+ std::to_string(ent->getType()) + std::string(", ")
+         + std::to_string(ent->getHandle()) + std::string(", ")
+         + std::to_string(ent->propertyCount())
+         + std::string(")");
 }
 
-std::string printEntityProperty(const std::shared_ptr<EntityProperty> prop)
-{
+std::string printEntityProperty(const std::shared_ptr<EntityProperty> prop) {
   std::string str = std::string("EntityProperty(") + std::to_string(prop->key());
 
-  for (std::size_t i = 0; i < prop->count(); i++ )
-  {
+  for (std::size_t i = 0; i < prop->count(); i++ ) {
     str += std::string(",\n  ") + prop->baseValue(i)->logString();
   }
 
@@ -141,8 +136,7 @@ std::string printEntityProperty(const std::shared_ptr<EntityProperty> prop)
   return str;
 }
 
-QueryResult DebugSerialise::execute()
-{
+QueryResult DebugSerialise::execute() {
   using namespace model::types;
 
   std::stringstream log;
@@ -238,8 +232,7 @@ QueryResult DebugSerialise::execute()
 
     const std::map<unsigned int, std::shared_ptr<EntityProperty>> &propTable = newEnt->properties();
     bool begin = true;
-    for ( auto it = propTable.cbegin(); it != propTable.cend(); ++it )
-    {
+    for ( auto it = propTable.cbegin(); it != propTable.cend(); ++it ) {
       if ( !begin ) log << ",\n";
       log << printEntityProperty(it->second);
       begin = false;
@@ -250,7 +243,7 @@ QueryResult DebugSerialise::execute()
     //With shared_ptr newEnt will be deleted automatically when it falls out of scope
     //delete newEnt;
   }
-  
+
   QueryResult result;
   result.setResultDataText(log.str());
   return result;

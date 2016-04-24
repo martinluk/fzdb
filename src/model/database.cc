@@ -1,40 +1,32 @@
 #include "./database.h"
 
-Database::Database(const std::string&& dataFilePath) : _entityManager(this), _users(), _dataFilePath(dataFilePath)
-{
-	
+Database::Database(const std::string&& dataFilePath) : _entityManager(this), _users(), _dataFilePath(dataFilePath) {
+
 }
 
-Database::~Database()
-{
+Database::~Database() {
 }
 
-void Database::init()
-{
-	_users.init();
+void Database::init() {
+  _users.init();
 }
 
-EntityManager& Database::entityManager()
-{
-    return _entityManager;    
+EntityManager& Database::entityManager() {
+  return _entityManager;
 }
 
-const EntityManager& Database::entityManager() const
-{
-    return _entityManager;
+const EntityManager& Database::entityManager() const {
+  return _entityManager;
 }
 
-UserOperation& Database::users()
-{
-    return _users;
+UserOperation& Database::users() {
+  return _users;
 }
 
-const UserOperation& Database::users() const
-{
-    return _users;
+const UserOperation& Database::users() const {
+  return _users;
 }
 
-const std::string Database::dataFilePath() const
-{
-	return _dataFilePath;
+const std::string Database::dataFilePath() const {
+  return _dataFilePath;
 }

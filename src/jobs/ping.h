@@ -8,17 +8,18 @@
 
 namespace jobs {
 /**
-* @brief Debugging command. Responds with "PONG". 
+* @brief Debugging command. Responds with "PONG".
 **/
-	class Ping : public Job
-	{
-	public:
+class Ping : public Job {
+ public:
 
-		Ping(std::shared_ptr<ISession> session);
+  Ping(std::shared_ptr<ISession> session);
 
-		virtual bool constOperation() const override { return true; }
-		virtual QueryResult executeConst() const override;
+  virtual bool constOperation() const override {
+    return true;
+  }
+  virtual QueryResult executeConst() const override;
 
-	};
+};
 }
 #endif    // JOB_PINGJOB_H

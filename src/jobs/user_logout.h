@@ -8,18 +8,20 @@
 #include "../query_result.h"
 
 namespace jobs {
-    /**
-     * @brief Logs a currently logged-in user out of the database.
-     */
-	class UserLogout : public Job {
-	public:
-		UserLogout(std::shared_ptr<ISession> session);
+/**
+ * @brief Logs a currently logged-in user out of the database.
+ */
+class UserLogout : public Job {
+ public:
+  UserLogout(std::shared_ptr<ISession> session);
 
-		virtual bool constOperation() const override { return true; }
-		virtual QueryResult executeConst() const override;
+  virtual bool constOperation() const override {
+    return true;
+  }
+  virtual QueryResult executeConst() const override;
 
-	private:
-		std::shared_ptr<ISession> _session;
-	};
+ private:
+  std::shared_ptr<ISession> _session;
+};
 }
 #endif

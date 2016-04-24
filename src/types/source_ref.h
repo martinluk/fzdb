@@ -8,52 +8,48 @@
 typedef unsigned long long EHandle_t;
 
 namespace model {
-    namespace types {
+namespace types {
 
-        // Class representing a reference to another entity.
-        // This reference is stored as a handle to the entity concerned.
-        // There is no guarantee that this handle will still be valid
-        // when it is used - the caller needs to check!
-        class SourceRef : public EntityRef {
-			friend class TypeSerialiser;
-        public:
-            SourceRef() : EntityRef()
-            {        
-            }
+// Class representing a reference to another entity.
+// This reference is stored as a handle to the entity concerned.
+// There is no guarantee that this handle will still be valid
+// when it is used - the caller needs to check!
+class SourceRef : public EntityRef {
+  friend class TypeSerialiser;
+ public:
+  SourceRef() : EntityRef() {
+  }
 
-            SourceRef(EHandle_t value) :
-                EntityRef(value)
-            {
-            }           
+  SourceRef(EHandle_t value) :
+    EntityRef(value) {
+  }
 
-			void setupDefaultMetaData(const unsigned char confidence) override;
-            
-            virtual ~SourceRef() {}
+  void setupDefaultMetaData(const unsigned char confidence) override;
 
-            virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<SourceRef>();
-				cloned->_value = _value;
-				copyValues(cloned);
-				return cloned;
-            }
-          
+  virtual ~SourceRef() {}
 
-			unsigned char confidence() const override {
-				return 100;
-			}
+  virtual std::shared_ptr<Base> Clone() override {
+    auto cloned = std::make_shared<SourceRef>();
+    cloned->_value = _value;
+    copyValues(cloned);
+    return cloned;
+  }
 
-			virtual SubType subtype() const
-			{
-				return SubType::SourceRef;
-			}
 
-        protected:
-           
-            SourceRef(const char* &serialisedData, std::size_t length) : EntityRef(serialisedData, length)
-            {
-            }
-        };
-    }
+  unsigned char confidence() const override {
+    return 100;
+  }
+
+  virtual SubType subtype() const {
+    return SubType::SourceRef;
+  }
+
+ protected:
+
+  SourceRef(const char* &serialisedData, std::size_t length) : EntityRef(serialisedData, length) {
+  }
+};
+}
 }
 
 

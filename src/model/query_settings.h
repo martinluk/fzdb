@@ -2,8 +2,8 @@
 #define FUZZY_MODEL_QUERYSETTINGS
 
 struct QuerySettings {
-public:
-    bool canon = false;
+ public:
+  bool canon = false;
 };
 
 

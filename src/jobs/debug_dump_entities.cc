@@ -5,9 +5,8 @@
 
 using namespace jobs;
 
-QueryResult DebugDumpEntities::execute(const Debug &j)
-{
-    QueryResult result;
-    result.setResultDataText(j._database->entityManager().dumpContents());
-    return result;
+QueryResult DebugDumpEntities::execute(const Debug &j) {
+  QueryResult result;
+  result.setResultDataText(j._database->entityManager().dumpContents());
+  return result;
 }

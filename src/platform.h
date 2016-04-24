@@ -13,11 +13,11 @@
 #define PLATFORM_UNIX     3
 
 #ifdef _WINDOWS
-    #define PLATFORM PLATFORM_WINDOWS
+#define PLATFORM PLATFORM_WINDOWS
 #elif defined(__APPLE__) && defined(__MACH__)
-    #define PLATFORM PLATFORM_MAC
+#define PLATFORM PLATFORM_MAC
 #else
-    #define PLATFORM PLATFORM_UNIX
+#define PLATFORM PLATFORM_UNIX
 #endif
 
 // http://stackoverflow.com/questions/1505582/determining-32-vs-64-bit-in-c

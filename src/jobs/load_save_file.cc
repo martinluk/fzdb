@@ -9,93 +9,73 @@
 
 using namespace jobs;
 
-LoadFile::LoadFile(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
-{
-    _message = message;
+LoadFile::LoadFile(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp) {
+  _message = message;
 }
 
-SaveFile::SaveFile(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp)
-{
-    _message = message;
+SaveFile::SaveFile(std::shared_ptr<ISession> session, const std::string &message) : Job(session, PermType::UserOp) {
+  _message = message;
 }
 
-QueryResult _result(const std::string &message)
-{
-    QueryResult result;
-    result.setResultDataText(message);
-    return result;
+QueryResult _result(const std::string &message) {
+  QueryResult result;
+  result.setResultDataText(message);
+  return result;
 }
 
-bool _preprocess(std::string &message)
-{
-    boost::algorithm::trim(message);
-    
-    if ( message.size() < 1 )
-    {
-        return false;
-    }
-    
-    if (message[0] == '\"')
-    {
-        message.erase(0,1);
-    }
-    
-    if ( message.size() < 1 )
-    {
-        return false;
-    }
-    
-    if ( message[message.size()-1] == '\"' )
-    {
-        message.erase(message.size()-1, 1);
-    }
-    
-    if ( message.size() < 1 )
-    {
-        return false;
-    }
-    
-    // If the first character is not '/', assume the file path is local.
-    if ( message[0] != '/' )
-    {
-        message = FileSystem::workingDirectory()  + std::string("/") + message;
-    }
-    
-    return true;
+bool _preprocess(std::string &message) {
+  boost::algorithm::trim(message);
+
+  if ( message.size() < 1 ) {
+    return false;
+  }
+
+  if (message[0] == '\"') {
+    message.erase(0,1);
+  }
+
+  if ( message.size() < 1 ) {
+    return false;
+  }
+
+  if ( message[message.size()-1] == '\"' ) {
+    message.erase(message.size()-1, 1);
+  }
+
+  if ( message.size() < 1 ) {
+    return false;
+  }
+
+  // If the first character is not '/', assume the file path is local.
+  if ( message[0] != '/' ) {
+    message = FileSystem::workingDirectory()  + std::string("/") + message;
+  }
+
+  return true;
 }
 
-QueryResult LoadFile::executeNonConst()
-{
-    if ( !_preprocess(_message) )
-    {
-        return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Invalid file name."));
-    }
-    
-    bool success = _database->entityManager().loadFromFile(_message);
-    if ( success )
-    {
-        return _result(std::string("Data successfully loaded from ") + _message);
-    }
-    else
-    {
-        return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Unable to read data from ") + _message);
-    }
+QueryResult LoadFile::executeNonConst() {
+  if ( !_preprocess(_message) ) {
+    return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Invalid file name."));
+  }
+
+  bool success = _database->entityManager().loadFromFile(_message);
+  if ( success ) {
+    return _result(std::string("Data successfully loaded from ") + _message);
+  } else {
+    return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Unable to read data from ") + _message);
+  }
 }
 
-QueryResult SaveFile::executeConst() const
-{
-    if ( !_preprocess(_message) )
-    {
-        return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Invalid file name."));
-    }
-    
-    bool success = _database->entityManager().saveToFile(_message);
-    if ( success )
-    {
-        return _result(std::string("Data successfully saved to ") + _message);
-    }
-    else
-    {
-        return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Unable to save data to ") + _message);
-    }
+QueryResult SaveFile::executeConst() const {
+  if ( !_preprocess(_message) ) {
+    return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Invalid file name."));
+  }
+
+  bool success = _database->entityManager().saveToFile(_message);
+  if ( success ) {
+    return _result(std::string("Data successfully saved to ") + _message);
+  } else {
+    return QueryResult::generateError(QueryResult::ErrorCode::FileSystemError, std::string("Unable to save data to ") + _message);
+  }
 }

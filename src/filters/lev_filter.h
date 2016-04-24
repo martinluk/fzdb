@@ -8,18 +8,17 @@
 
 #include <boost/regex.hpp>
 
-unsigned int levenshtein_distance(const std::string &s1, const std::string &s2)
-{
+unsigned int levenshtein_distance(const std::string &s1, const std::string &s2) {
   // To change the type this function manipulates and returns, change
   // the return type and the types of the two variables below.
   unsigned int s1len = s1.size();
   unsigned int s2len = s2.size();
-  
+
   auto column_start = (decltype(s1len))1;
-  
+
   auto column = new decltype(s1len)[s1len + 1];
   std::iota(column + column_start, column + s1len + 1, column_start);
-  
+
   for (auto x = column_start; x <= s2len; x++) {
     column[0] = x;
     auto last_diagonal = x - column_start;
@@ -40,31 +39,31 @@ unsigned int levenshtein_distance(const std::string &s1, const std::string &s2)
 }
 
 class LevFilter : public IFilter {
-private:
-   const uint32_t _maxdist;
-   const std::string _target;
-   const std::string _variable;
-public:
+ private:
+  const uint32_t _maxdist;
+  const std::string _target;
+  const std::string _variable;
+ public:
 
-   LevFilter(const std::string variable, std::string target, uint32_t maxdist) 
+  LevFilter(const std::string variable, std::string target, uint32_t maxdist)
     : _target(target), _variable(variable),  _maxdist(maxdist) { }
 
-   static bool TestAndCreate(IFilter** filter, std::string str) {
-       boost::smatch matches;
-       const static boost::regex pattern(" *\\$([a-zA-Z0-9]+) *, *\\\"([^\"]*)\\\" *, *([0-9]+) *");
+  static bool TestAndCreate(IFilter** filter, std::string str) {
+    boost::smatch matches;
+    const static boost::regex pattern(" *\\$([a-zA-Z0-9]+) *, *\\\"([^\"]*)\\\" *, *([0-9]+) *");
 
-       if (boost::regex_match(str, matches, pattern)) {
-           *filter = new LevFilter(matches[1], matches[2], std::stoul(matches[3]));
-           return true;
-       }
-       return false;
-   }
+    if (boost::regex_match(str, matches, pattern)) {
+      *filter = new LevFilter(matches[1], matches[2], std::stoul(matches[3]));
+      return true;
+    }
+    return false;
+  }
 
-   bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) override {
-	   std::size_t aa = variableSet.indexOf(_variable);
-       std::string str = std::dynamic_pointer_cast<model::types::String, model::types::Base>(values.at(aa).dataPointer())->value();
-       return levenshtein_distance(str, _target) <= _maxdist;
-   }
+  bool Test(const VariableSet&& variableSet, const VariableSetRow&& values) override {
+    std::size_t aa = variableSet.indexOf(_variable);
+    std::string str = std::dynamic_pointer_cast<model::types::String, model::types::Base>(values.at(aa).dataPointer())->value();
+    return levenshtein_distance(str, _target) <= _maxdist;
+  }
 
 };
 

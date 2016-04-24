@@ -8,24 +8,21 @@
 
 // Specialised class used to serialise a table that maps strings to
 // unsigned integers.
-class StringMapSerialiser
-{
-public:
-    StringMapSerialiser(NameManager* nameManager);
+class StringMapSerialiser {
+ public:
+  StringMapSerialiser(NameManager* nameManager);
 
-    std::size_t serialise(Serialiser &serialiser) const;
-    void unserialise(const char* serialisedData, std::size_t length);
-    
-    class InvalidInputStringTableException : public std::runtime_error
-    {
-    public:
-        explicit InvalidInputStringTableException(const std::string &msg) : std::runtime_error(msg)
-        {
-        }
-    };
+  std::size_t serialise(Serialiser &serialiser) const;
+  void unserialise(const char* serialisedData, std::size_t length);
 
-private:
-	NameManager* _nameManager;
+  class InvalidInputStringTableException : public std::runtime_error {
+   public:
+    explicit InvalidInputStringTableException(const std::string &msg) : std::runtime_error(msg) {
+    }
+  };
+
+ private:
+  NameManager* _nameManager;
 };
 
 #endif // STRINGMAPSERIALISER_H

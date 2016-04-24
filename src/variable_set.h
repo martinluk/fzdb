@@ -20,7 +20,7 @@ using VariableType = model::types::SubType;
   VariableSet is essentially a table of values
   Each column represents a variable in the query
   Each row represents a 'result'
-  It is intended to be the data-interchange between the scan 
+  It is intended to be the data-interchange between the scan
   functions and so has been developed in a rather hacky fashion
   and really needs tidying up a bit
 */
@@ -38,10 +38,10 @@ class VariableSetValue {
 
  public:
   VariableSetValue(std::shared_ptr<model::types::Base> ptr, unsigned int propertyId, uint64_t entityId) :
-      _ptr(ptr), _propertyId(propertyId), _entityId(entityId), _metaRef(0) {}
+    _ptr(ptr), _propertyId(propertyId), _entityId(entityId), _metaRef(0) {}
 
   VariableSetValue() :
-      _ptr(), _propertyId(0), _entityId(0), _metaRef(0) {}
+    _ptr(), _propertyId(0), _entityId(0), _metaRef(0) {}
 
   void reset() {
     _ptr.reset();
@@ -57,20 +57,26 @@ class VariableSetValue {
     _metaRef = 0;
   }
 
-  std::shared_ptr<model::types::Base> dataPointer() const { return _ptr; }
-  unsigned int property() const { return _propertyId; }
-  uint64_t entity() const { return _entityId; }
+  std::shared_ptr<model::types::Base> dataPointer() const {
+    return _ptr;
+  }
+  unsigned int property() const {
+    return _propertyId;
+  }
+  uint64_t entity() const {
+    return _entityId;
+  }
 
   void metaRef(unsigned int metaRef) {
-      _metaRef = metaRef;
+    _metaRef = metaRef;
   }
 
   unsigned int metaRef() const {
-      return _metaRef;
+    return _metaRef;
   }
 
   bool empty() const {
-      return _ptr ==  nullptr;
+    return _ptr ==  nullptr;
   }
 };
 
@@ -140,19 +146,27 @@ class VariableSet {
   unsigned int add(const VariableSetRow&& row);
 
   unsigned int add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
-  const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar);
+                   const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar);
 
   void add(const unsigned int var, const std::shared_ptr<model::types::Base>&& value,
-  const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar, unsigned int row);
+           const unsigned int propertyId, const Entity::EHandle_t entityId, const VariableType&& type, const std::string&& metaVar, unsigned int row);
 
   std::vector<unsigned int> find(const unsigned int varId, const std::string value);
 
   // std::vector<VariableSetRow>* getData();
-  std::vector<VariableSetRow>::iterator begin() { return _values.begin(); }
-  std::vector<VariableSetRow>::iterator end() { return _values.end(); }
+  std::vector<VariableSetRow>::iterator begin() {
+    return _values.begin();
+  }
+  std::vector<VariableSetRow>::iterator end() {
+    return _values.end();
+  }
 
-  std::vector<VariableSetRow>::const_iterator cbegin() const { return _values.cbegin(); }
-  std::vector<VariableSetRow>::const_iterator cend() const { return _values.cend(); }
+  std::vector<VariableSetRow>::const_iterator cbegin() const {
+    return _values.cbegin();
+  }
+  std::vector<VariableSetRow>::const_iterator cend() const {
+    return _values.cend();
+  }
 
   std::vector<VariableSetRow>::iterator erase(std::vector<VariableSetRow>::iterator iter);
 
@@ -177,7 +191,7 @@ class VariableSet {
   void removeMetaRefs(unsigned int metaRef);
 
   void addToMetaRefRow(unsigned int metaRef, std::size_t position, const std::shared_ptr<model::types::Base>&& value,
-  const unsigned int propertyId, const Entity::EHandle_t entityId);
+                       const unsigned int propertyId, const Entity::EHandle_t entityId);
 
   // this doesn't seem to work
   void trimEmptyRows();

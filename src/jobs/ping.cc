@@ -2,12 +2,10 @@
 
 using namespace jobs;
 
-Ping::Ping(std::shared_ptr<ISession> session) : Job(session, PermType::ViewDB)
-{
+Ping::Ping(std::shared_ptr<ISession> session) : Job(session, PermType::ViewDB) {
 }
 
-QueryResult Ping::executeConst() const
-{
+QueryResult Ping::executeConst() const {
   QueryResult result;
   result.setResultDataText("PONG");
   return result;

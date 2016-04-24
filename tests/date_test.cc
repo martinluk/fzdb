@@ -14,7 +14,7 @@ protected:
 
 TEST_F(DateTest, encodeAndRecodeDate) {
 	model::types::Date::StructuredDate originalDate(1842, 10, 12);
-	unsigned long encoded = model::types::Date::encode(originalDate);
+	uint64_t encoded = model::types::Date::encode(originalDate);
 	model::types::Date::StructuredDate decoded = model::types::Date::decode(encoded);
 	EXPECT_EQ(originalDate.toString(), decoded.toString());
 }

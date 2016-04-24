@@ -6,16 +6,16 @@
 
 using namespace jobs;
 
-UserLogout::UserLogout(std::shared_ptr<ISession> session) 
-    : Job(session,PermType::LoggedInUser) {
-    _session=session;
+UserLogout::UserLogout(std::shared_ptr<ISession> session)
+  : Job(session,PermType::LoggedInUser) {
+  _session=session;
 }
 
 QueryResult UserLogout::executeConst() const {
 
-	_database->users().logout(std::move(_session));
-    
-    QueryResult result;
-    result.setResultDataText("Logged out successfully.");
-    return result;
+  _database->users().logout(std::move(_session));
+
+  QueryResult result;
+  result.setResultDataText("Logged out successfully.");
+  return result;
 }

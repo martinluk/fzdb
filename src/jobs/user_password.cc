@@ -5,22 +5,21 @@
 using namespace jobs;
 
 UserPassword::UserPassword(std::shared_ptr<ISession> session,
-        const std::string &oldpassword,
-        const std::string &newpassword) : Job(session,PermType::LoggedInUser) {
-    _oldpassword=oldpassword;
-    _newpassword=newpassword;
-    _session=session;
+                           const std::string &oldpassword,
+                           const std::string &newpassword) : Job(session,PermType::LoggedInUser) {
+  _oldpassword=oldpassword;
+  _newpassword=newpassword;
+  _session=session;
 };
 
-QueryResult UserPassword::executeNonConst()
-{
-    try {
-        _database->users().changeUserPassword(std::move(_session), _oldpassword, _newpassword);
-    } catch (const LoginUnsuccessfulException &ex) { 
-        return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
-    }
-    
-    QueryResult result;
-    result.setResultDataText("Password changed successfully.");
-    return result;
+QueryResult UserPassword::executeNonConst() {
+  try {
+    _database->users().changeUserPassword(std::move(_session), _oldpassword, _newpassword);
+  } catch (const LoginUnsuccessfulException &ex) {
+    return QueryResult::generateError(QueryResult::ErrorCode::UserDataError, ex.what());
+  }
+
+  QueryResult result;
+  result.setResultDataText("Password changed successfully.");
+  return result;
 }

@@ -7,53 +7,49 @@
 #include <iostream>
 
 namespace model {
-    namespace types {
+namespace types {
 
-        // Stores an integer value.
-        class TypeID : public UInt {      
-			friend class TypeSerialiser;
-        public:
+// Stores an integer value.
+class TypeID : public UInt {
+  friend class TypeSerialiser;
+ public:
 
-            TypeID() : UInt()
-            {
+  TypeID() : UInt() {
 
-            }
-            
-            TypeID(uint32_t value) :
-                UInt(value)
-            {
-            }            
-           
+  }
 
-            virtual ~TypeID() {}            
+  TypeID(uint32_t value) :
+    UInt(value) {
+  }
 
-            virtual std::shared_ptr<Base> Clone() override {
-                auto cloned = std::make_shared<TypeID>();
-				cloned->_value = _value;
-				copyValues(cloned);
-				return cloned;
-            }    
 
-			std::string toString() const override;
+  virtual ~TypeID() {}
 
-			void setupDefaultMetaData(const unsigned char confidence) override;
+  virtual std::shared_ptr<Base> Clone() override {
+    auto cloned = std::make_shared<TypeID>();
+    cloned->_value = _value;
+    copyValues(cloned);
+    return cloned;
+  }
 
-			unsigned char confidence() const override {
-				return 100;
-			}
+  std::string toString() const override;
 
-			virtual SubType subtype() const
-			{
-				return SubType::TypeID;
-			}
+  void setupDefaultMetaData(const unsigned char confidence) override;
 
-        protected:
+  unsigned char confidence() const override {
+    return 100;
+  }
 
-            TypeID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length)
-            {
-            }
-        };
-    }
+  virtual SubType subtype() const {
+    return SubType::TypeID;
+  }
+
+ protected:
+
+  TypeID(const char* &serialisedData, std::size_t length) : UInt(serialisedData, length) {
+  }
+};
+}
 }
 
 

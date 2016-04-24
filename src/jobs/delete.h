@@ -1,4 +1,4 @@
-#ifndef FUZZY_JOBS_DELETE 
+#ifndef FUZZY_JOBS_DELETE
 #define FUZZY_JOBS_DELETE
 
 #include "../job.h"
@@ -8,22 +8,24 @@
 
 #include <string>
 
-namespace jobs {  
+namespace jobs {
 /**
 * @brief A delete query job.
 */
-  class Delete : public Job {
-  public:
+class Delete : public Job {
+ public:
 
-    Delete(std::shared_ptr<ISession> session, Query query);
+  Delete(std::shared_ptr<ISession> session, Query query);
 
-    virtual bool constOperation() const override { return false; }
-    virtual QueryResult executeNonConst() override;
+  virtual bool constOperation() const override {
+    return false;
+  }
+  virtual QueryResult executeNonConst() override;
 
-  private:
-    Query _query;
+ private:
+  Query _query;
 
-  };
+};
 }
 
 #endif

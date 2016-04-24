@@ -6,15 +6,13 @@
 
 using namespace jobs;
 
-Flush::Flush(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp)
-{
+Flush::Flush(std::shared_ptr<ISession> session) : Job(session, PermType::UserOp) {
 }
 
-QueryResult Flush::executeNonConst()
-{
-    _database->entityManager().clearAll();
-    
-    QueryResult result;
-    result.setResultDataText("Database cleared.");
-    return result;
+QueryResult Flush::executeNonConst() {
+  _database->entityManager().clearAll();
+
+  QueryResult result;
+  result.setResultDataText("Database cleared.");
+  return result;
 }

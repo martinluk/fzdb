@@ -8,45 +8,45 @@
 #include <string>
 
 namespace jobs {
-    
 
-    /**
-    * @brief Links two entities together. 
-    */
 
-    class Link : public Job {
-    public:
+/**
+* @brief Links two entities together.
+*/
 
-        Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
-        
-        virtual bool constOperation() const override { return false; }
-        virtual QueryResult executeNonConst() override;
+class Link : public Job {
+ public:
 
-    protected:
-        Entity::EHandle_t _entity1;
-        Entity::EHandle_t _entity2;
-    };
+  Link(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
 
-    /**
-    * @brief Unlinks two previously linked entities. 
-    */
-    class Unlink : public Link
-    {
+  virtual bool constOperation() const override {
+    return false;
+  }
+  virtual QueryResult executeNonConst() override;
 
-    public:
-        Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
-        virtual QueryResult executeNonConst() override;
-    };
+ protected:
+  Entity::EHandle_t _entity1;
+  Entity::EHandle_t _entity2;
+};
 
-    ///
-    /// Merges two entities. This is like linking except it cannot be undone.
-    ///
-    class Merge : public Link
-    {
-    public:
-        Merge(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
-        virtual QueryResult executeNonConst() override;
-    };
+/**
+* @brief Unlinks two previously linked entities.
+*/
+class Unlink : public Link {
+
+ public:
+  Unlink(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
+  virtual QueryResult executeNonConst() override;
+};
+
+///
+/// Merges two entities. This is like linking except it cannot be undone.
+///
+class Merge : public Link {
+ public:
+  Merge(std::shared_ptr<ISession> session, Entity::EHandle_t entity1, Entity::EHandle_t entity2);
+  virtual QueryResult executeNonConst() override;
+};
 }
 
 #endif    // JOBS_ECHOJOB_H
