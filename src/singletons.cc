@@ -14,7 +14,9 @@ void initialise() {
   _database = new Database(std::move(_dataFilePath));
   if ( boost::filesystem::exists(_dataFilePath)) {
     if ( !_database->entityManager().loadFromFile(_dataFilePath)) {
-      std::cerr << "Could not load file: " << _dataFilePath << std::endl;
+      std::cout << "Could not load file: " << _dataFilePath << std::endl;
+	  boost::filesystem::rename(_dataFilePath, _dataFilePath + ".failed");
+	  _database->entityManager().clearAll();
     } else {
       std::cout << "Loaded file " << _dataFilePath << " successfully." << std::endl;
     }
