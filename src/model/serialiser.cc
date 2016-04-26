@@ -27,7 +27,7 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
   for ( auto it = properties.cbegin(); it != properties.cend(); it++ ) {
     const char* first = static_cast<const char*>(it->first);
     const char* last = first + it->second;
-    startIt = serialData_.insert(startIt, first, last);
+    serialData_.insert(startIt, first, last);
     std::advance(startIt, it->second);
   }
 
