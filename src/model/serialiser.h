@@ -53,6 +53,20 @@ class Serialiser {
           ++it;
       }
   }
+  
+  template<typename T>
+  inline T castAsPrimitive(std::size_t index) const
+  {
+      T ret;
+      SerialiserData::const_iterator it = serialData_.cbegin() + index;
+      for ( std::size_t i = 0; i < sizeof(T); i++ )
+      {
+          *(reinterpret_cast<char*>(&ret) + i) = *it;
+          ++it;
+      }
+      
+      return ret;
+  }
 
   // Returns the size of the data.
   std::size_t size() const;
