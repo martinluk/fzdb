@@ -57,7 +57,7 @@ std::size_t EntityProperty::count() const {
 }
 
 void EntityProperty::append(BasePointer value) {
-  if (value->subtype() != _subtype) {
+	if (value->subtype() != _subtype && !(_subtype == model::types::SubType::SourceRef && value->subtype() == model::types::SubType::EntityRef)) {
     throw std::invalid_argument(std::string("Type ") + model::types::getSubString(value->subtype())
                                 + std::string(" does not match property type ") + model::types::getSubString(_subtype));
   }

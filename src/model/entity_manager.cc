@@ -283,6 +283,8 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
           auto values = variableSet.getData(variableSet.indexOf(triple.subject.value));
 
           for (auto val : values) {
+			  //TODO: is this right?
+            if (val.empty()) continue;
             std::shared_ptr<model::types::ValueRef> valueRef = std::dynamic_pointer_cast<model::types::ValueRef, model::types::Base>(val.dataPointer());
             auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
             assert(record->_manager == this);
