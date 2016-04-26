@@ -37,7 +37,9 @@ void testSerialisation(const BasePointer &typePtr)
     model::types::TypeSerialiser tSer(typePtr);
     std::size_t serialisedLength = tSer.serialise(ser);
     std::size_t advance = 0;
-    BasePointer unserialised = model::types::TypeSerialiser::unserialise(ser.begin(), &advance);
+    std::vector<char> vec;
+    ser.toVector(vec);
+    BasePointer unserialised = model::types::TypeSerialiser::unserialise(vec.data(), &advance);
 
     EXPECT_EQ(true, unserialised->memberwiseEqual(typePtr.get()));
     EXPECT_EQ(advance, serialisedLength);
@@ -119,7 +121,9 @@ TEST_F(SerialisationTest, testSerialiseEntities)
     Serialiser serialiser;
     EntitySerialiser entSer(ent);
     entSer.serialise(serialiser);
-    std::shared_ptr<Entity> unserialised = EntitySerialiser::unserialise(serialiser.begin(), serialiser.size());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    std::shared_ptr<Entity> unserialised = EntitySerialiser::unserialise(vec.data(), vec.size());
 
     EXPECT_EQ(true, ent->memberwiseEqual(unserialised.get()));
 }
@@ -141,7 +145,9 @@ TEST_F(SerialisationTest, testSerialiseEntityManager)
 
     EntityManager manager2(NULL);
     GraphSerialiser gSer2(&manager2);
-    gSer2.unserialise(serialiser.begin(), serialiser.size());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    gSer2.unserialise(vec.data(), serialiser.size());
 
     EXPECT_EQ(true, manager.memberwiseEqual(manager2));
 }

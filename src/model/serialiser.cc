@@ -20,7 +20,7 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
 
   // Resize the vector to be long enough.
   std::size_t prevSize = serialData_.size();
-  serialData_.resize(prevSize + propSize, '\0');
+  //serialData_.resize(prevSize + propSize, '\0');  // Don't need this any more
   auto startIt = serialData_.begin() + prevSize;
 
   // Copy all the properties in.
@@ -38,7 +38,7 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
 std::size_t Serialiser::serialise(const SerialProperty &property) {
   std::size_t propSize = property.second;
   std::size_t prevSize = serialData_.size();
-  serialData_.resize(prevSize + propSize, '\0');
+  //serialData_.resize(prevSize + propSize, '\0');  // Don't need this any more
   auto startIt = serialData_.begin() + prevSize;
   const char* first = static_cast<const char*>(property.first);
   const char* last = first + property.second;
