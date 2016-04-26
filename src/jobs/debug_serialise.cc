@@ -19,8 +19,10 @@ using namespace jobs;
 std::string outputSerialiserData(const Serialiser &serialiser) {
   std::stringstream log;
 
-  const char* buffer = serialiser.cbegin();
-  std::size_t length = serialiser.size();
+  std::vector<char> vec;
+  serialiser.toVector(vec);
+  const char* buffer = vec.data();
+  std::size_t length = vec.size();
 
   log << "Serialisation wrote " << length << " bytes.\nBytes written:\n";
 

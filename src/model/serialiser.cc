@@ -20,7 +20,7 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
 
   // Resize the vector to be long enough.
   std::size_t prevSize = serialData_.size();
-  serialData_.reserve(prevSize + propSize);
+  serialData_.resize(prevSize + propSize, '\0');
   auto startIt = serialData_.begin() + prevSize;
 
   // Copy all the properties in.
@@ -38,7 +38,7 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
 std::size_t Serialiser::serialise(const SerialProperty &property) {
   std::size_t propSize = property.second;
   std::size_t prevSize = serialData_.size();
-  serialData_.reserve(prevSize + propSize);
+  serialData_.resize(prevSize + propSize, '\0');
   auto startIt = serialData_.begin() + prevSize;
   const char* first = static_cast<const char*>(property.first);
   const char* last = first + property.second;
@@ -52,20 +52,20 @@ void Serialiser::clear() {
   lastSerialiseBytes_ = 0;
 }
 
-char* Serialiser::begin() {
-  return serialData_.data();
+Serialiser::SerialiserData::iterator Serialiser::begin() {
+  return serialData_.begin();
 }
 
-const char* Serialiser::cbegin() const {
-  return serialData_.data();
+Serialiser::SerialiserData::const_iterator Serialiser::cbegin() const {
+  return serialData_.cbegin();
 }
 
-char* Serialiser::end() {
-  return serialData_.data() + serialData_.size() - 1 ;
+Serialiser::SerialiserData::iterator Serialiser::end() {
+  return serialData_.end();
 }
 
-const char* Serialiser::cend() const {
-  return serialData_.data() + serialData_.size() - 1 ;
+Serialiser::SerialiserData::const_iterator Serialiser::cend() const {
+  return serialData_.cend();
 }
 
 std::size_t Serialiser::size() const {
@@ -74,4 +74,10 @@ std::size_t Serialiser::size() const {
 
 std::size_t Serialiser::lastSerialiseBytes() const {
   return lastSerialiseBytes_;
+}
+
+void Serialiser::toVector(std::vector<char> &vec) const
+{
+    vec.reserve(serialData_.size());
+    vec.insert(vec.begin(), serialData_.cbegin(), serialData_.cend());
 }

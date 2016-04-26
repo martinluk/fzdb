@@ -2,7 +2,9 @@
 #define MODEL_SERIALISER_H
 
 #include <utility>
-#include <vector>
+#include <deque>
+#include <algorithm>
+
 
 // Class to assist the process of serialisation.
 // SerialProperties are received, which consist of pointers
@@ -10,6 +12,8 @@
 // serialised.
 class Serialiser {
  public:
+  typedef std::deque<char> SerialiserData;    
+    
   // Specifies a property to serialise.
   // Pointer points to the data, size specifies how many bytes.
   typedef std::pair<const void*,std::size_t> SerialProperty;
@@ -29,17 +33,25 @@ class Serialiser {
   void clear();
 
   // Returns a pointer to the beginning of the data.
-  char* begin();
-  const char* cbegin() const;
+  SerialiserData::iterator begin();
+  SerialiserData::const_iterator cbegin() const;
 
   // Returns a pointer to the last valid byte in the vector.
-  char* end();
-  const char* cend() const;
-
-  // Returns a reinterpret_cast of the given byte of data.
-  template <typename T>
-  T reinterpretCast(const std::size_t index) {
-    return reinterpret_cast<T>(begin() + index);
+  SerialiserData::iterator end();
+  SerialiserData::const_iterator cend() const;
+  
+  // Assumes there is already enough space within the deque to
+  // write this value (ie. it won't write off the end).
+  // This was a lot simpler when everything was contiguous...
+  template<typename T>
+  inline void overwrite(std::size_t index, const T* item)
+  {
+      SerialiserData::iterator it = serialData_.begin() + index;
+      for ( std::size_t i = 0; i < sizeof(T); i++ )
+      {
+          *it = *(reinterpret_cast<const char*>(item)+i);
+          ++it;
+      }
   }
 
   // Returns the size of the data.
@@ -48,10 +60,12 @@ class Serialiser {
   // Return the number of bytes from the last call to serialise().
   // This is set to 0 on clear.
   std::size_t lastSerialiseBytes() const;
+  
+  void toVector(std::vector<char> &vec) const;
 
  private:
   // Vector that holds the actual serialised data.
-  std::vector<char> serialData_;
+  SerialiserData serialData_;
   std::size_t lastSerialiseBytes_;
 };
 

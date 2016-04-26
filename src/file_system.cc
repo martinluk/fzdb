@@ -2,10 +2,15 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
+#include <algorithm>
 
 #include <boost/filesystem.hpp>
 
 #define FZDB_VERSION 1
+#define CHUNK_BUFFER_SIZE (1024*1024)
+
+namespace FileSystem {
 
 // File header - this should not be returned to anyone calling these functions.
 // They just want their own data.
@@ -15,19 +20,22 @@ struct FileHeader {
   std::size_t size;       // Size of all serialised data after the file headers.
 };
 
-namespace FileSystem {
+void initFileHeader(FileHeader* h, std::size_t size)
+{
+    h->identifier[0] = 'F';
+    h->identifier[1] = 'Z';
+    h->identifier[2] = 'D';
+    h->identifier[3] = 'B';
+    h->version = FZDB_VERSION;
+    h->size = size;
+}
+
 void writeFile(const std::string &filename, const char *begin, std::size_t size) {
   std::fstream file;
 
   FileHeader header;
   Serialiser::zeroBuffer(&header, sizeof(FileHeader));
-
-  header.identifier[0] = 'F';
-  header.identifier[1] = 'Z';
-  header.identifier[2] = 'D';
-  header.identifier[3] = 'B';
-  header.version = FZDB_VERSION;
-  header.size = size;
+  initFileHeader(&header, size);
 
   try {
     file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
@@ -42,7 +50,36 @@ void writeFile(const std::string &filename, const char *begin, std::size_t size)
 }
 
 void writeFile(const std::string &filename, const Serialiser &serialiser) {
-  writeFile(filename, serialiser.cbegin(), serialiser.size());
+    std::fstream file;
+    std::size_t size = serialiser.size();
+    
+    FileHeader header;
+    Serialiser::zeroBuffer(&header, sizeof(FileHeader));
+    initFileHeader(&header, size);
+  
+    try {
+      file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+      file.write(reinterpret_cast<const char*>(&header), sizeof(FileHeader));
+      
+      // Now that the serialiser is no longer in contiguous memory,
+      // we need to chunk things.
+      char tempBuffer[CHUNK_BUFFER_SIZE];
+      Serialiser::SerialiserData::const_iterator start = serialiser.cbegin();
+      for ( std::size_t i = 0; i < size; i += CHUNK_BUFFER_SIZE )
+      {
+          std::size_t bytesThisIteration = std::min((std::size_t)CHUNK_BUFFER_SIZE, size-i);
+          
+          Serialiser::SerialiserData::const_iterator it = start + i;
+          std::copy(it, it+bytesThisIteration, tempBuffer);
+          file.write(tempBuffer, bytesThisIteration);
+      }
+      
+    } catch (const std::exception &ex) {
+      file.close();
+      throw ex;
+    }
+  
+    file.close();
 }
 
 std::string workingDirectory() {
