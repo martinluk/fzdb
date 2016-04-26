@@ -4,7 +4,7 @@
 #include <utility>
 #include <deque>
 #include <algorithm>
-
+#include <vector>
 
 // Class to assist the process of serialisation.
 // SerialProperties are received, which consist of pointers

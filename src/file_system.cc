@@ -63,7 +63,7 @@ void writeFile(const std::string &filename, const Serialiser &serialiser) {
       
       // Now that the serialiser is no longer in contiguous memory,
       // we need to chunk things.
-      char tempBuffer[CHUNK_BUFFER_SIZE];
+	  char* tempBuffer = new char[CHUNK_BUFFER_SIZE];
       Serialiser::SerialiserData::const_iterator start = serialiser.cbegin();
       for ( std::size_t i = 0; i < size; i += CHUNK_BUFFER_SIZE )
       {
@@ -73,6 +73,7 @@ void writeFile(const std::string &filename, const Serialiser &serialiser) {
           std::copy(it, it+bytesThisIteration, tempBuffer);
           file.write(tempBuffer, bytesThisIteration);
       }
+	  delete tempBuffer;
       
     } catch (const std::exception &ex) {
       file.close();

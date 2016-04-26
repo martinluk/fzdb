@@ -21,14 +21,16 @@ std::size_t Serialiser::serialise(const std::vector<SerialProperty> &properties)
   // Resize the vector to be long enough.
   std::size_t prevSize = serialData_.size();
   //serialData_.resize(prevSize + propSize, '\0');  // Don't need this any more
-  auto startIt = serialData_.begin() + prevSize;
+  //auto startIt = serialData_.begin() + prevSize;
 
   // Copy all the properties in.
+  int count = 0;
   for ( auto it = properties.cbegin(); it != properties.cend(); it++ ) {
     const char* first = static_cast<const char*>(it->first);
     const char* last = first + it->second;
+	auto startIt = serialData_.begin() + prevSize + count;
     serialData_.insert(startIt, first, last);
-    std::advance(startIt, it->second);
+	count += it->second;
   }
 
   lastSerialiseBytes_ = propSize;
