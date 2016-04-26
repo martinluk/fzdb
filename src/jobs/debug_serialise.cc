@@ -157,7 +157,9 @@ QueryResult DebugSerialise::execute() {
     serialiser.clear();
     TypeSerialiser tser(tBase);
     tser.serialise(serialiser);
-    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(vec.data());
     log << "Unserialised Base: " << newBase->logString() << "\n";
   }
 
@@ -170,7 +172,9 @@ QueryResult DebugSerialise::execute() {
     serialiser.clear();
     TypeSerialiser tser(tInt);
     tser.serialise(serialiser);
-    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(vec.data());
     log << "Unserialised Int: " << newBase->logString() << "\n";
   }
 
@@ -183,7 +187,9 @@ QueryResult DebugSerialise::execute() {
     serialiser.clear();
     TypeSerialiser tser(tString);
     tser.serialise(serialiser);
-    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(vec.data());
     log << "Unserialised String: " << newBase->logString() << "\n";
   }
 
@@ -196,7 +202,9 @@ QueryResult DebugSerialise::execute() {
     serialiser.clear();
     TypeSerialiser tser(tEntRef);
     tser.serialise(serialiser);
-    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(serialiser.cbegin());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    std::shared_ptr<Base> newBase = TypeSerialiser::unserialise(vec.data());
     log << "Unserialised EntityRef: " << newBase->logString() << "\n";
   }
 
@@ -229,7 +237,9 @@ QueryResult DebugSerialise::execute() {
     serialiser.clear();
     EntitySerialiser eSer(ent);
     eSer.serialise(serialiser);
-    std::shared_ptr<Entity> newEnt = eSer.unserialise(serialiser.begin(), serialiser.size());
+    std::vector<char> vec;
+    serialiser.toVector(vec);
+    std::shared_ptr<Entity> newEnt = eSer.unserialise(vec.data(), vec.size());
     log << "Unserialised entity: " << printEntity(newEnt) << "\nProperties:\n";
 
     const std::map<unsigned int, std::shared_ptr<EntityProperty>> &propTable = newEnt->properties();
