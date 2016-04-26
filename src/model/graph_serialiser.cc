@@ -103,9 +103,10 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const {
     std::size_t bytes = eSer.serialise(serialiser);
 
     // Update its header.
-    EntityHeader* pHeader = &(serialiser.reinterpretCast<EntityHeader*>(indexEntityHeaders)[i]);
-    pHeader->size = bytes;
-    pHeader->offset = (indexEntityRawData - header.entityDataOffset) + rawEntByteCount;
+    EntityHeader tempHeader = serialiser.castAsPrimitive<EntityHeader>(indexEntityHeaders, i);
+    tempHeader.size = bytes;
+    tempHeader.offset = (indexEntityRawData - header.entityDataOffset) + rawEntByteCount;
+    serialiser.overwrite(indexEntityHeaders, &tempHeader, i);
 
     rawEntByteCount += bytes;
   }
@@ -114,8 +115,9 @@ std::size_t GraphSerialiser::serialise(Serialiser &serialiser) const {
   std::size_t totalSerialised = serialiser.size() - indexBase;
   header.size = totalSerialised;
 
-  SerialHeader* pHeader = serialiser.reinterpretCast<SerialHeader*>(indexBase);
-  memcpy(pHeader, &header, sizeof(SerialHeader));
+  // Re-copy the updated header into the serialiser.
+  serialiser.overwrite<SerialHeader>(indexBase, &header);
+  
   return totalSerialised;
 }
 

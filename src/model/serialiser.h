@@ -42,11 +42,11 @@ class Serialiser {
   
   // Assumes there is already enough space within the deque to
   // write this value (ie. it won't write off the end).
-  // This was a lot simpler when everything was contiguous...
+  // Offset is added to the index, and is in multiples of sizeof(T).
   template<typename T>
-  inline void overwrite(std::size_t index, const T* item)
+  inline void overwrite(std::size_t index, const T* item, std::size_t offset = 0)
   {
-      SerialiserData::iterator it = serialData_.begin() + index;
+      SerialiserData::iterator it = serialData_.begin() + index + (offset * sizeof(T));
       for ( std::size_t i = 0; i < sizeof(T); i++ )
       {
           *it = *(reinterpret_cast<const char*>(item)+i);
@@ -54,11 +54,12 @@ class Serialiser {
       }
   }
   
+  // Offset is in multiples of sizeof(T).
   template<typename T>
-  inline T castAsPrimitive(std::size_t index) const
+  inline T castAsPrimitive(std::size_t index, std::size_t offset = 0) const
   {
       T ret;
-      SerialiserData::const_iterator it = serialData_.cbegin() + index;
+      SerialiserData::const_iterator it = serialData_.cbegin() + index + (offset * sizeof(T));
       for ( std::size_t i = 0; i < sizeof(T); i++ )
       {
           *(reinterpret_cast<char*>(&ret) + i) = *it;
