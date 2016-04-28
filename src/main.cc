@@ -64,6 +64,16 @@ void sigHandler(int s) {
  * @return Error code
  */
 int main(int argc, char* argv[]) {
+	/* 
+	* SPLASH SCREEN
+	*/
+
+	std::cout << " _____ _____ ____  _____ " << std::endl;
+	std::cout << "|   __|__   |    \\| __  |" << std::endl;
+	std::cout << "|   __|   __|  |  | __ -|" << std::endl;
+	std::cout << "|__|  |_____|____/|_____|" << std::endl << std::endl;
+	std::cout << "FZDB v1.0" << std::endl;
+	std::cout << "--------------------------------------------" << std::endl;
   /*
   *   DEFAULT SETTINGS
   */
@@ -191,8 +201,7 @@ int main(int argc, char* argv[]) {
   **/
 
   try {
-    std::cout << "Fuzzy Database v0.1" << std::endl;
-    std::cout << "--------------------------------------------" << std::endl;
+	  
     std::cout << "Listening on port " <<
               port << "..." << std::endl << std::endl;
     std::cout << "CTRL-C to stop" << std::endl;
