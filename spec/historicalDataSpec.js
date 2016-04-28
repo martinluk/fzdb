@@ -1,4 +1,4 @@
-var h = require('./support/helper.js');
+/*var h = require('./support/helper.js');
 
 var liverpoolHistoricalData = h.getData("liverpool_full.fuz");
 
@@ -116,4 +116,4 @@ describe("Fuzzy Database: Liverpool Historical Data", function() {
 	   
 	});		
   });
-}); 
+}); */
