@@ -27,6 +27,16 @@ describe("Fuzzy Database:MetadataSpec", function() {
           {"a":"2"}
         ]));
 
+	  h.testCase("sanity check", 'SELECT $a $b WHERE { $a <forename> $b }',
+        h.resultTemplate([
+          {a: '2', b:'Homer'}, {a: '3', b:'Marge'}, {a: '4', b:'Ned'}, {a: '5', b:'Moe'}, {a:'2', b:'Max'}       
+   	    ]));
+		
+	  h.testCase("sanity check", 'SELECT $a $b WHERE { $a <surname> $b }',
+        h.resultTemplate([
+          {a: '2', b:'Simpson'}, {a: '3', b:'Simpson'}, {a: '4', b:'Flanders'}, {a: '5', b:'Szyslak'}, {a:'2', b:'Power'}, {a:'3', b:'Bouvier'}       
+   	    ]));
+		
       h.testCase("no restrictions on meta value", 'SELECT $a WHERE { META $b { $a <forename> "Homer" } }',
         h.resultTemplate([
           {"a":"2"}
