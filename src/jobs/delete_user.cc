@@ -19,6 +19,6 @@ QueryResult DeleteUser::executeNonConst() {
   }
 
   QueryResult result;
-  result.setResultDataText(std::string("User ") + _username + std::string("Deleted successfully."));
+  result.setResultDataText(std::string("User ") + _username + std::string(" deleted successfully."));
   return result;
 }
