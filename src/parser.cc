@@ -19,7 +19,7 @@ TokenItem FSparqlParser::identifyToken(std::string str, unsigned int line, unsig
   static const boost::regex intRegex("[0-9]+");
   static const boost::regex simpleConfidenceRatingRegex("\\[([0-9]+)\\]");
   static const boost::regex filterRegex("FILTER *([a-zA-Z]*)\\( *(.+) *\\) *");
-  static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *\"([a-zA-Z0-9]+)\" *\\)");
+  static const boost::regex newEntityRegex("NEW\\( *\\$([a-zA-Z0-9]+) *, *\"([^\"]+)\" *\\)");
   static const boost::regex simpleDateRegex("([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\\/(0[1-9]|1[0-2]|[1-9])\\/([0-9]{1,4})");  // More validation still required.
 
   boost::smatch matches;
@@ -145,7 +145,7 @@ TokenList FSparqlParser::Tokenize(std::string str) {
       typing = false;
     } else {
 
-      if ((*iter == '{' || *iter == '}' || *iter == ';' || *iter == ',' || *iter == '.' /*|| (*iter == ':' && typing == false)*/) && !speechMarks && !squareBrackets && !filter) {
+      if ((*iter == '{' || *iter == '}' || *iter == ';' || *iter == ',' || *iter == '.' /*|| (*iter == ':' && typing == false)*/) && !speechMarks && !squareBrackets && !filter && !triangleBrackets) {
         if (buffer.length() > 0) {
           results.push_back(identifyToken(buffer, lineNo, charNo - buffer.length()));
           buffer.clear();

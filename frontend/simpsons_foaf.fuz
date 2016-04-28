@@ -1,0 +1,24 @@
+INSERT DATA {
+
+	$per1 <http://xmlns.com/foaf/spec/#term_givenName> "Homer", [60] "Max";
+	<http://xmlns.com/foaf/spec/#term_familyName> "Simpson", [60] "Power";
+	<http://xmlns.com/foaf/spec/#term_age> 38 ;
+	<http://dbpedia.org/page/Spouse> $per2;
+	<http://dbpedia.org/page/Drinks> "Beer" .
+
+	$per2 <http://xmlns.com/foaf/spec/#term_givenName> "Marge";
+	<http://xmlns.com/foaf/spec/#term_familyName> "Simpson", [40] "Bouvier";
+	<http://xmlns.com/foaf/spec/#term_age> 34 .
+
+	$per3 <http://xmlns.com/foaf/spec/#term_givenName> "Ned";
+	<http://xmlns.com/foaf/spec/#term_familyName> "Flanders" .
+
+	$per4 <http://xmlns.com/foaf/spec/#term_givenName> "Moe";
+	<http://xmlns.com/foaf/spec/#term_familyName> "Szyslak";
+	<http://dbpedia.org/page/Occupation> "Bartender"
+} WHERE {
+	NEW($per1,"http://xmlns.com/foaf/spec/#term_Person") .
+	NEW($per2,"http://xmlns.com/foaf/spec/#term_Person") .
+	NEW($per3,"http://xmlns.com/foaf/spec/#term_Person") .
+	NEW($per4,"http://xmlns.com/foaf/spec/#term_Person")
+}
