@@ -1,4 +1,4 @@
-project(fuzzy-database)
+project(fzdb)
 cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(VERSION 2.8.11)
 
@@ -99,24 +99,24 @@ GroupSources(src)
 SET(SOURCES_NO_MAIN ${SOURCES})
 LIST(REMOVE_ITEM SOURCES_NO_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc")
 
-add_library(fuzzy-database-lib OBJECT ${SOURCES_NO_MAIN} ${HEADERS})
+add_library(fzdb-lib OBJECT ${SOURCES_NO_MAIN} ${HEADERS})
 
-add_executable(fuzzy-database ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc $<TARGET_OBJECTS:fuzzy-database-lib> $<TARGET_OBJECTS:vedis-lib>)
+add_executable(fzdb ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc $<TARGET_OBJECTS:fzdb-lib> $<TARGET_OBJECTS:vedis-lib>)
 
-add_dependencies(fuzzy-database fuzzy-database-lib)
+add_dependencies(fzdb fzdb-lib)
 
-add_dependencies(fuzzy-database-lib nowide)
-add_dependencies(fuzzy-database-lib spdlog)
-add_dependencies(fuzzy-database-lib rapidjson)
-add_dependencies(fuzzy-database-lib vedis-lib)
+add_dependencies(fzdb-lib nowide)
+add_dependencies(fzdb-lib spdlog)
+add_dependencies(fzdb-lib rapidjson)
+add_dependencies(fzdb-lib vedis-lib)
 
-target_link_libraries(fuzzy-database ${Boost_LIBRARIES})
-target_link_libraries(fuzzy-database ${Boost_Nowide_LIBRARIES})
-target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(fuzzy-database ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(fzdb ${Boost_LIBRARIES})
+target_link_libraries(fzdb ${Boost_Nowide_LIBRARIES})
+target_link_libraries(fzdb ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(fzdb ${CMAKE_THREAD_LIBS_INIT})
 
 if(UNIX AND NOT APPLE)
-   target_link_libraries(fuzzy-database -lrt) 
+   target_link_libraries(fzdb -lrt) 
 endif()
 
 if(WIN32)
