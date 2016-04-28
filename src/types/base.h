@@ -72,6 +72,8 @@ class Base : public ILogString, public PropertyOwner {
   // For debugging - make sure we are -exactly- the same as the other type.
   virtual bool memberwiseEqual(const Base* other) const;
 
+  virtual Object toObject() const;
+
  protected:
   // Called when serialising.
   virtual std::size_t serialiseSubclass(Serialiser &serialiser);

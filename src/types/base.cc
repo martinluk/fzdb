@@ -8,6 +8,7 @@
 #include "./confidence.h"
 #include "./author_id.h"
 #include "../job_queue.h"
+#include "../model/triple.h"
 
 using namespace model::types;
 
@@ -107,6 +108,11 @@ bool Base::memberwiseEqual(const Base* other) const {
   return subtype() == other->subtype() &&
          _orderingId == other->_orderingId &&
          confidence() == other->confidence();
+}
+
+model::Object Base::toObject() const
+{
+	return model::Object(model::Object::Type::STRING, toString());
 }
 
 // Called when serialising.

@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 
 class StringMapSerialiser;
 
@@ -75,10 +76,10 @@ class NameManager {
     return _idToStringMap.size();
   }
 
-  std::vector<std::string> names() const {
-    std::vector<std::string> v;
+  std::set<std::string> names() const {
+    std::set<std::string> v;
     for (auto it = _stringToIdMap.begin(); it != _stringToIdMap.end(); ++it) {
-      v.push_back(it->first);
+      v.insert(it->first);
     }
     return v;
   }

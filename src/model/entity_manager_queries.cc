@@ -227,61 +227,131 @@ void EntityManager::ScanVVV(VariableSet&& variableSet, unsigned int variableId, 
                       model::types::SubType::PropertyReference, std::move(metaVar), rowId);
 
       auto type = _propertyTypes.at(prop.first);
-      std::shared_ptr<model::types::Base> val = entity.second->getProperty(prop.first)->baseValue(0)->Clone();
-      variableSet.add(std::move(variableId3),
-                      std::move(val), prop.first, entity.first,
-                      std::move(type), std::move(metaVar), rowId);
+	  for (auto originalVal : entity.second->getProperty(prop.first)->baseValues()) {
+		  std::shared_ptr<model::types::Base> val = originalVal->Clone();
+		  variableSet.add(std::move(variableId3),
+			  std::move(val), prop.first, entity.first,
+			  std::move(type), std::move(metaVar), rowId);
+	  }     
     }
   }
 }
 
 void EntityManager::ScanVVU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {
-  /*auto varId = variableSet.indexOf(variableName);
-  auto varId2 = variableSet.indexOf(variableName2);
-  auto varId3 = variableSet.indexOf(variableName3);
-  //only properties are restricted
-
-  for (auto iter = variableSet.getData()->cbegin(), end = variableSet.getData()->cend(); iter != end; iter++) {
-  	if (iter->at(varId3).empty()) continue;
-
-  	auto newObject = model::Object(model::Object::Type::STRING, iter->at(varId3).dataPointer()->toString());
-
-  	for (auto iter = _entities.cbegin(); iter != _entities.cend(); iter++) {
-
-  		for (auto propertyPair : properties) {
-  			auto vals = propertyPair.second->baseValues();
-  			for (auto value : vals) {
-  				if (value->Equals(object)) {
-  					rowsAdded.push_back(variableSet.add(std::move(variableName),
-  						VariableSetValue(std::make_shared<model::types::Property>(propertyPair.first, this, 0), 0, 0),
-  						model::types::SubType::PropertyReference, std::move(metaVar)));
-  				}
-  			}
-  		}
-  	}
-
-  	bool a = true;
-  }*/
+	auto data = variableSet.getData(variableId3);
+	variableSet.removeRowsWith(variableId3);
+	for (auto dat : data) {
+		if (dat.empty()) continue;
+		VariableSet temp = variableSet.split();
+		ScanVVR(std::move(temp), variableId, variableId2, dat.dataPointer()->toObject(), std::move(metaVar), std::move(settings));
+		for (auto iter = temp.begin(); iter != temp.end(); iter++) {
+			(*iter)[variableId3].reset(dat.dataPointer(), dat.entity(), dat.property());
+		}
+		variableSet.join(std::move(temp));
+	}
 }
 
 void EntityManager::ScanVUV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {
-
+	auto data = variableSet.getData(variableId2);
+	variableSet.removeRowsWith(variableId2);
+	for (auto dat : data) {
+		if (dat.empty()) continue;
+		VariableSet temp = variableSet.split();
+		ScanVPV(std::move(temp), variableId, model::Predicate(model::Predicate::Type::PROPERTY, dat.dataPointer()->toString()), variableId3, std::move(metaVar), std::move(settings));
+		for (auto iter = temp.begin(); iter != temp.end(); iter++) {
+			(*iter)[variableId2].reset(dat.dataPointer(), dat.entity(), dat.property());
+		}
+		variableSet.join(std::move(temp));
+	}
 }
 
 void EntityManager::ScanVUU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {
+	auto data2 = variableSet.getData(variableId2);
+	auto data3 = variableSet.getData(variableId3);
+	variableSet.removeRowsWith(variableId);
+	variableSet.removeRowsWith(variableId3);
+	for (auto dat2 : data2) {
+		if (dat2.empty()) continue;
+		for (auto dat3 : data3) {
+			if (dat3.empty()) continue;
+			VariableSet temp = variableSet.split();
 
+			ScanVPR(std::move(temp), std::move(variableId),
+				model::Predicate(model::Predicate::Type::PROPERTY, dat2.dataPointer()->toString()),
+				dat3.dataPointer()->toObject(), std::move(metaVar), std::move(settings));
+
+			for (auto iter = temp.begin(); iter != temp.end(); iter++) {
+				(*iter)[variableId2].reset(dat2.dataPointer(), dat2.entity(), dat2.property());
+				(*iter)[variableId3].reset(dat3.dataPointer(), dat3.entity(), dat3.property());
+			}
+
+			variableSet.join(std::move(temp));
+		}
+	}
 }
 
 void EntityManager::ScanUVV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {
-
+	auto data = variableSet.getData(variableId);
+	variableSet.removeRowsWith(variableId);
+	for (auto dat : data) {
+		if (dat.empty()) continue;
+		VariableSet temp = variableSet.split();
+		ScanEVV(std::move(temp), model::Subject(model::Subject::Type::ENTITYREF, dat.dataPointer()->toString()), variableId2, variableId3, std::move(metaVar), std::move(settings));
+		for (auto iter = temp.begin(); iter != temp.end(); iter++) {
+			(*iter)[variableId].reset(dat.dataPointer(), dat.entity(), dat.property());
+		}
+		variableSet.join(std::move(temp));
+	}
 }
 
 void EntityManager::ScanUVU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {
+	auto data = variableSet.getData(variableId);
+	auto data3 = variableSet.getData(variableId3);
+	variableSet.removeRowsWith(variableId);
+	variableSet.removeRowsWith(variableId3);
+	for (auto dat : data) {
+		if (dat.empty()) continue;
+		for (auto dat3 : data3) {
+			if (dat3.empty()) continue;
+			VariableSet temp = variableSet.split();
 
+			ScanEVR(std::move(temp), model::Subject(model::Subject::Type::ENTITYREF, dat.dataPointer()->toString()),
+				std::move(variableId2),
+				dat3.dataPointer()->toObject(), std::move(metaVar), std::move(settings));
+
+			for (auto iter = temp.begin(); iter != temp.end(); iter++) {
+				(*iter)[variableId].reset(dat.dataPointer(), dat.entity(), dat.property());
+				(*iter)[variableId3].reset(dat3.dataPointer(), dat3.entity(), dat3.property());
+			}
+
+			variableSet.join(std::move(temp));
+		}
+	}
 }
 
 void EntityManager::ScanUUV(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {
+	auto data = variableSet.getData(variableId);
+	auto data2 = variableSet.getData(variableId2);
+	variableSet.removeRowsWith(variableId);
+	variableSet.removeRowsWith(variableId2);
+	for (auto dat : data) {
+		if (dat.empty()) continue;
+		for (auto dat2 : data2) {
+			if (dat2.empty()) continue;
+			VariableSet temp = variableSet.split();
 
+			ScanEPV(std::move(temp), model::Subject(model::Subject::Type::ENTITYREF, dat.dataPointer()->toString()), 
+				model::Predicate(model::Predicate::Type::PROPERTY, dat2.dataPointer()->toString()), 
+				variableId3, std::move(metaVar), std::move(settings));
+
+			for (auto iter = temp.begin(); iter != temp.end(); iter++) {
+				(*iter)[variableId].reset(dat.dataPointer(), dat.entity(), dat.property());
+				(*iter)[variableId2].reset(dat2.dataPointer(), dat2.entity(), dat2.property());
+			}
+
+			variableSet.join(std::move(temp));
+		}
+	}
 }
 
 void EntityManager::ScanUUU(VariableSet&& variableSet, unsigned int variableId, unsigned int variableId2, unsigned int variableId3, const std::string&& metaVar, const QuerySettings&& settings) const {

@@ -322,10 +322,10 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const
     //Iterating over the returned variable set
     VariableSet vs = BGP(whereBlock, std::move(settings));
 
-    std::vector<std::string> variables = vs.getVariables();
+    std::set<std::string> variables = vs.getVariables();
     std::vector<VariableSetRow>::iterator rowIter;
 
-    for (std::vector<std::string>::iterator varsIter = variables.begin(); varsIter != variables.end(); ++varsIter) {
+    for (auto varsIter = variables.begin(); varsIter != variables.end(); ++varsIter) {
       std::string var = *varsIter;
       std::vector<VariableSetRow>::iterator rowIter;
 

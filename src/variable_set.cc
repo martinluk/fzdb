@@ -23,7 +23,6 @@ VariableSet::VariableSet(const std::set<std::string> &variableNames) : _nameMap(
     _variablesUsed[_nameMap.add(variableName)] = false;
     _typeMap.push_back(0);
   }
-
 }
 
 void VariableSet::extend(std::string variableName) {
@@ -114,12 +113,29 @@ std::vector<VariableSetRow>::iterator VariableSet::erase(std::vector<VariableSet
   }
 }
 
-std::vector<std::string> VariableSet::getVariables() {
+std::set<std::string> VariableSet::getVariables() const {
   //Iterate over _nameMap keys and return the variable used in this VariableSet
   //XXX This method was implemented as cannot find an efficient way to iterate over the rows, with their variable names
   //The reason that I want variable name at DeleteQuery is to find the Type of variable at BGP to apply correct action
   //Please feel free to change/let me know if a better implementation exists.
   return _nameMap.names();
+}
+
+VariableSet VariableSet::split() const
+{
+	return VariableSet(getVariables());
+}
+
+void VariableSet::join(const VariableSet && other)
+{
+	_values.insert(_values.end(), other._values.begin(), other._values.end());
+	_nextMetaRef = std::max(other._nextMetaRef, _nextMetaRef);
+	for (std::size_t i = 0; i < _variablesUsed.size(); i++) {
+		_variablesUsed[i] = _variablesUsed[i] & other._variablesUsed[i];
+	}
+	for (std::size_t i = 0; i < _typeMap.size(); i++) {
+		_typeMap[i] = _typeMap[i] | other._typeMap[i];
+	}
 }
 
 std::vector<VariableSetValue> VariableSet::getData(const unsigned int varId) const {

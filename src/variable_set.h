@@ -212,7 +212,10 @@ class VariableSet {
 
   void sort();
 
-  std::vector<std::string> getVariables();
+  std::set<std::string> getVariables() const;
+
+  VariableSet split() const;
+  void join(const VariableSet&& other);
 
  private:
   NameManager _nameMap;
