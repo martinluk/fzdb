@@ -59,29 +59,29 @@ describe("Fuzzy Database:finalQueryFormSpec", function() {
         )
       );
 
-      h.xtestCase("form VUU",  
-        `SELECT $i $a $b WHERE { entity:2 $a $b . $i $a $b }`,
-        h.resultTemplate(
-          [{"a":"2","b":"forename", "i": "Homer"},
-          {"a":"2","b":"forename", "i": "Max"}]
-        )
-      );
+      // h.xtestCase("form VUU",  
+      //   `SELECT $i $a $b WHERE { entity:2 $a $b . $i $a $b }`,
+      //   h.resultTemplate(
+      //     [{"a":"2","b":"forename", "i": "Homer"},
+      //     {"a":"2","b":"forename", "i": "Max"}]
+      //   )
+      // );
 
-      h.xtestCase("form UVU",  
-        `SELECT $a $i $b WHERE { $a <forename> $b . $a $i $b }`,
-        h.resultTemplate(
-          [{"a":"2","b":"forename", "i": "Homer"},
-          {"a":"2","b":"forename", "i": "Max"}]
-        )
-      );
+      // h.xtestCase("form UVU",  
+      //   `SELECT $a $i $b WHERE { $a <forename> $b . $a $i $b }`,
+      //   h.resultTemplate(
+      //     [{"a":"2","b":"forename", "i": "Homer"},
+      //     {"a":"2","b":"forename", "i": "Max"}]
+      //   )
+      // );
 
-      h.xtestCase("form UUV 2",  
-        `SELECT $a $b $i $cert WHERE { META $m { $a $b "Homer" . $a $b $i } . $m <fuz:certainty> $cert }`,
-        h.resultTemplate(
-          [{"a":"2","b":"forename", "i": "Homer"},
-          {"a":"2","b":"forename", "i": "Max"}]
-        )
-      );
+      // h.xtestCase("form UUV 2",  
+      //   `SELECT $a $b $i $cert WHERE { META $m { $a $b "Homer" . $a $b $i } . $m <fuz:certainty> $cert }`,
+      //   h.resultTemplate(
+      //     [{"a":"2","b":"forename", "i": "Homer"},
+      //     {"a":"2","b":"forename", "i": "Max"}]
+      //   )
+      // );
 
     });
  

@@ -80,7 +80,9 @@ void UserOperation::changeUserGroup(const std::string &userName, Permission::Use
 }
 
 void UserOperation::removeUser(const std::string &userName) {
-  if (!_fileOperations.contains(userName)) return;
+  if (!_fileOperations.contains(userName)) {
+      throw UserNotExistException();
+  }
   unsigned int oldUserId = _fileOperations.UserFileCache().at(userName).id;
   _idGen.addDeleted(oldUserId);
   _fileOperations.removeUser(userName);

@@ -8,7 +8,7 @@
 # Description:       Fuzzy database for historical research
 ### END INIT INFO
 
-SCRIPT=/bin/fuzzy-database
+SCRIPT=`sudo /bin/fuzzy-database --config=/etc/fzdb/default.cnf`
 RUNAS=root
 
 PIDFILE=/var/run/FZDB.pid
