@@ -33,6 +33,15 @@ describe("fzdb", function() {
                 });          
             });
 
+            it("Delete query with variable selector", function(done) {
+                h.sendCmd("DELETE { $x } WHERE {$x <forename> \"Fred\"}").then(function(data) {
+                    if (!data.status) {console.log(data);};
+                    expect(data.status).toBe(true);
+                    stat=data.status;
+                    done();
+                });
+            });
+
             describe("Deleting Fred from DB", function() {
                 beforeEach(function(done) {
                     var stat;
@@ -50,8 +59,8 @@ describe("fzdb", function() {
                     });          
                 });
             });
-
 		});
+
 
 		describe("DB with linked entities:", function() {
             var smithId;

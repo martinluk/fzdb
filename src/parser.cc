@@ -599,9 +599,21 @@ Query FSparqlParser::ParseAll(TokenList tokens) {
     if (iter->first.type == ParsedTokenType::KEYWORD_DELETE) {
       //Sample query
       //Delete WHERE {$a 'surname' 'Fred'}
+      //Delete {$a} WHERE {$a 'surname' 'Fred'}
       iter++;
       type = QueryType::DELETECMD;
       if (iter != tokens.end()) {
+        //Check whether select line exists
+        if (iter != tokens.end() && iter->first.type != ParsedTokenType::KEYWORD_WHERE) {
+          iter++;
+          selectLine = ParseSelectLine(std::move(iter), tokens.end());
+          iter++;
+          //Validate select line.
+          if(selectLine.empty()) {
+            throw ParseException("An empty select line was provided in delete query.");
+          }
+        }
+        spdlog::get("main")->info("Token type: {} Token content: {} Size of select line: {}", (int)iter->first.type, iter->second, selectLine.size());
         if (iter != tokens.end() && iter->first.type == ParsedTokenType::KEYWORD_WHERE) {
           iter++;
           whereClause = ParseInsert(std::move(iter), tokens.end());
