@@ -15,7 +15,7 @@ helper.sendCmd = function(cmd) {
 
     var onDataFunc = function(data) {
 
-      if((client.bytesRead-beforeBytes) < 1024) {
+      if((client.bytesRead-beforeBytes) < 384) {
         //we are done - disconnect client and resolve promise
         client.removeListener('data', onDataFunc);
         resolve(JSON.parse(resultString + data));
@@ -28,7 +28,7 @@ helper.sendCmd = function(cmd) {
             }
           }    
 
-          if((client.bytesRead-beforeBytes) % 1024 != 0) {
+          if((client.bytesRead-beforeBytes) % 384 != 0) {
             //we are done - disconnect client and resolve promise
             client.removeListener('data', onDataFunc);
             resolve(JSON.parse(resultString));

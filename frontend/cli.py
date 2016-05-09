@@ -12,7 +12,7 @@ sys.setdefaultencoding("utf-8")
 TCP_IP = 'localhost'
 TCP_PORT = 1407
 
-CHUNK_SIZE = 1024
+CHUNK_SIZE = 384
 
 COMMAND_UNKNOWN = -1
 COMMAND_NONE = 0
