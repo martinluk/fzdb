@@ -68,9 +68,9 @@ void TCPSession::handle_read(const boost::system::error_code& error,
   if (!error) {
 
     // If there's more data to read, do so.:quir
-    if ( bytes_transferred >= max_length ) {
-      assert(bytes_transferred == max_length);
-      bytes_transferred = max_length;
+    if ( bytes_transferred >= CHUNK_LENGTH) {
+      assert(bytes_transferred == CHUNK_LENGTH);
+      bytes_transferred = CHUNK_LENGTH;
 
       // Copy the data into the vector.
       copyDataToVector(bytes_transferred);
@@ -110,7 +110,7 @@ void TCPSession::copyDataToVector(std::size_t count) {
 }
 
 void TCPSession::readChunk() {
-  _socket.async_read_some(boost::asio::buffer(_data, max_length),
+  _socket.async_read_some(boost::asio::buffer(_data, CHUNK_LENGTH),
                           boost::bind(&TCPSession::handle_read, shared_from_this(),
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
@@ -147,17 +147,17 @@ void TCPSession::respond(const std::string response) {
   // is complete. If 1024 bytes are sent, the last byte
   // is always 0.
 
-  char buffer[max_length];
-  memset(buffer, 0, max_length);
+  char buffer[OUT_CHUNK_LENGTH];
+  memset(buffer, 0, OUT_CHUNK_LENGTH);
 
   // i advances by 1023 each time, because the 1024th byte is 0.
-  for ( std::size_t i = 0; i < response.length(); i += max_length - 1 ) {
+  for ( std::size_t i = 0; i < response.length(); i += OUT_CHUNK_LENGTH - 1 ) {
     // Find out how many chars to copy.
-    int charsToCopy = std::min<int>(max_length - 1, response.length() - i);
+    int charsToCopy = std::min<int>(OUT_CHUNK_LENGTH - 1, response.length() - i);
 
     // Determine how many characters to actually send.
     // If response.length() - i > max_length - 1, this means we're not done sending.
-    int charsToSend = (response.length() - i > max_length - 1) ? max_length : charsToCopy;
+    int charsToSend = (response.length() - i > OUT_CHUNK_LENGTH - 1) ? OUT_CHUNK_LENGTH : charsToCopy;
 
     //spdlog::get("main")->info("Sending {} bytes from response of length {}, beginning at position {}", charsToSend, response.length(), i);
 

@@ -9,6 +9,9 @@
 
 #include "./isession.h"
 
+#define CHUNK_LENGTH 2097152
+#define OUT_CHUNK_LENGTH 1024
+
 using boost::asio::ip::tcp;
 
 class TCPServer;
@@ -35,8 +38,7 @@ class TCPSession : public ISession, public std::enable_shared_from_this<TCPSessi
   void copyDataToVector(std::size_t count);
 
   tcp::socket _socket;
-  enum { max_length = 1024 };
-  char _data[max_length];
+  char _data[CHUNK_LENGTH];
   TCPServer*    _parent;
   boost::uuids::uuid _uuid;
 
