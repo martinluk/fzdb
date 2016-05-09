@@ -316,7 +316,7 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 }
 
 // For each variable described in triple block delete it
-std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const QuerySettings&& settings) {
+std::tuple<int, int, int> EntityManager::Delete(std::vector<std::string> selectLine, TriplesBlock&& whereBlock, const QuerySettings&& settings) {
   try {
 
     using VariableType = model::types::SubType;
@@ -329,9 +329,21 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const
     VariableSet vs = BGP(whereBlock, std::move(settings));
 
     std::set<std::string> variables = vs.getVariables();
+
+    std::set<std::string>::iterator varsIter = variables.begin();
+    std::set<std::string>::iterator varsEnd =  variables.end();
+
+    std::set<std::string> selectLineVarSet(selectLine.begin(), selectLine.end());
+
+    if (!selectLine.empty()) { 
+      assert(selectLineVarSet.size()>0);
+      varsIter=selectLineVarSet.begin();
+      varsEnd=selectLineVarSet.end();
+    }
+
     std::vector<VariableSetRow>::iterator rowIter;
 
-    for (auto varsIter = variables.begin(); varsIter != variables.end(); ++varsIter) {
+    for (; varsIter != varsEnd; ++varsIter) {
       std::string var = *varsIter;
       std::vector<VariableSetRow>::iterator rowIter;
 
@@ -363,7 +375,9 @@ std::tuple<int, int, int> EntityManager::Delete(TriplesBlock&& whereBlock, const
                                  model::Object(model::Object::Type::VARIABLE, o_name));
               tb.Add(std::move(trip));
 
-              auto intermediate = Delete(std::move(tb), std::move(settings));
+              std::vector<std::string> newSelect(tb.variables.begin(), tb.variables.end());
+
+              auto intermediate = Delete(std::move(newSelect), std::move(tb), std::move(settings));
               std::get<0>(result) = std::get<0>(intermediate) + std::get<0>(result);
               std::get<1>(result) = std::get<1>(intermediate) + std::get<1>(result);
               std::get<2>(result) = std::get<2>(intermediate) + std::get<2>(result);

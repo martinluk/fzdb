@@ -63,7 +63,7 @@ class EntityManager {
    */
   VariableSet BGP(TriplesBlock triplesBlock, const QuerySettings&& settings) const;
 
-  std::tuple<int,int,int> Delete(TriplesBlock&& whereBlock, const QuerySettings&& settings);
+  std::tuple<int,int,int> Delete(std::vector<std::string> selectLine, TriplesBlock&& whereBlock, const QuerySettings&& settings);
 
   /**
    * @brief Inserts the given triples into the datastore
