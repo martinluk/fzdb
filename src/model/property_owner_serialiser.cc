@@ -148,7 +148,7 @@ void populate(std::shared_ptr<PropertyOwner> ent, const PropertyHeader* header, 
           + " - null property returned.");
     }
 
-    if ( val->subtype() != header->subtype ) {
+    if ( val->subtype() != header->subtype && (val->subtype() == model::types::SubType::EntityRef & header->subtype != model::types::SubType::SourceRef)) {
       throw PropertyOwnerSerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
           //           + " of entity " + std::to_string(ent->getHandle())
           + ": subtype \"" + model::types::getSubString(val->subtype())
@@ -160,7 +160,7 @@ void populate(std::shared_ptr<PropertyOwner> ent, const PropertyHeader* header, 
     data += advance;
   }
 
-  ent->insertProperty(std::shared_ptr<EntityProperty>(new EntityProperty(EntityProperty::Type::FUZZY, header->key, header->subtype, values)));
+  ent->insertProperty(std::shared_ptr<EntityProperty>(new EntityProperty(EntityProperty::Type::FUZZY, header->key, header->subtype, values)), MatchState::Unserialising);
 }
 
 std::shared_ptr<PropertyOwner> PropertyOwnerSerialiser::unserialise(const char* &serialData, std::size_t length) {

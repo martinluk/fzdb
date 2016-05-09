@@ -17,7 +17,8 @@ enum class MatchState {
   None,
   Linked,
   UpTree,
-  DownTree
+  DownTree,
+  Unserialising
 };
 
 // This is basically a stripped-down Entity class.
