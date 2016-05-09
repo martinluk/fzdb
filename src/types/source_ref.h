@@ -24,6 +24,10 @@ class SourceRef : public EntityRef {
     EntityRef(value) {
   }
 
+  SourceRef(const std::string &value) : EntityRef(value) {
+
+  }
+
   void setupDefaultMetaData(const unsigned char confidence) override;
 
   virtual ~SourceRef() {}

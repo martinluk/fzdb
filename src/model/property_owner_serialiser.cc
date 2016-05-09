@@ -101,8 +101,15 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const {
 
     std::shared_ptr<EntityProperty> prop = it->second;
 
+	if (prop->subtype() == model::types::SubType::SourceRef) {
+		bool a = false;
+	}
+
     // Serialise each value.
     for (std::size_t i = 0; i < prop->count(); i++ ) {
+		if (prop->subtype() != prop->baseValue(i)->subtype()) {
+			bool b = false;
+		}
       TypeSerialiser typeSerialiser(prop->baseValue(i));
       propSerialisedSize += typeSerialiser.serialise(serialiser);
     }
@@ -148,7 +155,7 @@ void populate(std::shared_ptr<PropertyOwner> ent, const PropertyHeader* header, 
           + " - null property returned.");
     }
 
-    if ( val->subtype() != header->subtype && (val->subtype() == model::types::SubType::EntityRef & header->subtype != model::types::SubType::SourceRef)) {
+    if ( val->subtype() != header->subtype) {
       throw PropertyOwnerSerialiser::InvalidInputEntityException("Error unserialising property " + std::to_string(header->key)
           //           + " of entity " + std::to_string(ent->getHandle())
           + ": subtype \"" + model::types::getSubString(val->subtype())

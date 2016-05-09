@@ -35,7 +35,7 @@ std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const {
     assert(false);
   }
 
-  if (header.subtype == model::types::SubType::AuthorID) {
+  if (header.subtype == model::types::SubType::SourceRef) {
     bool a = false;
   }
 

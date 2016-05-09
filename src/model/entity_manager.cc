@@ -17,6 +17,7 @@
 #include "../types/base.h"
 #include "../types/value_ref.h"
 #include "../types/string.h"
+#include "../types/source_ref.h"
 #include "../types/entity_ref.h"
 #include "../types/int.h"
 #include "../types/date.h"
@@ -173,19 +174,21 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
 
       switch (triple.object.type) {
       case model::Object::Type::STRING:
-        //newRecordTypes.push_back(model::types::SubType::String);
         newRecords.push_back(std::make_shared<model::types::String>(triple.object.value, authorID, confidence));
         break;
       case model::Object::Type::ENTITYREF:
-        //newRecordTypes.push_back(model::types::SubType::EntityRef);
-        newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value));
+        // add sourceref?
+		  if (triple.predicate.value == "fuz:source") {
+			  newRecords.push_back(std::make_shared<model::types::SourceRef>(triple.object.value));
+		  }
+		  else {
+			  newRecords.push_back(std::make_shared<model::types::EntityRef>(triple.object.value));
+		  }        
         break;
       case model::Object::Type::INT:
-        //newRecordTypes.push_back(model::types::SubType::Int32);
         newRecords.push_back(std::make_shared<model::types::Int>(triple.object.value, authorID, confidence));
         break;
       case model::Object::Type::DATE:
-        //newRecordTypes.push_back(model::types::SubType::Date);
         newRecords.push_back(std::make_shared<model::types::Date>(model::types::Date::parseDateString(triple.object.value), model::types::Date::Ordering::EqualTo));
         break;
       case model::Object::Type::VARIABLE: {
@@ -193,7 +196,6 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
         for (auto whereVarIter = whereVars.begin(); whereVarIter != whereVars.end(); whereVarIter++) {
           if ((*whereVarIter)[varId].empty()) continue;
           newRecords.push_back((*whereVarIter)[varId].dataPointer()->Clone());
-          //newRecordTypes.push_back((*whereVarIter)[varId].dataPointer()->subtype());
         }
         break;
       }
@@ -289,7 +291,11 @@ std::map<std::string, Entity::EHandle_t> EntityManager::Insert(TriplesBlock&& bl
             auto record = dereference(valueRef->entity(), valueRef->prop(), valueRef->value());
             assert(record->_manager == this);
             for (auto newRecord : newRecords) {
-              record->insertProperty(propertyId, newRecord);
+				if (triple.predicate.value != "fuz:source") {
+					record->insertProperty(propertyId, newRecord->Clone());
+				} else {
+					record->insertProperty(propertyId, std::make_shared<model::types::SourceRef>(newRecord->toString()));
+				}
             }
           }
         }
