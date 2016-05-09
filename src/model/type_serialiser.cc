@@ -41,18 +41,21 @@ std::size_t TypeSerialiser::serialise(Serialiser &serialiser) const {
 
   std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(TypeSerialHeader)));
   bytesSerialised += baseType_->serialiseSubclass(serialiser);
-  TypeSerialHeader* pHeader = serialiser.reinterpretCast<TypeSerialHeader*>(initialSize);
-  pHeader->memberVariablesSize = bytesSerialised - sizeof(TypeSerialHeader);
+  
+  header.memberVariablesSize = bytesSerialised - sizeof(TypeSerialHeader);
+  
   PropertyOwnerSerialiser pos(baseType_);
   bytesSerialised += pos.serialise(serialiser);
-  pHeader = serialiser.reinterpretCast<TypeSerialHeader*>(initialSize);
-  pHeader->totalSize = bytesSerialised;
+  
+  header.totalSize = bytesSerialised;
 
-  if (pHeader->subtype == model::types::SubType::Undefined) {
+  if (header.subtype == model::types::SubType::Undefined) {
     assert(false);
   }
+  
+  serialiser.overwrite<TypeSerialHeader>(initialSize, &header);
 
-  return pHeader->totalSize;
+  return header.totalSize;
 }
 
 std::shared_ptr<Base> TypeSerialiser::unserialise(const char* serialisedData, std::size_t* advance) {

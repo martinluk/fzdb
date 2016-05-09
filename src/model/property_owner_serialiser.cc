@@ -82,9 +82,10 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const {
 
   // Update the header for this serialisation.
   {
-    PropertyOwnerSerialHeader* pHeader = serialiser.reinterpretCast<PropertyOwnerSerialHeader*>(indexBegin);
-    pHeader->memberDataOffset = indexDataBegin - indexBegin;
-    pHeader->memberDataLength = membersSerialisedLength;
+    PropertyOwnerSerialHeader tempHeader = serialiser.castAsPrimitive<PropertyOwnerSerialHeader>(indexBegin);
+    tempHeader.memberDataOffset = indexDataBegin - indexBegin;
+    tempHeader.memberDataLength = membersSerialisedLength;
+    serialiser.overwrite(indexBegin, &tempHeader);
   }
 
   std::size_t propertiesOffset = serialiser.size();
@@ -108,12 +109,13 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const {
 
     // Record results in the header.
     {
-      PropertyHeader* pPropHeader = serialiser.reinterpretCast<PropertyHeader*>(indexPropHeadersBegin + (propNumber * sizeof(PropertyHeader)));
-      pPropHeader->offset = propDataOffset;
-      pPropHeader->size = propSerialisedSize;
-      pPropHeader->key = prop->key();
-      pPropHeader->subtype = prop->subtype();
-      pPropHeader->valueCount = prop->count();
+      PropertyHeader tempHeader = serialiser.castAsPrimitive<PropertyHeader>(indexPropHeadersBegin, propNumber);
+      tempHeader.offset = propDataOffset;
+      tempHeader.size = propSerialisedSize;
+      tempHeader.key = prop->key();
+      tempHeader.subtype = prop->subtype();
+      tempHeader.valueCount = prop->count();
+      serialiser.overwrite<PropertyHeader>(indexPropHeadersBegin, &tempHeader, propNumber);
     }
 
     // Increment our counters.
@@ -122,11 +124,14 @@ std::size_t PropertyOwnerSerialiser::serialise(Serialiser &serialiser) const {
   }
 
   // Record the total serialised size.
-  PropertyOwnerSerialHeader* pHeader = serialiser.reinterpretCast<PropertyOwnerSerialHeader*>(indexBegin);
-  pHeader->propertyDataOffset = propertiesOffset - indexBegin;
-  pHeader->propertyDataLength = propDataOffset;
-  pHeader->size = serialiser.size() - indexBegin;
-  return pHeader->size;
+  //PropertyOwnerSerialHeader* pHeader = serialiser.reinterpretCast<PropertyOwnerSerialHeader*>(indexBegin);
+  header = serialiser.castAsPrimitive<PropertyOwnerSerialHeader>(indexBegin);
+  header.propertyDataOffset = propertiesOffset - indexBegin;
+  header.propertyDataLength = propDataOffset;
+  header.size = serialiser.size() - indexBegin;
+  serialiser.overwrite<PropertyOwnerSerialHeader>(indexBegin, &header);
+  
+  return header.size;
 }
 
 void populate(std::shared_ptr<PropertyOwner> ent, const PropertyHeader* header, const char* data) {

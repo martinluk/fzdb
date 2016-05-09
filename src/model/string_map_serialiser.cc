@@ -62,10 +62,10 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const {
     serialisedThisLoop += serialiser.serialise(Serialiser::SerialProperty(buffer, first.size()+1));
     delete buffer;
 
-    EntryHeader* pHeader = serialiser.reinterpretCast<EntryHeader*>(origSize + sizeof(NameManagerSerialHeader));
-    pHeader += i;
-    pHeader->stringSize = first.size()+1;
-    pHeader->offset = ourOffset;
+    EntryHeader tempHeader = serialiser.castAsPrimitive<EntryHeader>(origSize + sizeof(NameManagerSerialHeader), i);
+    tempHeader.stringSize = first.size()+1;
+    tempHeader.offset = ourOffset;
+    serialiser.overwrite<EntryHeader>(origSize + sizeof(NameManagerSerialHeader), &tempHeader, i);
 
     bytesSerialised += serialisedThisLoop;
     i++;
@@ -75,17 +75,19 @@ std::size_t StringMapSerialiser::serialise(Serialiser &serialiser) const {
     lambda(it->first, it->second);
   }
 
-  NameManagerSerialHeader* pHeader = serialiser.reinterpretCast<NameManagerSerialHeader*>(origSize);
-  pHeader->size = headerChunkSize + bytesSerialised;
-  assert(pHeader->size == serialiser.size() - origSize);
+  header = serialiser.castAsPrimitive<NameManagerSerialHeader>(origSize);
+  header.size = headerChunkSize + bytesSerialised;
+  assert(header.size == serialiser.size() - origSize);
 
-  pHeader->poolOffset = pHeader->size;
+  header.poolOffset = header.size;
 
   for (auto iter = _nameManager->_idGen._pool.begin(); iter != _nameManager->_idGen._pool.end(); iter++) {
-    pHeader->size += serialiser.serialise(std::make_pair<void*, std::size_t>(&(*iter), sizeof(unsigned int)));
+    header.size += serialiser.serialise(std::make_pair<void*, std::size_t>(&(*iter), sizeof(unsigned int)));
   }
+  
+  serialiser.overwrite<NameManagerSerialHeader>(origSize, &header);
 
-  return pHeader->size;
+  return header.size;
 }
 
 void StringMapSerialiser::unserialise(const char *serialisedData, std::size_t length) {

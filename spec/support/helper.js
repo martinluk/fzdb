@@ -131,6 +131,7 @@ helper.resultTemplate = function(results) {
 helper.setupClient = function(done) {
   client = new net.Socket();
   client.connect(1407, '127.0.0.1', function() {
+
   });
 }
 

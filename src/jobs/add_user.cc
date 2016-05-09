@@ -21,6 +21,6 @@ QueryResult AddUser::executeNonConst() {
   }
 
   QueryResult result;
-  result.setResultDataText(std::string("User ") + _username + std::string(" successfulyl added."));
+  result.setResultDataText(std::string("User ") + _username + std::string("added successfully."));
   return result;
 }

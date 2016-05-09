@@ -40,17 +40,20 @@ std::size_t EntitySerialiser::serialise(Serialiser &serialiser) const {
 
   std::size_t bytesSerialised = serialiser.serialise(Serialiser::SerialProperty(&header, sizeof(EntitySerialHeader)));
   bytesSerialised += _entity->_memberSerialiser.serialiseAll(serialiser);
-  EntitySerialHeader* pHeader = serialiser.reinterpretCast<EntitySerialHeader*>(initialSize);
-  pHeader->memberDataOffset = sizeof(EntitySerialHeader);
-  pHeader->memberDataLength = bytesSerialised - sizeof(EntitySerialHeader);
-  pHeader->propertyDataOffset = pHeader->memberDataOffset + pHeader->memberDataLength;
+  
+  header.memberDataOffset = sizeof(EntitySerialHeader);
+  header.memberDataLength = bytesSerialised - sizeof(EntitySerialHeader);
+  header.propertyDataOffset = header.memberDataOffset + header.memberDataLength;
+  
   PropertyOwnerSerialiser pos(_entity);
   bytesSerialised += pos.serialise(serialiser);
-  pHeader = serialiser.reinterpretCast<EntitySerialHeader*>(initialSize);
-  pHeader->size = bytesSerialised;
-  pHeader->propertyDataLength = bytesSerialised - pHeader->propertyDataOffset;
+  
+  header.size = bytesSerialised;
+  header.propertyDataLength = bytesSerialised - header.propertyDataOffset;
+  
+  serialiser.overwrite<EntitySerialHeader>(initialSize, &header);
 
-  return pHeader->size;
+  return header.size;
 }
 
 std::shared_ptr<Entity> EntitySerialiser::unserialise(const char *serialData, std::size_t length) {
