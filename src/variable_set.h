@@ -120,6 +120,10 @@ class VariableSetRow {
     return _values.cend();
   }
 
+  std::vector<VariableSetValue> values() {
+    return _values;
+  }
+
   VariableSetRow& operator=(const VariableSetRow& row) {
     // moooove
     if (row._size != _size) throw std::runtime_error("Attempt to assign a row of a different size!");
