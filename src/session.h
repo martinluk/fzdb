@@ -9,7 +9,7 @@
 
 #include "./isession.h"
 
-#define CHUNK_LENGTH 2097152
+#define CHUNK_LENGTH 384
 #define OUT_CHUNK_LENGTH 1024
 
 using boost::asio::ip::tcp;
