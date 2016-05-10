@@ -527,6 +527,7 @@ describe("fzdb", function() {
         it("Deletes fine",function(done) {
           h.sendCmd("DELETE {$p} WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
             expect(data.status).toBe(true);
+            expect(data.result.data).toEqual('Deleted 0 entities 0 properties and 0 objects ');
             done();
           });
         });
@@ -568,6 +569,7 @@ describe("fzdb", function() {
         it("Deletes fine",function(done) {
           h.sendCmd("DELETE {$o} WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
             expect(data.status).toBe(true);
+            expect(data.result.data).toEqual('Deleted 0 entities 0 properties and 1 objects ');
             done();
           });
         });
@@ -609,6 +611,7 @@ describe("fzdb", function() {
         it("Deletes fine",function(done) {
           h.sendCmd("DELETE WHERE { entity:"+moeId+" <profession> $o}").then(function(data) {
             expect(data.status).toBe(true);
+            expect(data.result.data).toEqual('Deleted 0 entities 0 properties and 1 objects ');
             done();
           });
         });
@@ -655,12 +658,14 @@ describe("fzdb", function() {
         });
         it("no error when deleting profession",function(done) {
           h.sendCmd("DELETE {$p} WHERE { entity:"+moeId+" $p \"Bartender\"}").then(function(data) {
+            expect(data.result.data).toEqual('Deleted 0 entities 1 properties and 0 objects ');
             expect(data.status).toBe(true);
             done();
           });
         });
         it("no error when deleting forename",function(done) {
           h.sendCmd("DELETE {$p} WHERE { entity:"+moeId+" $p \"Moe\"}").then(function(data) {
+            expect(data.result.data).toEqual('Deleted 0 entities 1 properties and 0 objects ');
             expect(data.status).toBe(true);
             done();
           });
