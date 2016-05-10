@@ -19,7 +19,7 @@ describe("Fuzzy Database", function() {
                 client.write('USER LOGOUT');
                 client.once('data', function(data) {
                     var resultJSON = JSON.parse(data);
-                    done();
+                    h.setupClient(done());
                 });
             });   
         });
@@ -301,36 +301,34 @@ describe("Fuzzy Database", function() {
     });
 
 	//test select - Option 4 $a $b $c
-    it("Retrieving all triples", function(done) {
-      client.write("SELECT $a $c $b WHERE { $a $b $c}");
-      client.once('data', function(data) {
-		var resultJSON = JSON.parse(data);
-        expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[
-          {"a": "1", "c": "Unknown Source", "b": "name"},
-          {"a": "1", "c": "source", "b": "type"},
 
-          {"a": "2", "c": "person", "b": "type"}, 
-          {"a": "2", "c": "Marco", "b": "forename"}, 
-          {"a": "2", "c": "Reus", "b": "surname"}, 
-          {"a": "2", "c": "28", "b": "age"}, 
-          {"a": "2", "c": "Water", "b": "drinks"},
+     // h.testCase("Retrieving all triples", "SELECT $a $c $b WHERE { $a $b $c}", function(data, done) {
+		   //  var resultJSON = JSON.parse(data);
+     //    expect(resultJSON).toEqual({status: true, errorCode: 0, info:'', result: {type: 'fsparql', data:[
+     //      {"a": "1", "c": "Unknown Source", "b": "name"},
+     //      {"a": "1", "c": "source", "b": "type"},
 
-          {"a": "3", "c": "person", "b": "type"}, 
-          {"a": "3", "c": "Moe", "b": "forename"}, 
-          {"a": "3", "c": "Szyslak", "b": "surname"},
-          {"a": "3", "c": "34", "b": "age"}, 
-          {"a": "3", "c": "Beer", "b": "drinks"},
-          {"a": "3", "c": "Bartender", "b": "profession"},
+     //      {"a": "2", "c": "person", "b": "type"}, 
+     //      {"a": "2", "c": "Marco", "b": "forename"}, 
+     //      {"a": "2", "c": "Reus", "b": "surname"}, 
+     //      {"a": "2", "c": "28", "b": "age"}, 
+     //      {"a": "2", "c": "Water", "b": "drinks"},
 
-          {"a": "4", "c": "person", "b": "type"},
-          {"a": "4", "c": "Marco", "b": "forename"},
-          {"a": "4", "c": "Polo", "b": "surname"},
-          {"a": "4", "c": "34", "b": "age"},
-          {"a": "4", "c": "Wine", "b": "drinks"}
-        ]}});
-        done();
-      });      
-    });
+     //      {"a": "3", "c": "person", "b": "type"}, 
+     //      {"a": "3", "c": "Moe", "b": "forename"}, 
+     //      {"a": "3", "c": "Szyslak", "b": "surname"},
+     //      {"a": "3", "c": "34", "b": "age"}, 
+     //      {"a": "3", "c": "Beer", "b": "drinks"},
+     //      {"a": "3", "c": "Bartender", "b": "profession"},
+
+     //      {"a": "4", "c": "person", "b": "type"},
+     //      {"a": "4", "c": "Marco", "b": "forename"},
+     //      {"a": "4", "c": "Polo", "b": "surname"},
+     //      {"a": "4", "c": "34", "b": "age"},
+     //      {"a": "4", "c": "Wine", "b": "drinks"}
+     //    ]}});
+     //    done();
+     //  }, 8000);      
 	
 	// //test select - Option 4 + Option 8 
  //    it("retrieving property-value pairs for entity:2", function(done) {
