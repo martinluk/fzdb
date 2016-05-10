@@ -73,7 +73,7 @@ describe("fzdb", function() {
           });
         });
       });
-      del=function(cmd, testName) {
+      delE=function(cmd, testName) {
         it("status check" , function(done) {
           h.sendCmd(cmd).then(function(data) {
             expect(data.status).toBe(true);
@@ -121,11 +121,70 @@ describe("fzdb", function() {
         });
       }
 
-      oldMethod = "DELETE      WHERE { $a <forename> \"Fred\" . $a <surname> \"Jones\" }";
-      newMethod = "DELETE {$a} WHERE { $a <forename> \"Fred\" . $a <surname> \"Jones\" }";
+      delV=function(cmd, testName) {
+        it("status check" , function(done) {
+          h.sendCmd(cmd).then(function(data) {
+            expect(data.status).toBe(true);
+            expect(data.result.data).toEqual('Deleted 0 entities 0 properties and 1 objects ');
+            done();
+          });
+        });
 
-      del(newMethod,'newMethod');
-      del(oldMethod,'oldMethod');
+        describe(testName+' delete', function() {
+          beforeEach(function(done) {
+            h.sendCmd(cmd).then(function(data) {
+              expect(data.status).toBe(true);
+              expect(data.result.data).toEqual('Deleted 0 entities 0 properties and 1 objects ');
+              done();
+            });
+          });
+          it("Jones is here", function(done) {
+            h.sendCmd("SELECT $a WHERE { $a <surname> \"Jones\" }") .then(function(data) {
+              expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                result: ({type: 'fsparql', data:[({a: jonesId})]})}));
+              done();
+            });      
+          });
+          it("Smith is here", function(done) {
+            h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+              expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                result: ({type: 'fsparql', data:[({a: smithId})]})}));
+              done();
+            });      
+          });
+          it("Smith is called Fred", function(done) {
+            h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" . $a <surname> \"Smith\" }") .then(function(data) {
+              expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                result: ({type: 'fsparql', data:[({a: smithId})]})}));
+              done();
+            });      
+          });
+          it("No Jones is called Fred", function(done) {
+            h.sendCmd("SELECT $a WHERE { $a <forename> \"Fred\" . $a <surname> \"Jones\" }") .then(function(data) {
+              expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                result: ({type: 'fsparql', data:[]})}));
+              done();
+            });      
+          });
+          it("Bartender value is not wiped", function(done) {
+            h.sendCmd("SELECT $p WHERE { $a <surname> \"Jones\" ; <profession> $p }") .then(function(data) {
+              expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                result: ({type: 'fsparql', data:[({p: 'Bartender'})]})}));
+              done();
+            });      
+          });
+        });
+      }
+
+      oldMethodE = "DELETE      WHERE { $a <forename> \"Fred\" . $a <surname> \"Jones\" }";
+      newMethodE = "DELETE {$a} WHERE { $a <forename> \"Fred\" . $a <surname> \"Jones\" }";
+
+      delE(newMethodE,'newMethodE');
+      delE(oldMethodE,'oldMethodE');
+
+
+      q = "DELETE {$v} WHERE { $e <forename> $v ; <surname> \"Jones\"}";
+      delV(q,"Jones");
 
       describe('Sanity checks', function() {
         it("Jones is here", function(done) {

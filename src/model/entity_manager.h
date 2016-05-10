@@ -248,6 +248,8 @@ class EntityManager {
     return _propertyNames.get(str);
   }
 
+  std::tuple<int, int, int> DeleteFromVariableSetValue(std::vector<VariableSetValue> vals);
+
   // Basic Graph Processing - returns a list of the variables in conditions
 
   void Scan1(VariableSet&& variableSet, unsigned int variableId, const model::Predicate&& predicate, const model::Object&& object, const std::string&& metaVar, const QuerySettings&& settings) const;
