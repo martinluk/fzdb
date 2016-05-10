@@ -34,14 +34,6 @@ describe("fzdb", function() {
                 });          
             });
 
-            it("Delete query with variable selector", function(done) {
-                h.sendCmd("DELETE { $x } WHERE {$x <forename> \"Fred\"}").then(function(data) {
-                    expect(data.status).toBe(true);
-                    stat=data.status;
-                    done();
-                });
-            });
-
             describe("Deleting Fred from DB", function() {
                 beforeEach(function(done) {
                     var stat;
@@ -68,11 +60,11 @@ describe("fzdb", function() {
                 h.sendCmd('FLUSH').then(function(data) {
                     expect(data.status).toBe(true);
                     expect(data.result.data).toEqual("Database cleared.");
-                    h.sendCmd("INSERT DATA { $a <forename> \"Fred\" . $a <surname> \"Jones\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                    h.sendCmd("INSERT DATA { $a <forename> \"Fred\" . $a <surname> \"Jones\" . $a <profession> \"Bartender\"} WHERE { NEW($a,\"person\") }").then(function(data) {
                         expect(data.status).toBe(true);
                         expect(data.result.data.a).not.toBeNull();
                         jonesId = data.result.data.a;
-                        h.sendCmd("INSERT DATA { $a <forename> \"Fred\" . $a <surname> \"Smith\" } WHERE { NEW($a,\"person\") }").then(function(data) {
+                        h.sendCmd("INSERT DATA { $a <forename> \"Fred\" . $a <surname> \"Smith\" . $a <profession> \"Singer\"} WHERE { NEW($a,\"person\") }").then(function(data) {
                             expect(data.status).toBe(true);
                             expect(data.result.data.a).not.toBeNull();
                             smithId = data.result.data.a;
@@ -108,6 +100,20 @@ describe("fzdb", function() {
                     });
                     it("Smith is here", function(done) {
                         h.sendCmd("SELECT $a WHERE { $a <surname> \"Smith\" }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[({a: smithId})]})}));
+                            done();
+                        });      
+                    });
+                    it("Assert clean up", function(done) {
+                        h.sendCmd("SELECT $a $b WHERE { entity:"+jonesId+" $a $b }") .then(function(data) {
+                            expect(data).toEqual(({status: true, errorCode: 0, info:'',
+                                result: ({type: 'fsparql', data:[]})}));
+                            done();
+                        });      
+                    });
+                    it("Smith is still a singer", function(done) {
+                        h.sendCmd("SELECT $a WHERE { $a <profession> \"Singer\" }") .then(function(data) {
                             expect(data).toEqual(({status: true, errorCode: 0, info:'',
                                 result: ({type: 'fsparql', data:[({a: smithId})]})}));
                             done();
