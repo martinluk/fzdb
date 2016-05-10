@@ -6,7 +6,9 @@ describe("fzdb", function() {
     h.setupClient();
     h.sendCmd(h.loginToAdminQuery).then(function(data) {
       expect(data.result.data).toEqual('Logged in successfully.');
-      done(); 
+      h.sendCmd('FLUSH').then(function(data) {
+        done(); 
+      });
     });
   });
   afterEach(function(done) {
