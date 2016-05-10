@@ -41,7 +41,7 @@ var sendCmd = function(cmd) {
 };
 
 
-fs.readFile('liverpool_full.fuz', 'utf8', function (err,dataFile) {
+fs.readFile('liverpool_person.fuz', 'utf8', function (err,dataFile) {
   if (err) {
     return console.log(err);
   }
